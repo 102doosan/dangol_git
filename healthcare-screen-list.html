@@ -64,7 +64,7 @@
     .screen-item.done-item { background: #F0FFF4; }
     .checkbox {
       width: 20px; height: 20px; border-radius: 6px; border: 2px solid #CBD5E0;
-      flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+      display: flex; align-items: center; justify-content: center;
       transition: all 0.2s; margin-top: 1px;
     }
     .checkbox.on::after { content: '✓'; color: #fff; font-size: 11px; font-weight: 900; }
@@ -72,7 +72,7 @@
     .screen-name { font-size: 14px; font-weight: 700; color: #2D3748; }
     .screen-name.done { text-decoration: line-through; color: #A0AEC0; }
     .screen-desc { font-size: 12px; color: #A0AEC0; margin-top: 2px; }
-    .screen-right { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+    .screen-right { display: flex; align-items: center; gap: 6px; }
     .priority-badge { font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 99px; }
     .dev-badge { font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 99px; background: #EDF2F7; color: #718096; }
 
@@ -93,10 +93,9 @@
     .tab-btn.active { background: #4F9CF9; color: #fff; box-shadow: 0 2px 8px rgba(79,156,249,0.35); }
     .tab-progress { font-size: 11px; font-weight: 600; margin-top: 2px; opacity: 0.7; }
 
-    .subtabs { display: flex; gap: 6px; margin-bottom: 16px; overflow-x: auto; padding-bottom: 4px; scrollbar-width: none; }
-    .subtabs::-webkit-scrollbar { display: none; }
+    .subtabs { display: flex; gap: 6px; margin-bottom: 16px; flex-wrap: wrap; }
     .subtab-btn {
-      flex-shrink: 0; padding: 5px 12px; border-radius: 99px; border: none; cursor: pointer;
+      padding: 5px 12px; border-radius: 99px; border: none; cursor: pointer;
       font-size: 12px; font-weight: 700; font-family: 'Noto Sans KR', sans-serif;
       transition: all 0.2s; background: #fff; color: #718096;
       box-shadow: 0 1px 3px rgba(0,0,0,0.08); white-space: nowrap;
