@@ -84,7 +84,7 @@
     .legend-item { display: flex; align-items: center; gap: 5px; font-size: 12px; color: #718096; font-weight: 600; }
     .legend-dot { width: 10px; height: 10px; border-radius: 3px; }
 
-    .tabs { display: flex; gap: 4px; margin-bottom: 20px; background: #fff; border-radius: 14px; padding: 6px; box-shadow: 0 1px 6px rgba(0,0,0,0.07); }
+    .tabs { display: flex; gap: 4px; margin-bottom: 10px; background: #fff; border-radius: 14px; padding: 6px; box-shadow: 0 1px 6px rgba(0,0,0,0.07); }
     .tab-btn {
       flex: 1; padding: 10px; border: none; border-radius: 10px; cursor: pointer;
       font-size: 14px; font-weight: 700; font-family: 'Noto Sans KR', sans-serif;
@@ -92,6 +92,16 @@
     }
     .tab-btn.active { background: #4F9CF9; color: #fff; box-shadow: 0 2px 8px rgba(79,156,249,0.35); }
     .tab-progress { font-size: 11px; font-weight: 600; margin-top: 2px; opacity: 0.7; }
+
+    .subtabs { display: flex; gap: 6px; margin-bottom: 16px; overflow-x: auto; padding-bottom: 4px; scrollbar-width: none; }
+    .subtabs::-webkit-scrollbar { display: none; }
+    .subtab-btn {
+      flex-shrink: 0; padding: 5px 12px; border-radius: 99px; border: none; cursor: pointer;
+      font-size: 12px; font-weight: 700; font-family: 'Noto Sans KR', sans-serif;
+      transition: all 0.2s; background: #fff; color: #718096;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.08); white-space: nowrap;
+    }
+    .subtab-btn.active { background: #4F9CF9; color: #fff; box-shadow: 0 2px 6px rgba(79,156,249,0.35); }
   </style>
 </head>
 <body>
@@ -113,6 +123,7 @@
   <div class="filters" id="filters"></div>
 
   <div class="tabs" id="tabs"></div>
+  <div class="subtabs" id="subtabs"></div>
   <div id="tab-content"></div>
 
   <div class="legend">
@@ -380,6 +391,7 @@ const priorityStyle = {
 let checked = {};
 let activeFilter = "전체";
 let activeTab = "user";
+let activeSubTab = "all";
 let openCats = {};
 allData.forEach(c => openCats[c.id] = true);
 
@@ -405,7 +417,8 @@ function updateStats() {
 }
 
 function setFilter(f) { activeFilter = f; render(); }
-function setTab(t) { activeTab = t; render(); }
+function setTab(t) { activeTab = t; activeSubTab = "all"; render(); }
+function setSubTab(id) { activeSubTab = id; render(); }
 function toggleCheck(id) { checked[id] = !checked[id]; render(); }
 function toggleCat(id) { openCats[id] = !openCats[id]; render(); }
 
@@ -464,8 +477,17 @@ function render() {
       <div class="tab-progress">${tabProgress(t.id)}</div>
     </button>`
   ).join('');
+
   const cats = activeTab === "user" ? userData : adminData;
-  document.getElementById('tab-content').innerHTML = renderCats(cats);
+  const subtabAll = {id:"all", icon:"📋", title:"전체"};
+  document.getElementById('subtabs').innerHTML = [subtabAll, ...cats].map(c => {
+    const screens = c.id === "all" ? cats.flatMap(x => x.screens) : c.screens;
+    const done = screens.filter(s => checked[s.id]).length;
+    return `<button class="subtab-btn ${activeSubTab===c.id?'active':''}" onclick="setSubTab('${c.id}')">${c.icon ? c.icon+' ' : ''}${c.title} <span style="opacity:0.7;font-size:10px">${done}/${screens.length}</span></button>`;
+  }).join('');
+
+  const visibleCats = activeSubTab === "all" ? cats : cats.filter(c => c.id === activeSubTab);
+  document.getElementById('tab-content').innerHTML = renderCats(visibleCats);
 }
 
 render();
