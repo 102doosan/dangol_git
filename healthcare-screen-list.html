@@ -83,6 +83,15 @@
     .legend { display: flex; gap: 16px; justify-content: center; margin-top: 20px; flex-wrap: wrap; }
     .legend-item { display: flex; align-items: center; gap: 5px; font-size: 12px; color: #718096; font-weight: 600; }
     .legend-dot { width: 10px; height: 10px; border-radius: 3px; }
+
+    .tabs { display: flex; gap: 4px; margin-bottom: 20px; background: #fff; border-radius: 14px; padding: 6px; box-shadow: 0 1px 6px rgba(0,0,0,0.07); }
+    .tab-btn {
+      flex: 1; padding: 10px; border: none; border-radius: 10px; cursor: pointer;
+      font-size: 14px; font-weight: 700; font-family: 'Noto Sans KR', sans-serif;
+      transition: all 0.2s; background: transparent; color: #A0AEC0;
+    }
+    .tab-btn.active { background: #1A202C; color: #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
+    .tab-progress { font-size: 11px; font-weight: 600; margin-top: 2px; opacity: 0.7; }
   </style>
 </head>
 <body>
@@ -103,15 +112,8 @@
   </div>
   <div class="filters" id="filters"></div>
 
-  <div class="section-label">🙍 사용자 앱</div>
-  <div id="user-cats"></div>
-
-  <div class="divider">
-    <div class="divider-line"></div>
-    <div class="divider-text">🖥️ 관리자 페이지</div>
-    <div class="divider-line"></div>
-  </div>
-  <div id="admin-cats"></div>
+  <div class="tabs" id="tabs"></div>
+  <div id="tab-content"></div>
 
   <div class="legend">
     <div class="legend-item"><div class="legend-dot" style="background:#E53E3E"></div>필수</div>
@@ -377,10 +379,12 @@ const priorityStyle = {
 
 let checked = {};
 let activeFilter = "전체";
+let activeTab = "user";
 let openCats = {};
 allData.forEach(c => openCats[c.id] = true);
 
 function allScreens() { return allData.flatMap(c => c.screens); }
+function tabScreens(tab) { return (tab === "user" ? userData : adminData).flatMap(c => c.screens); }
 
 function updateStats() {
   const all = allScreens();
@@ -401,11 +405,18 @@ function updateStats() {
 }
 
 function setFilter(f) { activeFilter = f; render(); }
+function setTab(t) { activeTab = t; render(); }
 function toggleCheck(id) { checked[id] = !checked[id]; render(); }
 function toggleCat(id) { openCats[id] = !openCats[id]; render(); }
 
-function renderCats(cats, containerId) {
-  document.getElementById(containerId).innerHTML = cats.map(cat => {
+function tabProgress(tab) {
+  const screens = tabScreens(tab);
+  const done = screens.filter(s => checked[s.id]).length;
+  return `${done}/${screens.length}`;
+}
+
+function renderCats(cats) {
+  return cats.map(cat => {
     const filtered = activeFilter === "전체" ? cat.screens : cat.screens.filter(s => s.priority === activeFilter);
     if (!filtered.length) return '';
     const catDone = filtered.filter(s => checked[s.id]).length;
@@ -444,8 +455,17 @@ function render() {
   document.getElementById('filters').innerHTML = ["전체","필수","권장","선택"].map(f =>
     `<button class="filter-btn ${activeFilter===f?'active':''}" onclick="setFilter('${f}')">${f}</button>`
   ).join('');
-  renderCats(userData, 'user-cats');
-  renderCats(adminData, 'admin-cats');
+  document.getElementById('tabs').innerHTML = [
+    {id:"user", label:"🙍 사용자 앱"},
+    {id:"admin", label:"🖥️ 관리자"}
+  ].map(t => `
+    <button class="tab-btn ${activeTab===t.id?'active':''}" onclick="setTab('${t.id}')">
+      ${t.label}
+      <div class="tab-progress">${tabProgress(t.id)}</div>
+    </button>`
+  ).join('');
+  const cats = activeTab === "user" ? userData : adminData;
+  document.getElementById('tab-content').innerHTML = renderCats(cats);
 }
 
 render();
