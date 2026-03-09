@@ -31,7 +31,7 @@
     .progress-label { font-size: 13px; font-weight: 700; color: #4A5568; }
     .progress-val { font-size: 13px; font-weight: 900; color: #4F9CF9; }
     .progress-bar { background: #EDF2F7; border-radius: 99px; height: 8px; overflow: hidden; }
-    .progress-fill { height: 100%; background: linear-gradient(90deg, #4F9CF9, #9B6DFF); border-radius: 99px; transition: width 0.4s ease; }
+    .progress-fill { height: 100%; max-width: 100%; background: linear-gradient(90deg, #4F9CF9, #9B6DFF); border-radius: 99px; transition: width 0.4s ease; }
 
     .filters { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
     .filter-btn {
@@ -401,7 +401,7 @@ function updateStats() {
   const all = allScreens();
   const total = all.length;
   const done = all.filter(s => checked[s.id]).length;
-  const pct = total ? Math.round(done/total*100) : 0;
+  const pct = total ? Math.min(100, Math.round(done/total*100)) : 0;
   const byP = {"필수":0,"권장":0,"선택":0};
   all.forEach(s => byP[s.priority]++);
   document.getElementById('stats').innerHTML = `
