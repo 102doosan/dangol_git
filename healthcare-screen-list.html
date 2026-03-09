@@ -350,7 +350,16 @@ const adminData = [
     ]
   },
   {
-    id:"a-prescription", icon:"💊", title:"운동처방 관리", color:"#E67E22",
+    id:"a-my-prescription", icon:"💊", title:"My 운동처방 관리", color:"#E67E22",
+    screens:[
+      {id:"amp01",name:"회원별 My 운동처방 현황",desc:"회원 검색 → 해당 회원의 처방 내역 목록 조회 · 처방일·운동 등급·처방 트레이너 표시 · 사용자 앱과 동일한 뷰로 확인",priority:"필수",dev:"FE/BE"},
+      {id:"amp02",name:"처방 상세 조회",desc:"특정 처방의 운동 목록·순서·세트·횟수 확인 · 트레이너 메모 포함 · 회원이 보는 화면과 동일한 내용",priority:"필수",dev:"FE/BE"},
+      {id:"amp03",name:"운동 진행 / 완료 이력",desc:"회원이 해당 처방으로 운동 진행한 이력 · 수행일·완료 여부·소요 시간 · 회차별 상세 확인",priority:"필수",dev:"FE/BE"},
+      {id:"amp04",name:"처방 신청 접수 관리",desc:"회원이 신청한 처방 요청 목록 · 신청 상태(대기·처리중·완료·반려) 관리 · 반려 시 사유 입력 · 처리 담당 트레이너 지정",priority:"필수",dev:"FE/BE"},
+    ]
+  },
+  {
+    id:"a-prescription", icon:"📝", title:"운동처방 관리", color:"#E67E22",
     screens:[
       {id:"ap01",name:"회원 운동처방 목록",desc:"전체·지점별 처방 현황 조회 · 회원 검색 & 필터 · [상단] 전체 회원 대비 처방 관리 회원 비율 차트 · 처방 완료·미처방·처방 대기 현황 요약",priority:"필수",dev:"FE/BE"},
       {id:"ap05",name:"처방 회원 현황 통계",desc:"처방받은 회원 목록 · 미처방 회원 목록 · 전체 회원 중 관리 회원 비율 · 지점별·기간별 필터",priority:"권장",dev:"FE/BE"},
