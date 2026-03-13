@@ -135,9 +135,9 @@
   <div id="tab-content"></div>
 
   <div class="legend">
-    <div class="legend-item"><div class="legend-dot" style="background:#E53E3E"></div>필수</div>
-    <div class="legend-item"><div class="legend-dot" style="background:#D97706"></div>권장</div>
-    <div class="legend-item"><div class="legend-dot" style="background:#38A169"></div>선택</div>
+    <div class="legend-item">🖥️ 화면개발</div>
+    <div class="legend-item">⚙️ 서버개발</div>
+    <div class="legend-item">🖥️⚙️ 둘다</div>
   </div>
 </div>
 
@@ -579,13 +579,8 @@ function updateStats() {
   const total = all.length;
   const done = all.filter(s => isScreenDone(s)).length;
   const pct = total ? Math.min(100, Math.round(done/total*100)) : 0;
-  const byP = {"필수":0,"권장":0,"선택":0};
-  all.forEach(s => byP[s.priority]++);
   document.getElementById('stats').innerHTML = `
     <div class="stat-box"><div class="stat-num" style="color:#4F9CF9">${total}</div><div class="stat-label">전체 화면</div></div>
-    <div class="stat-box"><div class="stat-num" style="color:#E53E3E">${byP["필수"]}</div><div class="stat-label">필수</div></div>
-    <div class="stat-box"><div class="stat-num" style="color:#D97706">${byP["권장"]}</div><div class="stat-label">권장</div></div>
-    <div class="stat-box"><div class="stat-num" style="color:#38A169">${byP["선택"]}</div><div class="stat-label">선택</div></div>
     <div class="stat-box"><div class="stat-num" style="color:#9B6DFF">${done}</div><div class="stat-label">완료</div></div>
   `;
   document.getElementById('progress-val').textContent = `${done} / ${total} (${pct}%)`;
@@ -633,8 +628,7 @@ function renderCats(cats) {
             ${subHtml}
           </div>
           <div class="screen-right">
-            <span class="priority-badge" style="background:${p.bg};color:${p.color};border:1px solid ${p.border}">${s.priority}</span>
-            <span class="dev-badge">${s.dev}</span>
+            <span class="dev-badge">${s.dev==='FE'?'🖥️ 화면':s.dev==='BE'?'⚙️ 서버':'🖥️⚙️ 둘다'}</span>
           </div>
         </div>`;
     }).join('') : '';
@@ -653,9 +647,7 @@ function renderCats(cats) {
 
 function render() {
   updateStats();
-  document.getElementById('filters').innerHTML = ["전체","필수","권장","선택"].map(f =>
-    `<button class="filter-btn ${activeFilter===f?'active':''}" onclick="setFilter('${f}')">${f}</button>`
-  ).join('');
+  document.getElementById('filters').innerHTML = '';
   document.getElementById('tabs').innerHTML = [
     {id:"user", label:"🙍 사용자 앱"},
     {id:"admin", label:"🖥️ 관리자"}
