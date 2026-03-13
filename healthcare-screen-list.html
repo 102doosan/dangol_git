@@ -232,6 +232,14 @@ const userData = [
     ]
   },
   {
+    id:"lesson", icon:"🎓", title:"레슨", color:"#F6AD55",
+    screens:[
+      {id:"ls01",name:"레슨 캘린더",desc:"월별 캘린더 뷰 · 레슨 있는 날짜에 색상 동그라미 표시 · 날짜 클릭 시 해당일 레슨 목록 표시",priority:"필수",dev:"FE/BE"},
+      {id:"ls02",name:"레슨 예정 목록",desc:"오늘 기준 예정된 레슨 리스트 · 레슨 날짜·시간·종류·담당 선생님 표시 · 최신순 정렬",priority:"필수",dev:"FE/BE"},
+      {id:"ls03",name:"레슨 상세",desc:"선택한 레슨의 날짜·시간·종류·담당 선생님·장소·메모 확인",priority:"필수",dev:"FE/BE"},
+    ]
+  },
+  {
     id:"routine", icon:"🔄", title:"마이루틴", color:"#9B6DFF",
     screens:[
       {id:"s15",name:"루틴 홈",desc:"등록된 루틴 목록 & 오늘 진행 현황 · 운동법에서 만든 나만의 운동 포함",priority:"필수",dev:"FE/BE"},
@@ -399,6 +407,16 @@ const adminData = [
       {id:"as04",name:"SFMA 결과 상세 조회",desc:"특정 회차 결과 상세 · 항목별 점수·코멘트 확인 · 회원이 보는 화면과 동일한 내용",priority:"필수",dev:"FE/BE"},
       {id:"as05",name:"SFMA 결과 비교 조회",desc:"회원의 과거 측정 회차 비교 · 항목별 점수 변화 차트 · 개선·악화 항목 하이라이트",priority:"필수",dev:"FE/BE"},
       {id:"as06",name:"SFMA 전체 현황 통계",desc:"전체·지점별 측정 완료 회원 현황 · 미측정 회원 목록 · 기간별 측정 건수 차트",priority:"권장",dev:"FE/BE"},
+    ]
+  },
+  {
+    id:"a-lesson", icon:"🎓", title:"레슨 관리", color:"#F6AD55",
+    screens:[
+      {id:"al01",name:"레슨 일정 목록",desc:"전체 레슨 일정 조회 · 선생별·요일별·시간별 필터 · 캘린더 뷰 / 리스트 뷰 전환",priority:"필수",dev:"FE/BE"},
+      {id:"al02",name:"레슨 등록",desc:"레슨 종류 입력 · 담당 선생님 선택 · 요일·시간 설정 · 반복 주기 설정(매주·격주·특정일) · 대상 회원 지정 · 장소·메모 입력",priority:"필수",dev:"FE/BE"},
+      {id:"al03",name:"레슨 수정",desc:"등록된 레슨 내용 수정 · 단건 수정 / 반복 일정 전체 수정 선택",priority:"필수",dev:"FE/BE"},
+      {id:"al04",name:"레슨 삭제",desc:"레슨 삭제 확인 다이얼로그 · 단건 삭제 / 반복 일정 전체 삭제 선택",priority:"필수",dev:"FE/BE"},
+      {id:"al05",name:"선생별 레슨 현황",desc:"선생님별 담당 레슨 목록 · 주간 스케줄 뷰 · 시간대별 배정 현황",priority:"권장",dev:"FE/BE"},
     ]
   },
   {
