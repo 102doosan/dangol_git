@@ -286,7 +286,30 @@ const userData = [
     ]
   },
   {
-    id:"mypage", icon:"👤", title:"마이페이지", color:"#76E4F7",
+    id:"store", icon:"🛒", title:"스토어", color:"#F472B6",
+    screens:[
+      {id:"st01",name:"스토어 홈",desc:"상품 카테고리 목록 · 추천·신상·인기 상품 배너 · 검색",priority:"필수",dev:"FE/BE"},
+      {id:"st02",name:"상품 목록",desc:"카테고리별 상품 리스트 · 가격·이름·썸네일 표시 · 필터(가격순·인기순)",priority:"필수",dev:"FE/BE"},
+      {id:"st03",name:"상품 상세",desc:"상품 이름·설명·이미지·가격·옵션 선택 · [장바구니 담기] · [바로 구매] 버튼",priority:"필수",dev:"FE/BE"},
+      {id:"st04",name:"장바구니",desc:"담은 상품 목록 · 수량 변경 · 선택 삭제 · 총 금액 합계 · [주문하기] 버튼",priority:"필수",dev:"FE/BE"},
+      {id:"st05",name:"주문 / 결제",desc:"배송지 입력 · 결제 수단 선택 · 최종 금액 확인 · 결제 완료",priority:"필수",dev:"FE/BE"},
+      {id:"st06",name:"주문 완료",desc:"주문 번호 · 배송 예정일 안내 · [주문 내역 보기] 버튼",priority:"필수",dev:"FE/BE"},
+      {id:"st07",name:"주문 내역",desc:"과거 주문 목록 · 주문일·상품명·금액·상태(배송중·완료·취소) 표시",priority:"필수",dev:"FE/BE"},
+      {id:"st08",name:"주문 상세",desc:"단건 주문 상세 · 배송 현황 · 취소·반품 신청",priority:"권장",dev:"FE/BE"},
+    ]
+  },
+  {
+    id:"myrecord", icon:"📈", title:"나의기록", color:"#4ECDC4",
+    screens:[
+      {id:"mr01",name:"나의기록 홈",desc:"신체 정보 요약(키·몸무게·체지방·근육량) · 최근 운동 기록 · 이번 달 달성 현황 · 각 항목 클릭 시 상세 진입",priority:"필수",dev:"FE/BE"},
+      {id:"mr02",name:"신체 기록",desc:"몸무게·체지방률·근육량·체수분 등 측정값 입력 · 날짜별 기록 목록 · 변화 추이 차트",priority:"필수",dev:"FE/BE"},
+      {id:"mr03",name:"신체 기록 상세 / 수정",desc:"특정 날짜 기록 상세 확인 · 수정 · 삭제",priority:"필수",dev:"FE/BE"},
+      {id:"mr04",name:"운동 기록 캘린더",desc:"월별 캘린더 뷰 · 운동한 날 색상 표시 · 날짜 클릭 시 해당일 운동 목록 확인",priority:"필수",dev:"FE/BE"},
+      {id:"mr05",name:"운동 기록 통계",desc:"주간·월간 운동 횟수·시간·칼로리 차트 · 부위별 운동 비율",priority:"권장",dev:"FE/BE"},
+    ]
+  },
+  {
+    id:"mypage", icon:"👤", title:"프로필", color:"#76E4F7",
     screens:[
       {id:"s41",name:"프로필",desc:"이름, 사진, 기본 정보 확인 · 주거지역 · 가입경로 확인",priority:"필수",dev:"FE/BE"},
       {id:"s42",name:"프로필 수정",desc:"신체정보, 이름, 사진 수정",priority:"필수",dev:"FE/BE"},
@@ -374,6 +397,25 @@ const adminData = [
       {id:"a16b",name:"배너 광고 관리",desc:"메인 배너 이미지/동영상 등록·수정·삭제 · 노출 순서 및 기간 설정 · 클릭 랜딩 URL 설정",priority:"필수",dev:"FE/BE"},
       {id:"a16c",name:"팝업 광고 관리",desc:"앱 진입 팝업 이미지 등록·수정·삭제 · 노출 기간 & 대상 설정",priority:"권장",dev:"FE/BE"},
       {id:"a19",name:"루틴 템플릿 관리",desc:"추천 루틴 템플릿 등록 & 수정",priority:"선택",dev:"FE/BE"},
+    ]
+  },
+  {
+    id:"a-store", icon:"🛒", title:"스토어 관리", color:"#F472B6",
+    screens:[
+      {id:"ast01",name:"상품 목록",desc:"등록된 상품 전체 조회 · 카테고리·상태(판매중·품절·숨김) 필터 · 검색",priority:"필수",dev:"FE/BE"},
+      {id:"ast02",name:"상품 등록 / 수정",desc:"상품명·카테고리·가격·옵션·설명·이미지 등록 & 수정 · 판매 상태 설정",priority:"필수",dev:"FE/BE"},
+      {id:"ast03",name:"상품 삭제 / 숨김",desc:"상품 삭제 또는 판매 일시 중단 처리",priority:"필수",dev:"FE/BE"},
+      {id:"ast04",name:"주문 목록",desc:"전체 주문 조회 · 주문일·회원·상품·금액·배송 상태 필터 · 검색",priority:"필수",dev:"FE/BE"},
+      {id:"ast05",name:"주문 상세 / 처리",desc:"단건 주문 상세 · 배송 상태 변경 · 송장 번호 입력 · 취소·반품 처리",priority:"필수",dev:"FE/BE"},
+      {id:"ast06",name:"매출 현황",desc:"기간별 스토어 매출 합계 · 상품별 판매량 차트 · 인기 상품 TOP",priority:"권장",dev:"FE/BE"},
+    ]
+  },
+  {
+    id:"a-myrecord", icon:"📈", title:"나의기록 관리", color:"#4ECDC4",
+    screens:[
+      {id:"amr01",name:"회원별 신체 기록 조회",desc:"회원 검색 → 신체 기록 이력(몸무게·체지방·근육량) · 날짜별 목록 · 변화 추이 차트",priority:"권장",dev:"FE/BE"},
+      {id:"amr02",name:"회원별 운동 기록 조회",desc:"회원 검색 → 운동 기록 캘린더 및 목록 · 운동 횟수·시간·칼로리 통계",priority:"권장",dev:"FE/BE"},
+      {id:"amr03",name:"전체 회원 기록 현황",desc:"기록 입력 활성 회원 현황 · 미기록 회원 목록 · 지점별·기간별 필터",priority:"선택",dev:"FE/BE"},
     ]
   },
   {
