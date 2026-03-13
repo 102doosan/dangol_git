@@ -167,13 +167,8 @@ const userData = [
       {id:"s13",name:"홈 대시보드",desc:"[최상단] 광고 배너(5초 자동 슬라이드) · ① 입장하기 QR · ② 현재 회원권 & 이용지점 표시 · ③ 오늘의 운동 · ④ My 운동처방 · ⑤ 운동법 · ⑥ 재활운동 · ⑦ SFMA 결과 · ⑧ 레슨 현황 · ⑨ My 루틴 · ⑩ 운동검진 · ⑪ 상품결제 스토어 · ⑫ 나의 기록 · ⑬ 프로필 수정 · ⑭ 알림센터(종 아이콘) · 하단 홈 버튼",priority:"필수",dev:"FE/BE"},
       {id:"s14",name:"알림 센터 (목록)",desc:"우측 상단 종(🔔) 아이콘 진입 · 미읽음 빨간 뱃지(숫자) · 읽지않음(진한 텍스트+파란 점) / 읽음(회색 처리) · 모두 읽음 · 개별 X 삭제 / 전체 삭제 · 유형 태그(시스템·이벤트·레슨) · 상대 시간 표시 · 빈 상태 화면",priority:"필수",dev:"FE/BE"},
       {id:"s14b",name:"알림 상세 (딥링크)",desc:"알림 항목 클릭 시 관련 화면으로 바로 이동 · 레슨 알림 → 레슨 상세 / 이벤트 알림 → 이벤트 페이지 등 유형별 이동 처리 · 알림 수신 설정은 마이페이지에서 ON/OFF",priority:"필수",dev:"FE/BE"},
-    ]
-  },
-  {
-    id:"banner", icon:"📢", title:"광고 / 배너", color:"#FF6B35",
-    screens:[
-      {id:"b01",name:"메인 광고 배너",desc:"홈 최상단 5초 자동 슬라이드 배너 · 이미지/동영상 지원 · 배너 클릭 시 랜딩 URL 이동",priority:"필수",dev:"FE/BE"},
-      {id:"b02",name:"팝업 광고",desc:"앱 진입 시 1회 노출 팝업 · '오늘 하루 보지 않기' 옵션",priority:"권장",dev:"FE/BE"},
+      {id:"b01",name:"메인 광고 배너",section:"📢 광고 / 배너",desc:"홈 최상단 5초 자동 슬라이드 배너 · 이미지/동영상 지원 · 배너 클릭 시 랜딩 URL 이동",priority:"필수",dev:"FE/BE"},
+      {id:"b02",name:"팝업 광고",section:"📢 광고 / 배너",desc:"앱 진입 시 1회 노출 팝업 · '오늘 하루 보지 않기' 옵션",priority:"권장",dev:"FE/BE"},
     ]
   },
   {
@@ -184,17 +179,9 @@ const userData = [
     ]
   },
   {
-    id:"mycard", icon:"💳", title:"내 회원권", color:"#6C63FF",
+    id:"prescription-request", icon:"📋", title:"운동처방 신청", color:"#20C997",
     screens:[
-      {id:"m01",name:"현재 회원권 현황",desc:"현재 등록된 회원권 이름·기간·잔여일 표시 · [우측] 이용 중인 센터 지점명 표시",priority:"필수",dev:"FE/BE"},
-      {id:"m03",name:"이용 지점 변경",desc:"등록된 센터 지점 목록에서 선택 · 변경 시 확인 다이얼로그 · 변경 이력 저장",priority:"필수",dev:"FE/BE"},
-      {id:"m02",name:"회원권 & 결제 이력",desc:"과거 구매한 회원권 목록 · 결제일·금액·종류 확인 · 영수증 상세 보기",priority:"필수",dev:"FE/BE"},
-    ]
-  },
-  {
-    id:"prescription-request", icon:"📋", title:"운동처방 관리", color:"#20C997",
-    screens:[
-      {id:"pr01",name:"운동처방 관리 메인",desc:"처방 신청 현황 확인 · 신청 버튼 · 신청 상태(대기중·완료·반려) 표시",priority:"필수",dev:"FE/BE"},
+      {id:"pr01",name:"운동처방 신청 메인",desc:"처방 신청 현황 확인 · 신청 버튼 · 신청 상태(대기중·완료·반려) 표시",priority:"필수",dev:"FE/BE"},
       {id:"pr02",name:"처방 신청서 작성",desc:"트레이너에게 처방 요청 · 운동 목표 선택 · 현재 불편 사항 입력 · 희망 운동 강도 선택",priority:"필수",dev:"FE/BE"},
       {id:"pr03",name:"신체 정보 입력",desc:"키·몸무게·체지방률 입력 · 불편 부위 체크(어깨·허리·무릎·목 등) · 과거 부상 이력 입력",priority:"필수",dev:"FE/BE"},
       {id:"pr04",name:"운동 검진 / SFMA 평가",desc:"SFMA(선택적 기능 동작 평가) 항목 응답 · 동작 수행 여부 체크 · 평가 결과 확인",priority:"권장",dev:"FE/BE"},
@@ -264,10 +251,11 @@ const userData = [
   {
     id:"membership", icon:"🎫", title:"회원권 관리", color:"#F6AD55",
     screens:[
-      {id:"s29",name:"회원권 홈",desc:"현재 이용 중인 회원권 현황",priority:"필수",dev:"FE/BE"},
+      {id:"m01",name:"현재 회원권 현황",desc:"현재 등록된 회원권 이름·기간·잔여일 표시 · 이용 중인 센터 지점명 표시",priority:"필수",dev:"FE/BE"},
+      {id:"m03",name:"이용 지점 변경",desc:"등록된 센터 지점 목록에서 선택 · 변경 시 확인 다이얼로그 · 변경 이력 저장",priority:"필수",dev:"FE/BE"},
       {id:"s30",name:"회원권 목록 / 구매",desc:"이용 가능한 플랜 선택 & 구매",priority:"필수",dev:"FE/BE"},
       {id:"s31",name:"회원권 상세",desc:"혜택, 기간, 이용 조건 안내",priority:"필수",dev:"FE/BE"},
-      {id:"s32",name:"회원권 이력",desc:"과거 이용 회원권 목록",priority:"권장",dev:"FE/BE"},
+      {id:"m02",name:"회원권 & 결제 이력",desc:"과거 구매한 회원권 목록 · 결제일·금액·종류 확인 · 영수증 상세 보기",priority:"필수",dev:"FE/BE"},
       {id:"s33",name:"회원권 만료 안내",desc:"만료 D-7 알림 & 연장 유도",priority:"권장",dev:"FE/BE"},
     ]
   },
@@ -306,6 +294,7 @@ const userData = [
       {id:"s45",name:"약관",section:"⚙️ 설정",desc:"개인정보 처리방침 · 이용약관 (웹뷰 or 인앱 표시)",priority:"필수",dev:"FE"},
       {id:"s47",name:"앱 정보 · 고객센터",section:"⚙️ 설정",desc:"앱 버전 정보 · 고객센터 문의 연결",priority:"권장",dev:"FE"},
       {id:"s48",name:"계정 관리",section:"⚙️ 설정",desc:"로그아웃 확인 다이얼로그 · 회원 탈퇴(사유 수집 & 데이터 삭제 처리)",priority:"필수",dev:"FE/BE"},
+      {id:"s53",name:"공지사항",section:"⚙️ 설정",desc:"앱 내 공지 목록 & 상세",priority:"선택",dev:"FE/BE"},
     ]
   },
   {
@@ -314,7 +303,6 @@ const userData = [
       {id:"s50",name:"에러 페이지",desc:"네트워크 오류, 서버 오류 안내",priority:"필수",dev:"FE"},
       {id:"s51",name:"로딩 / 스켈레톤",desc:"데이터 로딩 중 UI",priority:"권장",dev:"FE"},
       {id:"s52",name:"빈 상태 화면",desc:"데이터 없을 때 Empty State",priority:"권장",dev:"FE"},
-      {id:"s53",name:"공지사항",desc:"앱 내 공지 목록 & 상세",priority:"선택",dev:"FE/BE"},
     ]
   },
 ];
