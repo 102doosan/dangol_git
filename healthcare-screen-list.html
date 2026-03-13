@@ -76,6 +76,14 @@
     .priority-badge { font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 99px; }
     .dev-badge { font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 99px; background: #EDF2F7; color: #718096; }
 
+    .sub-items { margin-top: 6px; display: flex; flex-direction: column; gap: 3px; }
+    .sub-item { display: flex; align-items: center; gap: 8px; padding: 3px 0; cursor: pointer; border-radius: 6px; }
+    .sub-item:hover .sub-label { color: #4A5568; }
+    .sub-checkbox { width: 14px; height: 14px; border-radius: 3px; border: 2px solid #CBD5E0; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.2s; }
+    .sub-checkbox.on::after { content: '✓'; color: #fff; font-size: 8px; font-weight: 900; }
+    .sub-label { font-size: 12px; color: #A0AEC0; line-height: 1.4; }
+    .sub-label.done { text-decoration: line-through; color: #CBD5E0; }
+
     .divider { display: flex; align-items: center; gap: 12px; margin: 28px 0 12px; }
     .divider-line { flex: 1; height: 1px; background: #E2E8F0; }
     .divider-text { font-size: 12px; font-weight: 800; color: #718096; letter-spacing: 1px; white-space: nowrap; }
@@ -543,10 +551,40 @@ allData.forEach(c => openCats[c.id] = true);
 function allScreens() { return allData.flatMap(c => c.screens); }
 function tabScreens(tab) { return (tab === "user" ? userData : adminData).flatMap(c => c.screens); }
 
+function getSubItems(s) {
+  const parts = s.desc.split(' · ');
+  return parts.length >= 2 ? parts : [];
+}
+function isScreenDone(s) {
+  const subs = getSubItems(s);
+  if (subs.length === 0) return !!checked[s.id];
+  return subs.every((_, i) => !!checked[s.id + '_' + i]);
+}
+function toggleCheck(id) {
+  const s = allData.flatMap(c => c.screens).find(x => x.id === id);
+  if (!s) return;
+  const subs = getSubItems(s);
+  if (subs.length === 0) {
+    checked[id] = !checked[id];
+  } else {
+    const allDone = subs.every((_, i) => !!checked[id + '_' + i]);
+    subs.forEach((_, i) => { checked[id + '_' + i] = !allDone; });
+    checked[id] = !allDone;
+  }
+  render();
+}
+function toggleSubCheck(screenId, idx, total, event) {
+  event.stopPropagation();
+  checked[screenId + '_' + idx] = !checked[screenId + '_' + idx];
+  const allDone = Array.from({length: total}, (_, i) => !!checked[screenId + '_' + i]).every(Boolean);
+  checked[screenId] = allDone;
+  render();
+}
+
 function updateStats() {
   const all = allScreens();
   const total = all.length;
-  const done = all.filter(s => checked[s.id]).length;
+  const done = all.filter(s => isScreenDone(s)).length;
   const pct = total ? Math.min(100, Math.round(done/total*100)) : 0;
   const byP = {"필수":0,"권장":0,"선택":0};
   all.forEach(s => byP[s.priority]++);
@@ -564,7 +602,6 @@ function updateStats() {
 function setFilter(f) { activeFilter = f; render(); }
 function setTab(t) { activeTab = t; activeSubTab = "all"; render(); }
 function setSubTab(id) { activeSubTab = id; render(); }
-function toggleCheck(id) { checked[id] = !checked[id]; render(); }
 function toggleCat(id) { openCats[id] = !openCats[id]; render(); }
 
 function tabProgress(tab) {
@@ -577,17 +614,27 @@ function renderCats(cats) {
   return cats.map(cat => {
     const filtered = activeFilter === "전체" ? cat.screens : cat.screens.filter(s => s.priority === activeFilter);
     if (!filtered.length) return '';
-    const catDone = filtered.filter(s => checked[s.id]).length;
+    const catDone = filtered.filter(s => isScreenDone(s)).length;
     const isOpen = openCats[cat.id];
     const items = isOpen ? filtered.map(s => {
-      const isChecked = !!checked[s.id];
+      const isChecked = isScreenDone(s);
       const p = priorityStyle[s.priority];
+      const subs = getSubItems(s);
+      const subHtml = subs.length >= 2
+        ? `<div class="sub-items">${subs.map((sub, i) => {
+            const isSubChecked = !!checked[s.id + '_' + i];
+            return `<div class="sub-item" onclick="toggleSubCheck('${s.id}',${i},${subs.length},event)">
+              <div class="sub-checkbox ${isSubChecked?'on':''}" style="${isSubChecked?`background:${cat.color};border-color:${cat.color}`:''}"></div>
+              <span class="sub-label ${isSubChecked?'done':''}">${sub}</span>
+            </div>`;
+          }).join('')}</div>`
+        : `<div class="screen-desc">${s.desc}</div>`;
       return `
         <div class="screen-item ${isChecked?'done-item':''}" onclick="toggleCheck('${s.id}')">
           <div class="checkbox ${isChecked?'on':''}" style="${isChecked?`background:${cat.color};border-color:${cat.color}`:''}"></div>
           <div class="screen-info">
             <div class="screen-name ${isChecked?'done':''}">${s.name}</div>
-            <div class="screen-desc">${s.desc}</div>
+            ${subHtml}
           </div>
           <div class="screen-right">
             <span class="priority-badge" style="background:${p.bg};color:${p.color};border:1px solid ${p.border}">${s.priority}</span>
