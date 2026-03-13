@@ -262,18 +262,6 @@ const userData = [
     ]
   },
   {
-    id:"payment", icon:"💳", title:"결제 관리", color:"#68D391",
-    screens:[
-      {id:"s34",name:"결제 수단 등록",desc:"카드 번호 입력 & 등록",priority:"필수",dev:"FE/BE"},
-      {id:"s35",name:"결제 수단 목록",desc:"등록된 카드 목록 & 기본 카드 설정",priority:"필수",dev:"FE/BE"},
-      {id:"s36",name:"결제 수단 삭제",desc:"카드 삭제 확인 다이얼로그",priority:"필수",dev:"FE/BE"},
-      {id:"s37",name:"결제 내역",desc:"날짜별 결제 이력 목록",priority:"필수",dev:"FE/BE"},
-      {id:"s38",name:"결제 상세",desc:"단건 결제 영수증 상세",priority:"권장",dev:"FE/BE"},
-      {id:"s39",name:"환불 안내",desc:"환불 정책 및 절차 안내",priority:"권장",dev:"FE"},
-      {id:"s40",name:"구독 해지",desc:"해지 사유 수집 & 처리",priority:"권장",dev:"FE/BE"},
-    ]
-  },
-  {
     id:"store", icon:"🛒", title:"스토어", color:"#F472B6",
     screens:[
       {id:"st01",name:"스토어 홈",desc:"상품 카테고리 목록 · 추천·신상·인기 상품 배너 · 검색",priority:"필수",dev:"FE/BE"},
@@ -297,10 +285,18 @@ const userData = [
     ]
   },
   {
-    id:"mypage", icon:"👤", title:"프로필", color:"#76E4F7",
+    id:"mypage", icon:"👤", title:"마이페이지", color:"#76E4F7",
     screens:[
-      {id:"s41",name:"프로필",desc:"이름, 사진, 기본 정보 확인 · 주거지역 · 가입경로 확인",priority:"필수",dev:"FE/BE"},
-      {id:"s42",name:"프로필 수정",desc:"신체정보, 이름, 사진 수정",priority:"필수",dev:"FE/BE"},
+      {id:"s41",name:"마이페이지 홈",desc:"프로필 요약(사진·이름·회원권) · 메뉴 목록(프로필·결제관리·알림설정·연동관리 등)",priority:"필수",dev:"FE/BE"},
+      {id:"s42",name:"프로필",desc:"이름, 사진, 기본 정보 확인 · 주거지역 · 가입경로 확인",priority:"필수",dev:"FE/BE"},
+      {id:"s42b",name:"프로필 수정",desc:"신체정보, 이름, 사진 수정",priority:"필수",dev:"FE/BE"},
+      {id:"s34",name:"결제 수단 목록",desc:"등록된 카드 목록 & 기본 카드 설정 · [카드 추가] 버튼",priority:"필수",dev:"FE/BE"},
+      {id:"s34b",name:"결제 수단 등록",desc:"카드 번호 입력 & 등록",priority:"필수",dev:"FE/BE"},
+      {id:"s34c",name:"결제 수단 삭제",desc:"카드 삭제 확인 다이얼로그",priority:"필수",dev:"FE/BE"},
+      {id:"s37",name:"결제 내역",desc:"날짜별 결제 이력 목록",priority:"필수",dev:"FE/BE"},
+      {id:"s38",name:"결제 상세",desc:"단건 결제 영수증 상세",priority:"권장",dev:"FE/BE"},
+      {id:"s39",name:"환불 안내",desc:"환불 정책 및 절차 안내",priority:"권장",dev:"FE"},
+      {id:"s40",name:"구독 해지",desc:"해지 사유 수집 & 처리",priority:"권장",dev:"FE/BE"},
       {id:"s43",name:"알림 설정",desc:"항목별 푸시 알림 ON/OFF",priority:"필수",dev:"FE"},
       {id:"s44",name:"연동 관리",desc:"카카오/애플 소셜 연동 상태",priority:"권장",dev:"FE"},
       {id:"s45",name:"개인정보 처리방침",desc:"웹뷰 or 인앱 표시",priority:"필수",dev:"FE"},
