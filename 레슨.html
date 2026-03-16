@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>레슨 화면 디자인</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Noto Sans KR', sans-serif;
+      background: #1A1A2E;
+      min-height: 100vh;
+      display: flex; flex-direction: column; align-items: center;
+      padding: 24px 16px 48px; gap: 24px;
+    }
+
+    /* ── 툴바 ── */
+    .toolbar {
+      width: 100%; max-width: 1100px;
+      display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+    }
+    .toolbar-title { font-size: 18px; font-weight: 900; color: #fff; margin-right: auto; }
+    .screen-btn {
+      padding: 7px 15px; border-radius: 99px; border: none; cursor: pointer;
+      font-size: 12px; font-weight: 700; font-family: 'Noto Sans KR', sans-serif;
+      background: #2A2A4A; color: #A0AEC0; transition: all 0.2s;
+    }
+    .screen-btn.active { background: #D69E2E; color: #fff; }
+    .screen-btn:hover:not(.active) { background: #3A3A5A; color: #fff; }
+
+    /* ── 워크스페이스 ── */
+    .workspace { width: 100%; max-width: 1100px; display: flex; gap: 32px; align-items: flex-start; }
+
+    /* ── 폰 프레임 ── */
+    .phone {
+      width: 375px; min-height: 740px; background: #fff;
+      border-radius: 44px;
+      box-shadow: 0 0 0 10px #111, 0 30px 80px rgba(0,0,0,0.6);
+      overflow: hidden; position: relative;
+      display: flex; flex-direction: column; flex-shrink: 0;
+    }
+    .phone-notch {
+      position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+      width: 120px; height: 28px; background: #111;
+      border-radius: 0 0 18px 18px; z-index: 10;
+    }
+    .phone-screen { flex: 1; overflow: hidden; position: relative; margin-top: 28px; }
+    .screen-frame {
+      position: absolute; inset: 0;
+      display: none; flex-direction: column;
+      background: #FFFBF0; overflow-y: auto;
+    }
+    .screen-frame.active { display: flex; }
+
+    /* ── 메모판 ── */
+    .memo-panel {
+      flex: 1; background: #16213E; border-radius: 20px; padding: 24px;
+      min-height: 600px; display: flex; flex-direction: column; gap: 14px;
+    }
+    .memo-panel h3 { font-size: 14px; font-weight: 800; color: #F6AD55; letter-spacing: 1px; }
+    .memo-field { background: #0F3460; border-radius: 12px; padding: 14px 16px; }
+    .memo-field label { display: block; font-size: 11px; font-weight: 700; color: #F6AD55; margin-bottom: 6px; }
+    .memo-field textarea, .memo-field input {
+      width: 100%; background: transparent; border: none; outline: none;
+      color: #E2E8F0; font-family: 'Noto Sans KR', sans-serif; font-size: 13px; resize: none;
+    }
+    .memo-field textarea { min-height: 70px; line-height: 1.6; }
+    .memo-divider { height: 1px; background: #1E3A5F; }
+
+    /* ── 공통 앱 헤더 ── */
+    .app-header {
+      background: #C05621; color: #fff;
+      padding: 14px 20px;
+      display: flex; align-items: center; gap: 12px; flex-shrink: 0;
+    }
+    .app-header .back { font-size: 18px; cursor: pointer; opacity: 0.9; }
+    .app-header .title { font-size: 17px; font-weight: 700; }
+    .app-header .right { margin-left: auto; font-size: 13px; font-weight: 700; opacity: 0.9; }
+
+    /* ────────────────────────────────────────
+       ① 레슨 메인 (캘린더 + 예정 목록)
+    ──────────────────────────────────────── */
+    .cal-header {
+      background: linear-gradient(135deg, #C05621 0%, #DD6B20 50%, #F6AD55 100%);
+      padding: 14px 20px 20px; flex-shrink: 0;
+    }
+    .cal-header .ch-top {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 16px;
+    }
+    .ch-month { font-size: 18px; font-weight: 900; color: #fff; }
+    .ch-nav { display: flex; gap: 12px; }
+    .ch-arrow {
+      width: 30px; height: 30px; border-radius: 50%;
+      background: rgba(255,255,255,0.2); color: #fff;
+      border: none; cursor: pointer; font-size: 14px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .cal-dow {
+      display: grid; grid-template-columns: repeat(7, 1fr);
+      gap: 0; margin-bottom: 8px;
+    }
+    .dow-cell {
+      text-align: center; font-size: 11px; font-weight: 700;
+      color: rgba(255,255,255,0.7); padding: 4px 0;
+    }
+    .dow-cell:first-child { color: #FCA5A5; }
+    .dow-cell:last-child  { color: #93C5FD; }
+    .cal-grid {
+      display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px;
+    }
+    .cal-cell {
+      aspect-ratio: 1; display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      border-radius: 50%; cursor: pointer; position: relative;
+    }
+    .cal-date {
+      font-size: 13px; font-weight: 700; color: #fff; line-height: 1;
+    }
+    .cal-date.sun { color: #FCA5A5; }
+    .cal-date.sat { color: #93C5FD; }
+    .cal-date.other { color: rgba(255,255,255,0.35); }
+    .cal-dot {
+      width: 5px; height: 5px; border-radius: 50%;
+      background: #FFF; margin-top: 2px;
+    }
+    .cal-cell.today { background: rgba(255,255,255,0.25); }
+    .cal-cell.selected { background: #fff; }
+    .cal-cell.selected .cal-date { color: #C05621; }
+    .cal-cell.selected .cal-dot { background: #F6AD55; }
+    .cal-cell.has-lesson .cal-dot { opacity: 1; }
+    .cal-cell:not(.has-lesson) .cal-dot { opacity: 0; }
+
+    /* 예정 목록 섹션 */
+    .list-section { flex: 1; overflow-y: auto; }
+    .list-section-header {
+      padding: 14px 16px 8px;
+      display: flex; align-items: center; justify-content: space-between;
+      flex-shrink: 0;
+    }
+    .lsh-title { font-size: 14px; font-weight: 800; color: #2D3748; }
+    .lsh-count {
+      font-size: 12px; font-weight: 700; color: #F6AD55;
+      background: #FEEBC8; padding: 2px 10px; border-radius: 99px;
+    }
+    .lesson-card {
+      margin: 0 12px 10px;
+      background: #fff; border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.07);
+      cursor: pointer;
+      border-left: 4px solid #F6AD55;
+    }
+    .lesson-card.type-pt   { border-left-color: #F6AD55; }
+    .lesson-card.type-group { border-left-color: #68D391; }
+    .lesson-card.type-rehab { border-left-color: #FC8181; }
+    .lc-body { padding: 14px 14px 14px 14px; display: flex; align-items: center; gap: 12px; }
+    .lc-date-box {
+      background: #FFFBF0; border-radius: 12px; padding: 8px 10px;
+      text-align: center; min-width: 46px; flex-shrink: 0;
+    }
+    .lc-date-box .ldb-day   { font-size: 20px; font-weight: 900; color: #C05621; line-height: 1; }
+    .lc-date-box .ldb-dow   { font-size: 10px; font-weight: 700; color: #A0AEC0; margin-top: 2px; }
+    .lc-info { flex: 1; }
+    .lc-type-badge {
+      font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 99px;
+      display: inline-block; margin-bottom: 4px;
+    }
+    .badge-pt    { background: #FEEBC8; color: #744210; }
+    .badge-group { background: #C6F6D5; color: #276749; }
+    .badge-rehab { background: #FED7D7; color: #742A2A; }
+    .lc-name { font-size: 14px; font-weight: 700; color: #1A202C; }
+    .lc-meta { font-size: 12px; color: #A0AEC0; margin-top: 3px; }
+    .lc-right { text-align: right; flex-shrink: 0; }
+    .lc-time { font-size: 13px; font-weight: 800; color: #2D3748; }
+    .lc-trainer { font-size: 11px; color: #A0AEC0; margin-top: 3px; }
+
+    /* ────────────────────────────────────────
+       ② 날짜별 레슨 목록 (날짜 클릭 후)
+    ──────────────────────────────────────── */
+    .day-header {
+      background: linear-gradient(135deg, #C05621, #F6AD55);
+      padding: 16px 20px 20px; color: #fff; flex-shrink: 0;
+    }
+    .day-header .back { font-size: 18px; cursor: pointer; margin-bottom: 10px; display: block; }
+    .day-header .dh-date { font-size: 22px; font-weight: 900; }
+    .day-header .dh-count { font-size: 13px; opacity: 0.85; margin-top: 4px; }
+
+    /* ────────────────────────────────────────
+       ③ 레슨 상세
+    ──────────────────────────────────────── */
+    .detail-hero {
+      background: linear-gradient(135deg, #C05621, #DD6B20);
+      padding: 20px 20px 28px; color: #fff; flex-shrink: 0;
+    }
+    .detail-hero .back { font-size: 18px; cursor: pointer; margin-bottom: 12px; display: block; }
+    .detail-hero .dh-badge {
+      display: inline-block; background: rgba(255,255,255,0.25);
+      border-radius: 99px; padding: 3px 12px; font-size: 11px; font-weight: 700;
+      margin-bottom: 8px;
+    }
+    .detail-hero .dh-name { font-size: 22px; font-weight: 900; }
+    .detail-hero .dh-datetime { font-size: 13px; opacity: 0.85; margin-top: 6px; }
+    .detail-body { padding: 16px; display: flex; flex-direction: column; gap: 12px; overflow-y: auto; flex: 1; }
+    .info-card {
+      background: #fff; border-radius: 16px; padding: 16px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+    }
+    .info-row {
+      display: flex; align-items: flex-start; gap: 12px;
+      padding: 10px 0; border-bottom: 1px solid #F7FAFC;
+    }
+    .info-row:last-child { border-bottom: none; padding-bottom: 0; }
+    .info-icon { font-size: 18px; width: 28px; text-align: center; flex-shrink: 0; margin-top: 1px; }
+    .info-label { font-size: 11px; font-weight: 700; color: #A0AEC0; min-width: 60px; margin-top: 2px; }
+    .info-value { font-size: 14px; font-weight: 700; color: #1A202C; flex: 1; }
+    .trainer-card {
+      background: #FFFBF0; border-radius: 16px; padding: 16px;
+      display: flex; align-items: center; gap: 14px;
+      border: 1px solid #FEEBC8;
+    }
+    .trainer-avatar {
+      width: 48px; height: 48px; border-radius: 50%;
+      background: linear-gradient(135deg, #F6AD55, #C05621);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px; flex-shrink: 0;
+    }
+    .trainer-info .t-name { font-size: 15px; font-weight: 700; color: #1A202C; }
+    .trainer-info .t-role { font-size: 12px; color: #A0AEC0; margin-top: 2px; }
+    .trainer-info .t-career { font-size: 11px; color: #F6AD55; margin-top: 4px; font-weight: 700; }
+    .memo-card {
+      background: #FFFBF0; border-radius: 14px; padding: 14px 16px;
+      border-left: 4px solid #F6AD55;
+    }
+    .memo-card .mc-label { font-size: 11px; font-weight: 800; color: #F6AD55; margin-bottom: 6px; }
+    .memo-card .mc-text { font-size: 13px; color: #744210; line-height: 1.7; }
+    .status-bar {
+      margin: 0 16px 16px;
+      background: #fff; border-radius: 14px; padding: 14px 16px;
+      box-shadow: 0 1px 6px rgba(0,0,0,0.06);
+    }
+    .sb-label { font-size: 11px; font-weight: 800; color: #A0AEC0; margin-bottom: 8px; }
+    .sb-steps { display: flex; align-items: center; gap: 0; }
+    .sb-step { flex: 1; text-align: center; }
+    .sb-step-dot {
+      width: 24px; height: 24px; border-radius: 50%; margin: 0 auto 4px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px; font-weight: 800;
+    }
+    .dot-done  { background: #F6AD55; color: #fff; }
+    .dot-now   { background: #C05621; color: #fff; }
+    .dot-wait  { background: #EDF2F7; color: #A0AEC0; }
+    .sb-step-line { flex: 1; height: 2px; background: #EDF2F7; margin-bottom: 16px; }
+    .sb-step-line.done { background: #F6AD55; }
+    .sb-step-label { font-size: 10px; color: #A0AEC0; font-weight: 600; }
+    .sb-step-label.on { color: #C05621; font-weight: 800; }
+  </style>
+</head>
+<body>
+
+<div class="toolbar">
+  <span class="toolbar-title">🎓 레슨 화면 디자인</span>
+  <button class="screen-btn active" onclick="go('main')">① 캘린더 + 예정 목록</button>
+  <button class="screen-btn" onclick="go('day')">② 날짜별 레슨 목록</button>
+  <button class="screen-btn" onclick="go('detail')">③ 레슨 상세</button>
+</div>
+
+<div class="workspace">
+
+  <!-- 폰 프레임 -->
+  <div class="phone">
+    <div class="phone-notch"></div>
+    <div class="phone-screen">
+
+      <!-- ① 캘린더 + 예정 목록 -->
+      <div class="screen-frame active" id="screen-main">
+        <div class="cal-header">
+          <div class="ch-top">
+            <span class="ch-month">🎓 2026년 3월</span>
+            <div class="ch-nav">
+              <button class="ch-arrow">‹</button>
+              <button class="ch-arrow">›</button>
+            </div>
+          </div>
+          <div class="cal-dow">
+            <div class="dow-cell">일</div>
+            <div class="dow-cell">월</div>
+            <div class="dow-cell">화</div>
+            <div class="dow-cell">수</div>
+            <div class="dow-cell">목</div>
+            <div class="dow-cell">금</div>
+            <div class="dow-cell">토</div>
+          </div>
+          <div class="cal-grid">
+            <!-- 1행 -->
+            <div class="cal-cell"><span class="cal-date other">23</span><div class="cal-dot"></div></div>
+            <div class="cal-cell"><span class="cal-date other">24</span><div class="cal-dot"></div></div>
+            <div class="cal-cell"><span class="cal-date other">25</span><div class="cal-dot"></div></div>
+            <div class="cal-cell"><span class="cal-date other">26</span><div class="cal-dot"></div></div>
+            <div class="cal-cell"><span class="cal-date other">27</span><div class="cal-dot"></div></div>
+            <div class="cal-cell"><span class="cal-date other">28</span><div class="cal-dot"></div></div>
+            <div class="cal-cell has-lesson"><span class="cal-date sat">1</span><div class="cal-dot"></div></div>
+            <!-- 2행 -->
+            <div class="cal-cell"><span class="cal-date sun">2</span><div class="cal-dot"></div></div>
+            <div class="cal-cell has-lesson"><span class="cal-date">3</span><div class="cal-dot"></div></div>
+            <div class="cal-cell"><span class="cal-date">4</span><div class="cal-dot"></div></div>
+            <div class="cal-cell has-lesson"><span class="cal-date">5</span><div class="cal-dot"></div></div>
+            <div class="cal-cell"><span class="cal-date">6</span><div class="cal-dot"></div></div>
+            <div class="cal-cell has-lesson"><span class="cal-date">7</span><div class="cal-dot"></div></div>
+            <div class="cal-cell"><span class="cal-date sat">8</span><div class="cal-dot"></div></div>
+            <!-- 3행 -->
+            <div class="cal-cell"><span class="cal-date sun">9</span><div class="cal-dot"></div></div>
+            <div class="cal-cell has-lesson"><span class="cal-date">10</span><div class="cal-dot"></div></div>
+            <div class="cal-cell"><span class="cal-date">11</span><div class="cal-dot"></div></div>
+            <div class="cal-cell has-lesson"><span class="cal-date">12</span><div class="cal-dot"></div></div>
+            <div class="cal-cell"><span class="cal-date">13</span><div class="cal-dot"></div></div>
+            <div class="cal-cell has-lesson today"><span class="cal-date">14</span><div class="cal-dot"></div></div>
+            <div class="cal-cell"><span class="cal-date sat">15</span><div class="cal-dot"></div></div>
+            <!-- 4행 -->
+            <div class="cal-cell"><span class="cal-date sun">16</span><div class="cal-dot"></div></div>
+            <div class="cal-cell has-lesson selected" onclick="go('day')"><span class="cal-date">17</span><div class="cal-dot"></div></div>
+            <div class="cal-cell"><span class="cal-date">18</span><div class="cal-dot"></div></div>
+            <div class="cal-cell has-lesson"><span class="cal-date">19</span><div class="cal-dot"></div></div>
+            <div class="cal-cell"><span class="cal-date">20</span><div class="cal-dot"></div></div>
+            <div class="cal-cell has-lesson"><span class="cal-date">21</span><div class="cal-dot"></div></div>
+            <div class="cal-cell"><span class="cal-date sat">22</span><div class="cal-dot"></div></div>
+            <!-- 5행 -->
+            <div class="cal-cell"><span class="cal-date sun">23</span><div class="cal-dot"></div></div>
+            <div class="cal-cell has-lesson"><span class="cal-date">24</span><div class="cal-dot"></div></div>
+            <div class="cal-cell"><span class="cal-date">25</span><div class="cal-dot"></div></div>
+            <div class="cal-cell has-lesson"><span class="cal-date">26</span><div class="cal-dot"></div></div>
+            <div class="cal-cell"><span class="cal-date">27</span><div class="cal-dot"></div></div>
+            <div class="cal-cell"><span class="cal-date">28</span><div class="cal-dot"></div></div>
+            <div class="cal-cell"><span class="cal-date sat">29</span><div class="cal-dot"></div></div>
+          </div>
+        </div>
+
+        <div class="list-section">
+          <div class="list-section-header">
+            <span class="lsh-title">📅 예정된 레슨</span>
+            <span class="lsh-count">이번 달 12회</span>
+          </div>
+
+          <div class="lesson-card type-pt" onclick="go('detail')">
+            <div class="lc-body">
+              <div class="lc-date-box">
+                <div class="ldb-day">17</div>
+                <div class="ldb-dow">월</div>
+              </div>
+              <div class="lc-info">
+                <span class="lc-type-badge badge-pt">PT</span>
+                <div class="lc-name">개인 PT 레슨</div>
+                <div class="lc-meta">📍 1번 스튜디오</div>
+              </div>
+              <div class="lc-right">
+                <div class="lc-time">10:00</div>
+                <div class="lc-trainer">김트레이너</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="lesson-card type-group" onclick="go('detail')">
+            <div class="lc-body">
+              <div class="lc-date-box">
+                <div class="ldb-day">19</div>
+                <div class="ldb-dow">수</div>
+              </div>
+              <div class="lc-info">
+                <span class="lc-type-badge badge-group">그룹</span>
+                <div class="lc-name">코어 그룹 수업</div>
+                <div class="lc-meta">📍 그룹 스튜디오</div>
+              </div>
+              <div class="lc-right">
+                <div class="lc-time">14:00</div>
+                <div class="lc-trainer">이트레이너</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="lesson-card type-pt" onclick="go('detail')">
+            <div class="lc-body">
+              <div class="lc-date-box">
+                <div class="ldb-day">21</div>
+                <div class="ldb-dow">금</div>
+              </div>
+              <div class="lc-info">
+                <span class="lc-type-badge badge-pt">PT</span>
+                <div class="lc-name">개인 PT 레슨</div>
+                <div class="lc-meta">📍 1번 스튜디오</div>
+              </div>
+              <div class="lc-right">
+                <div class="lc-time">10:00</div>
+                <div class="lc-trainer">김트레이너</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="lesson-card type-rehab" onclick="go('detail')">
+            <div class="lc-body">
+              <div class="lc-date-box">
+                <div class="ldb-day">24</div>
+                <div class="ldb-dow">월</div>
+              </div>
+              <div class="lc-info">
+                <span class="lc-type-badge badge-rehab">재활</span>
+                <div class="lc-name">재활 전문 레슨</div>
+                <div class="lc-meta">📍 재활 스튜디오</div>
+              </div>
+              <div class="lc-right">
+                <div class="lc-time">11:00</div>
+                <div class="lc-trainer">박트레이너</div>
+              </div>
+            </div>
+          </div>
+
+          <div style="height:16px;"></div>
+        </div>
+      </div>
+
+      <!-- ② 날짜별 레슨 목록 -->
+      <div class="screen-frame" id="screen-day">
+        <div class="day-header">
+          <span class="back" onclick="go('main')">←</span>
+          <div class="dh-date">3월 17일 월요일</div>
+          <div class="dh-count">레슨 2개</div>
+        </div>
+        <div style="padding: 16px; display:flex; flex-direction:column; gap:12px; overflow-y:auto; flex:1;">
+
+          <div class="lesson-card type-pt" style="margin:0;" onclick="go('detail')">
+            <div class="lc-body">
+              <div style="width:44px; height:44px; border-radius:12px; background:#FEEBC8; display:flex; align-items:center; justify-content:center; font-size:20px; flex-shrink:0;">🏋️</div>
+              <div class="lc-info">
+                <span class="lc-type-badge badge-pt">PT</span>
+                <div class="lc-name">개인 PT 레슨</div>
+                <div class="lc-meta">10:00 ~ 11:00 · 📍 1번 스튜디오</div>
+              </div>
+              <div class="lc-right">
+                <div class="lc-trainer" style="font-size:12px; color:#C05621; font-weight:700;">김트레이너</div>
+                <div style="margin-top:6px; font-size:11px; background:#C6F6D5; color:#276749; padding:2px 8px; border-radius:99px; font-weight:700;">예정</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="lesson-card type-group" style="margin:0;" onclick="go('detail')">
+            <div class="lc-body">
+              <div style="width:44px; height:44px; border-radius:12px; background:#C6F6D5; display:flex; align-items:center; justify-content:center; font-size:20px; flex-shrink:0;">🧘</div>
+              <div class="lc-info">
+                <span class="lc-type-badge badge-group">그룹</span>
+                <div class="lc-name">저녁 스트레칭 수업</div>
+                <div class="lc-meta">19:00 ~ 20:00 · 📍 그룹 스튜디오</div>
+              </div>
+              <div class="lc-right">
+                <div class="lc-trainer" style="font-size:12px; color:#38A169; font-weight:700;">이트레이너</div>
+                <div style="margin-top:6px; font-size:11px; background:#C6F6D5; color:#276749; padding:2px 8px; border-radius:99px; font-weight:700;">예정</div>
+              </div>
+            </div>
+          </div>
+
+          <div style="background:#fff; border-radius:16px; padding:20px; text-align:center; box-shadow:0 1px 6px rgba(0,0,0,0.06);">
+            <div style="font-size:32px; margin-bottom:8px;">📅</div>
+            <div style="font-size:14px; font-weight:700; color:#4A5568; margin-bottom:4px;">오늘 레슨이 2개 있어요</div>
+            <div style="font-size:12px; color:#A0AEC0;">열심히 운동해 보세요 💪</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ③ 레슨 상세 -->
+      <div class="screen-frame" id="screen-detail">
+        <div class="detail-hero">
+          <span class="back" onclick="go('day')">←</span>
+          <span class="dh-badge">PT 레슨</span>
+          <div class="dh-name">개인 PT 레슨</div>
+          <div class="dh-datetime">2026. 03. 17 (월) 10:00 ~ 11:00</div>
+        </div>
+
+        <div style="padding: 0 16px; margin-top:-1px; flex-shrink:0;">
+          <div class="status-bar">
+            <div class="sb-label">레슨 상태</div>
+            <div style="display:flex; align-items:center;">
+              <div class="sb-step">
+                <div class="sb-step-dot dot-done">✓</div>
+                <div class="sb-step-label">예약</div>
+              </div>
+              <div class="sb-step-line done"></div>
+              <div class="sb-step">
+                <div class="sb-step-dot dot-now">→</div>
+                <div class="sb-step-label on">예정</div>
+              </div>
+              <div class="sb-step-line"></div>
+              <div class="sb-step">
+                <div class="sb-step-dot dot-wait">●</div>
+                <div class="sb-step-label">완료</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="detail-body">
+          <div class="info-card">
+            <div class="info-row">
+              <span class="info-icon">📅</span>
+              <span class="info-label">날짜</span>
+              <span class="info-value">2026. 03. 17 (월)</span>
+            </div>
+            <div class="info-row">
+              <span class="info-icon">⏰</span>
+              <span class="info-label">시간</span>
+              <span class="info-value">10:00 ~ 11:00 (60분)</span>
+            </div>
+            <div class="info-row">
+              <span class="info-icon">🏷️</span>
+              <span class="info-label">종류</span>
+              <span class="info-value">개인 PT 레슨</span>
+            </div>
+            <div class="info-row">
+              <span class="info-icon">📍</span>
+              <span class="info-label">장소</span>
+              <span class="info-value">1번 스튜디오 (강남점)</span>
+            </div>
+          </div>
+
+          <div class="trainer-card">
+            <div class="trainer-avatar">👨‍⚕️</div>
+            <div class="trainer-info">
+              <div class="t-name">김트레이너</div>
+              <div class="t-role">퍼스널 트레이너</div>
+              <div class="t-career">🏅 재활·코어 전문 · 경력 8년</div>
+            </div>
+          </div>
+
+          <div class="memo-card">
+            <div class="mc-label">📝 레슨 메모</div>
+            <div class="mc-text">저번 레슨에서 허리 불편감 호소. 이번 레슨은 코어 안정화 위주로 진행 예정. 무릎 스쿼트는 제외.</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- 메모판 -->
+  <div class="memo-panel">
+    <h3>🎓 레슨 화면 메모</h3>
+
+    <div class="memo-field">
+      <label>현재 화면</label>
+      <input type="text" id="memo-screen-name" value="① 캘린더 + 예정 목록" readonly />
+    </div>
+
+    <div class="memo-divider"></div>
+
+    <div class="memo-field">
+      <label>화면 설명 / 목적</label>
+      <textarea placeholder="이 화면의 역할과 목적..."></textarea>
+    </div>
+
+    <div class="memo-field">
+      <label>주요 컴포넌트</label>
+      <textarea placeholder="캘린더, 카드, 배지 등 UI 요소..."></textarea>
+    </div>
+
+    <div class="memo-field">
+      <label>UX 고려사항</label>
+      <textarea placeholder="사용자 흐름, 예외 처리, 피드백..."></textarea>
+    </div>
+
+    <div class="memo-field">
+      <label>개발 메모</label>
+      <textarea placeholder="캘린더 라이브러리, API, 상태 관리..."></textarea>
+    </div>
+
+    <div class="memo-divider"></div>
+
+    <div class="memo-field">
+      <label>화면 흐름</label>
+      <textarea readonly style="color:#F6AD55; font-size:12px;">① 캘린더 + 예정 목록
+  · 월별 캘린더 (레슨 있는 날 ● 점)
+  · 날짜 클릭 → ② 날짜별 목록
+  · 하단 : 오늘 이후 예정 레슨 전체
+
+② 날짜별 레슨 목록
+  · 선택한 날짜의 레슨 카드 목록
+  · 레슨 카드 클릭 → ③ 상세
+
+③ 레슨 상세
+  · 예약 상태 스텝 표시
+  · 날짜·시간·종류·장소
+  · 담당 트레이너 카드
+  · 레슨 메모</textarea>
+    </div>
+
+    <div class="memo-divider"></div>
+
+    <div class="memo-field">
+      <label>레슨 종류 (색상 구분)</label>
+      <textarea readonly style="color:#A0AEC0; font-size:12px;">🟡 PT         — 개인 PT 레슨
+🟢 그룹       — 그룹 수업
+🔴 재활       — 재활 전문 레슨</textarea>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  const screenNames = {
+    main:   '① 캘린더 + 예정 목록',
+    day:    '② 날짜별 레슨 목록',
+    detail: '③ 레슨 상세',
+  };
+  function go(id) {
+    document.querySelectorAll('.screen-frame').forEach(el => el.classList.remove('active'));
+    document.querySelectorAll('.screen-btn').forEach(el => el.classList.remove('active'));
+    document.getElementById('screen-' + id).classList.add('active');
+    document.querySelectorAll('.screen-btn').forEach(btn => {
+      if (btn.getAttribute('onclick').includes("'" + id + "'")) btn.classList.add('active');
+    });
+    document.getElementById('memo-screen-name').value = screenNames[id] || id;
+  }
+</script>
+
+</body>
+</html>
