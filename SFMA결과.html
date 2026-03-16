@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SFMA 결과 화면 디자인</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Noto Sans KR', sans-serif;
+      background: #1A1A2E;
+      min-height: 100vh;
+      display: flex; flex-direction: column; align-items: center;
+      padding: 24px 16px 48px; gap: 24px;
+    }
+
+    /* ── 툴바 ── */
+    .toolbar {
+      width: 100%; max-width: 1100px;
+      display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+    }
+    .toolbar-title { font-size: 18px; font-weight: 900; color: #fff; margin-right: auto; }
+    .screen-btn {
+      padding: 7px 15px; border-radius: 99px; border: none; cursor: pointer;
+      font-size: 12px; font-weight: 700; font-family: 'Noto Sans KR', sans-serif;
+      background: #2A2A4A; color: #A0AEC0; transition: all 0.2s;
+    }
+    .screen-btn.active { background: #7B61FF; color: #fff; }
+    .screen-btn:hover:not(.active) { background: #3A3A5A; color: #fff; }
+
+    /* ── 워크스페이스 ── */
+    .workspace { width: 100%; max-width: 1100px; display: flex; gap: 32px; align-items: flex-start; }
+
+    /* ── 폰 프레임 ── */
+    .phone {
+      width: 375px; min-height: 740px; background: #fff;
+      border-radius: 44px;
+      box-shadow: 0 0 0 10px #111, 0 30px 80px rgba(0,0,0,0.6);
+      overflow: hidden; position: relative;
+      display: flex; flex-direction: column; flex-shrink: 0;
+    }
+    .phone-notch {
+      position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+      width: 120px; height: 28px; background: #111; border-radius: 0 0 18px 18px; z-index: 10;
+    }
+    .phone-screen { flex: 1; overflow: hidden; position: relative; margin-top: 28px; }
+    .screen-frame {
+      position: absolute; inset: 0;
+      display: none; flex-direction: column;
+      background: #F5F3FF; overflow-y: auto;
+    }
+    .screen-frame.active { display: flex; }
+
+    /* ── 메모판 ── */
+    .memo-panel {
+      flex: 1; background: #16213E; border-radius: 20px; padding: 24px;
+      min-height: 600px; display: flex; flex-direction: column; gap: 14px;
+    }
+    .memo-panel h3 { font-size: 14px; font-weight: 800; color: #9B84FF; letter-spacing: 1px; }
+    .memo-field { background: #0F3460; border-radius: 12px; padding: 14px 16px; }
+    .memo-field label { display: block; font-size: 11px; font-weight: 700; color: #9B84FF; margin-bottom: 6px; }
+    .memo-field textarea, .memo-field input {
+      width: 100%; background: transparent; border: none; outline: none;
+      color: #E2E8F0; font-family: 'Noto Sans KR', sans-serif; font-size: 13px; resize: none;
+    }
+    .memo-field textarea { min-height: 70px; line-height: 1.6; }
+    .memo-divider { height: 1px; background: #1E3A5F; }
+
+    /* ── 공통 앱 헤더 ── */
+    .app-header {
+      background: #6B46C1; color: #fff;
+      padding: 14px 20px;
+      display: flex; align-items: center; gap: 12px; flex-shrink: 0;
+    }
+    .app-header .back { font-size: 18px; cursor: pointer; opacity: 0.9; }
+    .app-header .title { font-size: 17px; font-weight: 700; }
+    .app-header .right-btn {
+      margin-left: auto; font-size: 13px; font-weight: 700;
+      background: rgba(255,255,255,0.2); border-radius: 99px;
+      padding: 4px 12px; cursor: pointer;
+    }
+    .app-body { flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 12px; }
+
+    /* ────────────────────────────────────────
+       ① SFMA 결과 메인
+    ──────────────────────────────────────── */
+    .main-top {
+      background: linear-gradient(135deg, #553C9A 0%, #7B61FF 60%, #9B84FF 100%);
+      padding: 20px 20px 32px; color: #fff; flex-shrink: 0;
+    }
+    .main-top .sub { font-size: 13px; opacity: 0.8; margin-bottom: 4px; }
+    .main-top .heading { font-size: 22px; font-weight: 900; }
+    .main-top .date-badge {
+      display: inline-block; margin-top: 8px;
+      background: rgba(255,255,255,0.2); border-radius: 99px;
+      padding: 4px 14px; font-size: 12px; font-weight: 700;
+    }
+    .score-card {
+      margin: -20px 16px 0; background: #fff; border-radius: 20px;
+      padding: 20px; box-shadow: 0 4px 20px rgba(123,97,255,0.2);
+      flex-shrink: 0;
+    }
+    .score-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+    .score-label { font-size: 13px; font-weight: 700; color: #4A5568; }
+    .score-total { font-size: 36px; font-weight: 900; color: #7B61FF; }
+    .score-max { font-size: 16px; color: #A0AEC0; font-weight: 600; }
+    .score-grade {
+      background: #EDE9FE; color: #6B46C1;
+      border-radius: 99px; padding: 4px 14px; font-size: 13px; font-weight: 800;
+    }
+    .score-bar-wrap { background: #EDF2F7; border-radius: 99px; height: 10px; overflow: hidden; margin-top: 4px; }
+    .score-bar { height: 100%; border-radius: 99px; background: linear-gradient(90deg, #7B61FF, #9B84FF); }
+    .item-grid { padding: 16px; display: flex; flex-direction: column; gap: 10px; }
+    .item-row {
+      background: #fff; border-radius: 14px; padding: 14px 16px;
+      display: flex; align-items: center; gap: 12px;
+      box-shadow: 0 1px 6px rgba(0,0,0,0.06); cursor: pointer;
+    }
+    .item-icon { font-size: 22px; width: 36px; text-align: center; flex-shrink: 0; }
+    .item-name { flex: 1; font-size: 14px; font-weight: 700; color: #1A202C; }
+    .item-score-wrap { display: flex; align-items: center; gap: 8px; }
+    .item-score { font-size: 16px; font-weight: 900; }
+    .score-good  { color: #38A169; }
+    .score-warn  { color: #D69E2E; }
+    .score-bad   { color: #E53E3E; }
+    .item-bar-wrap { width: 60px; background: #EDF2F7; border-radius: 99px; height: 6px; overflow: hidden; }
+    .item-bar { height: 100%; border-radius: 99px; }
+    .bar-good  { background: #68D391; }
+    .bar-warn  { background: #F6AD55; }
+    .bar-bad   { background: #FC8181; }
+    .btn-compare {
+      margin: 0 16px 16px; background: #7B61FF; color: #fff;
+      border: none; border-radius: 14px; padding: 14px;
+      font-size: 14px; font-weight: 700; cursor: pointer;
+      font-family: 'Noto Sans KR', sans-serif;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+    }
+    .btn-history {
+      margin: 0 16px 20px; background: #fff; color: #7B61FF;
+      border: 2px solid #7B61FF; border-radius: 14px; padding: 12px;
+      font-size: 14px; font-weight: 700; cursor: pointer;
+      font-family: 'Noto Sans KR', sans-serif;
+    }
+
+    /* ────────────────────────────────────────
+       ② SFMA 결과 상세
+    ──────────────────────────────────────── */
+    .detail-hero {
+      background: linear-gradient(135deg, #553C9A, #7B61FF);
+      padding: 20px 20px 28px; color: #fff; flex-shrink: 0;
+    }
+    .detail-hero .back { font-size: 18px; cursor: pointer; margin-bottom: 12px; display: block; }
+    .detail-hero .d-name { font-size: 20px; font-weight: 900; }
+    .detail-hero .d-date { font-size: 12px; opacity: 0.8; margin-top: 4px; }
+    .detail-hero .d-score-row { display: flex; align-items: baseline; gap: 6px; margin-top: 12px; }
+    .detail-hero .d-score { font-size: 42px; font-weight: 900; }
+    .detail-hero .d-max { font-size: 18px; opacity: 0.7; }
+    .detail-hero .d-grade { background: rgba(255,255,255,0.25); border-radius: 99px; padding: 3px 12px; font-size: 12px; font-weight: 700; }
+    .detail-section { padding: 16px; display: flex; flex-direction: column; gap: 10px; }
+    .detail-item {
+      background: #fff; border-radius: 14px; padding: 14px 16px;
+      box-shadow: 0 1px 6px rgba(0,0,0,0.06);
+    }
+    .di-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+    .di-icon { font-size: 20px; }
+    .di-name { flex: 1; font-size: 14px; font-weight: 700; color: #1A202C; }
+    .di-score { font-size: 18px; font-weight: 900; }
+    .di-bar-wrap { background: #EDF2F7; border-radius: 99px; height: 8px; overflow: hidden; margin-bottom: 8px; }
+    .di-bar { height: 100%; border-radius: 99px; }
+    .di-comment { font-size: 12px; color: #718096; line-height: 1.6; }
+    .check-items { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+    .check-chip {
+      padding: 4px 10px; border-radius: 99px; font-size: 11px; font-weight: 700;
+    }
+    .chip-pass { background: #C6F6D5; color: #276749; }
+    .chip-fail { background: #FED7D7; color: #742A2A; }
+    .chip-partial { background: #FEEBC8; color: #744210; }
+    .opinion-box {
+      margin: 0 16px 16px; background: #EDE9FE; border-radius: 14px;
+      padding: 16px; border-left: 4px solid #7B61FF;
+    }
+    .opinion-box .op-title { font-size: 12px; font-weight: 800; color: #6B46C1; margin-bottom: 8px; }
+    .opinion-box .op-trainer { font-size: 12px; color: #9B84FF; margin-bottom: 8px; font-weight: 600; }
+    .opinion-box .op-text { font-size: 13px; color: #44337A; line-height: 1.7; }
+
+    /* ────────────────────────────────────────
+       ③ SFMA 결과 비교
+    ──────────────────────────────────────── */
+    .compare-select {
+      background: #fff; padding: 14px 16px; flex-shrink: 0;
+      border-bottom: 1px solid #E2E8F0;
+    }
+    .compare-select .cs-label { font-size: 11px; font-weight: 800; color: #7B61FF; margin-bottom: 8px; }
+    .round-select { display: flex; gap: 8px; }
+    .round-chip {
+      padding: 6px 14px; border-radius: 99px; font-size: 12px; font-weight: 700;
+      border: 2px solid #E2E8F0; cursor: pointer; transition: all 0.15s;
+      background: #fff; color: #718096;
+    }
+    .round-chip.on { background: #7B61FF; color: #fff; border-color: #7B61FF; }
+    .compare-body { padding: 16px; display: flex; flex-direction: column; gap: 14px; overflow-y: auto; flex: 1; }
+    .compare-header-row {
+      display: flex; gap: 0; background: #fff; border-radius: 14px;
+      overflow: hidden; box-shadow: 0 1px 6px rgba(0,0,0,0.06);
+    }
+    .ch-cell {
+      flex: 1; padding: 12px 8px; text-align: center;
+      font-size: 11px; font-weight: 700; color: #718096; border-right: 1px solid #EDF2F7;
+    }
+    .ch-cell:last-child { border-right: none; }
+    .ch-cell .ch-date { font-size: 10px; color: #A0AEC0; margin-top: 2px; }
+    .ch-cell .ch-score { font-size: 18px; font-weight: 900; color: #7B61FF; }
+    .ch-cell.highlight { background: #F5F3FF; }
+    .compare-item {
+      background: #fff; border-radius: 14px; padding: 14px 16px;
+      box-shadow: 0 1px 6px rgba(0,0,0,0.06);
+    }
+    .ci-name { font-size: 13px; font-weight: 700; color: #4A5568; margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
+    .ci-improve { font-size: 10px; background: #C6F6D5; color: #276749; padding: 2px 8px; border-radius: 99px; font-weight: 800; }
+    .ci-decline { font-size: 10px; background: #FED7D7; color: #742A2A; padding: 2px 8px; border-radius: 99px; font-weight: 800; }
+    .ci-same { font-size: 10px; background: #EDF2F7; color: #718096; padding: 2px 8px; border-radius: 99px; font-weight: 800; }
+    .ci-bars { display: flex; flex-direction: column; gap: 6px; }
+    .ci-bar-row { display: flex; align-items: center; gap: 8px; }
+    .ci-bar-label { font-size: 10px; color: #A0AEC0; width: 48px; text-align: right; flex-shrink: 0; }
+    .ci-bar-track { flex: 1; background: #EDF2F7; border-radius: 99px; height: 8px; overflow: hidden; }
+    .ci-bar-fill { height: 100%; border-radius: 99px; }
+    .fill-1 { background: #CBD5E0; }
+    .fill-2 { background: #9B84FF; }
+    .fill-3 { background: #7B61FF; }
+    .ci-bar-val { font-size: 11px; font-weight: 700; color: #4A5568; width: 24px; }
+
+    /* ────────────────────────────────────────
+       ④ SFMA 이력 목록
+    ──────────────────────────────────────── */
+    .history-item {
+      background: #fff; border-radius: 16px; padding: 16px;
+      box-shadow: 0 1px 6px rgba(0,0,0,0.06); cursor: pointer;
+      display: flex; align-items: center; gap: 14px;
+    }
+    .history-num {
+      width: 36px; height: 36px; border-radius: 50%; flex-shrink: 0;
+      background: #EDE9FE; color: #6B46C1;
+      font-size: 13px; font-weight: 800;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .history-num.latest { background: #7B61FF; color: #fff; }
+    .history-info { flex: 1; }
+    .history-round { font-size: 13px; font-weight: 700; color: #1A202C; }
+    .history-date { font-size: 12px; color: #A0AEC0; margin-top: 2px; }
+    .history-trainer { font-size: 11px; color: #9B84FF; margin-top: 2px; }
+    .history-score { font-size: 22px; font-weight: 900; color: #7B61FF; }
+    .history-grade {
+      font-size: 10px; font-weight: 700; padding: 3px 10px; border-radius: 99px;
+      background: #EDE9FE; color: #6B46C1;
+    }
+    .history-right { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
+  </style>
+</head>
+<body>
+
+<div class="toolbar">
+  <span class="toolbar-title">📊 SFMA 결과 화면 디자인</span>
+  <button class="screen-btn active" onclick="go('main')">① 결과 메인</button>
+  <button class="screen-btn" onclick="go('detail')">② 결과 상세</button>
+  <button class="screen-btn" onclick="go('compare')">③ 결과 비교</button>
+  <button class="screen-btn" onclick="go('history')">④ 이력 목록</button>
+</div>
+
+<div class="workspace">
+
+  <!-- 폰 프레임 -->
+  <div class="phone">
+    <div class="phone-notch"></div>
+    <div class="phone-screen">
+
+      <!-- ① 결과 메인 -->
+      <div class="screen-frame active" id="screen-main">
+        <div class="main-top">
+          <div class="sub">📊 SFMA 결과</div>
+          <div class="heading">최근 측정 결과</div>
+          <div class="date-badge">2025년 11월 18일 측정</div>
+        </div>
+        <div class="score-card">
+          <div class="score-row">
+            <div class="score-label">총점</div>
+            <span class="score-grade">양호</span>
+          </div>
+          <div style="display:flex; align-items:baseline; gap:6px; margin-bottom:10px;">
+            <span class="score-total">76</span>
+            <span class="score-max">/ 100</span>
+          </div>
+          <div class="score-bar-wrap">
+            <div class="score-bar" style="width:76%"></div>
+          </div>
+        </div>
+        <div class="item-grid">
+          <div class="item-row" onclick="go('detail')">
+            <span class="item-icon">🧍</span>
+            <span class="item-name">심층 스쿼트</span>
+            <div class="item-score-wrap">
+              <span class="item-score score-warn">7</span>
+              <div class="item-bar-wrap"><div class="item-bar bar-warn" style="width:70%"></div></div>
+            </div>
+          </div>
+          <div class="item-row" onclick="go('detail')">
+            <span class="item-icon">🚶</span>
+            <span class="item-name">제자리 걷기</span>
+            <div class="item-score-wrap">
+              <span class="item-score score-good">9</span>
+              <div class="item-bar-wrap"><div class="item-bar bar-good" style="width:90%"></div></div>
+            </div>
+          </div>
+          <div class="item-row" onclick="go('detail')">
+            <span class="item-icon">🔄</span>
+            <span class="item-name">상체 회전</span>
+            <div class="item-score-wrap">
+              <span class="item-score score-bad">5</span>
+              <div class="item-bar-wrap"><div class="item-bar bar-bad" style="width:50%"></div></div>
+            </div>
+          </div>
+          <div class="item-row" onclick="go('detail')">
+            <span class="item-icon">🤸</span>
+            <span class="item-name">어깨 가동성</span>
+            <div class="item-score-wrap">
+              <span class="item-score score-good">8</span>
+              <div class="item-bar-wrap"><div class="item-bar bar-good" style="width:80%"></div></div>
+            </div>
+          </div>
+          <div class="item-row" onclick="go('detail')">
+            <span class="item-icon">🦵</span>
+            <span class="item-name">능동 하지 거상</span>
+            <div class="item-score-wrap">
+              <span class="item-score score-warn">7</span>
+              <div class="item-bar-wrap"><div class="item-bar bar-warn" style="width:70%"></div></div>
+            </div>
+          </div>
+          <div class="item-row" onclick="go('detail')">
+            <span class="item-icon">🏋️</span>
+            <span class="item-name">체간 안정화 푸시업</span>
+            <div class="item-score-wrap">
+              <span class="item-score score-bad">6</span>
+              <div class="item-bar-wrap"><div class="item-bar bar-bad" style="width:60%"></div></div>
+            </div>
+          </div>
+          <div class="item-row" onclick="go('detail')">
+            <span class="item-icon">🦶</span>
+            <span class="item-name">회전 안정성</span>
+            <div class="item-score-wrap">
+              <span class="item-score score-good">9</span>
+              <div class="item-bar-wrap"><div class="item-bar bar-good" style="width:90%"></div></div>
+            </div>
+          </div>
+        </div>
+        <button class="btn-compare" onclick="go('compare')">📈 과거 결과와 비교하기</button>
+        <button class="btn-history" onclick="go('history')">📋 전체 이력 보기</button>
+      </div>
+
+      <!-- ② 결과 상세 -->
+      <div class="screen-frame" id="screen-detail">
+        <div class="detail-hero">
+          <span class="back" onclick="go('main')">←</span>
+          <div class="d-name">상체 회전 (Multisegmental Rotation)</div>
+          <div class="d-date">2025년 11월 18일</div>
+          <div class="d-score-row">
+            <span class="d-score">5</span>
+            <span class="d-max">/ 10</span>
+            <span class="d-grade">개선 필요</span>
+          </div>
+        </div>
+        <div class="detail-section">
+          <div class="detail-item">
+            <div class="di-header">
+              <span class="di-icon">🔄</span>
+              <span class="di-name">동작 수행 결과</span>
+              <span class="di-score score-bad">5 / 10</span>
+            </div>
+            <div class="di-bar-wrap">
+              <div class="di-bar bar-bad" style="width:50%"></div>
+            </div>
+            <div class="check-items">
+              <span class="check-chip chip-pass">좌측 회전 ✓</span>
+              <span class="check-chip chip-fail">우측 회전 ✗</span>
+              <span class="check-chip chip-partial">통증 없음 △</span>
+              <span class="check-chip chip-fail">대칭성 ✗</span>
+            </div>
+          </div>
+          <div class="detail-item">
+            <div class="di-header">
+              <span class="di-icon">📝</span>
+              <span class="di-name">트레이너 코멘트</span>
+            </div>
+            <div class="di-comment">우측 흉추 회전 제한이 관찰됩니다. 좌우 비대칭이 뚜렷하며 흉추 가동성 운동과 코어 안정화 운동을 병행하는 것을 권장합니다.</div>
+          </div>
+          <div class="detail-item">
+            <div class="di-header">
+              <span class="di-icon">📊</span>
+              <span class="di-name">이전 회차 비교</span>
+            </div>
+            <div style="display:flex; gap:10px; margin-top:4px;">
+              <div style="flex:1; text-align:center; background:#F5F3FF; border-radius:10px; padding:10px;">
+                <div style="font-size:10px; color:#9B84FF; font-weight:700;">1차 (24.03)</div>
+                <div style="font-size:20px; font-weight:900; color:#CBD5E0;">3</div>
+              </div>
+              <div style="flex:1; text-align:center; background:#F5F3FF; border-radius:10px; padding:10px;">
+                <div style="font-size:10px; color:#9B84FF; font-weight:700;">2차 (24.07)</div>
+                <div style="font-size:20px; font-weight:900; color:#9B84FF;">4</div>
+              </div>
+              <div style="flex:1; text-align:center; background:#EDE9FE; border-radius:10px; padding:10px; border:2px solid #7B61FF;">
+                <div style="font-size:10px; color:#6B46C1; font-weight:700;">3차 (25.11)</div>
+                <div style="font-size:20px; font-weight:900; color:#7B61FF;">5</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="opinion-box">
+          <div class="op-title">📋 트레이너 종합 소견</div>
+          <div class="op-trainer">👨‍⚕️ 김트레이너 · 2025.11.18</div>
+          <div class="op-text">흉추 회전 가동성이 전반적으로 제한되어 있습니다. 특히 우측 회전 시 어깨 보상 동작이 관찰됩니다. 재활운동 중 어깨 수술 카테고리의 흉추 가동성 운동을 병행하시길 권장드립니다.</div>
+        </div>
+      </div>
+
+      <!-- ③ 결과 비교 -->
+      <div class="screen-frame" id="screen-compare">
+        <div class="app-header">
+          <span class="back" onclick="go('main')">←</span>
+          <span class="title">결과 비교</span>
+          <span class="right-btn">최대 3회</span>
+        </div>
+        <div class="compare-select">
+          <div class="cs-label">비교할 회차 선택</div>
+          <div class="round-select">
+            <div class="round-chip">1차 (24.03)</div>
+            <div class="round-chip on">2차 (24.07)</div>
+            <div class="round-chip on">3차 (25.11)</div>
+          </div>
+        </div>
+        <div class="compare-body">
+          <div class="compare-header-row">
+            <div class="ch-cell">
+              <div>항목</div>
+            </div>
+            <div class="ch-cell">
+              <div>2차</div>
+              <div class="ch-date">24.07</div>
+              <div class="ch-score">72</div>
+            </div>
+            <div class="ch-cell highlight">
+              <div>3차</div>
+              <div class="ch-date">25.11</div>
+              <div class="ch-score">76</div>
+            </div>
+          </div>
+          <div class="compare-item">
+            <div class="ci-name">🧍 심층 스쿼트 <span class="ci-improve">▲ +1</span></div>
+            <div class="ci-bars">
+              <div class="ci-bar-row">
+                <span class="ci-bar-label">2차</span>
+                <div class="ci-bar-track"><div class="ci-bar-fill fill-2" style="width:60%"></div></div>
+                <span class="ci-bar-val">6</span>
+              </div>
+              <div class="ci-bar-row">
+                <span class="ci-bar-label">3차</span>
+                <div class="ci-bar-track"><div class="ci-bar-fill fill-3" style="width:70%"></div></div>
+                <span class="ci-bar-val">7</span>
+              </div>
+            </div>
+          </div>
+          <div class="compare-item">
+            <div class="ci-name">🔄 상체 회전 <span class="ci-improve">▲ +1</span></div>
+            <div class="ci-bars">
+              <div class="ci-bar-row">
+                <span class="ci-bar-label">2차</span>
+                <div class="ci-bar-track"><div class="ci-bar-fill fill-2" style="width:40%"></div></div>
+                <span class="ci-bar-val">4</span>
+              </div>
+              <div class="ci-bar-row">
+                <span class="ci-bar-label">3차</span>
+                <div class="ci-bar-track"><div class="ci-bar-fill fill-3" style="width:50%"></div></div>
+                <span class="ci-bar-val">5</span>
+              </div>
+            </div>
+          </div>
+          <div class="compare-item">
+            <div class="ci-name">🤸 어깨 가동성 <span class="ci-same">— 유지</span></div>
+            <div class="ci-bars">
+              <div class="ci-bar-row">
+                <span class="ci-bar-label">2차</span>
+                <div class="ci-bar-track"><div class="ci-bar-fill fill-2" style="width:80%"></div></div>
+                <span class="ci-bar-val">8</span>
+              </div>
+              <div class="ci-bar-row">
+                <span class="ci-bar-label">3차</span>
+                <div class="ci-bar-track"><div class="ci-bar-fill fill-3" style="width:80%"></div></div>
+                <span class="ci-bar-val">8</span>
+              </div>
+            </div>
+          </div>
+          <div class="compare-item">
+            <div class="ci-name">🏋️ 체간 안정화 푸시업 <span class="ci-decline">▼ -1</span></div>
+            <div class="ci-bars">
+              <div class="ci-bar-row">
+                <span class="ci-bar-label">2차</span>
+                <div class="ci-bar-track"><div class="ci-bar-fill fill-2" style="width:70%"></div></div>
+                <span class="ci-bar-val">7</span>
+              </div>
+              <div class="ci-bar-row">
+                <span class="ci-bar-label">3차</span>
+                <div class="ci-bar-track"><div class="ci-bar-fill fill-3" style="width:60%"></div></div>
+                <span class="ci-bar-val">6</span>
+              </div>
+            </div>
+          </div>
+          <div class="compare-item">
+            <div class="ci-name">🦵 능동 하지 거상 <span class="ci-improve">▲ +2</span></div>
+            <div class="ci-bars">
+              <div class="ci-bar-row">
+                <span class="ci-bar-label">2차</span>
+                <div class="ci-bar-track"><div class="ci-bar-fill fill-2" style="width:50%"></div></div>
+                <span class="ci-bar-val">5</span>
+              </div>
+              <div class="ci-bar-row">
+                <span class="ci-bar-label">3차</span>
+                <div class="ci-bar-track"><div class="ci-bar-fill fill-3" style="width:70%"></div></div>
+                <span class="ci-bar-val">7</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ④ 이력 목록 -->
+      <div class="screen-frame" id="screen-history">
+        <div class="app-header">
+          <span class="back" onclick="go('main')">←</span>
+          <span class="title">SFMA 이력</span>
+        </div>
+        <div class="app-body">
+          <div class="history-item" onclick="go('detail')">
+            <div class="history-num latest">3</div>
+            <div class="history-info">
+              <div class="history-round">3차 측정 <span style="font-size:11px; background:#EDE9FE; color:#7B61FF; border-radius:99px; padding:2px 8px; font-weight:700; margin-left:4px;">최근</span></div>
+              <div class="history-date">2025. 11. 18</div>
+              <div class="history-trainer">👨‍⚕️ 김트레이너</div>
+            </div>
+            <div class="history-right">
+              <span class="history-score">76</span>
+              <span class="history-grade">양호</span>
+            </div>
+          </div>
+          <div class="history-item" onclick="go('detail')">
+            <div class="history-num">2</div>
+            <div class="history-info">
+              <div class="history-round">2차 측정</div>
+              <div class="history-date">2024. 07. 22</div>
+              <div class="history-trainer">👨‍⚕️ 김트레이너</div>
+            </div>
+            <div class="history-right">
+              <span class="history-score" style="color:#9B84FF;">72</span>
+              <span class="history-grade">보통</span>
+            </div>
+          </div>
+          <div class="history-item" onclick="go('detail')">
+            <div class="history-num">1</div>
+            <div class="history-info">
+              <div class="history-round">1차 측정</div>
+              <div class="history-date">2024. 03. 05</div>
+              <div class="history-trainer">👩‍⚕️ 이트레이너</div>
+            </div>
+            <div class="history-right">
+              <span class="history-score" style="color:#CBD5E0;">61</span>
+              <span class="history-grade" style="background:#EDF2F7; color:#718096;">미흡</span>
+            </div>
+          </div>
+          <div style="padding: 16px; text-align:center; color:#A0AEC0; font-size:13px; font-weight:600;">
+            총 3회 측정 · 처음 측정 이후 <span style="color:#7B61FF; font-weight:800;">+15점</span> 향상
+          </div>
+        </div>
+        <div style="padding: 0 16px 16px; flex-shrink:0;">
+          <button style="width:100%; background:#7B61FF; color:#fff; border:none; border-radius:14px; padding:14px; font-size:14px; font-weight:700; cursor:pointer; font-family:'Noto Sans KR',sans-serif;" onclick="go('compare')">
+            📈 회차 비교하기
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- 메모판 -->
+  <div class="memo-panel">
+    <h3>📊 SFMA 결과 화면 메모</h3>
+
+    <div class="memo-field">
+      <label>현재 화면</label>
+      <input type="text" id="memo-screen-name" value="① 결과 메인" readonly />
+    </div>
+
+    <div class="memo-divider"></div>
+
+    <div class="memo-field">
+      <label>화면 설명 / 목적</label>
+      <textarea placeholder="이 화면의 역할과 목적..."></textarea>
+    </div>
+
+    <div class="memo-field">
+      <label>주요 컴포넌트</label>
+      <textarea placeholder="버튼, 카드, 차트, 탭 등 UI 요소..."></textarea>
+    </div>
+
+    <div class="memo-field">
+      <label>UX 고려사항</label>
+      <textarea placeholder="사용자 흐름, 예외 처리, 피드백..."></textarea>
+    </div>
+
+    <div class="memo-field">
+      <label>개발 메모</label>
+      <textarea placeholder="API, 차트 라이브러리, 데이터 구조..."></textarea>
+    </div>
+
+    <div class="memo-divider"></div>
+
+    <div class="memo-field">
+      <label>화면 흐름</label>
+      <textarea readonly style="color:#9B84FF; font-size:12px;">① 결과 메인
+  · 최근 측정 총점 + 항목별 점수 바
+  · [과거 결과 비교] → ③ 비교
+  · [전체 이력] → ④ 이력 목록
+  · 항목 클릭 → ② 상세
+
+② 결과 상세
+  · 항목별 동작 수행 체크
+  · 트레이너 코멘트
+  · 회차별 미니 비교
+  · 종합 소견
+
+③ 결과 비교 (최대 3회)
+  · 회차 선택 → 항목별 막대 비교
+  · 개선 ▲ / 유지 — / 악화 ▼ 표시
+
+④ 이력 목록
+  · 전체 측정 회차 목록
+  · 총점·날짜·트레이너 표시
+  · 클릭 → ② 상세</textarea>
+    </div>
+
+    <div class="memo-divider"></div>
+
+    <div class="memo-field">
+      <label>평가 항목 (7개)</label>
+      <textarea readonly style="color:#A0AEC0; font-size:12px;">1. 심층 스쿼트
+2. 제자리 걷기
+3. 상체 회전
+4. 어깨 가동성
+5. 능동 하지 거상
+6. 체간 안정화 푸시업
+7. 회전 안정성</textarea>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  const screenNames = {
+    main:    '① 결과 메인',
+    detail:  '② 결과 상세 (항목별)',
+    compare: '③ 결과 비교 (최대 3회)',
+    history: '④ 이력 목록',
+  };
+  function go(id) {
+    document.querySelectorAll('.screen-frame').forEach(el => el.classList.remove('active'));
+    document.querySelectorAll('.screen-btn').forEach(el => el.classList.remove('active'));
+    document.getElementById('screen-' + id).classList.add('active');
+    document.querySelectorAll('.screen-btn').forEach(btn => {
+      if (btn.getAttribute('onclick').includes("'" + id + "'")) btn.classList.add('active');
+    });
+    document.getElementById('memo-screen-name').value = screenNames[id] || id;
+  }
+</script>
+
+</body>
+</html>
