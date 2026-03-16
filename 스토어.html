@@ -1,0 +1,968 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>스토어 화면 디자인</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Noto Sans KR', sans-serif;
+      background: #1A1A2E;
+      min-height: 100vh;
+      display: flex; flex-direction: column; align-items: center;
+      padding: 24px 16px 48px; gap: 24px;
+    }
+    .toolbar {
+      width: 100%; max-width: 1200px;
+      display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+    }
+    .toolbar-title { font-size: 18px; font-weight: 900; color: #fff; margin-right: auto; }
+    .screen-btn {
+      padding: 7px 13px; border-radius: 99px; border: none; cursor: pointer;
+      font-size: 12px; font-weight: 700; font-family: 'Noto Sans KR', sans-serif;
+      background: #2A2A4A; color: #A0AEC0; transition: all 0.2s;
+    }
+    .screen-btn.active { background: #D53F8C; color: #fff; }
+    .screen-btn:hover:not(.active) { background: #3A3A5A; color: #fff; }
+
+    .workspace { width: 100%; max-width: 1200px; display: flex; gap: 32px; align-items: flex-start; }
+
+    .phone {
+      width: 375px; min-height: 740px; background: #fff;
+      border-radius: 44px;
+      box-shadow: 0 0 0 10px #111, 0 30px 80px rgba(0,0,0,0.6);
+      overflow: hidden; position: relative;
+      display: flex; flex-direction: column; flex-shrink: 0;
+    }
+    .phone-notch {
+      position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+      width: 120px; height: 28px; background: #111;
+      border-radius: 0 0 18px 18px; z-index: 10;
+    }
+    .phone-screen { flex: 1; overflow: hidden; position: relative; margin-top: 28px; }
+    .screen-frame {
+      position: absolute; inset: 0;
+      display: none; flex-direction: column;
+      background: #FFF5FB; overflow-y: auto;
+    }
+    .screen-frame.active { display: flex; }
+
+    .memo-panel {
+      flex: 1; background: #16213E; border-radius: 20px; padding: 24px;
+      min-height: 600px; display: flex; flex-direction: column; gap: 14px;
+    }
+    .memo-panel h3 { font-size: 14px; font-weight: 800; color: #F472B6; letter-spacing: 1px; }
+    .memo-field { background: #0F3460; border-radius: 12px; padding: 14px 16px; }
+    .memo-field label { display: block; font-size: 11px; font-weight: 700; color: #F472B6; margin-bottom: 6px; }
+    .memo-field textarea, .memo-field input {
+      width: 100%; background: transparent; border: none; outline: none;
+      color: #E2E8F0; font-family: 'Noto Sans KR', sans-serif; font-size: 13px; resize: none;
+    }
+    .memo-field textarea { min-height: 70px; line-height: 1.6; }
+    .memo-divider { height: 1px; background: #1E3A5F; }
+
+    .app-header {
+      background: #B83280; color: #fff;
+      padding: 14px 20px;
+      display: flex; align-items: center; gap: 10px; flex-shrink: 0;
+    }
+    .app-header .back { font-size: 18px; cursor: pointer; }
+    .app-header .title { font-size: 17px; font-weight: 700; flex: 1; }
+    .app-header .icon-btn { font-size: 22px; cursor: pointer; position: relative; }
+    .cart-badge {
+      position: absolute; top: -4px; right: -4px;
+      background: #FFD700; color: #1A202C;
+      width: 16px; height: 16px; border-radius: 50%;
+      font-size: 9px; font-weight: 900;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .app-body { flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 12px; }
+
+    /* ① 스토어 홈 */
+    .store-header {
+      background: linear-gradient(135deg, #97266D 0%, #D53F8C 55%, #F687B3 100%);
+      padding: 14px 20px 18px; flex-shrink: 0;
+    }
+    .sh-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+    .sh-title { font-size: 20px; font-weight: 900; color: #fff; }
+    .sh-cart { font-size: 24px; cursor: pointer; position: relative; }
+    .search-bar {
+      background: #fff; border-radius: 12px; padding: 10px 14px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .search-bar input {
+      flex: 1; border: none; outline: none; font-size: 14px;
+      font-family: 'Noto Sans KR', sans-serif; color: #4A5568;
+    }
+    .search-bar .si { font-size: 18px; color: #A0AEC0; }
+    .cat-scroll {
+      padding: 14px 16px 4px;
+      display: flex; gap: 10px; overflow-x: auto; flex-shrink: 0;
+    }
+    .cat-chip {
+      display: flex; flex-direction: column; align-items: center; gap: 4px;
+      flex-shrink: 0; cursor: pointer;
+    }
+    .cat-chip-icon {
+      width: 52px; height: 52px; border-radius: 16px;
+      display: flex; align-items: center; justify-content: center; font-size: 24px;
+    }
+    .cat-chip-label { font-size: 11px; font-weight: 700; color: #4A5568; }
+    .section-head {
+      padding: 14px 16px 8px;
+      display: flex; align-items: center; justify-content: space-between; flex-shrink: 0;
+    }
+    .section-head .sh { font-size: 15px; font-weight: 800; color: #1A202C; }
+    .section-head .more { font-size: 12px; color: #D53F8C; font-weight: 700; cursor: pointer; }
+    .product-row { padding: 0 16px; display: flex; gap: 12px; overflow-x: auto; }
+    .product-card {
+      background: #fff; border-radius: 16px; overflow: hidden;
+      box-shadow: 0 2px 10px rgba(213,63,140,0.1);
+      flex-shrink: 0; width: 150px; cursor: pointer;
+    }
+    .pc-img {
+      width: 100%; height: 120px;
+      display: flex; align-items: center; justify-content: center; font-size: 40px;
+    }
+    .pc-body { padding: 10px 12px 12px; }
+    .pc-name { font-size: 13px; font-weight: 700; color: #1A202C; line-height: 1.3; }
+    .pc-price { font-size: 14px; font-weight: 900; color: #D53F8C; margin-top: 4px; }
+    .pc-original { font-size: 11px; color: #A0AEC0; text-decoration: line-through; }
+    .pc-badge {
+      display: inline-block; font-size: 10px; font-weight: 700;
+      padding: 2px 6px; border-radius: 6px; margin-bottom: 4px;
+    }
+    .badge-new  { background: #FED7E2; color: #97266D; }
+    .badge-hot  { background: #FEE2C8; color: #C05621; }
+    .badge-sale { background: #C6F6D5; color: #276749; }
+
+    /* ② 상품 목록 */
+    .filter-bar {
+      background: #fff; padding: 10px 16px; flex-shrink: 0;
+      border-bottom: 1px solid #EDF2F7;
+      display: flex; gap: 8px; overflow-x: auto;
+    }
+    .f-chip {
+      padding: 5px 14px; border-radius: 99px; font-size: 12px; font-weight: 700;
+      border: none; cursor: pointer; white-space: nowrap; font-family: 'Noto Sans KR', sans-serif;
+      background: #EDF2F7; color: #718096;
+    }
+    .f-chip.on { background: #D53F8C; color: #fff; }
+    .list-product-card {
+      background: #fff; border-radius: 16px; overflow: hidden;
+      box-shadow: 0 1px 8px rgba(0,0,0,0.07); cursor: pointer;
+      display: flex; gap: 0;
+    }
+    .lpc-img {
+      width: 100px; height: 100px; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center; font-size: 40px;
+    }
+    .lpc-info { flex: 1; padding: 12px 14px; }
+    .lpc-tags { display: flex; gap: 4px; margin-bottom: 4px; }
+    .lpc-name { font-size: 14px; font-weight: 700; color: #1A202C; line-height: 1.3; }
+    .lpc-price { font-size: 15px; font-weight: 900; color: #D53F8C; margin-top: 6px; }
+    .lpc-original { font-size: 12px; color: #A0AEC0; text-decoration: line-through; margin-top: 2px; }
+    .lpc-review { font-size: 11px; color: #A0AEC0; margin-top: 4px; }
+
+    /* ③ 상품 상세 */
+    .detail-img {
+      width: 100%; height: 240px;
+      background: linear-gradient(135deg, #97266D, #F687B3);
+      display: flex; align-items: center; justify-content: center; font-size: 80px;
+      flex-shrink: 0; position: relative;
+    }
+    .detail-back {
+      position: absolute; top: 14px; left: 16px;
+      background: rgba(0,0,0,0.3); border-radius: 50%;
+      width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;
+      color: #fff; font-size: 16px; cursor: pointer;
+    }
+    .detail-cart-btn {
+      position: absolute; top: 14px; right: 16px;
+      background: rgba(0,0,0,0.3); border-radius: 50%;
+      width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;
+      font-size: 18px; cursor: pointer;
+    }
+    .detail-body { padding: 16px; display: flex; flex-direction: column; gap: 14px; }
+    .product-title { font-size: 20px; font-weight: 900; color: #1A202C; }
+    .price-row { display: flex; align-items: baseline; gap: 8px; }
+    .price-main { font-size: 24px; font-weight: 900; color: #D53F8C; }
+    .price-orig { font-size: 14px; color: #A0AEC0; text-decoration: line-through; }
+    .discount-badge { background: #FED7E2; color: #97266D; border-radius: 8px; padding: 3px 8px; font-size: 12px; font-weight: 800; }
+    .review-row { display: flex; align-items: center; gap: 6px; }
+    .stars { color: #F6AD55; font-size: 14px; }
+    .review-count { font-size: 12px; color: #718096; }
+    .option-box {
+      background: #fff; border-radius: 14px; padding: 14px 16px;
+      box-shadow: 0 1px 6px rgba(0,0,0,0.06);
+    }
+    .option-label { font-size: 12px; font-weight: 800; color: #4A5568; margin-bottom: 8px; }
+    .option-chips { display: flex; gap: 8px; flex-wrap: wrap; }
+    .option-chip {
+      padding: 7px 16px; border-radius: 10px; font-size: 13px; font-weight: 700;
+      border: 2px solid #EDF2F7; cursor: pointer; color: #4A5568;
+    }
+    .option-chip.on { border-color: #D53F8C; color: #D53F8C; background: #FFF5FB; }
+    .desc-box {
+      background: #F7FAFC; border-radius: 12px; padding: 14px 16px;
+      font-size: 13px; color: #4A5568; line-height: 1.7;
+    }
+    .btn-row { display: flex; gap: 10px; padding: 0 0 16px; flex-shrink: 0; }
+    .btn-cart {
+      flex: 1; background: #fff; color: #D53F8C; border: 2px solid #D53F8C;
+      border-radius: 14px; padding: 14px; font-size: 14px; font-weight: 700;
+      cursor: pointer; font-family: 'Noto Sans KR', sans-serif;
+    }
+    .btn-buy {
+      flex: 2; background: #D53F8C; color: #fff; border: none;
+      border-radius: 14px; padding: 14px; font-size: 14px; font-weight: 700;
+      cursor: pointer; font-family: 'Noto Sans KR', sans-serif;
+    }
+
+    /* ④ 장바구니 */
+    .cart-item {
+      background: #fff; border-radius: 16px; padding: 14px 16px;
+      box-shadow: 0 1px 8px rgba(0,0,0,0.07);
+      display: flex; gap: 12px; align-items: center;
+    }
+    .ci-check {
+      width: 22px; height: 22px; border-radius: 6px;
+      border: 2px solid #D53F8C; background: #D53F8C;
+      display: flex; align-items: center; justify-content: center;
+      color: #fff; font-size: 13px; flex-shrink: 0;
+    }
+    .ci-img {
+      width: 64px; height: 64px; border-radius: 12px; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center; font-size: 28px;
+    }
+    .ci-info { flex: 1; }
+    .ci-name { font-size: 13px; font-weight: 700; color: #1A202C; }
+    .ci-opt  { font-size: 11px; color: #A0AEC0; margin-top: 2px; }
+    .ci-price { font-size: 14px; font-weight: 900; color: #D53F8C; margin-top: 4px; }
+    .ci-qty { display: flex; align-items: center; gap: 8px; margin-top: 6px; }
+    .qty-btn {
+      width: 26px; height: 26px; border-radius: 8px;
+      border: 1.5px solid #E2E8F0; background: #fff; color: #4A5568;
+      font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center;
+    }
+    .qty-num { font-size: 14px; font-weight: 700; color: #1A202C; min-width: 20px; text-align: center; }
+    .ci-del { font-size: 18px; color: #CBD5E0; cursor: pointer; align-self: flex-start; }
+    .total-box {
+      background: #fff; border-radius: 16px; padding: 16px;
+      box-shadow: 0 1px 8px rgba(0,0,0,0.07);
+    }
+    .total-row { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; }
+    .total-label { font-size: 13px; color: #718096; }
+    .total-val   { font-size: 13px; font-weight: 700; color: #1A202C; }
+    .total-divider { height: 1px; background: #EDF2F7; margin: 6px 0; }
+    .total-final { font-size: 16px; font-weight: 900; color: #D53F8C; }
+    .btn-order {
+      background: #D53F8C; color: #fff; border: none; border-radius: 14px;
+      padding: 15px; font-size: 15px; font-weight: 700; cursor: pointer;
+      font-family: 'Noto Sans KR', sans-serif;
+      margin: 0 16px 16px; width: calc(100% - 32px); flex-shrink: 0;
+    }
+
+    /* ⑤ 주문/결제 */
+    .order-section {
+      background: #fff; border-radius: 16px; padding: 16px;
+      box-shadow: 0 1px 8px rgba(0,0,0,0.07);
+    }
+    .os-title { font-size: 13px; font-weight: 800; color: #4A5568; margin-bottom: 12px; }
+    .addr-row { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 8px; }
+    .addr-icon { font-size: 16px; margin-top: 2px; flex-shrink: 0; }
+    .addr-text { font-size: 13px; color: #2D3748; line-height: 1.6; flex: 1; }
+    .addr-change { font-size: 12px; color: #D53F8C; font-weight: 700; cursor: pointer; }
+    .pay-option {
+      display: flex; align-items: center; gap: 10px; padding: 10px 0;
+      border-bottom: 1px solid #EDF2F7; cursor: pointer;
+    }
+    .pay-option:last-child { border-bottom: none; }
+    .pay-radio {
+      width: 18px; height: 18px; border-radius: 50%;
+      border: 2px solid #D53F8C; display: flex; align-items: center; justify-content: center;
+    }
+    .pay-radio.on::after { content:''; width:9px; height:9px; border-radius:50%; background:#D53F8C; }
+    .pay-icon { font-size: 20px; }
+    .pay-name { font-size: 14px; font-weight: 700; color: #1A202C; flex: 1; }
+    .pay-sub  { font-size: 12px; color: #A0AEC0; }
+    .btn-pay {
+      background: #D53F8C; color: #fff; border: none; border-radius: 14px;
+      padding: 15px; font-size: 15px; font-weight: 700; cursor: pointer;
+      font-family: 'Noto Sans KR', sans-serif;
+      margin: 0 16px 16px; width: calc(100% - 32px); flex-shrink: 0;
+    }
+
+    /* ⑥ 주문 완료 */
+    .done-body {
+      flex: 1; display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      padding: 32px 24px; gap: 14px; text-align: center;
+    }
+    .done-icon { font-size: 80px; }
+    .done-title { font-size: 22px; font-weight: 900; color: #1A202C; }
+    .done-sub { font-size: 14px; color: #718096; line-height: 1.6; }
+    .done-info-card {
+      background: #FFF5FB; border-radius: 16px; padding: 16px 20px;
+      border: 2px solid #FED7E2; width: 100%; text-align: left;
+    }
+    .dic-row { display: flex; justify-content: space-between; padding: 6px 0; }
+    .dic-label { font-size: 12px; color: #A0AEC0; font-weight: 600; }
+    .dic-val   { font-size: 13px; font-weight: 700; color: #1A202C; }
+    .btn-pink {
+      background: #D53F8C; color: #fff; border: none; border-radius: 14px;
+      padding: 14px; font-size: 14px; font-weight: 700; cursor: pointer;
+      font-family: 'Noto Sans KR', sans-serif; width: 100%;
+    }
+    .btn-outline-pink {
+      background: #fff; color: #D53F8C; border: 2px solid #D53F8C; border-radius: 14px;
+      padding: 12px; font-size: 13px; font-weight: 700; cursor: pointer;
+      font-family: 'Noto Sans KR', sans-serif; width: 100%;
+    }
+
+    /* ⑦ 주문 내역 */
+    .order-card {
+      background: #fff; border-radius: 16px;
+      box-shadow: 0 1px 8px rgba(0,0,0,0.07); overflow: hidden; cursor: pointer;
+    }
+    .oc-header {
+      padding: 12px 16px; background: #FFF5FB;
+      display: flex; align-items: center; justify-content: space-between;
+      border-bottom: 1px solid #FED7E2;
+    }
+    .oc-date { font-size: 12px; color: #718096; font-weight: 600; }
+    .oc-num  { font-size: 11px; color: #A0AEC0; }
+    .oc-body { padding: 14px 16px; display: flex; gap: 12px; align-items: center; }
+    .oc-img  { width: 56px; height: 56px; border-radius: 10px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 26px; }
+    .oc-info { flex: 1; }
+    .oc-name  { font-size: 14px; font-weight: 700; color: #1A202C; }
+    .oc-price { font-size: 13px; font-weight: 800; color: #D53F8C; margin-top: 3px; }
+    .oc-status {
+      font-size: 12px; font-weight: 700; padding: 4px 12px; border-radius: 99px;
+    }
+    .status-ship    { background: #BEE3F8; color: #2A4365; }
+    .status-done    { background: #C6F6D5; color: #276749; }
+    .status-cancel  { background: #EDF2F7; color: #718096; }
+
+    /* ⑧ 주문 상세 */
+    .delivery-steps {
+      background: #fff; border-radius: 14px; padding: 16px;
+      box-shadow: 0 1px 6px rgba(0,0,0,0.06);
+    }
+    .ds-title { font-size: 13px; font-weight: 800; color: #4A5568; margin-bottom: 14px; }
+    .ds-step-row { display: flex; gap: 0; align-items: flex-start; }
+    .ds-step { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+    .ds-dot {
+      width: 28px; height: 28px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px; font-weight: 800;
+    }
+    .ds-dot.done { background: #D53F8C; color: #fff; }
+    .ds-dot.now  { background: #B83280; color: #fff; box-shadow: 0 0 0 4px #FED7E2; }
+    .ds-dot.wait { background: #EDF2F7; color: #A0AEC0; }
+    .ds-label { font-size: 10px; color: #A0AEC0; font-weight: 600; text-align: center; }
+    .ds-label.on { color: #B83280; font-weight: 800; }
+    .ds-line { flex: 1; height: 2px; margin-top: 14px; }
+    .ds-line.done { background: #D53F8C; }
+    .ds-line.wait { background: #EDF2F7; }
+    .delivery-info {
+      background: #FFF5FB; border-radius: 12px; padding: 12px 14px;
+      border: 1px solid #FED7E2; font-size: 13px; color: #97266D; line-height: 1.6;
+    }
+    .info-card {
+      background: #fff; border-radius: 14px; padding: 14px 16px;
+      box-shadow: 0 1px 6px rgba(0,0,0,0.06);
+    }
+    .info-row {
+      display: flex; justify-content: space-between; align-items: flex-start;
+      padding: 8px 0; border-bottom: 1px solid #F7FAFC;
+    }
+    .info-row:last-child { border-bottom: none; padding-bottom: 0; }
+    .info-key { font-size: 13px; color: #718096; flex-shrink: 0; }
+    .info-val { font-size: 13px; font-weight: 700; color: #1A202C; text-align: right; }
+    .cancel-btn {
+      background: #fff; color: #A0AEC0; border: 1.5px solid #E2E8F0; border-radius: 12px;
+      padding: 12px; font-size: 13px; font-weight: 700; cursor: pointer;
+      font-family: 'Noto Sans KR', sans-serif; width: 100%;
+    }
+  </style>
+</head>
+<body>
+
+<div class="toolbar">
+  <span class="toolbar-title">🛒 스토어 화면 디자인</span>
+  <button class="screen-btn active" onclick="go('home')">① 스토어 홈</button>
+  <button class="screen-btn" onclick="go('list')">② 상품 목록</button>
+  <button class="screen-btn" onclick="go('detail')">③ 상품 상세</button>
+  <button class="screen-btn" onclick="go('cart')">④ 장바구니</button>
+  <button class="screen-btn" onclick="go('order')">⑤ 주문/결제</button>
+  <button class="screen-btn" onclick="go('done')">⑥ 주문 완료</button>
+  <button class="screen-btn" onclick="go('history')">⑦ 주문 내역</button>
+  <button class="screen-btn" onclick="go('orderdetail')">⑧ 주문 상세</button>
+</div>
+
+<div class="workspace">
+  <div class="phone">
+    <div class="phone-notch"></div>
+    <div class="phone-screen">
+
+      <!-- ① 스토어 홈 -->
+      <div class="screen-frame active" id="screen-home">
+        <div class="store-header">
+          <div class="sh-top">
+            <span class="sh-title">🛒 스토어</span>
+            <span class="sh-cart" onclick="go('cart')">
+              🛒
+              <span class="cart-badge" style="position:relative; top:auto; right:auto; display:inline-flex; margin-left:-8px; vertical-align:top;">3</span>
+            </span>
+          </div>
+          <div class="search-bar">
+            <span class="si">🔍</span>
+            <input type="text" placeholder="상품명으로 검색하세요" />
+          </div>
+        </div>
+        <div class="cat-scroll">
+          <div class="cat-chip">
+            <div class="cat-chip-icon" style="background:#FFF0F5;">🏥</div>
+            <span class="cat-chip-label">보충제</span>
+          </div>
+          <div class="cat-chip">
+            <div class="cat-chip-icon" style="background:#FFF5F0;">🥗</div>
+            <span class="cat-chip-label">식품</span>
+          </div>
+          <div class="cat-chip">
+            <div class="cat-chip-icon" style="background:#F0FFF4;">🏋️</div>
+            <span class="cat-chip-label">용품</span>
+          </div>
+          <div class="cat-chip">
+            <div class="cat-chip-icon" style="background:#EBF8FF;">👕</div>
+            <span class="cat-chip-label">의류</span>
+          </div>
+          <div class="cat-chip">
+            <div class="cat-chip-icon" style="background:#F5F0FF;">🎁</div>
+            <span class="cat-chip-label">기타</span>
+          </div>
+        </div>
+        <div class="section-head">
+          <span class="sh">🔥 인기 상품</span>
+          <span class="more" onclick="go('list')">더보기 ›</span>
+        </div>
+        <div class="product-row">
+          <div class="product-card" onclick="go('detail')">
+            <div class="pc-img" style="background:#FFF0F5;">💊</div>
+            <div class="pc-body">
+              <span class="pc-badge badge-hot">HOT</span>
+              <div class="pc-name">마그네슘 + 비타민D 복합</div>
+              <div class="pc-original">38,000원</div>
+              <div class="pc-price">28,000원</div>
+            </div>
+          </div>
+          <div class="product-card" onclick="go('detail')">
+            <div class="pc-img" style="background:#F0FFF4;">🥤</div>
+            <div class="pc-body">
+              <span class="pc-badge badge-new">NEW</span>
+              <div class="pc-name">단백질 쉐이크 바닐라</div>
+              <div class="pc-price">32,000원</div>
+            </div>
+          </div>
+          <div class="product-card" onclick="go('detail')">
+            <div class="pc-img" style="background:#EBF8FF;">🦺</div>
+            <div class="pc-body">
+              <span class="pc-badge badge-sale">SALE</span>
+              <div class="pc-name">허리 보호대 프리미엄</div>
+              <div class="pc-original">55,000원</div>
+              <div class="pc-price">42,000원</div>
+            </div>
+          </div>
+        </div>
+        <div class="section-head">
+          <span class="sh">✨ 신상품</span>
+          <span class="more" onclick="go('list')">더보기 ›</span>
+        </div>
+        <div class="product-row" style="padding-bottom:16px;">
+          <div class="product-card" onclick="go('detail')">
+            <div class="pc-img" style="background:#FFF5F0;">🧴</div>
+            <div class="pc-body">
+              <span class="pc-badge badge-new">NEW</span>
+              <div class="pc-name">근육 이완 마사지 오일</div>
+              <div class="pc-price">24,000원</div>
+            </div>
+          </div>
+          <div class="product-card" onclick="go('detail')">
+            <div class="pc-img" style="background:#F5F0FF;">🎽</div>
+            <div class="pc-body">
+              <span class="pc-badge badge-new">NEW</span>
+              <div class="pc-name">컴프레션 레깅스</div>
+              <div class="pc-price">58,000원</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ② 상품 목록 -->
+      <div class="screen-frame" id="screen-list">
+        <div class="app-header">
+          <span class="back" onclick="go('home')">←</span>
+          <span class="title">보충제</span>
+          <span class="icon-btn" onclick="go('cart')">🛒<span class="cart-badge">3</span></span>
+        </div>
+        <div class="filter-bar">
+          <button class="f-chip on">전체</button>
+          <button class="f-chip">인기순</button>
+          <button class="f-chip">낮은 가격순</button>
+          <button class="f-chip">신상품순</button>
+        </div>
+        <div class="app-body">
+          <div class="list-product-card" onclick="go('detail')">
+            <div class="lpc-img" style="background:#FFF0F5;">💊</div>
+            <div class="lpc-info">
+              <div class="lpc-tags"><span class="pc-badge badge-hot">HOT</span></div>
+              <div class="lpc-name">마그네슘 + 비타민D 복합</div>
+              <div class="lpc-price">28,000원</div>
+              <div class="lpc-original">38,000원</div>
+              <div class="lpc-review">⭐ 4.8 · 리뷰 124개</div>
+            </div>
+          </div>
+          <div class="list-product-card" onclick="go('detail')">
+            <div class="lpc-img" style="background:#F0FFF4;">🥤</div>
+            <div class="lpc-info">
+              <div class="lpc-tags"><span class="pc-badge badge-new">NEW</span></div>
+              <div class="lpc-name">단백질 쉐이크 바닐라 맛 1kg</div>
+              <div class="lpc-price">32,000원</div>
+              <div class="lpc-review">⭐ 4.6 · 리뷰 87개</div>
+            </div>
+          </div>
+          <div class="list-product-card" onclick="go('detail')">
+            <div class="lpc-img" style="background:#FFFBF0;">🍯</div>
+            <div class="lpc-info">
+              <div class="lpc-tags"><span class="pc-badge badge-sale">SALE</span></div>
+              <div class="lpc-name">오메가3 고함량 EPA/DHA</div>
+              <div class="lpc-price">19,000원</div>
+              <div class="lpc-original">26,000원</div>
+              <div class="lpc-review">⭐ 4.7 · 리뷰 203개</div>
+            </div>
+          </div>
+          <div class="list-product-card" onclick="go('detail')">
+            <div class="lpc-img" style="background:#FFF5F0;">🧴</div>
+            <div class="lpc-info">
+              <div class="lpc-tags"></div>
+              <div class="lpc-name">근육 이완 마사지 오일 100ml</div>
+              <div class="lpc-price">24,000원</div>
+              <div class="lpc-review">⭐ 4.5 · 리뷰 56개</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ③ 상품 상세 -->
+      <div class="screen-frame" id="screen-detail">
+        <div class="detail-img">
+          <div class="detail-back" onclick="go('list')">←</div>
+          💊
+          <div class="detail-cart-btn">🛒</div>
+        </div>
+        <div style="overflow-y:auto; flex:1;">
+          <div class="detail-body">
+            <div>
+              <div class="product-title">마그네슘 + 비타민D 복합</div>
+              <div class="review-row" style="margin-top:6px;">
+                <span class="stars">★★★★★</span>
+                <span class="review-count">4.8 · 리뷰 124개</span>
+              </div>
+            </div>
+            <div class="price-row">
+              <span class="price-main">28,000원</span>
+              <span class="price-orig">38,000원</span>
+              <span class="discount-badge">26% OFF</span>
+            </div>
+            <div class="option-box">
+              <div class="option-label">용량 선택</div>
+              <div class="option-chips">
+                <div class="option-chip">60정</div>
+                <div class="option-chip on">120정</div>
+                <div class="option-chip">240정</div>
+              </div>
+            </div>
+            <div>
+              <div style="font-size:13px; font-weight:800; color:#4A5568; margin-bottom:8px;">상품 설명</div>
+              <div class="desc-box">
+                근육 경련 완화와 뼈 건강을 위한 마그네슘과 비타민D 복합 제품입니다.<br><br>
+                · 1일 2정, 식후 복용 권장<br>
+                · 국내 GMP 인증 공장 생산<br>
+                · 인공색소·방부제 無
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="btn-row" style="padding: 0 16px 16px; flex-shrink:0;">
+          <button class="btn-cart" onclick="go('cart')">🛒 장바구니</button>
+          <button class="btn-buy" onclick="go('order')">바로 구매</button>
+        </div>
+      </div>
+
+      <!-- ④ 장바구니 -->
+      <div class="screen-frame" id="screen-cart">
+        <div class="app-header">
+          <span class="back" onclick="go('detail')">←</span>
+          <span class="title">장바구니</span>
+          <span style="margin-left:auto; font-size:13px; color:rgba(255,255,255,0.8); cursor:pointer;">전체 삭제</span>
+        </div>
+        <div class="app-body">
+          <div class="cart-item">
+            <div class="ci-check">✓</div>
+            <div class="ci-img" style="background:#FFF0F5;">💊</div>
+            <div class="ci-info">
+              <div class="ci-name">마그네슘 + 비타민D 복합</div>
+              <div class="ci-opt">120정</div>
+              <div class="ci-price">28,000원</div>
+              <div class="ci-qty">
+                <button class="qty-btn">−</button>
+                <span class="qty-num">1</span>
+                <button class="qty-btn">+</button>
+              </div>
+            </div>
+            <span class="ci-del">✕</span>
+          </div>
+          <div class="cart-item">
+            <div class="ci-check">✓</div>
+            <div class="ci-img" style="background:#F0FFF4;">🥤</div>
+            <div class="ci-info">
+              <div class="ci-name">단백질 쉐이크 바닐라 1kg</div>
+              <div class="ci-opt">바닐라</div>
+              <div class="ci-price">32,000원</div>
+              <div class="ci-qty">
+                <button class="qty-btn">−</button>
+                <span class="qty-num">2</span>
+                <button class="qty-btn">+</button>
+              </div>
+            </div>
+            <span class="ci-del">✕</span>
+          </div>
+          <div class="total-box">
+            <div class="total-row">
+              <span class="total-label">상품 금액</span>
+              <span class="total-val">92,000원</span>
+            </div>
+            <div class="total-row">
+              <span class="total-label">배송비</span>
+              <span class="total-val" style="color:#38A169;">무료</span>
+            </div>
+            <div class="total-row">
+              <span class="total-label">할인</span>
+              <span class="total-val" style="color:#E53E3E;">-10,000원</span>
+            </div>
+            <div class="total-divider"></div>
+            <div class="total-row">
+              <span class="total-label" style="font-weight:800; color:#1A202C;">총 결제 금액</span>
+              <span class="total-final">82,000원</span>
+            </div>
+          </div>
+        </div>
+        <button class="btn-order" onclick="go('order')">주문하기 (3개)</button>
+      </div>
+
+      <!-- ⑤ 주문/결제 -->
+      <div class="screen-frame" id="screen-order">
+        <div class="app-header">
+          <span class="back" onclick="go('cart')">←</span>
+          <span class="title">주문 / 결제</span>
+        </div>
+        <div class="app-body">
+          <div class="order-section">
+            <div class="os-title">📍 배송지</div>
+            <div class="addr-row">
+              <span class="addr-icon">🏠</span>
+              <div class="addr-text">
+                <b>홍길동</b> · 010-1234-5678<br>
+                서울특별시 강남구 테헤란로 123<br>
+                (역삼동, 헬스케어빌딩) 4층
+              </div>
+              <span class="addr-change">변경</span>
+            </div>
+          </div>
+          <div class="order-section">
+            <div class="os-title">📦 주문 상품 (3개)</div>
+            <div style="display:flex; align-items:center; gap:10px; padding:6px 0;">
+              <span style="font-size:22px;">💊</span>
+              <div style="flex:1; font-size:13px; font-weight:700; color:#1A202C;">마그네슘 + 비타민D 외 2개</div>
+              <span style="font-size:14px; font-weight:800; color:#D53F8C;">82,000원</span>
+            </div>
+          </div>
+          <div class="order-section">
+            <div class="os-title">💳 결제 수단</div>
+            <div class="pay-option">
+              <div class="pay-radio on"></div>
+              <span class="pay-icon">💳</span>
+              <span class="pay-name">신용카드</span>
+              <span class="pay-sub">KB 4567</span>
+            </div>
+            <div class="pay-option">
+              <div class="pay-radio"></div>
+              <span class="pay-icon">🟡</span>
+              <span class="pay-name">카카오페이</span>
+              <span class="pay-sub"></span>
+            </div>
+            <div class="pay-option">
+              <div class="pay-radio"></div>
+              <span class="pay-icon">🏦</span>
+              <span class="pay-name">무통장 입금</span>
+              <span class="pay-sub"></span>
+            </div>
+          </div>
+          <div class="total-box">
+            <div class="total-row">
+              <span class="total-label" style="font-weight:800; color:#1A202C;">최종 결제 금액</span>
+              <span class="total-final">82,000원</span>
+            </div>
+          </div>
+        </div>
+        <button class="btn-pay" onclick="go('done')">82,000원 결제하기</button>
+      </div>
+
+      <!-- ⑥ 주문 완료 -->
+      <div class="screen-frame" id="screen-done" style="background:#fff;">
+        <div class="done-body">
+          <div class="done-icon">🎉</div>
+          <div class="done-title">주문 완료!</div>
+          <div class="done-sub">주문이 정상 접수되었습니다.<br>빠르게 배송해 드릴게요.</div>
+          <div class="done-info-card">
+            <div class="dic-row">
+              <span class="dic-label">주문 번호</span>
+              <span class="dic-val">ORD-2026031601</span>
+            </div>
+            <div class="dic-row">
+              <span class="dic-label">결제 금액</span>
+              <span class="dic-val" style="color:#D53F8C;">82,000원</span>
+            </div>
+            <div class="dic-row">
+              <span class="dic-label">배송 예정</span>
+              <span class="dic-val">3월 18일 (수) ~ 19일 (목)</span>
+            </div>
+            <div class="dic-row">
+              <span class="dic-label">배송지</span>
+              <span class="dic-val">강남구 테헤란로 123</span>
+            </div>
+          </div>
+          <button class="btn-pink" onclick="go('history')">주문 내역 보기</button>
+          <button class="btn-outline-pink" onclick="go('home')">쇼핑 계속하기</button>
+        </div>
+      </div>
+
+      <!-- ⑦ 주문 내역 -->
+      <div class="screen-frame" id="screen-history">
+        <div class="app-header">
+          <span class="back" onclick="go('home')">←</span>
+          <span class="title">주문 내역</span>
+        </div>
+        <div class="app-body">
+          <div class="order-card" onclick="go('orderdetail')">
+            <div class="oc-header">
+              <span class="oc-date">2026.03.16</span>
+              <span class="oc-num">ORD-2026031601</span>
+            </div>
+            <div class="oc-body">
+              <div class="oc-img" style="background:#FFF0F5;">💊</div>
+              <div class="oc-info">
+                <div class="oc-name">마그네슘 + 비타민D 외 2개</div>
+                <div class="oc-price">82,000원</div>
+              </div>
+              <span class="oc-status status-ship">배송중</span>
+            </div>
+          </div>
+          <div class="order-card" onclick="go('orderdetail')">
+            <div class="oc-header">
+              <span class="oc-date">2026.02.28</span>
+              <span class="oc-num">ORD-2026022801</span>
+            </div>
+            <div class="oc-body">
+              <div class="oc-img" style="background:#EBF8FF;">🦺</div>
+              <div class="oc-info">
+                <div class="oc-name">허리 보호대 프리미엄</div>
+                <div class="oc-price">42,000원</div>
+              </div>
+              <span class="oc-status status-done">배송완료</span>
+            </div>
+          </div>
+          <div class="order-card" onclick="go('orderdetail')">
+            <div class="oc-header">
+              <span class="oc-date">2026.01.15</span>
+              <span class="oc-num">ORD-2026011501</span>
+            </div>
+            <div class="oc-body">
+              <div class="oc-img" style="background:#F5F0FF;">🎽</div>
+              <div class="oc-info">
+                <div class="oc-name">컴프레션 레깅스</div>
+                <div class="oc-price">58,000원</div>
+              </div>
+              <span class="oc-status status-cancel">취소완료</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ⑧ 주문 상세 -->
+      <div class="screen-frame" id="screen-orderdetail">
+        <div class="app-header">
+          <span class="back" onclick="go('history')">←</span>
+          <span class="title">주문 상세</span>
+        </div>
+        <div class="app-body">
+          <div class="delivery-steps">
+            <div class="ds-title">🚚 배송 현황</div>
+            <div class="ds-step-row">
+              <div class="ds-step">
+                <div class="ds-dot done">✓</div>
+                <div class="ds-label on">결제완료</div>
+              </div>
+              <div class="ds-line done"></div>
+              <div class="ds-step">
+                <div class="ds-dot done">✓</div>
+                <div class="ds-label on">상품준비</div>
+              </div>
+              <div class="ds-line done"></div>
+              <div class="ds-step">
+                <div class="ds-dot now">→</div>
+                <div class="ds-label on">배송중</div>
+              </div>
+              <div class="ds-line wait"></div>
+              <div class="ds-step">
+                <div class="ds-dot wait">●</div>
+                <div class="ds-label">배송완료</div>
+              </div>
+            </div>
+          </div>
+          <div class="delivery-info">
+            📦 CJ대한통운 · 운송장 1234-5678-9012<br>
+            예상 도착일: 3월 18일 (수) ~ 19일 (목)
+          </div>
+          <div class="info-card">
+            <div style="font-size:13px; font-weight:800; color:#4A5568; margin-bottom:8px;">주문 상품</div>
+            <div class="info-row">
+              <span class="info-key">💊 마그네슘 + 비타민D (120정)</span>
+              <span class="info-val">28,000원</span>
+            </div>
+            <div class="info-row">
+              <span class="info-key">🥤 단백질 쉐이크 바닐라 ×2</span>
+              <span class="info-val">64,000원</span>
+            </div>
+          </div>
+          <div class="info-card">
+            <div style="font-size:13px; font-weight:800; color:#4A5568; margin-bottom:8px;">결제 정보</div>
+            <div class="info-row">
+              <span class="info-key">결제 수단</span>
+              <span class="info-val">KB 신용카드 4567</span>
+            </div>
+            <div class="info-row">
+              <span class="info-key">결제 금액</span>
+              <span class="info-val" style="color:#D53F8C; font-size:15px;">82,000원</span>
+            </div>
+          </div>
+          <div class="info-card">
+            <div style="font-size:13px; font-weight:800; color:#4A5568; margin-bottom:8px;">배송지</div>
+            <div class="info-row">
+              <span class="info-key">받는 분</span>
+              <span class="info-val">홍길동 · 010-1234-5678</span>
+            </div>
+            <div class="info-row">
+              <span class="info-key">주소</span>
+              <span class="info-val">강남구 테헤란로 123, 4층</span>
+            </div>
+          </div>
+          <button class="cancel-btn">취소 / 반품 신청</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- 메모판 -->
+  <div class="memo-panel">
+    <h3>🛒 스토어 화면 메모</h3>
+    <div class="memo-field">
+      <label>현재 화면</label>
+      <input type="text" id="memo-screen-name" value="① 스토어 홈" readonly />
+    </div>
+    <div class="memo-divider"></div>
+    <div class="memo-field">
+      <label>화면 설명 / 목적</label>
+      <textarea placeholder="이 화면의 역할과 목적..."></textarea>
+    </div>
+    <div class="memo-field">
+      <label>주요 컴포넌트</label>
+      <textarea placeholder="카드, 배지, 수량 버튼, 결제 등 UI 요소..."></textarea>
+    </div>
+    <div class="memo-field">
+      <label>UX 고려사항</label>
+      <textarea placeholder="구매 흐름, 빈 장바구니, 결제 실패 처리..."></textarea>
+    </div>
+    <div class="memo-field">
+      <label>개발 메모</label>
+      <textarea placeholder="결제 API, 장바구니 상태, 주문 API..."></textarea>
+    </div>
+    <div class="memo-divider"></div>
+    <div class="memo-field">
+      <label>화면 흐름</label>
+      <textarea readonly style="color:#F9A8D4; font-size:12px;">① 스토어 홈
+  · 검색 · 카테고리 · 인기/신상 배너
+  · 상품 클릭 → ③ 상세
+  · 🛒 아이콘 → ④ 장바구니
+
+② 상품 목록
+  · 필터(인기순·가격순·신상품순)
+  · 상품 클릭 → ③ 상세
+
+③ 상품 상세
+  · 이미지 · 가격 · 옵션 선택
+  · [장바구니] → ④
+  · [바로 구매] → ⑤
+
+④ 장바구니
+  · 수량 변경 · 선택 삭제
+  · 총 금액 · [주문하기] → ⑤
+
+⑤ 주문/결제
+  · 배송지 · 결제 수단 선택
+  · [결제하기] → ⑥
+
+⑥ 주문 완료
+  · 주문번호·배송예정일
+  · [주문 내역] → ⑦
+
+⑦ 주문 내역
+  · 과거 주문 목록
+  · 상태(배송중·완료·취소)
+  · 클릭 → ⑧
+
+⑧ 주문 상세
+  · 배송 현황 스텝
+  · 상품·결제·배송지 정보
+  · 취소/반품 신청</textarea>
+    </div>
+  </div>
+</div>
+
+<script>
+  const screenNames = {
+    home:        '① 스토어 홈',
+    list:        '② 상품 목록',
+    detail:      '③ 상품 상세',
+    cart:        '④ 장바구니',
+    order:       '⑤ 주문 / 결제',
+    done:        '⑥ 주문 완료',
+    history:     '⑦ 주문 내역',
+    orderdetail: '⑧ 주문 상세',
+  };
+  function go(id) {
+    document.querySelectorAll('.screen-frame').forEach(el => el.classList.remove('active'));
+    document.querySelectorAll('.screen-btn').forEach(el => el.classList.remove('active'));
+    document.getElementById('screen-' + id).classList.add('active');
+    document.querySelectorAll('.screen-btn').forEach(btn => {
+      if (btn.getAttribute('onclick').includes("'" + id + "'")) btn.classList.add('active');
+    });
+    document.getElementById('memo-screen-name').value = screenNames[id] || id;
+  }
+</script>
+</body>
+</html>
