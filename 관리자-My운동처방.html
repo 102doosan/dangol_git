@@ -193,15 +193,32 @@
     .ex-add-input:focus { border-color: #E67E22; }
     .ex-add-select { border: 1.5px solid #E2E8F0; border-radius: 8px; padding: 7px 8px; font-size: 12px; font-family: 'Noto Sans KR', sans-serif; color: #2D3748; outline: none; background: #fff; width: 100%; }
     .btn-del-ex { background: #FED7D7; color: #C53030; border: none; border-radius: 8px; width: 28px; height: 28px; font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-    /* 운동명 자동완성 */
-    .ex-name-wrap { position: relative; }
-    .ex-ac-list { position: absolute; top: calc(100% + 4px); left: 0; right: 0; background: #fff; border: 1.5px solid #E67E22; border-radius: 10px; box-shadow: 0 6px 20px rgba(0,0,0,0.12); z-index: 200; max-height: 220px; overflow-y: auto; display: none; }
-    .ex-ac-item { padding: 9px 12px; cursor: pointer; display: flex; flex-direction: column; gap: 2px; border-bottom: 1px solid #F7F9FC; }
-    .ex-ac-item:last-child { border-bottom: none; }
-    .ex-ac-item:hover, .ex-ac-item.highlighted { background: #FFF7ED; }
-    .ex-ac-name { font-size: 13px; font-weight: 700; color: #2D3748; }
-    .ex-ac-meta { font-size: 11px; color: #A0AEC0; }
-    .ex-ac-meta mark { background: none; color: #E67E22; font-weight: 800; }
+    /* 운동 선택 모달 */
+    .ex-name-wrap { display: flex; gap: 4px; }
+    .ex-search-btn { flex-shrink: 0; background: #FFF7ED; border: 1.5px solid #F6AD55; border-radius: 8px; padding: 0 10px; font-size: 13px; cursor: pointer; color: #E67E22; white-space: nowrap; }
+    .ex-search-btn:hover { background: #FEEBC8; }
+    .ex-modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.45); z-index: 1000; align-items: center; justify-content: center; }
+    .ex-modal-overlay.open { display: flex; }
+    .ex-modal { background: #fff; border-radius: 20px; width: 760px; max-width: 96vw; max-height: 88vh; display: flex; flex-direction: column; box-shadow: 0 20px 60px rgba(0,0,0,0.25); overflow: hidden; }
+    .ex-modal-header { padding: 20px 24px 16px; border-bottom: 1px solid #F0F4F8; display: flex; align-items: center; gap: 12px; }
+    .ex-modal-title { font-size: 17px; font-weight: 900; color: #1A202C; flex: 1; }
+    .ex-modal-search-input { flex: 1; border: 1.5px solid #E2E8F0; border-radius: 10px; padding: 9px 14px; font-size: 14px; font-family: 'Noto Sans KR', sans-serif; outline: none; }
+    .ex-modal-search-input:focus { border-color: #E67E22; }
+    .ex-modal-close { background: #F7F9FC; border: none; border-radius: 8px; width: 32px; height: 32px; font-size: 16px; cursor: pointer; color: #718096; }
+    .ex-modal-filters { padding: 14px 24px 10px; border-bottom: 1px solid #F0F4F8; display: flex; flex-direction: column; gap: 10px; }
+    .ex-modal-filter-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .ex-modal-filter-label { font-size: 11px; font-weight: 800; color: #A0AEC0; width: 36px; flex-shrink: 0; }
+    .ex-ftab { padding: 5px 12px; border-radius: 99px; border: 1.5px solid #E2E8F0; background: #fff; font-size: 12px; font-weight: 700; cursor: pointer; font-family: 'Noto Sans KR', sans-serif; color: #718096; transition: all .15s; }
+    .ex-ftab.active { background: #E67E22; border-color: #E67E22; color: #fff; }
+    .ex-modal-count { padding: 10px 24px 8px; font-size: 12px; font-weight: 700; color: #A0AEC0; }
+    .ex-modal-grid { padding: 0 24px 20px; overflow-y: auto; display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; flex: 1; }
+    .ex-card { border: 1.5px solid #E2E8F0; border-radius: 12px; padding: 14px; cursor: pointer; transition: all .15s; background: #fff; }
+    .ex-card:hover { border-color: #E67E22; background: #FFF7ED; box-shadow: 0 4px 12px rgba(230,126,34,0.15); }
+    .ex-card-name { font-size: 13px; font-weight: 800; color: #1A202C; margin-bottom: 6px; line-height: 1.4; }
+    .ex-card-part { display: inline-block; font-size: 10px; font-weight: 800; border-radius: 99px; padding: 2px 8px; margin-bottom: 6px; }
+    .ex-card-meta { font-size: 11px; color: #718096; display: flex; gap: 6px; flex-wrap: wrap; }
+    .ex-card-meta span { background: #F7F9FC; border-radius: 4px; padding: 1px 6px; }
+    .ex-modal-empty { grid-column: 1/-1; text-align: center; padding: 40px; color: #A0AEC0; font-size: 14px; font-weight: 700; }
     .btn-add-ex { background: #FFF7ED; color: #E67E22; border: 2px dashed #F6AD55; border-radius: 12px; padding: 12px; text-align: center; font-size: 13px; font-weight: 700; cursor: pointer; width: 100%; font-family: 'Noto Sans KR', sans-serif; margin-top: 4px; }
     .btn-add-ex:hover { background: #FEEBC8; }
 
@@ -875,7 +892,7 @@
             <div class="ex-add-item">
               <div class="ex-add-num">1</div>
               <div class="ex-add-fields">
-                <div class="ex-name-wrap"><input class="ex-add-input" type="text" placeholder="운동명 검색" value="맥켄지 신전 운동" oninput="showAc(this)" onkeydown="acKey(event,this)" onblur="hideAc(this,200)" autocomplete="off" /><div class="ex-ac-list"></div></div>
+                <div class="ex-name-wrap"><input class="ex-add-input" type="text" placeholder="운동명 직접 입력" value="맥켄지 신전 운동" autocomplete="off" /><button class="ex-search-btn" type="button" onclick="openExModal(this.previousElementSibling)">🔍 검색</button></div>
                 <input class="ex-add-input" type="text" placeholder="세트" value="3세트" />
                 <input class="ex-add-input" type="text" placeholder="횟수/시간" value="10회" />
                 <select class="ex-add-select"><option>필수</option><option>권장</option><option>선택</option></select>
@@ -885,7 +902,7 @@
             <div class="ex-add-item">
               <div class="ex-add-num">2</div>
               <div class="ex-add-fields">
-                <div class="ex-name-wrap"><input class="ex-add-input" type="text" placeholder="운동명 검색" value="코어 안정화 운동" oninput="showAc(this)" onkeydown="acKey(event,this)" onblur="hideAc(this,200)" autocomplete="off" /><div class="ex-ac-list"></div></div>
+                <div class="ex-name-wrap"><input class="ex-add-input" type="text" placeholder="운동명 직접 입력" value="코어 안정화 운동" autocomplete="off" /><button class="ex-search-btn" type="button" onclick="openExModal(this.previousElementSibling)">🔍 검색</button></div>
                 <input class="ex-add-input" type="text" placeholder="세트" value="3세트" />
                 <input class="ex-add-input" type="text" placeholder="횟수/시간" value="15회" />
                 <select class="ex-add-select"><option>필수</option><option>권장</option><option>선택</option></select>
@@ -895,7 +912,7 @@
             <div class="ex-add-item">
               <div class="ex-add-num">3</div>
               <div class="ex-add-fields">
-                <div class="ex-name-wrap"><input class="ex-add-input" type="text" placeholder="운동명 검색" value="고관절 스트레칭" oninput="showAc(this)" onkeydown="acKey(event,this)" onblur="hideAc(this,200)" autocomplete="off" /><div class="ex-ac-list"></div></div>
+                <div class="ex-name-wrap"><input class="ex-add-input" type="text" placeholder="운동명 직접 입력" value="고관절 스트레칭" autocomplete="off" /><button class="ex-search-btn" type="button" onclick="openExModal(this.previousElementSibling)">🔍 검색</button></div>
                 <input class="ex-add-input" type="text" placeholder="세트" value="2세트" />
                 <input class="ex-add-input" type="text" placeholder="횟수/시간" value="30초" />
                 <select class="ex-add-select"><option>필수</option><option selected>권장</option><option>선택</option></select>
@@ -1028,7 +1045,7 @@
       div.innerHTML = `
         <div class="ex-add-num">${exCount}</div>
         <div class="ex-add-fields">
-          <div class="ex-name-wrap"><input class="ex-add-input" type="text" placeholder="운동명 검색" oninput="showAc(this)" onkeydown="acKey(event,this)" onblur="hideAc(this,200)" autocomplete="off" /><div class="ex-ac-list"></div></div>
+          <div class="ex-name-wrap"><input class="ex-add-input" type="text" placeholder="운동명 직접 입력" autocomplete="off" /><button class="ex-search-btn" type="button" onclick="openExModal(this.previousElementSibling)">🔍 검색</button></div>
           <input class="ex-add-input" type="text" placeholder="세트" />
           <input class="ex-add-input" type="text" placeholder="횟수/시간" />
           <select class="ex-add-select"><option>필수</option><option>권장</option><option>선택</option></select>
@@ -1114,66 +1131,123 @@
       '하체':'#3182CE','상체':'#276749','전신':'#2A69AC'
     };
 
-    function showAc(input) {
-      const q = input.value.trim().toLowerCase();
-      const list = input.nextElementSibling;
-      if (!q) { list.style.display = 'none'; return; }
-      const results = acExercises.filter(e =>
-        e[0].toLowerCase().includes(q) || e[1].toLowerCase().includes(q)
-      ).slice(0, 10);
-      if (!results.length) { list.style.display = 'none'; return; }
-      list.innerHTML = results.map((e, i) => {
-        const hl = e[0].replace(new RegExp('('+q+')', 'gi'), '<mark>$1</mark>');
+    /* ── 운동 선택 모달 ── */
+    let exModalTarget = null;
+    let exFilter = { part: '', type: '', level: '' };
+
+    function openExModal(input) {
+      exModalTarget = input;
+      exFilter = { part: '', type: '', level: '' };
+      // 필터 탭 초기화
+      document.querySelectorAll('.ex-ftab').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.ex-modal-filter-row').forEach(row => {
+        row.querySelector('.ex-ftab').classList.add('active');
+      });
+      // 검색어 현재 input 값으로 프리필
+      const q = input.value.trim();
+      document.getElementById('exModalSearch').value = q;
+      document.getElementById('exModalOverlay').classList.add('open');
+      renderExCards();
+      setTimeout(() => document.getElementById('exModalSearch').focus(), 80);
+    }
+
+    function closeExModal() {
+      document.getElementById('exModalOverlay').classList.remove('open');
+      exModalTarget = null;
+    }
+
+    function setExFilter(key, val, btn) {
+      exFilter[key] = val;
+      btn.closest('.ex-modal-filter-row').querySelectorAll('.ex-ftab').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      renderExCards();
+    }
+
+    function renderExCards() {
+      const q = document.getElementById('exModalSearch').value.trim().toLowerCase();
+      const filtered = acExercises.filter(e => {
+        if (exFilter.part  && e[1] !== exFilter.part)  return false;
+        if (exFilter.type  && e[2] !== exFilter.type)  return false;
+        if (exFilter.level && e[3] !== exFilter.level) return false;
+        if (q && !e[0].toLowerCase().includes(q) && !e[1].toLowerCase().includes(q)) return false;
+        return true;
+      });
+      document.getElementById('exModalCount').textContent = `총 ${filtered.length}개`;
+      const grid = document.getElementById('exModalGrid');
+      if (!filtered.length) {
+        grid.innerHTML = '<div class="ex-modal-empty">검색 결과가 없습니다</div>';
+        return;
+      }
+      grid.innerHTML = filtered.map(e => {
         const c = acPartColors[e[1]] || '#718096';
-        return `<div class="ex-ac-item" data-idx="${i}" onmousedown="selectAc(this,'${e[0]}','${e[4]}','${e[5]}')" >
-          <div class="ex-ac-name">${hl}</div>
-          <div class="ex-ac-meta"><span style="color:${c};font-weight:800">${e[1]}</span> · ${e[2]} · ${e[3]} · ${e[4]} · ${e[5]}</div>
+        const nameHl = q ? e[0].replace(new RegExp('('+q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+')', 'gi'), '<mark style="background:#FFF3CD;color:#E67E22;font-weight:900;border-radius:2px;">$1</mark>') : e[0];
+        return `<div class="ex-card" onclick="selectExCard('${e[0].replace(/'/g,"\\'")}','${e[4]}','${e[5]}')">
+          <div class="ex-card-name">${nameHl}</div>
+          <span class="ex-card-part" style="background:${c}22;color:${c}">${e[1]}</span>
+          <div class="ex-card-meta">
+            <span>${e[2]}</span><span>${e[3]}</span><span>${e[4]}</span><span>${e[5]}</span>
+          </div>
         </div>`;
       }).join('');
-      list.style.display = 'block';
     }
 
-    function selectAc(item, name, sets, reps) {
-      const wrap = item.closest('.ex-name-wrap');
-      const input = wrap.querySelector('input');
-      const fields = wrap.closest('.ex-add-fields');
+    function selectExCard(name, sets, reps) {
+      if (!exModalTarget) return;
+      exModalTarget.value = name;
+      const fields = exModalTarget.closest('.ex-add-fields');
       const inputs = fields.querySelectorAll('.ex-add-input');
-      input.value = name;
       if (inputs[1]) inputs[1].value = sets;
       if (inputs[2]) inputs[2].value = reps;
-      wrap.querySelector('.ex-ac-list').style.display = 'none';
+      closeExModal();
     }
 
-    function hideAc(input, delay) {
-      setTimeout(() => {
-        const list = input.nextElementSibling;
-        if (list) list.style.display = 'none';
-      }, delay);
-    }
-
-    function acKey(e, input) {
-      const list = input.nextElementSibling;
-      const items = list.querySelectorAll('.ex-ac-item');
-      const cur = list.querySelector('.ex-ac-item.highlighted');
-      if (e.key === 'ArrowDown') {
-        e.preventDefault();
-        const next = cur ? (cur.nextElementSibling || items[0]) : items[0];
-        cur && cur.classList.remove('highlighted');
-        next && next.classList.add('highlighted');
-      } else if (e.key === 'ArrowUp') {
-        e.preventDefault();
-        const prev = cur ? (cur.previousElementSibling || items[items.length-1]) : items[items.length-1];
-        cur && cur.classList.remove('highlighted');
-        prev && prev.classList.add('highlighted');
-      } else if (e.key === 'Enter' && cur) {
-        e.preventDefault();
-        cur.dispatchEvent(new MouseEvent('mousedown'));
-      } else if (e.key === 'Escape') {
-        list.style.display = 'none';
-      }
-    }
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape') closeExModal();
+    });
 
     showScreen(0, document.querySelector('.nav-btn.active'));
   </script>
+
+  <!-- 운동 선택 모달 -->
+  <div class="ex-modal-overlay" id="exModalOverlay" onclick="if(event.target===this)closeExModal()">
+    <div class="ex-modal">
+      <div class="ex-modal-header">
+        <div class="ex-modal-title">🏋️ 운동 선택</div>
+        <input class="ex-modal-search-input" id="exModalSearch" type="text" placeholder="🔍  운동명 검색..." oninput="renderExCards()" autocomplete="off" />
+        <button class="ex-modal-close" onclick="closeExModal()">✕</button>
+      </div>
+
+      <div class="ex-modal-filters">
+        <div class="ex-modal-filter-row">
+          <span class="ex-modal-filter-label">부위</span>
+          <button class="ex-ftab active" data-part="" onclick="setExFilter('part','',this)">전체</button>
+          <button class="ex-ftab" data-part="목·어깨" onclick="setExFilter('part','목·어깨',this)">목·어깨</button>
+          <button class="ex-ftab" data-part="허리·척추" onclick="setExFilter('part','허리·척추',this)">허리·척추</button>
+          <button class="ex-ftab" data-part="코어" onclick="setExFilter('part','코어',this)">코어</button>
+          <button class="ex-ftab" data-part="하체" onclick="setExFilter('part','하체',this)">하체</button>
+          <button class="ex-ftab" data-part="상체" onclick="setExFilter('part','상체',this)">상체</button>
+          <button class="ex-ftab" data-part="전신" onclick="setExFilter('part','전신',this)">전신</button>
+        </div>
+        <div class="ex-modal-filter-row">
+          <span class="ex-modal-filter-label">유형</span>
+          <button class="ex-ftab active" onclick="setExFilter('type','',this)">전체</button>
+          <button class="ex-ftab" onclick="setExFilter('type','재활',this)">재활</button>
+          <button class="ex-ftab" onclick="setExFilter('type','근력',this)">근력</button>
+          <button class="ex-ftab" onclick="setExFilter('type','스트레칭',this)">스트레칭</button>
+          <button class="ex-ftab" onclick="setExFilter('type','유산소',this)">유산소</button>
+        </div>
+        <div class="ex-modal-filter-row">
+          <span class="ex-modal-filter-label">난이도</span>
+          <button class="ex-ftab active" onclick="setExFilter('level','',this)">전체</button>
+          <button class="ex-ftab" onclick="setExFilter('level','초급',this)">초급</button>
+          <button class="ex-ftab" onclick="setExFilter('level','중급',this)">중급</button>
+          <button class="ex-ftab" onclick="setExFilter('level','고급',this)">고급</button>
+        </div>
+      </div>
+
+      <div class="ex-modal-count" id="exModalCount"></div>
+      <div class="ex-modal-grid" id="exModalGrid"></div>
+    </div>
+  </div>
 </body>
 </html>
