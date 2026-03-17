@@ -302,8 +302,10 @@ const adminData = [
   {
     id:"a-dashboard", icon:"📊", title:"대시보드", color:"#4299E1",
     screens:[
-      {id:"a03",name:"메인 대시보드",desc:"가입자 수, 활성 유저, 매출 요약",priority:"필수",dev:"FE/BE"},
-      {id:"a04",name:"통계 차트",desc:"일별/주별/월별 주요 지표 그래프",priority:"필수",dev:"FE/BE"},
+      {id:"a03",name:"메인 대시보드",desc:"상단 헤더 (날짜·미처리 건수 요약 + 미니 통계 3개: 전체 회원·미처리·이번달 매출) · 요약 카드 4개 (처방 신청 대기·SFMA 도래·신규 회원·레슨 미배정)",priority:"필수",dev:"FE/BE"},
+      {id:"a04",name:"팝업 알림 패널",desc:"탭 필터 (전체·처방 신청·SFMA·레슨) · 미처리 알림 목록 (색상 dot로 유형 구분) · 알림 항목 클릭 → 해당 관리 화면으로 이동",priority:"필수",dev:"FE/BE"},
+      {id:"a05",name:"미처리 업무 패널",desc:"팝업 알림의 미완료 건과 연동 · 카테고리별 섹션 구분 + 체크박스 · 완료 처리 시 알림 목록에서도 제거",priority:"필수",dev:"FE/BE"},
+      {id:"a06",name:"매출 통계 / 회원 현황",desc:"월별 매출 바 차트 (3개월·6개월·1년 전환) · 회원 현황 도넛 차트 · GET /admin/sales?period=",priority:"권장",dev:"FE/BE"},
     ]
   },
   {
