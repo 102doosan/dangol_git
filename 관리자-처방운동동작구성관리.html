@@ -240,52 +240,52 @@
         <div class="stats-row">
           <div class="stat-card indigo">
             <div class="stat-card-top"><span class="stat-card-label">전체 운동 동작</span><span class="stat-card-icon">🏋️</span></div>
-            <div class="stat-card-val">48</div>
+            <div class="stat-card-val" id="stat-total">300</div>
             <div class="stat-card-sub">6개 부위</div>
           </div>
           <div class="stat-card green">
             <div class="stat-card-top"><span class="stat-card-label">재활 운동</span><span class="stat-card-icon">🩺</span></div>
-            <div class="stat-card-val">19</div>
-            <div class="stat-card-sub">전체의 39%</div>
+            <div class="stat-card-val" id="stat-rehab">-</div>
+            <div class="stat-card-sub" id="stat-rehab-pct"></div>
           </div>
           <div class="stat-card orange">
             <div class="stat-card-top"><span class="stat-card-label">근력 운동</span><span class="stat-card-icon">💪</span></div>
-            <div class="stat-card-val">17</div>
-            <div class="stat-card-sub">전체의 35%</div>
+            <div class="stat-card-val" id="stat-strength">-</div>
+            <div class="stat-card-sub" id="stat-strength-pct"></div>
           </div>
           <div class="stat-card purple">
             <div class="stat-card-top"><span class="stat-card-label">스트레칭</span><span class="stat-card-icon">🧘</span></div>
-            <div class="stat-card-val">12</div>
-            <div class="stat-card-sub">전체의 26%</div>
+            <div class="stat-card-val" id="stat-stretch">-</div>
+            <div class="stat-card-sub" id="stat-stretch-pct"></div>
           </div>
         </div>
 
         <!-- 부위 탭 -->
         <div class="body-tabs">
-          <button class="body-tab active" onclick="filterTab(this,'all')">전체 <span class="body-tab-count">48</span></button>
-          <button class="body-tab" onclick="filterTab(this,'neck')">목·어깨 <span class="body-tab-count">8</span></button>
-          <button class="body-tab" onclick="filterTab(this,'back')">허리·척추 <span class="body-tab-count">10</span></button>
-          <button class="body-tab" onclick="filterTab(this,'core')">코어 <span class="body-tab-count">9</span></button>
-          <button class="body-tab" onclick="filterTab(this,'lower')">하체 <span class="body-tab-count">10</span></button>
-          <button class="body-tab" onclick="filterTab(this,'upper')">상체 <span class="body-tab-count">7</span></button>
-          <button class="body-tab" onclick="filterTab(this,'full')">전신 <span class="body-tab-count">4</span></button>
+          <button class="body-tab active" onclick="filterTab(this,'all')">전체 <span class="body-tab-count" id="cnt-all">300</span></button>
+          <button class="body-tab" onclick="filterTab(this,'neck')">목·어깨 <span class="body-tab-count" id="cnt-neck">50</span></button>
+          <button class="body-tab" onclick="filterTab(this,'back')">허리·척추 <span class="body-tab-count" id="cnt-back">50</span></button>
+          <button class="body-tab" onclick="filterTab(this,'core')">코어 <span class="body-tab-count" id="cnt-core">50</span></button>
+          <button class="body-tab" onclick="filterTab(this,'lower')">하체 <span class="body-tab-count" id="cnt-lower">50</span></button>
+          <button class="body-tab" onclick="filterTab(this,'upper')">상체 <span class="body-tab-count" id="cnt-upper">50</span></button>
+          <button class="body-tab" onclick="filterTab(this,'full')">전신 <span class="body-tab-count" id="cnt-full">50</span></button>
         </div>
 
         <!-- 검색 -->
         <div class="search-bar">
-          <input class="search-input" type="text" placeholder="🔍  운동명 검색" />
-          <select class="filter-select">
-            <option>전체 유형</option>
-            <option>재활</option>
-            <option>근력</option>
-            <option>스트레칭</option>
-            <option>유산소</option>
+          <input class="search-input" id="ex-search" type="text" placeholder="🔍  운동명 검색" oninput="renderTable()" />
+          <select class="filter-select" id="ex-filter-type" onchange="renderTable()">
+            <option value="">전체 유형</option>
+            <option value="재활">재활</option>
+            <option value="근력">근력</option>
+            <option value="스트레칭">스트레칭</option>
+            <option value="유산소">유산소</option>
           </select>
-          <select class="filter-select">
-            <option>전체 난이도</option>
-            <option>초급</option>
-            <option>중급</option>
-            <option>고급</option>
+          <select class="filter-select" id="ex-filter-level" onchange="renderTable()">
+            <option value="">전체 난이도</option>
+            <option value="초급">초급</option>
+            <option value="중급">중급</option>
+            <option value="고급">고급</option>
           </select>
         </div>
 
@@ -293,7 +293,7 @@
         <div class="table-wrap">
           <div class="table-header">
             <span class="table-title">운동 동작 목록</span>
-            <span class="table-count">총 48개</span>
+            <span class="table-count" id="ex-count">총 300개</span>
           </div>
           <table>
             <thead>
@@ -308,88 +308,7 @@
                 <th>관리</th>
               </tr>
             </thead>
-            <tbody>
-              <tr>
-                <td><span class="part-dot" style="background:#E53E3E;"></span>허리·척추</td>
-                <td><div class="td-name">맥켄지 신전 운동</div><div class="td-sub">요추 신전, 디스크 재활 대표 동작</div></td>
-                <td><span class="badge badge-green">재활</span></td>
-                <td><span class="badge badge-blue">초급</span></td>
-                <td>3세트</td>
-                <td>10회</td>
-                <td style="font-weight:800;color:#5A67D8;">38건</td>
-                <td style="display:flex;gap:6px;"><button class="btn-edit" onclick="showScreen(1,document.querySelectorAll('.nav-btn')[1])">수정</button><button class="btn-del">삭제</button></td>
-              </tr>
-              <tr>
-                <td><span class="part-dot" style="background:#E67E22;"></span>코어</td>
-                <td><div class="td-name">플랭크</div><div class="td-sub">코어 전반 안정화, 허리 보호</div></td>
-                <td><span class="badge badge-orange">근력</span></td>
-                <td><span class="badge badge-purple">중급</span></td>
-                <td>3세트</td>
-                <td>30초</td>
-                <td style="font-weight:800;color:#5A67D8;">31건</td>
-                <td style="display:flex;gap:6px;"><button class="btn-edit" onclick="showScreen(1,document.querySelectorAll('.nav-btn')[1])">수정</button><button class="btn-del">삭제</button></td>
-              </tr>
-              <tr>
-                <td><span class="part-dot" style="background:#E53E3E;"></span>허리·척추</td>
-                <td><div class="td-name">고양이-낙타 운동</div><div class="td-sub">척추 유연성 향상, 통증 완화</div></td>
-                <td><span class="badge badge-green">재활</span></td>
-                <td><span class="badge badge-blue">초급</span></td>
-                <td>2세트</td>
-                <td>10회</td>
-                <td style="font-weight:800;color:#5A67D8;">27건</td>
-                <td style="display:flex;gap:6px;"><button class="btn-edit" onclick="showScreen(1,document.querySelectorAll('.nav-btn')[1])">수정</button><button class="btn-del">삭제</button></td>
-              </tr>
-              <tr>
-                <td><span class="part-dot" style="background:#3182CE;"></span>하체</td>
-                <td><div class="td-name">스쿼트</div><div class="td-sub">하체 전반 근력 강화</div></td>
-                <td><span class="badge badge-orange">근력</span></td>
-                <td><span class="badge badge-blue">초급</span></td>
-                <td>3세트</td>
-                <td>12회</td>
-                <td style="font-weight:800;color:#5A67D8;">24건</td>
-                <td style="display:flex;gap:6px;"><button class="btn-edit" onclick="showScreen(1,document.querySelectorAll('.nav-btn')[1])">수정</button><button class="btn-del">삭제</button></td>
-              </tr>
-              <tr>
-                <td><span class="part-dot" style="background:#805AD5;"></span>목·어깨</td>
-                <td><div class="td-name">경추 측면 스트레칭</div><div class="td-sub">목 옆 근육 이완, 자세 교정</div></td>
-                <td><span class="badge badge-teal">스트레칭</span></td>
-                <td><span class="badge badge-blue">초급</span></td>
-                <td>2세트</td>
-                <td>30초</td>
-                <td style="font-weight:800;color:#5A67D8;">22건</td>
-                <td style="display:flex;gap:6px;"><button class="btn-edit" onclick="showScreen(1,document.querySelectorAll('.nav-btn')[1])">수정</button><button class="btn-del">삭제</button></td>
-              </tr>
-              <tr>
-                <td><span class="part-dot" style="background:#E67E22;"></span>코어</td>
-                <td><div class="td-name">데드버그</div><div class="td-sub">복부 안정화, 허리 부하 최소화</div></td>
-                <td><span class="badge badge-orange">근력</span></td>
-                <td><span class="badge badge-purple">중급</span></td>
-                <td>3세트</td>
-                <td>10회</td>
-                <td style="font-weight:800;color:#5A67D8;">19건</td>
-                <td style="display:flex;gap:6px;"><button class="btn-edit" onclick="showScreen(1,document.querySelectorAll('.nav-btn')[1])">수정</button><button class="btn-del">삭제</button></td>
-              </tr>
-              <tr>
-                <td><span class="part-dot" style="background:#3182CE;"></span>하체</td>
-                <td><div class="td-name">고관절 굴곡 스트레칭</div><div class="td-sub">고관절 유연성, 허리 연계 재활</div></td>
-                <td><span class="badge badge-teal">스트레칭</span></td>
-                <td><span class="badge badge-blue">초급</span></td>
-                <td>2세트</td>
-                <td>40초</td>
-                <td style="font-weight:800;color:#5A67D8;">17건</td>
-                <td style="display:flex;gap:6px;"><button class="btn-edit" onclick="showScreen(1,document.querySelectorAll('.nav-btn')[1])">수정</button><button class="btn-del">삭제</button></td>
-              </tr>
-              <tr>
-                <td><span class="part-dot" style="background:#276749;"></span>상체</td>
-                <td><div class="td-name">밴드 로우</div><div class="td-sub">등 상부 근력, 어깨 후방 강화</div></td>
-                <td><span class="badge badge-orange">근력</span></td>
-                <td><span class="badge badge-purple">중급</span></td>
-                <td>3세트</td>
-                <td>12회</td>
-                <td style="font-weight:800;color:#5A67D8;">14건</td>
-                <td style="display:flex;gap:6px;"><button class="btn-edit" onclick="showScreen(1,document.querySelectorAll('.nav-btn')[1])">수정</button><button class="btn-del">삭제</button></td>
-              </tr>
-            </tbody>
+            <tbody id="ex-tbody"></tbody>
           </table>
         </div>
       </div>
@@ -754,9 +673,392 @@
       document.getElementById('memo-body').innerHTML = html;
     }
 
+    // ── 운동 데이터 [운동명, 부위코드, 유형, 난이도, 세트, 횟수/시간, 설명] ──────────
+    // 부위코드: neck=목어깨, back=허리척추, core=코어, lower=하체, upper=상체, full=전신
+    const exercises = [
+      // ── 목·어깨 (50개) ─────────────────────────────────────────────────────────
+      ['경추 측면 스트레칭','neck','스트레칭','초급','2세트','30초','목 옆 근육 이완, 자세 교정'],
+      ['경추 전굴/후굴 운동','neck','재활','초급','2세트','10회','경추 굴곡·신전 가동 범위 회복'],
+      ['경추 회전 운동','neck','재활','초급','2세트','10회','경추 좌우 회전 근력 및 가동 향상'],
+      ['어깨 회전 운동','neck','스트레칭','초급','2세트','15회','어깨 관절 전방·후방 회전 이완'],
+      ['승모근 스트레칭','neck','스트레칭','초급','2세트','30초','상부 승모근 과긴장 해소'],
+      ['흉쇄유돌근 스트레칭','neck','스트레칭','초급','2세트','30초','목 회전 근육 이완, 두통 완화'],
+      ['어깨 으쓱하기 (Shoulder Shrug)','neck','근력','초급','3세트','15회','승모근·상부 등 근력 강화'],
+      ['넥 리트렉션 (Chin Tuck)','neck','재활','초급','3세트','10회','일자목 교정, 심부 경추 근육 활성화'],
+      ['밴드 페이스 풀','neck','근력','중급','3세트','12회','후방 어깨 및 외회전근 강화'],
+      ['사이드 레터럴 레이즈','neck','근력','중급','3세트','12회','삼각근 중간 부위 강화'],
+      ['프론트 레이즈','neck','근력','중급','3세트','12회','삼각근 전방 부위 강화'],
+      ['어깨 내·외회전 스트레칭','neck','스트레칭','초급','2세트','30초','회전근개 유연성 향상'],
+      ['월 슬라이드 (Wall Slide)','neck','재활','초급','3세트','10회','어깨 안정화 및 날개뼈 가동 훈련'],
+      ['밴드 숄더 외회전','neck','재활','초급','3세트','12회','회전근개 강화, 충돌증후군 예방'],
+      ['숄더 프레스 (덤벨)','neck','근력','중급','3세트','12회','삼각근 전방·중간 부위 복합 강화'],
+      ['리어 델트 플라이','neck','근력','중급','3세트','12회','삼각근 후방 및 능형근 강화'],
+      ['케이블 숄더 내회전','neck','재활','중급','3세트','15회','회전근개 내회전 근력 강화'],
+      ['도어웨이 가슴 스트레칭','neck','스트레칭','초급','2세트','30초','소흉근·대흉근 이완, 어깨 전방 이완'],
+      ['경추 굴곡 근력 운동','neck','재활','초급','3세트','10회','심부 경추 굴곡근 강화'],
+      ['경추 신전 근력 운동','neck','재활','초급','3세트','10회','경추 신전근 강화, 일자목 교정'],
+      ['어깨 펜듈럼 운동','neck','재활','초급','3세트','1분','어깨 관절 감압 이완, 오십견 재활'],
+      ['팔 가로 당기기 (Cross Body Stretch)','neck','스트레칭','초급','2세트','30초','삼각근 후방 스트레칭'],
+      ['어깨 내회전 스트레칭','neck','스트레칭','초급','2세트','30초','내회전 단축 이완, 자세 교정'],
+      ['밴드 W 운동','neck','재활','초급','3세트','12회','날개뼈 후인·하강 활성화'],
+      ['밴드 Y 운동','neck','재활','중급','3세트','12회','하부 승모근 및 전거근 강화'],
+      ['밴드 T 운동','neck','재활','중급','3세트','12회','중부 승모근·능형근 강화'],
+      ['밀리터리 프레스 (바벨)','neck','근력','고급','4세트','8회','삼각근 전체 복합 근력 강화'],
+      ['아놀드 프레스','neck','근력','중급','3세트','10회','삼각근 3두 모두 자극'],
+      ['업라이트 로우','neck','근력','중급','3세트','12회','삼각근·승모근 동시 강화'],
+      ['넥 플렉션 (중립위)','neck','재활','초급','2세트','10회','경추 중립 자세 유지 훈련'],
+      ['후두하근 이완','neck','스트레칭','초급','2세트','1분','두통·목 통증 완화, 후두하근 이완'],
+      ['사각근 스트레칭','neck','스트레칭','초급','2세트','30초','흉곽 출구 증후군 예방, 측면 목 이완'],
+      ['흉추 신전 (폼롤러)','neck','재활','초급','2세트','1분','흉추 과후만 교정, 어깨 자세 개선'],
+      ['어깨 관절 가동 운동','neck','재활','초급','3세트','10회','어깨 전 방향 가동 범위 회복'],
+      ['팔꿈치 들기 운동 (Elbow Raise)','neck','재활','초급','3세트','10회','견갑 거상 억제, 어깨 안정성'],
+      ['케이블 외회전','neck','재활','중급','3세트','15회','극하근·소원근 강화'],
+      ['밴드 숄더 내회전','neck','재활','초급','3세트','15회','견갑하근 강화, 내회전 안정화'],
+      ['덤벨 숄더 서클','neck','스트레칭','초급','2세트','10회','어깨 관절 전방향 가동 이완'],
+      ['폼롤러 승모근 이완','neck','스트레칭','초급','2세트','1분','상·중부 승모근 압박 이완'],
+      ['슈퍼맨 운동 (상부)','neck','근력','중급','3세트','12회','척추 신전근·후방 어깨 강화'],
+      ['어깨 세라투스 활성화','neck','재활','초급','3세트','10회','전거근 활성화, 날개뼈 부상 예방'],
+      ['어깨 충돌증후군 재활','neck','재활','초급','2세트','10회','견봉하 공간 확보 운동'],
+      ['회전근개 강화 운동','neck','재활','중급','3세트','15회','극상근·극하근·소원근·견갑하근 복합 강화'],
+      ['밴드 풀 어파트','neck','근력','초급','3세트','15회','후방 어깨·능형근 강화'],
+      ['어깨 전방 스트레칭','neck','스트레칭','초급','2세트','30초','소흉근·이두근 장두 이완'],
+      ['목 등척성 저항 운동','neck','재활','중급','3세트','10회','경추 다방향 등척성 근력 훈련'],
+      ['더블 친 예방 운동','neck','재활','초급','3세트','10회','경추 전만 회복, 두부 전방 자세 교정'],
+      ['고양이 스트레칭 (경추)','neck','스트레칭','초급','2세트','30초','경추·흉추 연결 유연성 향상'],
+      ['어깨 내전 스트레칭','neck','스트레칭','초급','2세트','30초','어깨 후방 관절낭 이완'],
+      ['밴드 오버헤드 스트레칭','neck','스트레칭','중급','2세트','30초','광배근·삼두근·어깨 복합 이완'],
+      // ── 허리·척추 (50개) ────────────────────────────────────────────────────────
+      ['맥켄지 신전 운동','back','재활','초급','3세트','10회','요추 신전, 디스크 재활 대표 동작'],
+      ['고양이-낙타 운동','back','재활','초급','2세트','10회','척추 분절 유연성 향상, 통증 완화'],
+      ['척추 회전 스트레칭','back','스트레칭','초급','2세트','30초','흉·요추 회전 이완, 굳은 등 풀기'],
+      ['무릎 가슴 당기기','back','스트레칭','초급','2세트','30초','요추 신근·둔근 이완'],
+      ['골반 전후방 경사 운동','back','재활','초급','3세트','15회','골반 안정화, 요추 전만 조절'],
+      ['브릿지 운동','back','근력','초급','3세트','15회','둔근·요추 신근 강화'],
+      ['싱글 레그 브릿지','back','근력','중급','3세트','12회','편측 둔근·코어 강화'],
+      ['슈퍼맨 운동','back','근력','중급','3세트','12회','척추 신전근·둔근 동시 강화'],
+      ['척추 신전 (백 익스텐션)','back','근력','중급','3세트','15회','척추 기립근 강화'],
+      ['버드독 (Bird-Dog)','back','재활','중급','3세트','10회','척추 안정화, 코어-허리 연계 훈련'],
+      ['요방형근 스트레칭','back','스트레칭','초급','2세트','30초','요방형근 단축 이완, 허리 통증 완화'],
+      ['엉덩이 스트레칭 (피리포미스)','back','스트레칭','초급','2세트','30초','피리포미스 이완, 방사통 완화'],
+      ['굿모닝 운동','back','근력','중급','3세트','12회','척추 기립근·햄스트링 강화'],
+      ['데드리프트 (루마니안)','back','근력','중급','4세트','10회','후방 체인 근력 복합 강화'],
+      ['하이퍼익스텐션','back','근력','중급','3세트','15회','척추 기립근 집중 강화'],
+      ['척추 측만 교정 운동','back','재활','초급','3세트','10회','비대칭 근육 균형 회복'],
+      ['복부 드로인 운동','back','재활','초급','3세트','10회','복횡근 활성화, 요추 안정화'],
+      ['경첩 운동 (Hip Hinge)','back','재활','초급','3세트','10회','올바른 허리 사용법 훈련'],
+      ['엉덩이 워크','back','재활','초급','3세트','15회','좌골 보행 훈련, 골반 안정화'],
+      ['반 엎드린 자세 코어','back','재활','초급','3세트','30초','요추 신전위 안정화 훈련'],
+      ['세라투스 활성화 운동','back','재활','초급','3세트','10회','전거근 활성화로 흉추 안정화'],
+      ['측면 굴곡 스트레칭','back','스트레칭','초급','2세트','30초','측면 요방형근 이완'],
+      ['허리 회전 스트레칭 (앉아서)','back','스트레칭','초급','2세트','30초','앉은 자세 흉·요추 회전 이완'],
+      ['스핑크스 자세','back','재활','초급','2세트','1분','요추 신전 유도, 디스크 자연 재흡수'],
+      ['코브라 스트레칭','back','스트레칭','초급','2세트','30초','복부 이완·척추 신전 스트레칭'],
+      ['아동 자세 (Child\'s Pose)','back','스트레칭','초급','2세트','1분','요추 굴곡 이완, 전신 긴장 해소'],
+      ['햄스트링 스트레칭 (누워서)','back','스트레칭','초급','2세트','30초','햄스트링 단축 교정, 허리 보호'],
+      ['폼롤러 흉추 이완','back','스트레칭','초급','2세트','1분','흉추 과후만 교정, 어깨 자세 개선'],
+      ['척추 분절 운동','back','재활','초급','3세트','10회','각 척추 분절 독립 가동 훈련'],
+      ['로우백 스트레칭','back','스트레칭','초급','2세트','30초','요추 하부 근육 전반 이완'],
+      ['네발 자세 척추 신전','back','재활','초급','3세트','10회','중립 척추 유지 신전 훈련'],
+      ['네발 자세 허리 회전','back','재활','초급','3세트','10회','네발 자세 회전 안정성 훈련'],
+      ['반 무릎 자세 척추 신전','back','재활','초급','3세트','10회','선 자세 전 단계 재활 운동'],
+      ['데드버그 변형 (허리)','back','재활','중급','3세트','10회','요추 안정화 복합 훈련'],
+      ['사이드 브릿지','back','근력','중급','3세트','30초','측면 코어·요방형근 강화'],
+      ['클램쉘 운동','back','재활','초급','3세트','15회','고관절 외회전근 강화로 허리 보호'],
+      ['힙 서클 운동','back','스트레칭','초급','2세트','10회','고관절 전방향 가동 이완'],
+      ['척추 안정화 운동 A','back','재활','초급','3세트','10회','기초 척추 안정화 패턴 훈련'],
+      ['척추 안정화 운동 B','back','재활','중급','3세트','10회','심화 척추 안정화 패턴 훈련'],
+      ['발목 펌프 운동','back','재활','초급','3세트','20회','하지정맥 순환 촉진'],
+      ['척추 측면 굽힘 (앉아서)','back','재활','초급','2세트','10회','측면 가동 범위 회복 훈련'],
+      ['바닥 눕기 리셋 자세','back','재활','초급','2세트','3분','척추 감압·전신 이완'],
+      ['트랙션 스트레칭 (허리)','back','재활','초급','2세트','2분','요추 견인으로 디스크 압력 경감'],
+      ['요가 다운독 자세','back','스트레칭','초급','2세트','30초','척추 신장·햄스트링 복합 이완'],
+      ['테이블탑 척추 안정화','back','재활','중급','3세트','12회','상지·하지 협응 코어 훈련'],
+      ['선 자세 허리 신전','back','재활','초급','3세트','10회','직립 요추 신전 운동'],
+      ['윌리엄스 굴곡 운동','back','재활','초급','3세트','10회','요추 굴곡 근육 강화 운동'],
+      ['하프 닐링 척추 신전','back','재활','중급','3세트','10회','반무릎 자세 요추 신전 강화'],
+      ['척추 감압 스트레칭','back','스트레칭','초급','2세트','2분','철봉 매달리기로 척추 감압'],
+      ['골반 시계 운동','back','재활','초급','2세트','10회','골반 전후·좌우 안정화 훈련'],
+      ['요추 스태빌리제이션','back','재활','중급','3세트','10회','요추 중립 유지 동적 안정화'],
+      // ── 코어 (50개) ─────────────────────────────────────────────────────────────
+      ['플랭크','core','근력','중급','3세트','30초','코어 전반 안정화, 허리 보호'],
+      ['사이드 플랭크','core','근력','중급','3세트','20초','측면 코어·요방형근 강화'],
+      ['데드버그','core','근력','중급','3세트','10회','복부 안정화, 허리 부하 최소화'],
+      ['크런치','core','근력','초급','3세트','15회','복직근 상부 집중 강화'],
+      ['바이시클 크런치','core','근력','중급','3세트','20회','복직근·복사근 복합 자극'],
+      ['레그 레이즈','core','근력','중급','3세트','12회','복직근 하부 강화'],
+      ['리버스 크런치','core','근력','중급','3세트','15회','복직근 하부 집중 자극'],
+      ['러시안 트위스트','core','근력','중급','3세트','20회','복사근 회전력 강화'],
+      ['복부 드로인','core','재활','초급','3세트','10회','복횡근 선택적 활성화'],
+      ['복횡근 활성화 운동','core','재활','초급','3세트','10회','심부 복횡근 단독 강화'],
+      ['힐 탭','core','재활','초급','3세트','20회','복직근 하부·복횡근 협응 훈련'],
+      ['토 탭','core','재활','초급','3세트','20회','코어 안정화 기초 동작'],
+      ['마운틴 클라이머','core','유산소','중급','3세트','30초','코어·유산소 복합 훈련'],
+      ['롤아웃 (Ab Wheel)','core','근력','고급','3세트','10회','복직근 전체 최대 부하 운동'],
+      ['케이블 크런치','core','근력','중급','3세트','15회','저항 부하 복직근 강화'],
+      ['행잉 니 레이즈','core','근력','중급','3세트','12회','복직근 하부·고관절 굴곡근 강화'],
+      ['행잉 레그 레이즈','core','근력','고급','3세트','10회','복직근 하부 최대 자극'],
+      ['브릿지 마치','core','근력','중급','3세트','10회','코어 안정화+하체 협응 훈련'],
+      ['코어 롤링','core','재활','초급','3세트','10회','전신 코어 협응·이완 운동'],
+      ['팔로프 프레스','core','근력','중급','3세트','12회','항회전 코어 안정화 훈련'],
+      ['케틀벨 사이드 밴드','core','근력','중급','3세트','12회','측면 코어 저항 강화'],
+      ['드래곤 플래그','core','근력','고급','3세트','6회','전신 코어 최고난이도 운동'],
+      ['V-업','core','근력','고급','3세트','10회','복직근 상·하부 동시 자극'],
+      ['보수볼 플랭크','core','근력','중급','3세트','30초','불안정 면 코어 강화'],
+      ['TRX 크런치','core','근력','중급','3세트','12회','TRX 불안정 자극 복근 운동'],
+      ['스위스볼 크런치','core','근력','중급','3세트','15회','볼 위 크런치로 복근 확장'],
+      ['스위스볼 패스','core','근력','고급','3세트','10회','양손·양발 볼 패스 코어 훈련'],
+      ['복부 진공 운동 (Vacuum)','core','재활','초급','3세트','5회','복횡근 최대 수축 훈련'],
+      ['코어 브리싱','core','재활','초급','3세트','5회','호흡 연동 복횡근 활성화'],
+      ['롤업 (Pilates)','core','재활','중급','3세트','8회','척추 분절 가동·복근 통합 운동'],
+      ['니 투 엘보우 플랭크','core','근력','중급','3세트','10회','측면 코어·복사근 자극 플랭크'],
+      ['플랭크 숄더 탭','core','근력','중급','3세트','10회','항회전+코어 안정 플랭크 변형'],
+      ['플랭크 힙 딥','core','근력','중급','3세트','15회','옆구리 집중 플랭크 변형'],
+      ['리버스 플랭크','core','근력','중급','3세트','20초','후방 코어·둔근·어깨 복합 강화'],
+      ['스플릿 레그 크런치','core','근력','중급','3세트','15회','하체 고정 크런치 변형'],
+      ['비행기 자세 (코어)','core','재활','초급','3세트','10회','중심 잡기·코어 균형 훈련'],
+      ['코어 트위스트','core','근력','초급','3세트','15회','복사근 회전 기초 운동'],
+      ['버드독','core','재활','중급','3세트','10회','척추 중립+코어 협응 훈련'],
+      ['파이크','core','근력','고급','3세트','8회','하체→코어 접어 올리기 고난이도'],
+      ['할로우 홀드','core','근력','중급','3세트','20초','체조식 코어 긴장 유지 훈련'],
+      ['헝잉 사이드 니 레이즈','core','근력','중급','3세트','12회','측면 복사근 행잉 훈련'],
+      ['케이블 우드찹','core','근력','중급','3세트','12회','회전 코어 저항 강화'],
+      ['케이블 사이드 밴드','core','근력','중급','3세트','12회','측면 코어 케이블 저항'],
+      ['플로어 와이퍼','core','근력','고급','3세트','10회','레그 레이즈+사이드 회전 복합'],
+      ['복부 활성화 호흡','core','재활','초급','2세트','5회','횡격막 호흡으로 코어 연동 활성'],
+      ['플랭크 로우','core','근력','중급','3세트','10회','플랭크+로우 복합 코어·등 훈련'],
+      ['코어 밸런스 볼 운동','core','근력','중급','3세트','12회','불안정 면 코어 통합 강화'],
+      ['스완 다이브 (Pilates)','core','재활','중급','3세트','8회','척추 신전+코어 통합 필라테스'],
+      ['테이블 크런치','core','근력','초급','3세트','15회','테이블탑 자세 기초 크런치'],
+      ['옆구리 두드리기','core','재활','초급','2세트','20회','옆구리 순환 촉진·이완'],
+      // ── 하체 (50개) ─────────────────────────────────────────────────────────────
+      ['스쿼트','lower','근력','초급','3세트','12회','하체 전반 근력 강화'],
+      ['런지','lower','근력','초급','3세트','10회','대퇴사두근·둔근 강화, 균형 향상'],
+      ['고관절 굴곡 스트레칭','lower','스트레칭','초급','2세트','30초','장요근 이완, 허리 연계 재활'],
+      ['레그 프레스','lower','근력','중급','4세트','12회','대퇴사두근·둔근 복합 강화'],
+      ['레그 익스텐션','lower','근력','초급','3세트','15회','대퇴사두근 고립 강화'],
+      ['레그 컬','lower','근력','초급','3세트','15회','햄스트링 고립 강화'],
+      ['힙 어브덕션','lower','재활','초급','3세트','15회','고관절 외전근 강화, 무릎 안정화'],
+      ['힙 어덕션','lower','재활','초급','3세트','15회','고관절 내전근 강화'],
+      ['클램쉘 운동','lower','재활','초급','3세트','15회','고관절 외회전근·둔근 강화'],
+      ['햄스트링 스트레칭 (서서)','lower','스트레칭','초급','2세트','30초','햄스트링 단축 교정'],
+      ['대퇴사두근 스트레칭','lower','스트레칭','초급','2세트','30초','대퇴사두근 이완, 슬개골 보호'],
+      ['IT밴드 스트레칭','lower','스트레칭','초급','2세트','30초','장경인대 이완, 무릎 통증 예방'],
+      ['종아리 스트레칭','lower','스트레칭','초급','2세트','30초','비복근·가자미근 이완'],
+      ['발목 가동 운동','lower','재활','초급','3세트','10회','발목 가동 범위 회복'],
+      ['종아리 올리기 (Calf Raise)','lower','근력','초급','3세트','20회','비복근·가자미근 강화'],
+      ['싱글 레그 스쿼트 (Pistol)','lower','근력','고급','3세트','5회','편측 하체 최고난이도 강화'],
+      ['불가리안 스플릿 스쿼트','lower','근력','중급','3세트','10회','대퇴사두근·둔근 편측 집중'],
+      ['스텝업','lower','근력','중급','3세트','12회','하체 복합 근력+균형 훈련'],
+      ['사이드 런지','lower','근력','초급','3세트','10회','대퇴내전근·둔근 측방 강화'],
+      ['워킹 런지','lower','근력','중급','3세트','10회','이동 런지로 협응력 향상'],
+      ['힙 쓰러스트','lower','근력','중급','4세트','12회','대둔근 최대 수축 운동'],
+      ['데드리프트 (스모)','lower','근력','중급','4세트','8회','내전근·둔근 강화 스모 데드'],
+      ['레그 슬라이드','lower','재활','초급','3세트','10회','무릎 재활 기초 가동 운동'],
+      ['쿼드 세트 (등척성)','lower','재활','초급','3세트','10회','대퇴사두근 등척성 수축 훈련'],
+      ['힐 슬라이드','lower','재활','초급','3세트','10회','슬관절 굴곡 가동 회복'],
+      ['무릎 굴곡 가동 운동','lower','재활','초급','3세트','10회','슬관절 가동 범위 회복'],
+      ['발목 펌프','lower','재활','초급','3세트','20회','하지정맥 순환 촉진'],
+      ['고관절 외회전 스트레칭','lower','스트레칭','초급','2세트','30초','고관절 외회전 유연성 향상'],
+      ['비둘기 자세 (고관절)','lower','스트레칭','초급','2세트','1분','고관절 복합 이완'],
+      ['피리포미스 스트레칭','lower','스트레칭','초급','2세트','30초','피리포미스 이완, 방사통 완화'],
+      ['하체 밴드 워킹','lower','재활','초급','3세트','15회','고관절 외전·외회전 강화'],
+      ['미니밴드 사이드 워킹','lower','재활','초급','3세트','15회','둔근·외전근 활성화'],
+      ['박스 점프','lower','유산소','고급','4세트','8회','하체 순발력·폭발력 훈련'],
+      ['점프 스쿼트','lower','유산소','중급','3세트','10회','하체 파워 훈련'],
+      ['스플릿 점프','lower','유산소','중급','3세트','10회','런지 점프 하체 파워 훈련'],
+      ['힙 어브덕션 (밴드)','lower','재활','초급','3세트','15회','밴드 저항 고관절 외전 강화'],
+      ['와이드 스쿼트 (수모)','lower','근력','초급','3세트','12회','내전근·둔근 넓은 스탠스 강화'],
+      ['수목 서기 (발목 안정화)','lower','재활','초급','2세트','30초','발목 고유감각 훈련'],
+      ['무릎 원 그리기','lower','재활','초급','2세트','10회','슬관절 가동·안정화 훈련'],
+      ['레그 스윙','lower','스트레칭','초급','2세트','15회','고관절 전·후방 동적 스트레칭'],
+      ['슈퍼맨 다리 (하체)','lower','근력','초급','3세트','12회','둔근·척추 기립근 동시 강화'],
+      ['종아리 근력 운동 (앉아서)','lower','근력','초급','3세트','20회','가자미근 집중 강화'],
+      ['깊은 스쿼트 가동 훈련','lower','스트레칭','중급','2세트','10회','발목·고관절 복합 가동성 향상'],
+      ['몬스터 워크','lower','재활','초급','3세트','15회','둔근 전체·고관절 복합 강화'],
+      ['니 투 체스트 스트레칭','lower','스트레칭','초급','2세트','30초','둔근·고관절 굴곡근 이완'],
+      ['무릎 굴절 스트레칭 (엎드려)','lower','스트레칭','초급','2세트','30초','대퇴사두근 이완'],
+      ['레그 크로스 스트레칭','lower','스트레칭','초급','2세트','30초','IT밴드·외측 고관절 이완'],
+      ['싱글 레그 데드리프트','lower','근력','중급','3세트','10회','햄스트링+균형 편측 훈련'],
+      ['니 서클 운동','lower','재활','초급','2세트','10회','슬관절 원형 가동 훈련'],
+      ['터미널 니 익스텐션','lower','재활','초급','3세트','15회','대퇴사두근 말단 강화, 무릎 재활'],
+      // ── 상체 (50개) ─────────────────────────────────────────────────────────────
+      ['푸시업','upper','근력','초급','3세트','12회','대흉근·삼두근·코어 복합 강화'],
+      ['밴드 로우','upper','근력','중급','3세트','12회','등 상부 근력, 어깨 후방 강화'],
+      ['숄더 프레스 (덤벨)','upper','근력','중급','3세트','12회','삼각근 복합 강화'],
+      ['바이셉 컬 (덤벨)','upper','근력','초급','3세트','12회','이두근 고립 강화'],
+      ['트라이셉 딥스','upper','근력','중급','3세트','10회','삼두근·대흉근 하부 강화'],
+      ['가슴 스트레칭 (벽)','upper','스트레칭','초급','2세트','30초','소흉근·대흉근 이완'],
+      ['광배근 스트레칭','upper','스트레칭','초급','2세트','30초','광배근 이완, 어깨 하강 유도'],
+      ['체스트 프레스 (덤벨)','upper','근력','중급','4세트','12회','대흉근 전체 강화'],
+      ['체스트 플라이','upper','근력','중급','3세트','12회','대흉근 스트레칭+수축 복합'],
+      ['시티드 로우','upper','근력','중급','4세트','12회','광배근·능형근 복합 강화'],
+      ['랫 풀다운','upper','근력','중급','4세트','12회','광배근·이두근 복합 강화'],
+      ['풀업','upper','근력','고급','3세트','6회','광배근·이두근 체중 최강 훈련'],
+      ['딥스','upper','근력','고급','3세트','8회','삼두근·대흉근 하부 고난이도'],
+      ['트라이셉 익스텐션 (오버헤드)','upper','근력','중급','3세트','12회','삼두근 장두 집중 강화'],
+      ['해머 컬','upper','근력','초급','3세트','12회','이두근+상완근 복합 강화'],
+      ['컨센트레이션 컬','upper','근력','초급','3세트','12회','이두근 고립 최대 수축'],
+      ['케이블 크로스오버','upper','근력','중급','3세트','12회','대흉근 중간~내측 집중'],
+      ['인클라인 푸시업','upper','근력','초급','3세트','12회','대흉근 상부·삼두근 강화'],
+      ['디클라인 푸시업','upper','근력','중급','3세트','12회','대흉근 하부 강화'],
+      ['와이드 푸시업','upper','근력','초급','3세트','12회','대흉근 외측 강화'],
+      ['다이아몬드 푸시업','upper','근력','중급','3세트','10회','삼두근 집중 푸시업 변형'],
+      ['슈러그 (덤벨)','upper','근력','초급','3세트','15회','상부 승모근 강화'],
+      ['페이스 풀 (케이블)','upper','근력','중급','3세트','15회','후방 삼각근·외회전근 강화'],
+      ['밴드 체스트 프레스','upper','재활','초급','3세트','12회','밴드 저항 흉근 재활 강화'],
+      ['밴드 풀다운','upper','재활','초급','3세트','12회','밴드 저항 광배근 재활'],
+      ['엘보우 플렉션 스트레칭','upper','스트레칭','초급','2세트','30초','이두근·전완 이완'],
+      ['손목 굴곡/신전 스트레칭','upper','스트레칭','초급','2세트','30초','손목 유연성 향상'],
+      ['전완근 스트레칭','upper','스트레칭','초급','2세트','30초','테니스 엘보우 예방'],
+      ['이두근 스트레칭','upper','스트레칭','초급','2세트','30초','이두근 단축 이완'],
+      ['삼두근 스트레칭','upper','스트레칭','초급','2세트','30초','삼두근 이완'],
+      ['T-Y-W 운동','upper','재활','중급','3세트','12회','어깨+등 복합 재활 강화'],
+      ['손목 회전 운동','upper','재활','초급','2세트','10회','손목 가동 범위 회복'],
+      ['손가락 굴곡/신전','upper','재활','초급','2세트','10회','손가락 건 강화, 악력 훈련'],
+      ['덤벨 리버스 컬','upper','근력','초급','3세트','12회','전완·신전근 강화'],
+      ['리스트 컬','upper','근력','초급','3세트','15회','손목 굴곡근 강화'],
+      ['케이블 내회전','upper','재활','초급','3세트','15회','내회전 재활 강화'],
+      ['케이블 외회전','upper','재활','초급','3세트','15회','외회전 재활 강화'],
+      ['벤트오버 로우','upper','근력','중급','4세트','10회','광배근·능형근·이두근 복합'],
+      ['덤벨 스내치','upper','근력','고급','3세트','5회','전신 파워+어깨 복합'],
+      ['인버티드 로우','upper','근력','중급','3세트','12회','등+이두근 체중 로우'],
+      ['팔 흔들기 (이완)','upper','재활','초급','2세트','1분','상지 혈액 순환 촉진'],
+      ['팔목 댄글 스트레칭','upper','스트레칭','초급','2세트','30초','손목 이완 스트레칭'],
+      ['밴드 익스터널 로테이션','upper','재활','초급','3세트','15회','외회전근 밴드 재활'],
+      ['밴드 인터널 로테이션','upper','재활','초급','3세트','15회','내회전근 밴드 재활'],
+      ['랫 스트레칭 (폼롤러)','upper','스트레칭','초급','2세트','1분','광배근 압박 이완'],
+      ['오버헤드 트라이셉 스트레칭','upper','스트레칭','초급','2세트','30초','삼두근 장두 이완'],
+      ['원암 덤벨 로우','upper','근력','중급','3세트','12회','광배근 편측 집중 강화'],
+      ['체스트 지지 로우','upper','근력','중급','3세트','12회','능형근·광배근 안정화 로우'],
+      ['밴드 어시스티드 풀업','upper','근력','중급','3세트','8회','밴드 보조 풀업 훈련'],
+      ['펙 덱 플라이','upper','근력','중급','3세트','12회','대흉근 내측 집중 자극'],
+      // ── 전신 (50개) ─────────────────────────────────────────────────────────────
+      ['버피','full','유산소','고급','3세트','8회','전신 유산소+근력 복합'],
+      ['케틀벨 스윙','full','근력','중급','4세트','15회','힙 힌지 파워+전신 강화'],
+      ['점핑 잭','full','유산소','초급','3세트','30초','전신 유산소 워밍업'],
+      ['마운틴 클라이머','full','유산소','중급','3세트','30초','코어+유산소 복합 훈련'],
+      ['베어 크롤','full','근력','중급','3세트','20초','전신 협응 코어 운동'],
+      ['터키쉬 겟업','full','근력','고급','3세트','5회','전신 안정성·협응력 최고 훈련'],
+      ['스쿼트 점프','full','유산소','중급','3세트','10회','하체 파워+유산소'],
+      ['인치웜','full','재활','초급','3세트','8회','전신 이완+코어 워밍업'],
+      ['월볼 스로','full','근력','중급','3세트','12회','전신 파워+벽 던지기'],
+      ['박스 점프','full','유산소','고급','4세트','8회','하체 폭발력+유산소'],
+      ['케틀벨 스내치','full','근력','고급','4세트','5회','전신 폭발력 복합 훈련'],
+      ['케틀벨 클린','full','근력','고급','4세트','5회','힙 드라이브+상체 복합'],
+      ['배틀 로프','full','유산소','중급','4세트','30초','전신 유산소+상체 근력'],
+      ['슬레드 드래그/푸시','full','근력','고급','4세트','20m','전신 강도 높은 복합 훈련'],
+      ['파머스 워크','full','근력','중급','3세트','30m','그립+코어+하체 복합'],
+      ['크롤링 운동','full','재활','초급','3세트','20m','전신 협응 재활 훈련'],
+      ['레터럴 셔플','full','유산소','중급','3세트','30초','사이드 스텝 유산소'],
+      ['전신 스트레칭 루틴','full','스트레칭','초급','2세트','5분','전신 종합 이완'],
+      ['수리야 나마스카르','full','스트레칭','중급','2세트','5회','태양경배 전신 스트레칭'],
+      ['롤링 패턴','full','재활','초급','3세트','5회','전신 협응 재활 기초'],
+      ['프리말 무브먼트','full','재활','중급','3세트','10회','원시적 전신 움직임 패턴'],
+      ['래더 드릴','full','유산소','중급','3세트','1분','민첩성+유산소 훈련'],
+      ['콘 드릴 (방향전환)','full','유산소','중급','3세트','1분','방향 전환 민첩성 훈련'],
+      ['가속 스프린트 (단거리)','full','유산소','고급','4세트','20m','전신 최대 속도 훈련'],
+      ['서킷 트레이닝 기본','full','유산소','중급','3세트','5분','전신 복합 순환 훈련'],
+      ['타바타 인터벌','full','유산소','고급','8세트','20초','고강도 인터벌 최고 효율'],
+      ['덤벨 스쿼트 투 프레스','full','근력','중급','3세트','10회','하체+어깨 복합 동작'],
+      ['스모 데드리프트 하이 풀','full','근력','중급','3세트','10회','전신 파워+후방 체인'],
+      ['헥스 바 데드리프트','full','근력','중급','4세트','8회','전신 후방 체인 강화'],
+      ['전신 폼롤러 이완','full','스트레칭','초급','1세트','10분','전신 압박 이완'],
+      ['점프 로프 기본','full','유산소','초급','3세트','1분','전신 유산소 기초'],
+      ['클린 앤 저크','full','근력','고급','4세트','3회','올림픽 리프팅 전신 파워'],
+      ['스내치','full','근력','고급','4세트','3회','올림픽 리프팅 최고 파워'],
+      ['메디신볼 슬램','full','근력','중급','4세트','10회','전신 파워+코어 복합'],
+      ['케이블 우드찹 (전신)','full','근력','중급','3세트','12회','전신 회전 파워'],
+      ['덤벨 쓰러스터','full','근력','중급','3세트','10회','스쿼트+프레스 복합'],
+      ['워밍업 루틴 (전신)','full','재활','초급','1세트','10분','운동 전 전신 준비'],
+      ['전신 스태빌리티 볼 운동','full','재활','중급','3세트','12회','불안정 면 전신 협응'],
+      ['필라테스 시퀀스','full','재활','중급','2세트','10분','전신 균형·코어 통합'],
+      ['요가 시퀀스 A','full','스트레칭','초급','1세트','15분','전신 스트레칭 요가 흐름'],
+      ['걷기 (트레드밀)','full','유산소','초급','1세트','30분','저강도 전신 유산소'],
+      ['자전거 타기 (스테이셔너리)','full','유산소','초급','1세트','30분','하체 위주 전신 유산소'],
+      ['수중 에어로빅','full','유산소','초급','1세트','30분','관절 부담 최소 유산소'],
+      ['로잉 머신','full','유산소','중급','3세트','3분','전신 근력+유산소 복합'],
+      ['스텝퍼 운동','full','유산소','초급','1세트','20분','하체+유산소 저강도'],
+      ['일립티컬','full','유산소','초급','1세트','30분','관절 보호 전신 유산소'],
+      ['파워 클린','full','근력','고급','4세트','4회','전신 폭발력 복합 훈련'],
+      ['케틀벨 고블릿 스쿼트','full','근력','초급','3세트','12회','전신 안정화+하체 강화'],
+      ['베어 플랭크','full','근력','중급','3세트','20초','전신 협응 코어 훈련'],
+      ['크롤링 래터럴','full','재활','중급','3세트','10m','측면 크롤링 전신 협응'],
+    ];
+
+    const partInfo = {
+      neck:  { label:'목·어깨',   color:'#805AD5' },
+      back:  { label:'허리·척추', color:'#E53E3E' },
+      core:  { label:'코어',      color:'#E67E22' },
+      lower: { label:'하체',      color:'#3182CE' },
+      upper: { label:'상체',      color:'#276749' },
+      full:  { label:'전신',      color:'#2A69AC' },
+    };
+    const typeBadge = {
+      '재활':'badge-green', '근력':'badge-orange', '스트레칭':'badge-teal', '유산소':'badge-purple'
+    };
+    const levelBadge = {
+      '초급':'badge-blue', '중급':'badge-purple', '고급':'badge-red'
+    };
+
+    let currentPart = 'all';
+
+    function renderTable() {
+      const q = document.getElementById('ex-search').value.trim().toLowerCase();
+      const ft = document.getElementById('ex-filter-type').value;
+      const fl = document.getElementById('ex-filter-level').value;
+
+      const filtered = exercises.filter(e => {
+        if (currentPart !== 'all' && e[1] !== currentPart) return false;
+        if (ft && e[2] !== ft) return false;
+        if (fl && e[3] !== fl) return false;
+        if (q && !e[0].toLowerCase().includes(q)) return false;
+        return true;
+      });
+
+      document.getElementById('ex-count').textContent = `총 ${filtered.length}개`;
+
+      const tbody = document.getElementById('ex-tbody');
+      tbody.innerHTML = filtered.map(e => {
+        const pi = partInfo[e[1]];
+        return `<tr>
+          <td><span class="part-dot" style="background:${pi.color};"></span>${pi.label}</td>
+          <td><div class="td-name">${e[0]}</div><div class="td-sub">${e[6]}</div></td>
+          <td><span class="badge ${typeBadge[e[2]]}">${e[2]}</span></td>
+          <td><span class="badge ${levelBadge[e[3]]}">${e[3]}</span></td>
+          <td>${e[4]}</td>
+          <td>${e[5]}</td>
+          <td style="font-weight:800;color:#5A67D8;">-</td>
+          <td style="display:flex;gap:6px;"><button class="btn-edit" onclick="showScreen(1,document.querySelectorAll('.nav-btn')[1])">수정</button><button class="btn-del">삭제</button></td>
+        </tr>`;
+      }).join('');
+    }
+
+    function updateStats() {
+      const total = exercises.length;
+      const r = exercises.filter(e=>e[2]==='재활').length;
+      const s = exercises.filter(e=>e[2]==='근력').length;
+      const st = exercises.filter(e=>e[2]==='스트레칭').length;
+      document.getElementById('stat-total').textContent = total;
+      document.getElementById('stat-rehab').textContent = r;
+      document.getElementById('stat-rehab-pct').textContent = `전체의 ${Math.round(r/total*100)}%`;
+      document.getElementById('stat-strength').textContent = s;
+      document.getElementById('stat-strength-pct').textContent = `전체의 ${Math.round(s/total*100)}%`;
+      document.getElementById('stat-stretch').textContent = st;
+      document.getElementById('stat-stretch-pct').textContent = `전체의 ${Math.round(st/total*100)}%`;
+
+      const parts = ['all','neck','back','core','lower','upper','full'];
+      const ids   = ['cnt-all','cnt-neck','cnt-back','cnt-core','cnt-lower','cnt-upper','cnt-full'];
+      parts.forEach((p,i) => {
+        const cnt = p==='all' ? exercises.length : exercises.filter(e=>e[1]===p).length;
+        document.getElementById(ids[i]).textContent = cnt;
+      });
+    }
+
     function filterTab(btn, part) {
       document.querySelectorAll('.body-tab').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
+      currentPart = part;
+      renderTable();
     }
     function selectPart(el) {
       document.querySelectorAll('.part-option').forEach(o => o.classList.remove('selected'));
@@ -771,6 +1073,8 @@
       el.classList.add('selected');
     }
 
+    updateStats();
+    renderTable();
     showScreen(0, document.querySelector('.nav-btn.active'));
   </script>
 </body>
