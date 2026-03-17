@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>관리자 대시보드</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Noto Sans KR', sans-serif; background: #F0F4F8; color: #1A202C; min-height: 100vh; padding: 24px 20px 48px; }
+
+    h1 { font-size: 20px; font-weight: 900; margin-bottom: 4px; }
+    .subtitle { font-size: 13px; color: #718096; margin-bottom: 20px; }
+
+    /* 전체 레이아웃 */
+    .admin-wrap { display: flex; gap: 20px; align-items: flex-start; }
+
+    /* 사이드바 */
+    .sidebar { width: 220px; flex-shrink: 0; background: #1E2A3A; border-radius: 16px; padding: 20px 0; color: #fff; min-height: 700px; }
+    .sidebar-logo { padding: 0 20px 16px; border-bottom: 1px solid #2D3F54; margin-bottom: 12px; }
+    .sidebar-logo-title { font-size: 15px; font-weight: 900; color: #fff; }
+    .sidebar-logo-sub { font-size: 11px; color: #718096; margin-top: 2px; }
+    .sidebar-section { font-size: 10px; font-weight: 800; color: #4A6080; letter-spacing: 1.5px; padding: 8px 20px 4px; }
+    .sidebar-item { display: flex; align-items: center; gap: 10px; padding: 10px 20px; font-size: 13px; font-weight: 600; color: #A0AEC0; cursor: pointer; transition: all 0.15s; position: relative; }
+    .sidebar-item:hover { background: #2D3F54; color: #fff; }
+    .sidebar-item.active { background: #4299E1; color: #fff; border-right: 3px solid #63B3ED; }
+    .sidebar-item-icon { font-size: 16px; width: 20px; text-align: center; }
+    .sidebar-badge { position: absolute; right: 16px; background: #E53E3E; color: #fff; font-size: 10px; font-weight: 800; border-radius: 99px; padding: 1px 6px; }
+
+    /* 메인 */
+    .main { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 16px; }
+
+    /* 상단 헤더 */
+    .dash-header { background: linear-gradient(135deg, #1E3A5F 0%, #2A5298 100%); border-radius: 16px; padding: 20px 24px; display: flex; align-items: center; justify-content: space-between; color: #fff; }
+    .dash-header-left h2 { font-size: 20px; font-weight: 900; }
+    .dash-header-left p { font-size: 13px; opacity: 0.7; margin-top: 2px; }
+    .dash-header-right { display: flex; gap: 10px; }
+    .dash-stat-mini { text-align: center; background: rgba(255,255,255,0.12); border-radius: 12px; padding: 10px 18px; }
+    .dash-stat-mini-val { font-size: 22px; font-weight: 900; }
+    .dash-stat-mini-label { font-size: 10px; opacity: 0.7; margin-top: 2px; font-weight: 600; }
+
+    /* 요약 카드 4개 */
+    .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+    .stat-card { background: #fff; border-radius: 14px; padding: 16px 18px; box-shadow: 0 1px 6px rgba(0,0,0,0.06); border-left: 4px solid transparent; }
+    .stat-card.blue   { border-left-color: #4299E1; }
+    .stat-card.orange { border-left-color: #E67E22; }
+    .stat-card.green  { border-left-color: #48BB78; }
+    .stat-card.red    { border-left-color: #E53E3E; }
+    .stat-card-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+    .stat-card-label { font-size: 12px; color: #A0AEC0; font-weight: 700; }
+    .stat-card-icon { font-size: 20px; }
+    .stat-card-val { font-size: 26px; font-weight: 900; color: #1A202C; }
+    .stat-card-change { font-size: 12px; margin-top: 4px; font-weight: 600; }
+    .up { color: #38A169; } .dn { color: #E53E3E; } .gray { color: #A0AEC0; }
+
+    /* 중단 2열 레이아웃 */
+    .mid-row { display: grid; grid-template-columns: 1fr 340px; gap: 16px; }
+
+    /* 팝업 알림 패널 */
+    .panel { background: #fff; border-radius: 16px; box-shadow: 0 1px 6px rgba(0,0,0,0.06); overflow: hidden; }
+    .panel-header { display: flex; align-items: center; justify-content: space-between; padding: 16px 20px 12px; border-bottom: 1px solid #F0F4F8; }
+    .panel-title { font-size: 15px; font-weight: 900; color: #1A202C; display: flex; align-items: center; gap: 8px; }
+    .panel-badge { background: #E53E3E; color: #fff; font-size: 11px; font-weight: 800; border-radius: 99px; padding: 2px 8px; }
+    .panel-action { font-size: 12px; color: #4299E1; font-weight: 700; cursor: pointer; }
+
+    /* 알림 탭 */
+    .notif-tabs { display: flex; border-bottom: 1px solid #F0F4F8; }
+    .notif-tab { flex: 1; padding: 10px; text-align: center; font-size: 12px; font-weight: 700; color: #A0AEC0; cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.15s; }
+    .notif-tab.active { color: #4299E1; border-bottom-color: #4299E1; }
+
+    /* 알림 아이템 */
+    .notif-list { padding: 8px 0; max-height: 420px; overflow-y: auto; }
+    .notif-item { display: flex; align-items: flex-start; gap: 12px; padding: 12px 20px; border-bottom: 1px solid #F7F9FC; cursor: pointer; transition: background 0.15s; }
+    .notif-item:hover { background: #F7F9FC; }
+    .notif-item:last-child { border-bottom: none; }
+    .notif-item.unread { background: #EBF8FF; }
+    .notif-item.unread:hover { background: #BEE3F8; }
+    .notif-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; margin-top: 5px; }
+    .notif-icon { width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 17px; flex-shrink: 0; }
+    .notif-content { flex: 1; min-width: 0; }
+    .notif-title { font-size: 13px; font-weight: 700; color: #2D3748; margin-bottom: 2px; }
+    .notif-desc { font-size: 12px; color: #718096; line-height: 1.4; }
+    .notif-time { font-size: 11px; color: #A0AEC0; margin-top: 4px; font-weight: 600; }
+    .notif-right { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; flex-shrink: 0; }
+    .notif-tag { font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 99px; }
+
+    /* 미처리 업무 패널 */
+    .todo-list { padding: 8px 0; }
+    .todo-section-title { font-size: 11px; font-weight: 800; color: #A0AEC0; letter-spacing: 1px; padding: 8px 16px 4px; }
+    .todo-item { display: flex; align-items: center; gap: 10px; padding: 10px 16px; border-bottom: 1px solid #F7F9FC; cursor: pointer; transition: background 0.15s; }
+    .todo-item:hover { background: #F7F9FC; }
+    .todo-checkbox { width: 18px; height: 18px; border-radius: 5px; border: 2px solid #CBD5E0; flex-shrink: 0; }
+    .todo-info { flex: 1; min-width: 0; }
+    .todo-name { font-size: 13px; font-weight: 700; color: #2D3748; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .todo-sub { font-size: 11px; color: #A0AEC0; margin-top: 1px; }
+    .todo-badge { font-size: 10px; font-weight: 800; padding: 2px 7px; border-radius: 99px; flex-shrink: 0; }
+    .todo-count { font-size: 18px; font-weight: 900; color: #E53E3E; flex-shrink: 0; min-width: 24px; text-align: right; }
+
+    /* 하단 통계 2열 */
+    .bottom-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+    /* 차트 패널 */
+    .chart-wrap { padding: 16px 20px 20px; }
+    .chart-title { font-size: 13px; font-weight: 800; color: #2D3748; margin-bottom: 14px; display: flex; align-items: center; justify-content: space-between; }
+    .chart-period { display: flex; gap: 4px; }
+    .period-btn { font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 99px; border: none; cursor: pointer; font-family: 'Noto Sans KR', sans-serif; }
+    .period-btn.active { background: #4299E1; color: #fff; }
+    .period-btn:not(.active) { background: #EDF2F7; color: #718096; }
+
+    /* 매출 바 차트 */
+    .bar-chart { display: flex; align-items: flex-end; gap: 6px; height: 120px; margin-bottom: 8px; }
+    .bar-col { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+    .bar-val { font-size: 9px; color: #4A5568; font-weight: 600; }
+    .bar-body { width: 100%; border-radius: 4px 4px 0 0; }
+    .bar-lbl { font-size: 10px; color: #A0AEC0; }
+    .bar-total { font-size: 11px; color: #A0AEC0; text-align: right; }
+
+    /* 도넛 차트 */
+    .donut-wrap { display: flex; gap: 20px; align-items: center; }
+    .donut-svg-wrap { position: relative; width: 100px; height: 100px; flex-shrink: 0; }
+    .donut-svg-wrap svg { width: 100px; height: 100px; }
+    .donut-center { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); text-align: center; }
+    .donut-center-val { font-size: 16px; font-weight: 900; color: #1A202C; }
+    .donut-center-lbl { font-size: 10px; color: #A0AEC0; }
+    .donut-legend { flex: 1; display: flex; flex-direction: column; gap: 8px; }
+    .legend-item { display: flex; align-items: center; gap: 8px; }
+    .legend-dot { width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0; }
+    .legend-name { font-size: 12px; color: #4A5568; flex: 1; }
+    .legend-val { font-size: 12px; font-weight: 800; color: #1A202C; }
+    .legend-pct { font-size: 11px; color: #A0AEC0; width: 32px; text-align: right; }
+
+    /* 뱃지 */
+    .badge { display: inline-block; padding: 2px 8px; border-radius: 99px; font-size: 11px; font-weight: 700; }
+    .badge-red    { background: #FED7D7; color: #C53030; }
+    .badge-orange { background: #FEEBC8; color: #C05621; }
+    .badge-blue   { background: #BEE3F8; color: #2A69AC; }
+    .badge-green  { background: #C6F6D5; color: #276749; }
+    .badge-purple { background: #E9D8FD; color: #6B46C1; }
+    .badge-gray   { background: #EDF2F7; color: #718096; }
+
+    /* 알림 색상 */
+    .dot-red    { background: #E53E3E; }
+    .dot-orange { background: #E67E22; }
+    .dot-blue   { background: #4299E1; }
+    .dot-purple { background: #9B6DFF; }
+    .dot-green  { background: #48BB78; }
+    .icon-red    { background: #FED7D7; }
+    .icon-orange { background: #FEEBC8; }
+    .icon-blue   { background: #BEE3F8; }
+    .icon-purple { background: #E9D8FD; }
+    .icon-green  { background: #C6F6D5; }
+
+    /* 메모판 */
+    .memo-panel { background: #fff; border-radius: 16px; padding: 22px; box-shadow: 0 1px 6px rgba(0,0,0,0.06); margin-top: 16px; }
+    .memo-title { font-size: 14px; font-weight: 900; color: #2D3748; margin-bottom: 4px; }
+    .memo-id { font-size: 12px; color: #A0AEC0; margin-bottom: 14px; }
+    .memo-divider { height: 1px; background: #F0F4F8; margin-bottom: 14px; }
+    .memo-sec-title { font-size: 11px; font-weight: 800; color: #A0AEC0; letter-spacing: 1px; margin-bottom: 8px; margin-top: 14px; }
+    .memo-item { display: flex; gap: 8px; margin-bottom: 7px; }
+    .memo-dot { width: 6px; height: 6px; border-radius: 50%; background: #4299E1; margin-top: 5px; flex-shrink: 0; }
+    .memo-text { font-size: 13px; color: #4A5568; line-height: 1.6; }
+    .memo-tag { display: inline-block; padding: 3px 10px; border-radius: 99px; font-size: 11px; font-weight: 700; margin: 2px; }
+  </style>
+</head>
+<body>
+  <h1>📊 관리자 대시보드</h1>
+  <p class="subtitle">관리자 앱 · 메인 대시보드 화면 목업</p>
+
+  <div class="admin-wrap">
+    <!-- 사이드바 -->
+    <div class="sidebar">
+      <div class="sidebar-logo">
+        <div class="sidebar-logo-title">💼 헬스케어 관리자</div>
+        <div class="sidebar-logo-sub">Admin Dashboard</div>
+      </div>
+      <div class="sidebar-section">메인</div>
+      <div class="sidebar-item active"><span class="sidebar-item-icon">📊</span>대시보드<span class="sidebar-badge">14</span></div>
+      <div class="sidebar-section">회원 관리</div>
+      <div class="sidebar-item"><span class="sidebar-item-icon">👥</span>회원 목록</div>
+      <div class="sidebar-section">운동처방</div>
+      <div class="sidebar-item"><span class="sidebar-item-icon">💊</span>My 운동처방 관리</div>
+      <div class="sidebar-section">콘텐츠</div>
+      <div class="sidebar-item"><span class="sidebar-item-icon">🏋️</span>운동법 관리</div>
+      <div class="sidebar-item"><span class="sidebar-item-icon">🔄</span>마이루틴 관리</div>
+      <div class="sidebar-section">기타</div>
+      <div class="sidebar-item"><span class="sidebar-item-icon">⚙️</span>설정</div>
+    </div>
+
+    <!-- 메인 콘텐츠 -->
+    <div class="main">
+
+      <!-- 상단 헤더 -->
+      <div class="dash-header">
+        <div class="dash-header-left">
+          <h2>안녕하세요, 관리자님 👋</h2>
+          <p>2026년 3월 17일 월요일 · 미처리 업무 14건이 있습니다</p>
+        </div>
+        <div class="dash-header-right">
+          <div class="dash-stat-mini">
+            <div class="dash-stat-mini-val">248</div>
+            <div class="dash-stat-mini-label">전체 회원</div>
+          </div>
+          <div class="dash-stat-mini">
+            <div class="dash-stat-mini-val">14</div>
+            <div class="dash-stat-mini-label">미처리 건</div>
+          </div>
+          <div class="dash-stat-mini">
+            <div class="dash-stat-mini-val">₩4.2M</div>
+            <div class="dash-stat-mini-label">이번달 매출</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 요약 통계 카드 -->
+      <div class="stats-row">
+        <div class="stat-card blue">
+          <div class="stat-card-top"><span class="stat-card-label">처방 신청 대기</span><span class="stat-card-icon">💊</span></div>
+          <div class="stat-card-val">14</div>
+          <div class="stat-card-change dn">미처리 · 즉시 확인 필요</div>
+        </div>
+        <div class="stat-card orange">
+          <div class="stat-card-top"><span class="stat-card-label">SFMA 도래 회원</span><span class="stat-card-icon">📋</span></div>
+          <div class="stat-card-val">8</div>
+          <div class="stat-card-change dn">재검사 일정 미확정</div>
+        </div>
+        <div class="stat-card green">
+          <div class="stat-card-top"><span class="stat-card-label">이번달 신규 회원</span><span class="stat-card-icon">👤</span></div>
+          <div class="stat-card-val">23</div>
+          <div class="stat-card-change up">▲ 전월 대비 +5명</div>
+        </div>
+        <div class="stat-card red">
+          <div class="stat-card-top"><span class="stat-card-label">레슨 미확정 예약</span><span class="stat-card-icon">📅</span></div>
+          <div class="stat-card-val">6</div>
+          <div class="stat-card-change dn">트레이너 배정 필요</div>
+        </div>
+      </div>
+
+      <!-- 중단: 팝업 알림 + 미처리 업무 -->
+      <div class="mid-row">
+
+        <!-- 좌측: 팝업 알림 -->
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title">🔔 팝업 알림 <span class="panel-badge">14</span></div>
+            <span class="panel-action">전체 읽음</span>
+          </div>
+          <div class="notif-tabs">
+            <div class="notif-tab active">전체 (14)</div>
+            <div class="notif-tab">처방 신청 (6)</div>
+            <div class="notif-tab">SFMA (4)</div>
+            <div class="notif-tab">레슨 (4)</div>
+          </div>
+          <div class="notif-list">
+
+            <!-- 처방 신청 미처리 -->
+            <div class="notif-item unread">
+              <div class="notif-dot dot-red"></div>
+              <div class="notif-icon icon-red">💊</div>
+              <div class="notif-content">
+                <div class="notif-title">박현우 · 처방 신청 대기</div>
+                <div class="notif-desc">L4-L5 추간판 탈출증 재활 운동 처방 신청 — 트레이너 미배정</div>
+                <div class="notif-time">방금 전</div>
+              </div>
+              <div class="notif-right">
+                <span class="notif-tag badge badge-red">미처리</span>
+              </div>
+            </div>
+
+            <div class="notif-item unread">
+              <div class="notif-dot dot-red"></div>
+              <div class="notif-icon icon-red">💊</div>
+              <div class="notif-content">
+                <div class="notif-title">한소희 · 처방 신청 대기</div>
+                <div class="notif-desc">무릎 연골 연화증 하체 강화 운동 처방 신청 — 이트레이너 배정 완료, 처방 미작성</div>
+                <div class="notif-time">2시간 전</div>
+              </div>
+              <div class="notif-right">
+                <span class="notif-tag badge badge-orange">처리중</span>
+              </div>
+            </div>
+
+            <div class="notif-item unread">
+              <div class="notif-dot dot-red"></div>
+              <div class="notif-icon icon-red">💊</div>
+              <div class="notif-content">
+                <div class="notif-title">김지훈 외 4명 · 처방 신청</div>
+                <div class="notif-desc">처방 신청 4건 추가 대기 중 — 트레이너 미배정</div>
+                <div class="notif-time">오늘</div>
+              </div>
+              <div class="notif-right">
+                <span class="notif-tag badge badge-red">미처리</span>
+              </div>
+            </div>
+
+            <!-- SFMA 도래 -->
+            <div class="notif-item unread">
+              <div class="notif-dot dot-orange"></div>
+              <div class="notif-icon icon-orange">📋</div>
+              <div class="notif-content">
+                <div class="notif-title">김도산 · SFMA 재검사 도래</div>
+                <div class="notif-desc">최초 검사 후 6개월 경과 — 재검사 일정 미확정</div>
+                <div class="notif-time">오늘</div>
+              </div>
+              <div class="notif-right">
+                <span class="notif-tag badge badge-orange">미확정</span>
+              </div>
+            </div>
+
+            <div class="notif-item unread">
+              <div class="notif-dot dot-orange"></div>
+              <div class="notif-icon icon-orange">📋</div>
+              <div class="notif-content">
+                <div class="notif-title">이민준 · SFMA 재검사 D-7</div>
+                <div class="notif-desc">재검사 예정일 3/24 — 회원에게 안내 메시지 미발송</div>
+                <div class="notif-time">어제</div>
+              </div>
+              <div class="notif-right">
+                <span class="notif-tag badge badge-orange">D-7</span>
+              </div>
+            </div>
+
+            <div class="notif-item unread">
+              <div class="notif-dot dot-orange"></div>
+              <div class="notif-icon icon-orange">📋</div>
+              <div class="notif-content">
+                <div class="notif-title">SFMA 도래 회원 2명 추가</div>
+                <div class="notif-desc">최수진, 정유나 · 3개월 재검사 설정 기준 도래</div>
+                <div class="notif-time">2일 전</div>
+              </div>
+              <div class="notif-right">
+                <span class="notif-tag badge badge-orange">미확정</span>
+              </div>
+            </div>
+
+            <!-- 레슨 예약 -->
+            <div class="notif-item unread">
+              <div class="notif-dot dot-purple"></div>
+              <div class="notif-icon icon-purple">📅</div>
+              <div class="notif-content">
+                <div class="notif-title">레슨 예약 3/18 · 트레이너 미배정</div>
+                <div class="notif-desc">박현우 외 2명 · 오전 10시 레슨 예약 — 담당 트레이너 미지정</div>
+                <div class="notif-time">어제</div>
+              </div>
+              <div class="notif-right">
+                <span class="notif-tag badge badge-purple">미배정</span>
+              </div>
+            </div>
+
+            <div class="notif-item unread">
+              <div class="notif-dot dot-purple"></div>
+              <div class="notif-icon icon-purple">📅</div>
+              <div class="notif-content">
+                <div class="notif-title">레슨 예약 3/20 · 취소 요청</div>
+                <div class="notif-desc">최수진 · 레슨 취소 요청 — 환불 처리 미완료</div>
+                <div class="notif-time">2일 전</div>
+              </div>
+              <div class="notif-right">
+                <span class="notif-tag badge badge-red">미처리</span>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- 우측: 미처리 업무 -->
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title">✅ 미처리 업무 <span class="panel-badge">14</span></div>
+            <span class="panel-action">전체보기</span>
+          </div>
+          <div class="todo-list">
+            <div class="todo-section-title">💊 처방 신청 (6건)</div>
+
+            <div class="todo-item">
+              <div class="todo-checkbox" style="border-color:#E53E3E;"></div>
+              <div class="todo-info">
+                <div class="todo-name">박현우 · 트레이너 배정</div>
+                <div class="todo-sub">처방 신청 대기 · 방금 전</div>
+              </div>
+              <span class="todo-badge badge badge-red">긴급</span>
+            </div>
+
+            <div class="todo-item">
+              <div class="todo-checkbox" style="border-color:#E67E22;"></div>
+              <div class="todo-info">
+                <div class="todo-name">한소희 · 처방 작성</div>
+                <div class="todo-sub">이트레이너 배정 완료 · 2시간 전</div>
+              </div>
+              <span class="todo-badge badge badge-orange">처리중</span>
+            </div>
+
+            <div class="todo-item">
+              <div class="todo-checkbox" style="border-color:#E53E3E;"></div>
+              <div class="todo-info">
+                <div class="todo-name">신청 대기 4건 · 트레이너 배정</div>
+                <div class="todo-sub">김지훈 외 3명 · 오늘</div>
+              </div>
+              <div class="todo-count">4</div>
+            </div>
+
+            <div class="todo-section-title">📋 SFMA 도래 (4건)</div>
+
+            <div class="todo-item">
+              <div class="todo-checkbox" style="border-color:#E67E22;"></div>
+              <div class="todo-info">
+                <div class="todo-name">김도산 · 재검사 일정 확정</div>
+                <div class="todo-sub">6개월 경과 · 오늘</div>
+              </div>
+              <span class="todo-badge badge badge-orange">미확정</span>
+            </div>
+
+            <div class="todo-item">
+              <div class="todo-checkbox" style="border-color:#E67E22;"></div>
+              <div class="todo-info">
+                <div class="todo-name">이민준 · 안내 메시지 발송</div>
+                <div class="todo-sub">재검사 D-7 · 어제</div>
+              </div>
+              <span class="todo-badge badge badge-orange">D-7</span>
+            </div>
+
+            <div class="todo-item">
+              <div class="todo-checkbox" style="border-color:#E67E22;"></div>
+              <div class="todo-info">
+                <div class="todo-name">최수진, 정유나 · 일정 확정</div>
+                <div class="todo-sub">3개월 도래 2건 · 2일 전</div>
+              </div>
+              <div class="todo-count" style="color:#E67E22;">2</div>
+            </div>
+
+            <div class="todo-section-title">📅 레슨 예약 (4건)</div>
+
+            <div class="todo-item">
+              <div class="todo-checkbox" style="border-color:#9B6DFF;"></div>
+              <div class="todo-info">
+                <div class="todo-name">3/18 레슨 · 트레이너 배정</div>
+                <div class="todo-sub">박현우 외 2명 · 어제</div>
+              </div>
+              <div class="todo-count" style="color:#9B6DFF;">3</div>
+            </div>
+
+            <div class="todo-item">
+              <div class="todo-checkbox" style="border-color:#E53E3E;"></div>
+              <div class="todo-info">
+                <div class="todo-name">최수진 · 취소 환불 처리</div>
+                <div class="todo-sub">3/20 레슨 취소 · 2일 전</div>
+              </div>
+              <span class="todo-badge badge badge-red">미처리</span>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- mid-row end -->
+
+      <!-- 하단: 매출 & 통계 -->
+      <div class="bottom-row">
+
+        <!-- 월별 매출 바 차트 -->
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title">💰 월별 매출 현황</div>
+            <div class="chart-period">
+              <button class="period-btn">3개월</button>
+              <button class="period-btn active">6개월</button>
+              <button class="period-btn">1년</button>
+            </div>
+          </div>
+          <div class="chart-wrap">
+            <div class="bar-chart">
+              <div class="bar-col">
+                <div class="bar-val">3.1M</div>
+                <div class="bar-body" style="height:65px;background:#BEE3F8;"></div>
+                <div class="bar-lbl">10월</div>
+              </div>
+              <div class="bar-col">
+                <div class="bar-val">3.4M</div>
+                <div class="bar-body" style="height:72px;background:#BEE3F8;"></div>
+                <div class="bar-lbl">11월</div>
+              </div>
+              <div class="bar-col">
+                <div class="bar-val">3.8M</div>
+                <div class="bar-body" style="height:80px;background:#BEE3F8;"></div>
+                <div class="bar-lbl">12월</div>
+              </div>
+              <div class="bar-col">
+                <div class="bar-val">3.6M</div>
+                <div class="bar-body" style="height:76px;background:#BEE3F8;"></div>
+                <div class="bar-lbl">1월</div>
+              </div>
+              <div class="bar-col">
+                <div class="bar-val">3.9M</div>
+                <div class="bar-body" style="height:82px;background:#BEE3F8;"></div>
+                <div class="bar-lbl">2월</div>
+              </div>
+              <div class="bar-col">
+                <div class="bar-val">4.2M</div>
+                <div class="bar-body" style="height:90px;background:#4299E1;"></div>
+                <div class="bar-lbl" style="color:#4299E1;font-weight:800;">3월</div>
+              </div>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-top:4px;">
+              <span style="font-size:12px;color:#A0AEC0;">6개월 누적 <strong style="color:#1A202C;">22.0M</strong></span>
+              <span style="font-size:12px;color:#38A169;font-weight:700;">▲ 전월 대비 +7.7%</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 회원 현황 도넛 차트 -->
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title">👥 회원 현황 통계</div>
+            <span class="panel-action">상세보기</span>
+          </div>
+          <div class="chart-wrap">
+            <div class="donut-wrap">
+              <div class="donut-svg-wrap">
+                <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="50" cy="50" r="38" fill="none" stroke="#EDF2F7" stroke-width="14"/>
+                  <!-- 활성 (60%) -->
+                  <circle cx="50" cy="50" r="38" fill="none" stroke="#4299E1" stroke-width="14"
+                    stroke-dasharray="143 239" stroke-dashoffset="0" transform="rotate(-90 50 50)"/>
+                  <!-- SFMA 도래 (13%) -->
+                  <circle cx="50" cy="50" r="38" fill="none" stroke="#E67E22" stroke-width="14"
+                    stroke-dasharray="31 239" stroke-dashoffset="-143" transform="rotate(-90 50 50)"/>
+                  <!-- 처방 대기 (9%) -->
+                  <circle cx="50" cy="50" r="38" fill="none" stroke="#E53E3E" stroke-width="14"
+                    stroke-dasharray="22 239" stroke-dashoffset="-174" transform="rotate(-90 50 50)"/>
+                  <!-- 휴면 (18%) -->
+                  <circle cx="50" cy="50" r="38" fill="none" stroke="#CBD5E0" stroke-width="14"
+                    stroke-dasharray="43 239" stroke-dashoffset="-196" transform="rotate(-90 50 50)"/>
+                </svg>
+                <div class="donut-center">
+                  <div class="donut-center-val">248</div>
+                  <div class="donut-center-lbl">전체</div>
+                </div>
+              </div>
+              <div class="donut-legend">
+                <div class="legend-item">
+                  <div class="legend-dot" style="background:#4299E1;"></div>
+                  <div class="legend-name">활성 회원</div>
+                  <div class="legend-val">149</div>
+                  <div class="legend-pct">60%</div>
+                </div>
+                <div class="legend-item">
+                  <div class="legend-dot" style="background:#CBD5E0;"></div>
+                  <div class="legend-name">휴면 회원</div>
+                  <div class="legend-val">44</div>
+                  <div class="legend-pct">18%</div>
+                </div>
+                <div class="legend-item">
+                  <div class="legend-dot" style="background:#E67E22;"></div>
+                  <div class="legend-name">SFMA 도래</div>
+                  <div class="legend-val">32</div>
+                  <div class="legend-pct">13%</div>
+                </div>
+                <div class="legend-item">
+                  <div class="legend-dot" style="background:#E53E3E;"></div>
+                  <div class="legend-name">처방 대기</div>
+                  <div class="legend-val">23</div>
+                  <div class="legend-pct">9%</div>
+                </div>
+              </div>
+            </div>
+            <div style="margin-top:16px;display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+              <div style="background:#EBF8FF;border-radius:10px;padding:10px 12px;">
+                <div style="font-size:11px;color:#2A69AC;font-weight:700;">이번달 신규</div>
+                <div style="font-size:20px;font-weight:900;color:#2A69AC;">+23명</div>
+              </div>
+              <div style="background:#FFF5F5;border-radius:10px;padding:10px 12px;">
+                <div style="font-size:11px;color:#C53030;font-weight:700;">이번달 탈퇴</div>
+                <div style="font-size:20px;font-weight:900;color:#C53030;">-4명</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- bottom-row end -->
+
+    </div><!-- main end -->
+  </div><!-- admin-wrap end -->
+
+  <!-- 메모판 -->
+  <div class="memo-panel">
+    <div class="memo-title">📊 관리자 대시보드</div>
+    <div class="memo-id">a-dashboard · 필수 · FE/BE</div>
+    <div class="memo-divider"></div>
+
+    <div class="memo-sec-title" style="margin-top:0;">화면 구성</div>
+    <div class="memo-item"><div class="memo-dot"></div><div class="memo-text">상단 헤더: 날짜·미처리 건수 요약 + 미니 통계 3개 (전체 회원·미처리·이번달 매출)</div></div>
+    <div class="memo-item"><div class="memo-dot"></div><div class="memo-text">요약 카드 4개: 처방 신청 대기 · SFMA 도래 · 신규 회원 · 레슨 미배정</div></div>
+    <div class="memo-item"><div class="memo-dot"></div><div class="memo-text">좌측 팝업 알림: 탭(전체·처방 신청·SFMA·레슨) + 미처리 알림 목록 (색상 dot로 유형 구분)</div></div>
+    <div class="memo-item"><div class="memo-dot"></div><div class="memo-text">우측 미처리 업무: 알림 목록의 미완료 건과 연동 — 카테고리별 섹션 구분 + 체크박스</div></div>
+    <div class="memo-item"><div class="memo-dot"></div><div class="memo-text">하단 매출 차트: 월별 바 차트 (6개월 기본) + 회원 현황 도넛 차트</div></div>
+
+    <div class="memo-sec-title">동작</div>
+    <div class="memo-item"><div class="memo-dot"></div><div class="memo-text">알림 항목 클릭 → 해당 관리 화면으로 이동 (처방 신청 → My 운동처방 관리, SFMA → SFMA 관리)</div></div>
+    <div class="memo-item"><div class="memo-dot"></div><div class="memo-text">미처리 업무 체크박스 → 완료 처리 시 알림 목록에서도 제거</div></div>
+    <div class="memo-item"><div class="memo-dot"></div><div class="memo-text">알림 탭 전환 → 해당 유형 알림만 필터링</div></div>
+    <div class="memo-item"><div class="memo-dot"></div><div class="memo-text">매출 차트 기간 버튼 → 3개월 / 6개월 / 1년 전환</div></div>
+
+    <div class="memo-sec-title">API</div>
+    <div class="memo-item"><div class="memo-dot"></div><div class="memo-text">GET /admin/dashboard/stats — 요약 카드 수치</div></div>
+    <div class="memo-item"><div class="memo-dot"></div><div class="memo-text">GET /admin/notifications?status=unread — 미처리 알림 목록</div></div>
+    <div class="memo-item"><div class="memo-dot"></div><div class="memo-text">GET /admin/sales?period=6m — 매출 차트 데이터</div></div>
+    <div class="memo-item"><div class="memo-dot"></div><div class="memo-text">PATCH /admin/notifications/:id/read — 알림 읽음 처리</div></div>
+
+    <div class="memo-sec-title">태그</div>
+    <div>
+      <span class="memo-tag" style="background:#4299E122;color:#4299E1;">#대시보드</span>
+      <span class="memo-tag" style="background:#E53E3E22;color:#E53E3E;">#미처리알림</span>
+      <span class="memo-tag" style="background:#E67E2222;color:#E67E22;">#SFMA도래</span>
+      <span class="memo-tag" style="background:#9B6DFF22;color:#9B6DFF;">#처방신청</span>
+      <span class="memo-tag" style="background:#48BB7822;color:#48BB78;">#매출통계</span>
+    </div>
+  </div>
+
+</body>
+</html>
