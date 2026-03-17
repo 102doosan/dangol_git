@@ -237,8 +237,8 @@
   <div class="nav">
     <button class="nav-btn active" onclick="showScreen(0,this)">① 운동 동작 목록</button>
     <button class="nav-btn" onclick="showScreen(1,this)">② 운동 동작 등록/수정</button>
-    <button class="nav-btn" onclick="showScreen(2,this)">③ 부위별 현황 통계</button>
-    <button class="nav-btn" onclick="showScreen(3,this)">④ 운동 부위 관리</button>
+    <button class="nav-btn" onclick="showScreen(2,this)">③ 운동 부위 관리</button>
+    <button class="nav-btn" onclick="showScreen(3,this)">④ 부위별 현황 통계</button>
   </div>
 
   <div class="admin-wrap">
@@ -271,7 +271,7 @@
             <div class="page-sub">부위별로 분류된 처방 운동 동작을 관리합니다</div>
           </div>
           <div class="page-actions">
-            <button class="btn-secondary" onclick="showScreen(2,document.querySelectorAll('.nav-btn')[2])">📊 현황 통계</button>
+            <button class="btn-secondary" onclick="showScreen(3,document.querySelectorAll('.nav-btn')[3])">📊 현황 통계</button>
             <button class="btn-primary" onclick="showScreen(1,document.querySelectorAll('.nav-btn')[1])">+ 운동 추가</button>
           </div>
         </div>
@@ -535,8 +535,8 @@
         </div>
       </div>
 
-      <!-- ③ 부위별 현황 통계 -->
-      <div class="screen" id="s2">
+      <!-- ④ 부위별 현황 통계 -->
+      <div class="screen" id="s3">
         <div class="page-header">
           <div>
             <div class="page-title">부위별 현황 통계</div>
@@ -682,8 +682,8 @@
         </div>
       </div>
 
-      <!-- ④ 운동 부위 관리 -->
-      <div class="screen" id="s3">
+      <!-- ③ 운동 부위 관리 -->
+      <div class="screen" id="s2">
         <div class="page-header">
           <div>
             <div class="page-title">운동 부위 관리</div>
@@ -776,24 +776,24 @@
         tags:[["#동작등록","#5A67D8"],["#부위선택","#E53E3E"],["#난이도","#F6AD55"],["#폼","#48BB78"]]
       },
       {
-        title:"③ 부위별 현황 통계",
-        id:"ap03 · 권장 · FE/BE",
-        sections:[
-          { title:"화면 구성", items:["부위별 운동 수 도넛 차트 + 범례 (6개 부위 색상 구분)", "난이도별 운동 수 가로 바 차트 (초급/중급/고급)", "유형별 운동 수 가로 바 차트 (재활/근력/스트레칭/유산소)", "처방에 가장 많이 사용된 운동 TOP 5 (건수 표시)"] },
-          { title:"동작", items:["TOP5 항목 클릭 → 해당 운동 수정 폼으로 이동", "통계는 실시간 집계 (처방 등록 시 카운트 갱신)"] },
-          { title:"API", items:["GET /admin/exercises/stats", "GET /admin/exercises/popular?limit=5"] }
-        ],
-        tags:[["#통계","#5A67D8"],["#도넛차트","#E53E3E"],["#TOP5","#F6AD55"],["#부위별","#48BB78"]]
-      },
-      {
-        title:"④ 운동 부위 관리",
-        id:"ap04 · 필수 · FE/BE",
+        title:"③ 운동 부위 관리",
+        id:"ap03 · 필수 · FE/BE",
         sections:[
           { title:"화면 구성", items:["등록된 부위 카드 목록 (부위명·영문키·색상·운동 수)", "부위 추가 폼 (한국어명·영문키·아이콘·색상 팔레트)", "색상 직접 입력 (#HEX) 또는 컬러피커"] },
           { title:"동작", items:["[+ 부위 추가] → 추가 폼 펼치기", "[수정] → 해당 부위 정보 폼에 채워짐", "[삭제] → 등록 운동 있으면 삭제 차단", "저장 시 ① 목록 탭과 동적 동기화"] },
           { title:"API", items:["GET /admin/parts", "POST /admin/parts", "PUT /admin/parts/:key", "DELETE /admin/parts/:key"] }
         ],
         tags:[["#부위관리","#5A67D8"],["#동적추가","#48BB78"],["#색상팔레트","#D53F8C"]]
+      },
+      {
+        title:"④ 부위별 현황 통계",
+        id:"ap04 · 권장 · FE/BE",
+        sections:[
+          { title:"화면 구성", items:["부위별 운동 수 도넛 차트 + 범례 (6개 부위 색상 구분)", "난이도별 운동 수 가로 바 차트 (초급/중급/고급)", "유형별 운동 수 가로 바 차트 (재활/근력/스트레칭/유산소)", "처방에 가장 많이 사용된 운동 TOP 5 (건수 표시)"] },
+          { title:"동작", items:["TOP5 항목 클릭 → 해당 운동 수정 폼으로 이동", "통계는 실시간 집계 (처방 등록 시 카운트 갱신)"] },
+          { title:"API", items:["GET /admin/exercises/stats", "GET /admin/exercises/popular?limit=5"] }
+        ],
+        tags:[["#통계","#5A67D8"],["#도넛차트","#E53E3E"],["#TOP5","#F6AD55"],["#부위별","#48BB78"]]
       }
     ];
 
@@ -820,7 +820,7 @@
         html += '</div></div>';
       }
       document.getElementById('memo-body').innerHTML = html;
-      if (idx === 3) renderPartGrid();
+      if (idx === 2) renderPartGrid();
     }
 
     /* ── 부위 관리 ── */
