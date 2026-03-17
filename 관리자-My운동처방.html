@@ -193,6 +193,15 @@
     .ex-add-input:focus { border-color: #E67E22; }
     .ex-add-select { border: 1.5px solid #E2E8F0; border-radius: 8px; padding: 7px 8px; font-size: 12px; font-family: 'Noto Sans KR', sans-serif; color: #2D3748; outline: none; background: #fff; width: 100%; }
     .btn-del-ex { background: #FED7D7; color: #C53030; border: none; border-radius: 8px; width: 28px; height: 28px; font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    /* 운동명 자동완성 */
+    .ex-name-wrap { position: relative; }
+    .ex-ac-list { position: absolute; top: calc(100% + 4px); left: 0; right: 0; background: #fff; border: 1.5px solid #E67E22; border-radius: 10px; box-shadow: 0 6px 20px rgba(0,0,0,0.12); z-index: 200; max-height: 220px; overflow-y: auto; display: none; }
+    .ex-ac-item { padding: 9px 12px; cursor: pointer; display: flex; flex-direction: column; gap: 2px; border-bottom: 1px solid #F7F9FC; }
+    .ex-ac-item:last-child { border-bottom: none; }
+    .ex-ac-item:hover, .ex-ac-item.highlighted { background: #FFF7ED; }
+    .ex-ac-name { font-size: 13px; font-weight: 700; color: #2D3748; }
+    .ex-ac-meta { font-size: 11px; color: #A0AEC0; }
+    .ex-ac-meta mark { background: none; color: #E67E22; font-weight: 800; }
     .btn-add-ex { background: #FFF7ED; color: #E67E22; border: 2px dashed #F6AD55; border-radius: 12px; padding: 12px; text-align: center; font-size: 13px; font-weight: 700; cursor: pointer; width: 100%; font-family: 'Noto Sans KR', sans-serif; margin-top: 4px; }
     .btn-add-ex:hover { background: #FEEBC8; }
 
@@ -866,42 +875,30 @@
             <div class="ex-add-item">
               <div class="ex-add-num">1</div>
               <div class="ex-add-fields">
-                <input class="ex-add-input" type="text" placeholder="운동명 입력" value="맥켄지 신전 운동" />
+                <div class="ex-name-wrap"><input class="ex-add-input" type="text" placeholder="운동명 검색" value="맥켄지 신전 운동" oninput="showAc(this)" onkeydown="acKey(event,this)" onblur="hideAc(this,200)" autocomplete="off" /><div class="ex-ac-list"></div></div>
                 <input class="ex-add-input" type="text" placeholder="세트" value="3세트" />
                 <input class="ex-add-input" type="text" placeholder="횟수/시간" value="10회" />
-                <select class="ex-add-select">
-                  <option>필수</option>
-                  <option>권장</option>
-                  <option>선택</option>
-                </select>
+                <select class="ex-add-select"><option>필수</option><option>권장</option><option>선택</option></select>
               </div>
               <button class="btn-del-ex">×</button>
             </div>
             <div class="ex-add-item">
               <div class="ex-add-num">2</div>
               <div class="ex-add-fields">
-                <input class="ex-add-input" type="text" placeholder="운동명 입력" value="코어 안정화 운동" />
+                <div class="ex-name-wrap"><input class="ex-add-input" type="text" placeholder="운동명 검색" value="코어 안정화 운동" oninput="showAc(this)" onkeydown="acKey(event,this)" onblur="hideAc(this,200)" autocomplete="off" /><div class="ex-ac-list"></div></div>
                 <input class="ex-add-input" type="text" placeholder="세트" value="3세트" />
                 <input class="ex-add-input" type="text" placeholder="횟수/시간" value="15회" />
-                <select class="ex-add-select">
-                  <option>필수</option>
-                  <option>권장</option>
-                  <option>선택</option>
-                </select>
+                <select class="ex-add-select"><option>필수</option><option>권장</option><option>선택</option></select>
               </div>
               <button class="btn-del-ex">×</button>
             </div>
             <div class="ex-add-item">
               <div class="ex-add-num">3</div>
               <div class="ex-add-fields">
-                <input class="ex-add-input" type="text" placeholder="운동명 입력" value="고관절 스트레칭" />
+                <div class="ex-name-wrap"><input class="ex-add-input" type="text" placeholder="운동명 검색" value="고관절 스트레칭" oninput="showAc(this)" onkeydown="acKey(event,this)" onblur="hideAc(this,200)" autocomplete="off" /><div class="ex-ac-list"></div></div>
                 <input class="ex-add-input" type="text" placeholder="세트" value="2세트" />
                 <input class="ex-add-input" type="text" placeholder="횟수/시간" value="30초" />
-                <select class="ex-add-select">
-                  <option>필수</option>
-                  <option selected>권장</option>
-                  <option>선택</option>
-                </select>
+                <select class="ex-add-select"><option>필수</option><option selected>권장</option><option>선택</option></select>
               </div>
               <button class="btn-del-ex">×</button>
             </div>
@@ -1031,12 +1028,10 @@
       div.innerHTML = `
         <div class="ex-add-num">${exCount}</div>
         <div class="ex-add-fields">
-          <input class="ex-add-input" type="text" placeholder="운동명 입력" />
+          <div class="ex-name-wrap"><input class="ex-add-input" type="text" placeholder="운동명 검색" oninput="showAc(this)" onkeydown="acKey(event,this)" onblur="hideAc(this,200)" autocomplete="off" /><div class="ex-ac-list"></div></div>
           <input class="ex-add-input" type="text" placeholder="세트" />
           <input class="ex-add-input" type="text" placeholder="횟수/시간" />
-          <select class="ex-add-select">
-            <option>필수</option><option>권장</option><option>선택</option>
-          </select>
+          <select class="ex-add-select"><option>필수</option><option>권장</option><option>선택</option></select>
         </div>
         <button class="btn-del-ex" onclick="this.parentElement.remove();renum()">×</button>
       `;
@@ -1049,6 +1044,134 @@
     document.querySelectorAll('#ex-add-list .btn-del-ex').forEach(btn => {
       btn.onclick = function(){ this.parentElement.remove(); renum(); };
     });
+
+    /* ── 운동 자동완성 데이터 (처방운동 동작 구성관리 연동) ── */
+    const acExercises = [
+      ['경추 측면 스트레칭','목·어깨','스트레칭','초급','2세트','30초'],
+      ['승모근 롤링','목·어깨','스트레칭','초급','2세트','1분'],
+      ['턱 당기기 운동','목·어깨','재활','초급','3세트','10회'],
+      ['어깨 외회전 밴드','목·어깨','재활','초급','3세트','15회'],
+      ['어깨 내회전 스트레칭','목·어깨','스트레칭','초급','2세트','30초'],
+      ['사이드 넥 스트레칭','목·어깨','스트레칭','초급','2세트','20초'],
+      ['숄더 패킹','목·어깨','재활','초급','3세트','10회'],
+      ['도어웨이 가슴 스트레칭','목·어깨','스트레칭','초급','2세트','30초'],
+      ['케이블 페이스 풀','목·어깨','근력','중급','3세트','15회'],
+      ['밴드 W-Y-T 운동','목·어깨','재활','초급','3세트','10회'],
+      ['맥켄지 신전 운동','허리·척추','재활','초급','3세트','10회'],
+      ['고양이-낙타 스트레칭','허리·척추','스트레칭','초급','3세트','10회'],
+      ['데드버그','허리·척추','재활','초급','3세트','10회'],
+      ['버드독','허리·척추','재활','초급','3세트','10회'],
+      ['슈퍼맨 운동','허리·척추','근력','초급','3세트','10회'],
+      ['굿모닝 스트레칭','허리·척추','스트레칭','초급','2세트','30초'],
+      ['척추 회전 스트레칭','허리·척추','스트레칭','초급','2세트','30초'],
+      ['브릿지 운동','허리·척추','재활','초급','3세트','15회'],
+      ['힙 힌지','허리·척추','재활','초급','3세트','12회'],
+      ['SLR 운동','허리·척추','재활','초급','3세트','10회'],
+      ['플랭크','코어','근력','초급','3세트','30초'],
+      ['사이드 플랭크','코어','근력','초급','3세트','20초'],
+      ['크런치','코어','근력','초급','3세트','15회'],
+      ['레그 레이즈','코어','근력','중급','3세트','12회'],
+      ['코어 안정화 운동','코어','재활','초급','3세트','15회'],
+      ['V-업','코어','근력','중급','3세트','10회'],
+      ['러시안 트위스트','코어','근력','중급','3세트','20회'],
+      ['할로우 바디 홀드','코어','근력','중급','3세트','20초'],
+      ['복근 롤아웃','코어','근력','고급','3세트','10회'],
+      ['케이블 크런치','코어','근력','중급','3세트','15회'],
+      ['스쿼트','하체','근력','초급','3세트','15회'],
+      ['런지','하체','근력','초급','3세트','12회'],
+      ['레그 프레스','하체','근력','중급','4세트','12회'],
+      ['레그 컬','하체','근력','중급','3세트','12회'],
+      ['고관절 스트레칭','하체','스트레칭','초급','2세트','30초'],
+      ['햄스트링 스트레칭','하체','스트레칭','초급','2세트','30초'],
+      ['대퇴사두 스트레칭','하체','스트레칭','초급','2세트','30초'],
+      ['힙 플렉서 스트레칭','하체','스트레칭','초급','2세트','30초'],
+      ['카프 레이즈','하체','근력','초급','3세트','20회'],
+      ['글루트 브릿지','하체','근력','초급','3세트','15회'],
+      ['벤치 프레스','상체','근력','중급','4세트','10회'],
+      ['덤벨 플라이','상체','근력','중급','3세트','12회'],
+      ['숄더 프레스','상체','근력','중급','3세트','12회'],
+      ['사이드 레터럴 레이즈','상체','근력','초급','3세트','15회'],
+      ['바벨 로우','상체','근력','중급','4세트','10회'],
+      ['풀업','상체','근력','고급','3세트','8회'],
+      ['바이셉스 컬','상체','근력','초급','3세트','12회'],
+      ['트라이셉스 딥스','상체','근력','중급','3세트','10회'],
+      ['케이블 로우','상체','근력','중급','3세트','12회'],
+      ['페이스 풀','상체','재활','초급','3세트','15회'],
+      ['버피','전신','유산소','중급','3세트','10회'],
+      ['케틀벨 스윙','전신','근력','중급','3세트','15회'],
+      ['데드리프트','전신','근력','중급','4세트','8회'],
+      ['클린 앤 저크','전신','근력','고급','4세트','3회'],
+      ['점프 스쿼트','전신','유산소','중급','3세트','12회'],
+      ['마운틴 클라이머','전신','유산소','중급','3세트','30초'],
+      ['배틀 로프','전신','유산소','중급','3세트','30초'],
+      ['터키시 겟업','전신','근력','중급','3세트','5회'],
+      ['메디신볼 슬램','전신','근력','중급','4세트','10회'],
+      ['덤벨 쓰러스터','전신','근력','중급','3세트','10회'],
+    ];
+
+    const acPartColors = {
+      '목·어깨':'#805AD5','허리·척추':'#E53E3E','코어':'#E67E22',
+      '하체':'#3182CE','상체':'#276749','전신':'#2A69AC'
+    };
+
+    function showAc(input) {
+      const q = input.value.trim().toLowerCase();
+      const list = input.nextElementSibling;
+      if (!q) { list.style.display = 'none'; return; }
+      const results = acExercises.filter(e =>
+        e[0].toLowerCase().includes(q) || e[1].toLowerCase().includes(q)
+      ).slice(0, 10);
+      if (!results.length) { list.style.display = 'none'; return; }
+      list.innerHTML = results.map((e, i) => {
+        const hl = e[0].replace(new RegExp('('+q+')', 'gi'), '<mark>$1</mark>');
+        const c = acPartColors[e[1]] || '#718096';
+        return `<div class="ex-ac-item" data-idx="${i}" onmousedown="selectAc(this,'${e[0]}','${e[4]}','${e[5]}')" >
+          <div class="ex-ac-name">${hl}</div>
+          <div class="ex-ac-meta"><span style="color:${c};font-weight:800">${e[1]}</span> · ${e[2]} · ${e[3]} · ${e[4]} · ${e[5]}</div>
+        </div>`;
+      }).join('');
+      list.style.display = 'block';
+    }
+
+    function selectAc(item, name, sets, reps) {
+      const wrap = item.closest('.ex-name-wrap');
+      const input = wrap.querySelector('input');
+      const fields = wrap.closest('.ex-add-fields');
+      const inputs = fields.querySelectorAll('.ex-add-input');
+      input.value = name;
+      if (inputs[1]) inputs[1].value = sets;
+      if (inputs[2]) inputs[2].value = reps;
+      wrap.querySelector('.ex-ac-list').style.display = 'none';
+    }
+
+    function hideAc(input, delay) {
+      setTimeout(() => {
+        const list = input.nextElementSibling;
+        if (list) list.style.display = 'none';
+      }, delay);
+    }
+
+    function acKey(e, input) {
+      const list = input.nextElementSibling;
+      const items = list.querySelectorAll('.ex-ac-item');
+      const cur = list.querySelector('.ex-ac-item.highlighted');
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        const next = cur ? (cur.nextElementSibling || items[0]) : items[0];
+        cur && cur.classList.remove('highlighted');
+        next && next.classList.add('highlighted');
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        const prev = cur ? (cur.previousElementSibling || items[items.length-1]) : items[items.length-1];
+        cur && cur.classList.remove('highlighted');
+        prev && prev.classList.add('highlighted');
+      } else if (e.key === 'Enter' && cur) {
+        e.preventDefault();
+        cur.dispatchEvent(new MouseEvent('mousedown'));
+      } else if (e.key === 'Escape') {
+        list.style.display = 'none';
+      }
+    }
 
     showScreen(0, document.querySelector('.nav-btn.active'));
   </script>
