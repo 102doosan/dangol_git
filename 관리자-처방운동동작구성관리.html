@@ -1416,7 +1416,7 @@
           <td>${e[4]}</td>
           <td>${e[5]}</td>
           <td style="font-weight:800;color:#5A67D8;">-</td>
-          <td style="display:flex;gap:6px;"><button class="btn-edit" onclick="showScreen(1,document.querySelectorAll('.nav-btn')[1])">수정</button><button class="btn-del" onclick="deleteEx(${JSON.stringify(e[0])})">삭제</button></td>
+          <td style="display:flex;gap:6px;"><button class="btn-edit" onclick="showScreen(1,document.querySelectorAll('.nav-btn')[1])">수정</button><button class="btn-del" onclick="deleteEx('${e[0].replace(/'/g, "\\'")}')">삭제</button></td>
         </tr>`;
       }).join('');
     }
