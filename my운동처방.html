@@ -266,37 +266,81 @@
             <span class="title">운동처방</span>
           </div>
           <div class="app-body">
-            <!-- 디스크시술 5주차: 척추 의료 일러스트 -->
+            <!-- 디스크시술 5주차: 3D 척추 글로우 일러스트 -->
             <div class="pcard">
               <div class="pcard-thumb">
                 <svg viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg">
-                  <rect width="56" height="56" fill="#1A4A8A"/>
-                  <rect x="0" y="0" width="56" height="56" fill="url(#spineGrad)"/>
                   <defs>
-                    <linearGradient id="spineGrad" x1="0" y1="0" x2="1" y2="1">
-                      <stop offset="0%" stop-color="#1B5EAE"/>
-                      <stop offset="100%" stop-color="#0D3B73"/>
+                    <radialGradient id="bgRadial" cx="50%" cy="50%" r="70%">
+                      <stop offset="0%"   stop-color="#1A7A8A"/>
+                      <stop offset="60%"  stop-color="#0D5570"/>
+                      <stop offset="100%" stop-color="#062040"/>
+                    </radialGradient>
+                    <radialGradient id="glowRed" cx="50%" cy="50%" r="50%">
+                      <stop offset="0%"  stop-color="#ffffff" stop-opacity="0.95"/>
+                      <stop offset="40%" stop-color="#ffe066" stop-opacity="0.7"/>
+                      <stop offset="100%" stop-color="#ff6600" stop-opacity="0"/>
+                    </radialGradient>
+                    <linearGradient id="vertTop" x1="0" y1="0" x2="1" y2="1">
+                      <stop offset="0%" stop-color="#A8E6F0"/>
+                      <stop offset="100%" stop-color="#5BB8D4"/>
                     </linearGradient>
+                    <linearGradient id="vertSide" x1="0" y1="0" x2="1" y2="0">
+                      <stop offset="0%" stop-color="#3A9FBF"/>
+                      <stop offset="100%" stop-color="#1D6A88"/>
+                    </linearGradient>
+                    <filter id="glow">
+                      <feGaussianBlur stdDeviation="1.5" result="blur"/>
+                      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+                    </filter>
                   </defs>
-                  <!-- 척추 중앙 기둥 -->
-                  <rect x="25" y="6" width="6" height="44" rx="3" fill="#4A90D9" opacity="0.3"/>
-                  <!-- 척추 디스크 마디들 -->
-                  <rect x="19" y="8"  width="18" height="5" rx="2.5" fill="#6BAED6"/>
-                  <rect x="19" y="16" width="18" height="5" rx="2.5" fill="#6BAED6"/>
-                  <rect x="19" y="24" width="18" height="5" rx="2.5" fill="#4A9BC4"/>
-                  <rect x="19" y="32" width="18" height="5" rx="2.5" fill="#6BAED6"/>
-                  <rect x="19" y="40" width="18" height="5" rx="2.5" fill="#6BAED6"/>
-                  <!-- 강조 디스크(이상 부위) -->
-                  <rect x="18" y="24" width="20" height="5" rx="2.5" fill="#E8505B" opacity="0.85"/>
-                  <!-- 신경선 -->
-                  <line x1="37" y1="11" x2="46" y2="9"  stroke="#AED6F1" stroke-width="1.2" stroke-linecap="round"/>
-                  <line x1="37" y1="19" x2="46" y2="17" stroke="#AED6F1" stroke-width="1.2" stroke-linecap="round"/>
-                  <line x1="37" y1="35" x2="46" y2="33" stroke="#AED6F1" stroke-width="1.2" stroke-linecap="round"/>
-                  <line x1="37" y1="43" x2="46" y2="41" stroke="#AED6F1" stroke-width="1.2" stroke-linecap="round"/>
-                  <line x1="19" y1="11" x2="10" y2="9"  stroke="#AED6F1" stroke-width="1.2" stroke-linecap="round"/>
-                  <line x1="19" y1="19" x2="10" y2="17" stroke="#AED6F1" stroke-width="1.2" stroke-linecap="round"/>
-                  <line x1="19" y1="35" x2="10" y2="33" stroke="#AED6F1" stroke-width="1.2" stroke-linecap="round"/>
-                  <line x1="19" y1="43" x2="10" y2="41" stroke="#AED6F1" stroke-width="1.2" stroke-linecap="round"/>
+                  <!-- 배경 -->
+                  <rect width="56" height="56" fill="url(#bgRadial)"/>
+
+                  <!-- 척추뼈 5개 (3D 원통 느낌: 상면 타원 + 측면 사각) -->
+                  <!-- 뼈 1 -->
+                  <rect x="18" y="5"  width="20" height="6" rx="1" fill="url(#vertSide)"/>
+                  <ellipse cx="28" cy="5"  rx="10" ry="2.5" fill="url(#vertTop)"/>
+                  <ellipse cx="28" cy="11" rx="10" ry="2.5" fill="#3A8FAF" opacity="0.6"/>
+                  <!-- 디스크 1 -->
+                  <ellipse cx="28" cy="13" rx="8" ry="1.8" fill="#1E5F7A"/>
+
+                  <!-- 뼈 2 -->
+                  <rect x="18" y="14" width="20" height="6" rx="1" fill="url(#vertSide)"/>
+                  <ellipse cx="28" cy="14" rx="10" ry="2.5" fill="url(#vertTop)"/>
+                  <ellipse cx="28" cy="20" rx="10" ry="2.5" fill="#3A8FAF" opacity="0.6"/>
+                  <!-- 디스크 2 -->
+                  <ellipse cx="28" cy="22" rx="8" ry="1.8" fill="#1E5F7A"/>
+
+                  <!-- 뼈 3 (강조 - 시술 부위) -->
+                  <rect x="17" y="23" width="22" height="7" rx="1" fill="#4AACCF"/>
+                  <ellipse cx="28" cy="23" rx="11" ry="2.8" fill="#7FD4E8"/>
+                  <ellipse cx="28" cy="30" rx="11" ry="2.8" fill="#3A9FBF" opacity="0.7"/>
+                  <!-- 강조 디스크 (글로우) -->
+                  <ellipse cx="28" cy="32" rx="9" ry="2.2" fill="#0A4060"/>
+                  <ellipse cx="28" cy="32" rx="9" ry="2.2" fill="url(#glowRed)" filter="url(#glow)"/>
+
+                  <!-- 뼈 4 -->
+                  <rect x="18" y="33" width="20" height="6" rx="1" fill="url(#vertSide)"/>
+                  <ellipse cx="28" cy="33" rx="10" ry="2.5" fill="url(#vertTop)"/>
+                  <ellipse cx="28" cy="39" rx="10" ry="2.5" fill="#3A8FAF" opacity="0.6"/>
+                  <!-- 디스크 4 -->
+                  <ellipse cx="28" cy="41" rx="8" ry="1.8" fill="#1E5F7A"/>
+
+                  <!-- 뼈 5 -->
+                  <rect x="18" y="42" width="20" height="6" rx="1" fill="url(#vertSide)"/>
+                  <ellipse cx="28" cy="42" rx="10" ry="2.5" fill="url(#vertTop)"/>
+                  <ellipse cx="28" cy="48" rx="10" ry="2.5" fill="#3A8FAF" opacity="0.5"/>
+
+                  <!-- 좌측 진동파형 -->
+                  <path d="M14 20 Q11 22 14 24 Q17 26 14 28 Q11 30 14 32 Q17 34 14 36" stroke="#5CE8F8" stroke-width="1.2" fill="none" opacity="0.7"/>
+                  <path d="M10 22 Q7 25 10 28 Q13 31 10 34" stroke="#5CE8F8" stroke-width="0.8" fill="none" opacity="0.4"/>
+                  <!-- 우측 진동파형 -->
+                  <path d="M42 20 Q45 22 42 24 Q39 26 42 28 Q45 30 42 32 Q39 34 42 36" stroke="#5CE8F8" stroke-width="1.2" fill="none" opacity="0.7"/>
+                  <path d="M46 22 Q49 25 46 28 Q43 31 46 34" stroke="#5CE8F8" stroke-width="0.8" fill="none" opacity="0.4"/>
+
+                  <!-- 글로우 중심점 -->
+                  <circle cx="28" cy="32" r="3" fill="url(#glowRed)" opacity="0.9"/>
                 </svg>
               </div>
               <div class="pcard-info">
