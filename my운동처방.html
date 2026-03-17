@@ -436,40 +436,58 @@
               </div>
             </div>
 
-            <!-- F, Cx core, 2x4: 전신 운동 실루엣 -->
+            <!-- F, Cx core, 2x4: 메르카바 + 인체 -->
             <div class="pcard">
               <div class="pcard-thumb">
                 <svg viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg">
                   <defs>
-                    <linearGradient id="cxGrad" x1="0" y1="0" x2="1" y2="1">
-                      <stop offset="0%" stop-color="#5B2D8A"/>
-                      <stop offset="100%" stop-color="#3D1A6E"/>
+                    <linearGradient id="cxBg" x1="0" y1="0" x2="0.8" y2="1">
+                      <stop offset="0%"   stop-color="#1A9A9A"/>
+                      <stop offset="50%"  stop-color="#2A5080"/>
+                      <stop offset="100%" stop-color="#3A1A6E"/>
                     </linearGradient>
+                    <radialGradient id="cxGlow" cx="50%" cy="48%" r="45%">
+                      <stop offset="0%"   stop-color="#A0F0FF" stop-opacity="0.3"/>
+                      <stop offset="100%" stop-color="#A0F0FF" stop-opacity="0"/>
+                    </radialGradient>
+                    <filter id="gf3">
+                      <feGaussianBlur stdDeviation="1" result="b"/>
+                      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+                    </filter>
                   </defs>
-                  <rect width="56" height="56" fill="url(#cxGrad)"/>
-                  <!-- 서있는 운동 자세 실루엣 -->
+
+                  <!-- 배경 -->
+                  <rect width="56" height="56" fill="url(#cxBg)"/>
+                  <!-- 중앙 오라 -->
+                  <ellipse cx="28" cy="28" rx="18" ry="20" fill="url(#cxGlow)"/>
+
+                  <!-- 별(메르카바) - 위 삼각형 -->
+                  <polygon points="28,7 42,31 14,31" fill="none" stroke="#7FFFD4" stroke-width="1.3" opacity="0.85"/>
+                  <!-- 별(메르카바) - 아래 삼각형 -->
+                  <polygon points="28,49 14,25 42,25" fill="none" stroke="#7FFFD4" stroke-width="1.3" opacity="0.85"/>
+
+                  <!-- 내부 작은 육각형 -->
+                  <polygon points="28,17 34,21 34,29 28,33 22,29 22,21" fill="none" stroke="#A0FFF0" stroke-width="0.8" opacity="0.6"/>
+
+                  <!-- 인체 실루엣 (서있는 자세) -->
                   <!-- 머리 -->
-                  <circle cx="28" cy="10" r="5" fill="#C4A3E8"/>
-                  <!-- 목 -->
-                  <rect x="26" y="14" width="4" height="3" rx="1" fill="#C4A3E8"/>
-                  <!-- 상체 -->
-                  <path d="M20 17 L36 17 L33 30 L23 30 Z" fill="#A87DD4"/>
-                  <!-- 왼팔 (들어올린 포즈) -->
-                  <line x1="20" y1="18" x2="10" y2="12" stroke="#C4A3E8" stroke-width="3.5" stroke-linecap="round"/>
-                  <line x1="10" y1="12" x2="6"  y2="20" stroke="#C4A3E8" stroke-width="3" stroke-linecap="round"/>
-                  <!-- 오른팔 -->
-                  <line x1="36" y1="18" x2="46" y2="14" stroke="#C4A3E8" stroke-width="3.5" stroke-linecap="round"/>
-                  <line x1="46" y1="14" x2="50" y2="22" stroke="#C4A3E8" stroke-width="3" stroke-linecap="round"/>
-                  <!-- 골반 -->
-                  <rect x="22" y="30" width="12" height="4" rx="2" fill="#9B6DCA"/>
-                  <!-- 왼다리 -->
-                  <line x1="24" y1="34" x2="20" y2="46" stroke="#C4A3E8" stroke-width="4" stroke-linecap="round"/>
-                  <line x1="20" y1="46" x2="16" y2="50" stroke="#C4A3E8" stroke-width="3" stroke-linecap="round"/>
-                  <!-- 오른다리 -->
-                  <line x1="32" y1="34" x2="36" y2="46" stroke="#C4A3E8" stroke-width="4" stroke-linecap="round"/>
-                  <line x1="36" y1="46" x2="40" y2="50" stroke="#C4A3E8" stroke-width="3" stroke-linecap="round"/>
-                  <!-- 강조 원 -->
-                  <circle cx="28" cy="24" r="6" fill="none" stroke="#E040FB" stroke-width="1.2" opacity="0.5"/>
+                  <circle cx="28" cy="14" r="3.5" fill="none" stroke="#C8F0FF" stroke-width="1.2" opacity="0.9"/>
+                  <!-- 몸통 (목~허리) -->
+                  <line x1="28" y1="17.5" x2="28" y2="30" stroke="#C8F0FF" stroke-width="1.3" opacity="0.8"/>
+                  <!-- 어깨 / 팔 -->
+                  <line x1="19" y1="21" x2="37" y2="21" stroke="#C8F0FF" stroke-width="1.2" opacity="0.75"/>
+                  <line x1="19" y1="21" x2="16" y2="29" stroke="#C8F0FF" stroke-width="1.1" stroke-linecap="round" opacity="0.7"/>
+                  <line x1="37" y1="21" x2="40" y2="29" stroke="#C8F0FF" stroke-width="1.1" stroke-linecap="round" opacity="0.7"/>
+                  <!-- 다리 -->
+                  <line x1="28" y1="30" x2="22" y2="42" stroke="#C8F0FF" stroke-width="1.2" stroke-linecap="round" opacity="0.75"/>
+                  <line x1="28" y1="30" x2="34" y2="42" stroke="#C8F0FF" stroke-width="1.2" stroke-linecap="round" opacity="0.75"/>
+
+                  <!-- 하단 중앙 원(에너지 포인트) -->
+                  <circle cx="28" cy="46" r="2" fill="none" stroke="#7FFFD4" stroke-width="1" opacity="0.8"/>
+                  <circle cx="28" cy="46" r="0.8" fill="#7FFFD4" opacity="0.9"/>
+
+                  <!-- 상단 광점 -->
+                  <circle cx="28" cy="7" r="1.5" fill="#7FFFD4" opacity="0.7" filter="url(#gf3)"/>
                 </svg>
               </div>
               <div class="pcard-info">
