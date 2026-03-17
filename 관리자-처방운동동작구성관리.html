@@ -885,6 +885,14 @@
       form.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
 
+    function deleteEx(name) {
+      if (!confirm(`"${name}" 운동을 삭제하시겠습니까?`)) return;
+      const idx = exercises.findIndex(e => e[0] === name);
+      if (idx !== -1) exercises.splice(idx, 1);
+      updateStats();
+      renderTable();
+    }
+
     function deletePart(key) {
       const p = parts.find(x => x.key === key);
       const cnt = exercises.filter(e => e[1] === key).length;
@@ -1311,7 +1319,7 @@
           <td>${e[4]}</td>
           <td>${e[5]}</td>
           <td style="font-weight:800;color:#5A67D8;">-</td>
-          <td style="display:flex;gap:6px;"><button class="btn-edit" onclick="showScreen(1,document.querySelectorAll('.nav-btn')[1])">수정</button><button class="btn-del">삭제</button></td>
+          <td style="display:flex;gap:6px;"><button class="btn-edit" onclick="showScreen(1,document.querySelectorAll('.nav-btn')[1])">수정</button><button class="btn-del" onclick="deleteEx(${JSON.stringify(e[0])})">삭제</button></td>
         </tr>`;
       }).join('');
     }
