@@ -487,6 +487,7 @@
           </div>
           <div class="page-actions">
             <button class="btn-secondary" onclick="showScreen(0,document.querySelectorAll('.nav-btn')[0])">← 목록</button>
+            <button class="btn-secondary" id="btn-edit-prx" onclick="editPrx()">처방 수정</button>
             <button class="btn-primary" onclick="showScreen(2,document.querySelectorAll('.nav-btn')[2])">+ 신규 처방</button>
           </div>
         </div>
@@ -521,6 +522,12 @@
                 <div class="detail-panel-title">🏋️ 처방 운동 목록</div>
                 <div class="ex-list" id="pd-exlist"></div>
               </div>
+            </div>
+
+            <!-- SFMA 검사 현황 -->
+            <div class="detail-panel" style="margin-bottom:16px;background:linear-gradient(135deg,#FFFAF0,#FFF7ED);">
+              <div class="detail-panel-title">🔬 SFMA 검사 알림 설정</div>
+              <div id="pd-sfma-card"></div>
             </div>
 
             <!-- 운동 수행 이력 -->
@@ -1126,7 +1133,7 @@
         list: [
           {
             id: 1, name: '디스크시술 5주차', date: '2024.06.27', grade: '중급', trainer: '김트레이너',
-            status: 'active', count: 23,
+            status: 'active', count: 23, sfmaAfter: 20, sfmaAlertDays: 3,
             memo: '허리에 무리가 가지 않도록 천천히 진행하세요. 통증 발생 시 즉시 중단. 4주차 이후 강도 점진적 증가 예정.',
             exercises: [
               { name:'맥켄지 신전 운동', detail:'3세트 × 10회 · 세트 간 휴식 60초', grade:'필수' },
@@ -1146,7 +1153,7 @@
           },
           {
             id: 2, name: '디스크시술 4주차', date: '2024.05.15', grade: '초급', trainer: '김트레이너',
-            status: 'done', count: 18,
+            status: 'done', count: 18, sfmaAfter: 15, sfmaAlertDays: 5,
             memo: '초기 재활 단계. 통증 없는 범위 내에서 천천히 진행.',
             exercises: [
               { name:'맥켄지 신전 운동', detail:'2세트 × 8회', grade:'필수' },
@@ -1163,7 +1170,7 @@
           },
           {
             id: 3, name: '디스크시술 3주차', date: '2024.04.01', grade: '초급', trainer: '이트레이너',
-            status: 'done', count: 14,
+            status: 'done', count: 14, sfmaAfter: 12, sfmaAlertDays: 3,
             memo: '물리치료 병행 중. 운동 강도 최소화.',
             exercises: [
               { name:'고양이-낙타 스트레칭', detail:'2세트 × 10회', grade:'필수' },
@@ -1178,7 +1185,7 @@
           },
           {
             id: 4, name: '초기 재활 처방', date: '2024.02.15', grade: '초급', trainer: '이트레이너',
-            status: 'done', count: 10,
+            status: 'done', count: 10, sfmaAfter: 8, sfmaAlertDays: 2,
             memo: '수술 직후 안정기. 통증 모니터링 최우선.',
             exercises: [
               { name:'굿모닝 스트레칭', detail:'2세트 × 30초', grade:'필수' },
@@ -1287,7 +1294,193 @@
         </div>
       </div>`;
 
+      // SFMA 카드
+      const sfmaNext = p.sfmaAfter > p.count
+        ? `${p.sfmaAfter - p.count}회 후 예정`
+        : `${p.count - p.sfmaAfter}회 전 도달`;
+      const sfmaReached = p.count >= p.sfmaAfter;
+      document.getElementById('pd-sfma-card').innerHTML = `
+        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+          <div style="flex:1;min-width:160px;">
+            <div style="font-size:11px;color:#A0AEC0;font-weight:700;margin-bottom:4px;">SFMA 검사 기준</div>
+            <div style="font-size:14px;font-weight:800;color:#2D3748;">${p.sfmaAfter}회차 후 검사</div>
+            <div style="font-size:12px;margin-top:3px;color:${sfmaReached?'#48BB78':'#E67E22'};font-weight:700;">${sfmaReached?'✅ 검사 시점 도달':'⏳ '+sfmaNext}</div>
+          </div>
+          <div style="flex:1;min-width:160px;">
+            <div style="font-size:11px;color:#A0AEC0;font-weight:700;margin-bottom:4px;">사전 알림</div>
+            <div style="font-size:14px;font-weight:800;color:#2D3748;">${p.sfmaAlertDays}일 전 알림</div>
+            <div style="font-size:12px;margin-top:3px;color:#718096;">회원 앱 푸시 + 트레이너 알림</div>
+          </div>
+        </div>`;
+
       renderPrxTimeline(); // dot active 갱신
+    }
+
+    function editPrx() {
+      const data = memberPrescriptions[currentMember];
+      const p = data.list.find(x => x.id === selectedPrxId);
+      if (!p) return;
+
+      const gradeOpts = ['초급','중급','고급'].map(g =>
+        `<option value="${g}"${p.grade===g?' selected':''}>${g}</option>`).join('');
+      const statusOpts = [['active','활성'],['done','완료']].map(([v,l]) =>
+        `<option value="${v}"${p.status===v?' selected':''}>${l}</option>`).join('');
+      const exGradeOpts = (cur) => ['필수','권장','선택'].map(g =>
+        `<option value="${g}"${cur===g?' selected':''}>${g}</option>`).join('');
+
+      document.getElementById('prx-detail').innerHTML = `
+        <div class="detail-panel" style="margin-bottom:16px;">
+          <div class="detail-panel-title" style="margin-bottom:18px;">✏️ 처방 수정 — ${p.name}</div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <div class="form-label">처방명 <span class="required">*</span></div>
+              <input class="form-input" id="ep-name" value="${p.name}">
+            </div>
+            <div class="form-group">
+              <div class="form-label">처방일</div>
+              <input class="form-input" id="ep-date" value="${p.date}">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <div class="form-label">운동 등급</div>
+              <select class="form-select" id="ep-grade">${gradeOpts}</select>
+            </div>
+            <div class="form-group">
+              <div class="form-label">담당 트레이너</div>
+              <input class="form-input" id="ep-trainer" value="${p.trainer}">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <div class="form-label">상태</div>
+              <select class="form-select" id="ep-status">${statusOpts}</select>
+            </div>
+          </div>
+          <div class="form-row-full">
+            <div class="form-group">
+              <div class="form-label">트레이너 메모</div>
+              <textarea class="form-textarea" id="ep-memo">${p.memo}</textarea>
+            </div>
+          </div>
+        </div>
+
+        <!-- SFMA 검사 설정 -->
+        <div class="detail-panel" style="margin-bottom:16px;">
+          <div class="detail-panel-title">🔬 SFMA 검사 알림 설정</div>
+          <div style="background:#FFF7ED;border:1.5px solid #F6AD55;border-radius:12px;padding:14px 16px;margin-bottom:16px;font-size:13px;color:#744210;line-height:1.6;">
+            SFMA(Selective Functional Movement Assessment)는 운동 기능 평가 검사입니다.<br>
+            목표 횟수 도달 전 회원과 트레이너에게 자동 알림이 발송됩니다.
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <div class="form-label">SFMA 검사 기준 횟수 <span class="required">*</span></div>
+              <div style="display:flex;align-items:center;gap:8px;">
+                <input class="form-input" id="ep-sfma-after" type="number" min="1" max="999" value="${p.sfmaAfter}" style="max-width:100px;text-align:center;font-size:16px;font-weight:800;">
+                <span style="font-size:14px;color:#4A5568;font-weight:600;white-space:nowrap;">회차 수행 후 검사 권장</span>
+              </div>
+              <div style="font-size:12px;color:#A0AEC0;margin-top:6px;">현재 수행 ${p.count}회 · ${p.sfmaAfter > p.count ? (p.sfmaAfter - p.count)+'회 남음' : '검사 시점 도달'}</div>
+            </div>
+            <div class="form-group">
+              <div class="form-label">사전 알림 시점 <span class="required">*</span></div>
+              <div style="display:flex;align-items:center;gap:8px;">
+                <span style="font-size:14px;color:#4A5568;font-weight:600;white-space:nowrap;">기준 횟수</span>
+                <input class="form-input" id="ep-sfma-alert" type="number" min="1" max="30" value="${p.sfmaAlertDays}" style="max-width:80px;text-align:center;font-size:16px;font-weight:800;">
+                <span style="font-size:14px;color:#4A5568;font-weight:600;white-space:nowrap;">회 전 알림 발송</span>
+              </div>
+              <div style="font-size:12px;color:#A0AEC0;margin-top:6px;">회원 앱 푸시 알림 + 담당 트레이너 알림</div>
+            </div>
+          </div>
+
+          <!-- 알림 미리보기 -->
+          <div style="background:#F0FFF4;border:1.5px solid #9AE6B4;border-radius:12px;padding:14px 16px;">
+            <div style="font-size:12px;font-weight:800;color:#276749;margin-bottom:8px;">📱 알림 미리보기</div>
+            <div style="font-size:13px;color:#276749;">
+              <b>${currentMember}</b>님이 <b id="ep-preview-target">${p.sfmaAfter}회차</b>를
+              <b id="ep-preview-alert">${p.sfmaAlertDays}회</b> 앞두면 알림 발송
+            </div>
+            <div style="font-size:12px;color:#48BB78;margin-top:4px;">
+              예: "${currentMember}님, ${p.sfmaAfter}회차 운동까지 ${p.sfmaAlertDays}회 남았습니다. SFMA 검사 예약을 준비해 주세요."
+            </div>
+          </div>
+        </div>
+
+        <!-- 운동 목록 수정 -->
+        <div class="detail-panel" style="margin-bottom:16px;">
+          <div class="detail-panel-title">🏋️ 처방 운동 목록</div>
+          <div id="ep-exlist">
+            ${p.exercises.map((e, i) => `
+            <div class="ex-item" style="margin-bottom:8px;" id="ep-ex-${i}">
+              <div class="ex-num">${i+1}</div>
+              <div class="ex-info" style="flex:1;">
+                <input class="form-input" style="margin-bottom:4px;" value="${e.name}" id="ep-ex-name-${i}">
+                <input class="form-input" style="font-size:12px;" value="${e.detail}" id="ep-ex-detail-${i}">
+              </div>
+              <select class="form-select" style="width:70px;font-size:12px;" id="ep-ex-grade-${i}">${exGradeOpts(e.grade)}</select>
+              <button onclick="removeEditEx(${i})" style="background:#FED7D7;color:#C53030;border:none;border-radius:8px;padding:6px 10px;cursor:pointer;font-size:12px;margin-left:4px;">✕</button>
+            </div>`).join('')}
+          </div>
+          <button onclick="addEditEx()" style="background:#F7F9FC;border:1.5px dashed #CBD5E0;border-radius:10px;padding:10px;width:100%;cursor:pointer;font-size:13px;color:#718096;margin-top:8px;">+ 운동 추가</button>
+        </div>
+
+        <div style="display:flex;gap:10px;justify-content:flex-end;padding-bottom:16px;">
+          <button class="btn-cancel" onclick="cancelEditPrx()">취소</button>
+          <button class="btn-primary" onclick="savePrx()">저장</button>
+        </div>`;
+
+      // 실시간 미리보기 갱신
+      document.getElementById('ep-sfma-after').addEventListener('input', function() {
+        document.getElementById('ep-preview-target').textContent = (this.value||'?') + '회차';
+      });
+      document.getElementById('ep-sfma-alert').addEventListener('input', function() {
+        document.getElementById('ep-preview-alert').textContent = (this.value||'?') + '회';
+      });
+    }
+
+    let editExList = null;
+    function removeEditEx(idx) {
+      const data = memberPrescriptions[currentMember];
+      const p = data.list.find(x => x.id === selectedPrxId);
+      if (!p || p.exercises.length <= 1) return;
+      // 현재 편집 중인 값 수집 후 해당 항목 삭제
+      p.exercises = p.exercises.filter((_, i) => i !== idx);
+      editPrx();
+    }
+    function addEditEx() {
+      const data = memberPrescriptions[currentMember];
+      const p = data.list.find(x => x.id === selectedPrxId);
+      if (!p) return;
+      // 현재 입력값 저장 후 항목 추가
+      _syncEditExToData(p);
+      p.exercises.push({ name:'새 운동', detail:'3세트 × 10회', grade:'선택' });
+      editPrx();
+    }
+    function _syncEditExToData(p) {
+      p.exercises = p.exercises.map((e, i) => ({
+        name: document.getElementById('ep-ex-name-'+i)?.value || e.name,
+        detail: document.getElementById('ep-ex-detail-'+i)?.value || e.detail,
+        grade: document.getElementById('ep-ex-grade-'+i)?.value || e.grade,
+      }));
+    }
+
+    function savePrx() {
+      const data = memberPrescriptions[currentMember];
+      const p = data.list.find(x => x.id === selectedPrxId);
+      if (!p) return;
+      p.name    = document.getElementById('ep-name').value.trim() || p.name;
+      p.date    = document.getElementById('ep-date').value.trim();
+      p.grade   = document.getElementById('ep-grade').value;
+      p.trainer = document.getElementById('ep-trainer').value.trim();
+      p.status  = document.getElementById('ep-status').value;
+      p.memo    = document.getElementById('ep-memo').value.trim();
+      p.sfmaAfter    = parseInt(document.getElementById('ep-sfma-after').value) || p.sfmaAfter;
+      p.sfmaAlertDays = parseInt(document.getElementById('ep-sfma-alert').value) || p.sfmaAlertDays;
+      _syncEditExToData(p);
+      selectPrx(selectedPrxId);
+    }
+    function cancelEditPrx() {
+      selectPrx(selectedPrxId);
     }
 
     /* ── 운동 선택 모달 ── */
