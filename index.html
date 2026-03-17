@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>헬스케어 앱 디자인 허브</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Noto Sans KR', sans-serif; background: #F0F4F8; min-height: 100vh; padding: 40px 24px 60px; color: #1A202C; }
+
+    .top-header { max-width: 960px; margin: 0 auto 40px; }
+    .top-header h1 { font-size: 28px; font-weight: 900; margin-bottom: 6px; }
+    .top-header p { font-size: 14px; color: #718096; }
+
+    .section { max-width: 960px; margin: 0 auto 36px; }
+    .section-label {
+      font-size: 11px; font-weight: 800; color: #A0AEC0; letter-spacing: 2px;
+      margin-bottom: 14px; display: flex; align-items: center; gap: 10px;
+    }
+    .section-label::after { content: ''; flex: 1; height: 1px; background: #E2E8F0; }
+
+    .card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 14px; }
+
+    .card {
+      background: #fff; border-radius: 18px; padding: 22px 24px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.07);
+      text-decoration: none; color: inherit;
+      display: flex; align-items: center; gap: 16px;
+      border: 2px solid transparent;
+      transition: all 0.2s;
+      cursor: pointer;
+    }
+    .card:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0,0,0,0.12); border-color: var(--accent); }
+
+    .card-icon {
+      width: 52px; height: 52px; border-radius: 14px; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 24px; background: var(--icon-bg);
+    }
+    .card-info { flex: 1; min-width: 0; }
+    .card-title { font-size: 15px; font-weight: 800; color: #1A202C; margin-bottom: 3px; }
+    .card-desc { font-size: 12px; color: #A0AEC0; font-weight: 500; }
+    .card-screens { font-size: 11px; font-weight: 700; margin-top: 6px; color: var(--accent); }
+    .card-arrow { font-size: 20px; color: #CBD5E0; flex-shrink: 0; transition: transform 0.2s; }
+    .card:hover .card-arrow { transform: translateX(4px); color: var(--accent); }
+
+    /* 특별 카드: 전체 목록 */
+    .card-main {
+      background: linear-gradient(135deg, #1E3A5F 0%, #2A5298 100%);
+      color: #fff; border-color: transparent;
+      grid-column: 1 / -1;
+      padding: 28px 28px;
+    }
+    .card-main .card-title { font-size: 18px; color: #fff; }
+    .card-main .card-desc { color: rgba(255,255,255,0.65); font-size: 13px; }
+    .card-main .card-screens { color: #63B3ED; font-size: 13px; }
+    .card-main .card-arrow { color: rgba(255,255,255,0.4); }
+    .card-main:hover { border-color: #63B3ED; }
+    .card-main .card-icon { background: rgba(255,255,255,0.15); font-size: 28px; width: 60px; height: 60px; }
+  </style>
+</head>
+<body>
+
+  <div class="top-header">
+    <h1>🏥 헬스케어 앱 디자인 허브</h1>
+    <p>모든 화면 디자인 파일을 한 곳에서 확인하세요</p>
+  </div>
+
+  <!-- 전체 화면 목록 -->
+  <div class="section">
+    <div class="section-label">📋 전체 화면 목록</div>
+    <div class="card-grid">
+      <a class="card card-main" href="전체앱-list.html" target="_blank">
+        <div class="card-icon">📋</div>
+        <div class="card-info">
+          <div class="card-title">전체 앱 화면 목록</div>
+          <div class="card-desc">사용자 앱 + 관리자 앱 전체 화면 구조 및 진행 현황</div>
+          <div class="card-screens">사용자 앱 · 관리자 앱 · 체크리스트</div>
+        </div>
+        <div class="card-arrow">›</div>
+      </a>
+    </div>
+  </div>
+
+  <!-- 사용자 앱 -->
+  <div class="section">
+    <div class="section-label">📱 사용자 앱 화면 디자인</div>
+    <div class="card-grid">
+
+      <a class="card" href="my운동처방.html" target="_blank" style="--accent:#3B6FF0;--icon-bg:#EEF2FF;">
+        <div class="card-icon">💊</div>
+        <div class="card-info">
+          <div class="card-title">My 운동처방</div>
+          <div class="card-desc">처방 목록 · 상세 · 운동 진행 · 완료</div>
+          <div class="card-screens">5개 화면</div>
+        </div>
+        <div class="card-arrow">›</div>
+      </a>
+
+      <a class="card" href="운동법.html" target="_blank" style="--accent:#38A169;--icon-bg:#F0FFF4;">
+        <div class="card-icon">🏋️</div>
+        <div class="card-info">
+          <div class="card-title">운동법</div>
+          <div class="card-desc">운동 목록 · 상세 · 따라하기 · 완료</div>
+          <div class="card-screens">5개 화면</div>
+        </div>
+        <div class="card-arrow">›</div>
+      </a>
+
+      <a class="card" href="재활운동.html" target="_blank" style="--accent:#D69E2E;--icon-bg:#FFFFF0;">
+        <div class="card-icon">🦴</div>
+        <div class="card-info">
+          <div class="card-title">재활운동</div>
+          <div class="card-desc">재활 프로그램 · 단계별 운동 · 기록</div>
+          <div class="card-screens">5개 화면</div>
+        </div>
+        <div class="card-arrow">›</div>
+      </a>
+
+      <a class="card" href="SFMA결과.html" target="_blank" style="--accent:#805AD5;--icon-bg:#FAF5FF;">
+        <div class="card-icon">📋</div>
+        <div class="card-info">
+          <div class="card-title">SFMA 결과</div>
+          <div class="card-desc">검사 결과 · 분석 · 히스토리</div>
+          <div class="card-screens">4개 화면</div>
+        </div>
+        <div class="card-arrow">›</div>
+      </a>
+
+      <a class="card" href="레슨.html" target="_blank" style="--accent:#E67E22;--icon-bg:#FFFAF0;">
+        <div class="card-icon">🎯</div>
+        <div class="card-info">
+          <div class="card-title">레슨</div>
+          <div class="card-desc">레슨 목록 · 예약 · 상세</div>
+          <div class="card-screens">3개 화면</div>
+        </div>
+        <div class="card-arrow">›</div>
+      </a>
+
+      <a class="card" href="마이루틴.html" target="_blank" style="--accent:#9B6DFF;--icon-bg:#F3EEFF;">
+        <div class="card-icon">🔄</div>
+        <div class="card-info">
+          <div class="card-title">마이루틴</div>
+          <div class="card-desc">루틴 홈 · 만들기 · 따라하기 · 달성이력</div>
+          <div class="card-screens">6개 화면</div>
+        </div>
+        <div class="card-arrow">›</div>
+      </a>
+
+      <a class="card" href="나의기록.html" target="_blank" style="--accent:#4ECDC4;--icon-bg:#E6FFFA;">
+        <div class="card-icon">📈</div>
+        <div class="card-info">
+          <div class="card-title">나의기록</div>
+          <div class="card-desc">기록 홈 · 신체기록 · 캘린더 · 통계</div>
+          <div class="card-screens">5개 화면</div>
+        </div>
+        <div class="card-arrow">›</div>
+      </a>
+
+      <a class="card" href="스토어.html" target="_blank" style="--accent:#F472B6;--icon-bg:#FFF0F6;">
+        <div class="card-icon">🛒</div>
+        <div class="card-info">
+          <div class="card-title">스토어</div>
+          <div class="card-desc">상품 목록 · 상세 · 장바구니 · 주문</div>
+          <div class="card-screens">8개 화면</div>
+        </div>
+        <div class="card-arrow">›</div>
+      </a>
+
+    </div>
+  </div>
+
+  <!-- 관리자 앱 -->
+  <div class="section">
+    <div class="section-label">🖥️ 관리자 앱 화면 디자인</div>
+    <div class="card-grid">
+
+      <a class="card" href="관리자-대시보드.html" target="_blank" style="--accent:#4299E1;--icon-bg:#EBF8FF;">
+        <div class="card-icon">📊</div>
+        <div class="card-info">
+          <div class="card-title">대시보드</div>
+          <div class="card-desc">팝업 알림 · 미처리 업무 · 매출 · 회원 통계</div>
+          <div class="card-screens">1개 화면</div>
+        </div>
+        <div class="card-arrow">›</div>
+      </a>
+
+      <a class="card" href="관리자-My운동처방.html" target="_blank" style="--accent:#E67E22;--icon-bg:#FFFAF0;">
+        <div class="card-icon">💊</div>
+        <div class="card-info">
+          <div class="card-title">My 운동처방 관리</div>
+          <div class="card-desc">처방 현황 · 상세 조회 · 이력 · 신청 접수</div>
+          <div class="card-screens">4개 화면</div>
+        </div>
+        <div class="card-arrow">›</div>
+      </a>
+
+    </div>
+  </div>
+
+</body>
+</html>
