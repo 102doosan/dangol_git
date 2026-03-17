@@ -139,6 +139,24 @@
     .type-option:hover { border-color: #5A67D8; color: #5A67D8; }
     .type-option.selected { border-color: #5A67D8; background: #5A67D8; color: #fff; }
 
+    /* 동영상 업로드 */
+    .video-upload-area { border: 2px dashed #CBD5E0; border-radius: 12px; padding: 28px 20px; text-align: center; cursor: pointer; transition: all .2s; background: #F7FAFC; }
+    .video-upload-area:hover, .video-upload-area.drag-over { border-color: #5A67D8; background: #EBF4FF; }
+    .video-upload-icon { font-size: 36px; margin-bottom: 10px; }
+    .video-upload-text { font-size: 14px; font-weight: 700; color: #4A5568; margin-bottom: 4px; }
+    .video-upload-sub { font-size: 12px; color: #A0AEC0; margin-bottom: 14px; }
+    .video-upload-btn { display: inline-block; background: #5A67D8; color: #fff; font-size: 12px; font-weight: 700; border-radius: 8px; padding: 8px 18px; cursor: pointer; border: none; font-family: 'Noto Sans KR', sans-serif; }
+    .video-divider { display: flex; align-items: center; gap: 12px; margin: 16px 0; color: #A0AEC0; font-size: 12px; font-weight: 700; }
+    .video-divider::before, .video-divider::after { content:''; flex:1; height:1px; background:#E2E8F0; }
+    .video-url-row { display: flex; gap: 10px; }
+    .video-url-row .form-input { flex: 1; }
+    .video-url-check { background: #EBF4FF; color: #5A67D8; border: 1.5px solid #5A67D8; border-radius: 10px; padding: 10px 16px; font-size: 12px; font-weight: 800; cursor: pointer; white-space: nowrap; font-family: 'Noto Sans KR', sans-serif; }
+    .video-preview-box { margin-top: 16px; border-radius: 12px; overflow: hidden; background: #000; position: relative; aspect-ratio: 9/16; max-height: 320px; max-width: 180px; }
+    .video-preview-box video { width: 100%; height: 100%; object-fit: contain; }
+    .video-preview-box iframe { width: 100%; height: 100%; border: none; }
+    .video-preview-remove { position: absolute; top: 8px; right: 8px; background: rgba(0,0,0,.6); color: #fff; border: none; border-radius: 50%; width: 26px; height: 26px; font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+    .video-file-name { margin-top: 10px; font-size: 12px; color: #718096; display: flex; align-items: center; gap: 8px; }
+
     /* 폼 푸터 */
     .form-footer { background: #fff; border-radius: 14px; box-shadow: 0 1px 6px rgba(0,0,0,0.06); padding: 18px 24px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
     .form-footer-left { font-size: 13px; color: #A0AEC0; font-weight: 600; }
@@ -443,6 +461,45 @@
             <div class="form-group">
               <div class="form-label">주의 / 금기 사항</div>
               <textarea class="form-textarea" placeholder="이 운동 시 주의해야 할 사항이나 금기 조건을 입력하세요...">통증이 악화되면 즉시 중단. 급성 염증기에는 시행하지 않도록 합니다. 목 부위에 방사통 발생 시 중단 후 트레이너에게 보고.</textarea>
+            </div>
+          </div>
+        </div>
+
+        <!-- 동영상 -->
+        <div class="form-panel">
+          <div class="form-panel-title">🎬 운동 동작 영상 (선택)</div>
+
+          <!-- 파일 업로드 영역 -->
+          <div class="video-upload-area" id="videoDropZone"
+               ondragover="event.preventDefault();this.classList.add('drag-over')"
+               ondragleave="this.classList.remove('drag-over')"
+               ondrop="handleVideoDrop(event)">
+            <div class="video-upload-icon">📹</div>
+            <div class="video-upload-text">영상 파일을 드래그하거나 버튼으로 업로드</div>
+            <div class="video-upload-sub">MP4, MOV, AVI 지원 · 최대 200MB</div>
+            <label class="video-upload-btn" for="videoFileInput">파일 선택</label>
+            <input type="file" id="videoFileInput" accept="video/*" style="display:none" onchange="handleVideoFile(this)">
+          </div>
+
+          <!-- 파일명 표시 -->
+          <div class="video-file-name" id="videoFileName" style="display:none">
+            <span>🎞️</span><span id="videoFileNameText"></span>
+            <button onclick="clearVideo()" style="background:none;border:none;color:#E53E3E;cursor:pointer;font-size:12px;font-weight:700;">✕ 제거</button>
+          </div>
+
+          <div class="video-divider">또는 URL로 입력</div>
+
+          <!-- URL 입력 -->
+          <div class="video-url-row">
+            <input class="form-input" type="url" id="videoUrlInput" placeholder="YouTube URL 또는 직접 영상 링크를 붙여넣으세요" oninput="onVideoUrlInput(this.value)" />
+            <button class="video-url-check" onclick="previewVideoUrl()">미리보기</button>
+          </div>
+          <div style="margin-top:6px;font-size:11px;color:#A0AEC0;">예) https://www.youtube.com/watch?v=xxxxx</div>
+
+          <!-- 미리보기 -->
+          <div id="videoPreviewWrap" style="display:none">
+            <div class="video-preview-box" id="videoPreviewBox">
+              <button class="video-preview-remove" onclick="clearVideo()">✕</button>
             </div>
           </div>
         </div>
@@ -1080,6 +1137,68 @@
     updateStats();
     renderTable();
     showScreen(0, document.querySelector('.nav-btn.active'));
+
+    /* ── 동영상 업로드/미리보기 ── */
+    let currentVideoFile = null;
+
+    function handleVideoFile(input) {
+      const file = input.files[0];
+      if (!file) return;
+      currentVideoFile = file;
+      document.getElementById('videoUrlInput').value = '';
+      document.getElementById('videoFileName').style.display = 'flex';
+      document.getElementById('videoFileNameText').textContent = file.name + '  (' + (file.size / 1024 / 1024).toFixed(1) + 'MB)';
+      const url = URL.createObjectURL(file);
+      showLocalVideoPreview(url);
+    }
+
+    function handleVideoDrop(e) {
+      e.preventDefault();
+      document.getElementById('videoDropZone').classList.remove('drag-over');
+      const file = e.dataTransfer.files[0];
+      if (!file || !file.type.startsWith('video/')) return;
+      const dt = new DataTransfer();
+      dt.items.add(file);
+      document.getElementById('videoFileInput').files = dt.files;
+      handleVideoFile(document.getElementById('videoFileInput'));
+    }
+
+    function showLocalVideoPreview(url) {
+      const wrap = document.getElementById('videoPreviewWrap');
+      const box = document.getElementById('videoPreviewBox');
+      box.innerHTML = '<button class="video-preview-remove" onclick="clearVideo()">✕</button><video src="' + url + '" controls playsinline></video>';
+      wrap.style.display = 'block';
+    }
+
+    function onVideoUrlInput(val) {
+      if (!val) return;
+      currentVideoFile = null;
+      document.getElementById('videoFileName').style.display = 'none';
+    }
+
+    function previewVideoUrl() {
+      const url = document.getElementById('videoUrlInput').value.trim();
+      if (!url) return;
+      const wrap = document.getElementById('videoPreviewWrap');
+      const box = document.getElementById('videoPreviewBox');
+      const ytMatch = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([A-Za-z0-9_-]{11})/);
+      if (ytMatch) {
+        const id = ytMatch[1];
+        box.innerHTML = '<button class="video-preview-remove" onclick="clearVideo()">✕</button><iframe src="https://www.youtube.com/embed/' + id + '" allow="autoplay; encrypted-media" allowfullscreen></iframe>';
+      } else {
+        box.innerHTML = '<button class="video-preview-remove" onclick="clearVideo()">✕</button><video src="' + url + '" controls playsinline></video>';
+      }
+      wrap.style.display = 'block';
+    }
+
+    function clearVideo() {
+      currentVideoFile = null;
+      document.getElementById('videoFileInput').value = '';
+      document.getElementById('videoUrlInput').value = '';
+      document.getElementById('videoFileName').style.display = 'none';
+      document.getElementById('videoPreviewWrap').style.display = 'none';
+      document.getElementById('videoPreviewBox').innerHTML = '<button class="video-preview-remove" onclick="clearVideo()">✕</button>';
+    }
   </script>
 </body>
 </html>
