@@ -273,7 +273,7 @@
 
         <!-- 검색 -->
         <div class="search-bar">
-          <input class="search-input" id="ex-search" type="text" placeholder="🔍  운동명 검색" oninput="renderTable()" />
+          <input class="search-input" id="ex-search" type="text" placeholder="🔍  운동명·부위·설명 검색" oninput="renderTable()" />
           <select class="filter-select" id="ex-filter-type" onchange="renderTable()">
             <option value="">전체 유형</option>
             <option value="재활">재활</option>
@@ -1011,7 +1011,11 @@
         if (currentPart !== 'all' && e[1] !== currentPart) return false;
         if (ft && e[2] !== ft) return false;
         if (fl && e[3] !== fl) return false;
-        if (q && !e[0].toLowerCase().includes(q)) return false;
+        if (q) {
+          const partLabel = (partInfo[e[1]]?.label || '').toLowerCase();
+          const desc = (e[6] || '').toLowerCase();
+          if (!e[0].toLowerCase().includes(q) && !partLabel.includes(q) && !desc.includes(q)) return false;
+        }
         return true;
       });
 
