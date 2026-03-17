@@ -129,6 +129,25 @@
     .timeline-stat { font-size: 12px; color: #4A5568; font-weight: 600; }
     .timeline-stat span { color: #E67E22; font-weight: 800; }
 
+    /* 처방 이력 좌우 분할 레이아웃 */
+    .prx-layout { display: grid; grid-template-columns: 230px 1fr; gap: 16px; align-items: start; }
+    .prx-list-wrap { background: #fff; border-radius: 16px; box-shadow: 0 1px 6px rgba(0,0,0,0.07); padding: 16px; position: sticky; top: 16px; max-height: calc(100vh - 160px); overflow-y: auto; }
+    .prx-list-header { font-size: 13px; font-weight: 900; color: #1A202C; margin-bottom: 14px; padding-bottom: 10px; border-bottom: 1px solid #F0F4F8; }
+    .prx-list-header span { color: #A0AEC0; font-weight: 600; margin-left: 6px; }
+    .prx-timeline { display: flex; flex-direction: column; gap: 0; }
+    .prx-tl-item { display: flex; gap: 12px; padding-bottom: 16px; cursor: pointer; }
+    .prx-tl-item:last-child { padding-bottom: 0; }
+    .prx-tl-left { display: flex; flex-direction: column; align-items: center; width: 18px; flex-shrink: 0; }
+    .prx-tl-dot { width: 12px; height: 12px; border-radius: 50%; border: 2px solid #E67E22; background: #fff; z-index: 1; flex-shrink: 0; margin-top: 3px; }
+    .prx-tl-dot.active { background: #E67E22; box-shadow: 0 0 0 3px rgba(230,126,34,0.2); }
+    .prx-tl-line { width: 2px; background: #E2E8F0; flex: 1; margin-top: 4px; }
+    .prx-tl-body { flex: 1; background: #F7F9FC; border-radius: 10px; padding: 10px 12px; border: 2px solid transparent; transition: all 0.15s; }
+    .prx-tl-item.sel .prx-tl-body { background: #FFF7ED; border-color: #F6AD55; }
+    .prx-tl-item:hover .prx-tl-body { background: #FFF7ED; }
+    .prx-tl-name { font-size: 13px; font-weight: 800; color: #2D3748; margin-bottom: 4px; line-height: 1.3; }
+    .prx-tl-date { font-size: 11px; color: #A0AEC0; font-weight: 600; }
+    .prx-tl-badges { display: flex; gap: 4px; margin-top: 5px; flex-wrap: wrap; }
+
     /* 신청 접수 카드 */
     .request-list { display: flex; flex-direction: column; gap: 10px; }
     .request-card { background: #F7F9FC; border-radius: 14px; padding: 16px 20px; display: flex; align-items: flex-start; gap: 16px; border-left: 4px solid #E2E8F0; }
@@ -464,193 +483,72 @@
         <div class="page-header">
           <div>
             <div class="page-title">처방 상세 조회</div>
-            <div class="page-sub">김도산 · 디스크시술 5주차</div>
+            <div class="page-sub" id="s1-member-sub">김도산 · 010-1234-5678</div>
           </div>
           <div class="page-actions">
             <button class="btn-secondary" onclick="showScreen(0,document.querySelectorAll('.nav-btn')[0])">← 목록</button>
-            <button class="btn-primary">처방 수정</button>
+            <button class="btn-primary" onclick="showScreen(2,document.querySelectorAll('.nav-btn')[2])">+ 신규 처방</button>
           </div>
         </div>
 
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
-          <div class="detail-panel">
-            <div class="detail-panel-title">📋 처방 기본 정보</div>
-            <div class="detail-grid">
-              <div class="detail-field">
-                <div class="detail-field-label">회원명</div>
-                <div class="detail-field-val">김도산</div>
-              </div>
-              <div class="detail-field">
-                <div class="detail-field-label">연락처</div>
-                <div class="detail-field-val">010-1234-5678</div>
-              </div>
-              <div class="detail-field">
-                <div class="detail-field-label">처방명</div>
-                <div class="detail-field-val">디스크시술 5주차</div>
-              </div>
-              <div class="detail-field">
-                <div class="detail-field-label">처방일</div>
-                <div class="detail-field-val">2024.06.27</div>
-              </div>
-              <div class="detail-field">
-                <div class="detail-field-label">운동 등급</div>
-                <div class="detail-field-val"><span class="badge badge-blue">중급</span></div>
-              </div>
-              <div class="detail-field">
-                <div class="detail-field-label">담당 트레이너</div>
-                <div class="detail-field-val">김트레이너</div>
-              </div>
-              <div class="detail-field">
-                <div class="detail-field-label">상태</div>
-                <div class="detail-field-val"><span class="badge badge-green">활성</span></div>
-              </div>
-              <div class="detail-field">
-                <div class="detail-field-label">총 수행 횟수</div>
-                <div class="detail-field-val">23회</div>
-              </div>
-            </div>
-            <div class="detail-field" style="margin-top:4px;">
-              <div class="detail-field-label">트레이너 메모</div>
-              <div style="background:#F7F9FC;border-radius:10px;padding:12px;font-size:13px;color:#4A5568;line-height:1.6;margin-top:6px;">
-                허리에 무리가 가지 않도록 천천히 진행하세요. 통증 발생 시 즉시 중단. 4주차 이후 강도 점진적 증가 예정.
-              </div>
-            </div>
+        <div class="prx-layout">
+          <!-- 왼쪽: 처방 이력 타임라인 -->
+          <div class="prx-list-wrap">
+            <div class="prx-list-header">처방 이력 <span id="prx-count"></span></div>
+            <div class="prx-timeline" id="prx-timeline"></div>
           </div>
 
-          <div class="detail-panel">
-            <div class="detail-panel-title">🏋️ 처방 운동 목록</div>
-            <div class="ex-list">
-              <div class="ex-item">
-                <div class="ex-num">1</div>
-                <div class="ex-info">
-                  <div class="ex-name">맥켄지 신전 운동</div>
-                  <div class="ex-detail">3세트 × 10회 · 세트 간 휴식 60초</div>
+          <!-- 오른쪽: 선택된 처방 상세 -->
+          <div id="prx-detail">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
+              <div class="detail-panel">
+                <div class="detail-panel-title">📋 처방 기본 정보</div>
+                <div class="detail-grid">
+                  <div class="detail-field"><div class="detail-field-label">처방명</div><div class="detail-field-val" id="pd-name">—</div></div>
+                  <div class="detail-field"><div class="detail-field-label">처방일</div><div class="detail-field-val" id="pd-date">—</div></div>
+                  <div class="detail-field"><div class="detail-field-label">운동 등급</div><div class="detail-field-val" id="pd-grade">—</div></div>
+                  <div class="detail-field"><div class="detail-field-label">담당 트레이너</div><div class="detail-field-val" id="pd-trainer">—</div></div>
+                  <div class="detail-field"><div class="detail-field-label">상태</div><div class="detail-field-val" id="pd-status">—</div></div>
+                  <div class="detail-field"><div class="detail-field-label">총 수행 횟수</div><div class="detail-field-val" id="pd-count">—</div></div>
                 </div>
-                <span class="badge badge-blue">필수</span>
-              </div>
-              <div class="ex-item">
-                <div class="ex-num">2</div>
-                <div class="ex-info">
-                  <div class="ex-name">코어 안정화 운동</div>
-                  <div class="ex-detail">3세트 × 15회 · 세트 간 휴식 45초</div>
+                <div class="detail-field" style="margin-top:4px;">
+                  <div class="detail-field-label">트레이너 메모</div>
+                  <div id="pd-memo" style="background:#F7F9FC;border-radius:10px;padding:12px;font-size:13px;color:#4A5568;line-height:1.6;margin-top:6px;"></div>
                 </div>
-                <span class="badge badge-blue">필수</span>
               </div>
-              <div class="ex-item">
-                <div class="ex-num">3</div>
-                <div class="ex-info">
-                  <div class="ex-name">고관절 스트레칭</div>
-                  <div class="ex-detail">2세트 × 30초 유지</div>
-                </div>
-                <span class="badge badge-green">권장</span>
-              </div>
-              <div class="ex-item">
-                <div class="ex-num">4</div>
-                <div class="ex-info">
-                  <div class="ex-name">허리 굴곡 운동</div>
-                  <div class="ex-detail">2세트 × 12회</div>
-                </div>
-                <span class="badge badge-green">권장</span>
-              </div>
-              <div class="ex-item">
-                <div class="ex-num">5</div>
-                <div class="ex-info">
-                  <div class="ex-name">골반 교정 스트레칭</div>
-                  <div class="ex-detail">1세트 × 60초</div>
-                </div>
-                <span class="badge badge-gray">선택</span>
-              </div>
-            </div>
-          </div>
-        </div>
 
-        <!-- 운동 진행 / 완료 이력 (처방 상세 하단) -->
-        <div style="margin-top:4px;">
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
-            <div style="font-size:15px;font-weight:900;color:#1A202C;">📅 운동 진행 / 완료 이력</div>
-            <button class="btn-secondary" style="font-size:12px;padding:6px 14px;">CSV 내보내기</button>
-          </div>
-          <div class="stats-row" style="grid-template-columns:repeat(3,1fr);margin-bottom:16px;">
-            <div class="stat-card">
-              <div class="stat-card-top"><span class="stat-card-label">총 수행 횟수</span><span class="stat-card-icon">🔁</span></div>
-              <div class="stat-card-val">23</div>
-              <div class="stat-card-change" style="color:#A0AEC0;">처방 이후 누적</div>
+              <div class="detail-panel">
+                <div class="detail-panel-title">🏋️ 처방 운동 목록</div>
+                <div class="ex-list" id="pd-exlist"></div>
+              </div>
             </div>
-            <div class="stat-card">
-              <div class="stat-card-top"><span class="stat-card-label">완료율</span><span class="stat-card-icon">✅</span></div>
-              <div class="stat-card-val">87%</div>
-              <div class="stat-card-change change-up">▲ 완료 20회 / 중단 3회</div>
-            </div>
-            <div class="stat-card">
-              <div class="stat-card-top"><span class="stat-card-label">평균 소요시간</span><span class="stat-card-icon">⏱</span></div>
-              <div class="stat-card-val">32분</div>
-              <div class="stat-card-change" style="color:#A0AEC0;">목표 35분 대비</div>
-            </div>
-          </div>
-          <div class="detail-panel">
-            <div class="detail-panel-title">🗓 회차별 수행 이력</div>
-            <div class="timeline">
-              <div class="timeline-item">
-                <div class="timeline-left"><div class="timeline-dot done"></div><div class="timeline-line"></div></div>
-                <div class="timeline-content">
-                  <div class="timeline-date">2026.03.17 (오늘)</div>
-                  <div class="timeline-card">
-                    <div class="timeline-title">23회차 · <span class="badge badge-green" style="font-size:11px;">완료</span></div>
-                    <div class="timeline-stats">
-                      <div class="timeline-stat">소요시간 <span>34분</span></div>
-                      <div class="timeline-stat">완료 운동 <span>5/5</span></div>
-                      <div class="timeline-stat">총 세트 <span>13세트</span></div>
-                    </div>
-                  </div>
+
+            <!-- 운동 수행 이력 -->
+            <div>
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+                <div style="font-size:15px;font-weight:900;color:#1A202C;">📅 운동 수행 이력</div>
+                <button class="btn-secondary" style="font-size:12px;padding:6px 14px;">CSV 내보내기</button>
+              </div>
+              <div class="stats-row" style="grid-template-columns:repeat(3,1fr);margin-bottom:16px;">
+                <div class="stat-card">
+                  <div class="stat-card-top"><span class="stat-card-label">총 수행 횟수</span><span class="stat-card-icon">🔁</span></div>
+                  <div class="stat-card-val" id="pd-hist-total">—</div>
+                  <div class="stat-card-change" style="color:#A0AEC0;">처방 이후 누적</div>
+                </div>
+                <div class="stat-card">
+                  <div class="stat-card-top"><span class="stat-card-label">완료율</span><span class="stat-card-icon">✅</span></div>
+                  <div class="stat-card-val" id="pd-hist-rate">—</div>
+                  <div class="stat-card-change change-up" id="pd-hist-rate-sub"></div>
+                </div>
+                <div class="stat-card">
+                  <div class="stat-card-top"><span class="stat-card-label">평균 소요시간</span><span class="stat-card-icon">⏱</span></div>
+                  <div class="stat-card-val" id="pd-hist-avg">—</div>
+                  <div class="stat-card-change" style="color:#A0AEC0;" id="pd-hist-avg-sub"></div>
                 </div>
               </div>
-              <div class="timeline-item">
-                <div class="timeline-left"><div class="timeline-dot done"></div><div class="timeline-line"></div></div>
-                <div class="timeline-content">
-                  <div class="timeline-date">2026.03.14</div>
-                  <div class="timeline-card">
-                    <div class="timeline-title">22회차 · <span class="badge badge-green" style="font-size:11px;">완료</span></div>
-                    <div class="timeline-stats">
-                      <div class="timeline-stat">소요시간 <span>29분</span></div>
-                      <div class="timeline-stat">완료 운동 <span>5/5</span></div>
-                      <div class="timeline-stat">총 세트 <span>13세트</span></div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div class="timeline-item">
-                <div class="timeline-left"><div class="timeline-dot done"></div><div class="timeline-line"></div></div>
-                <div class="timeline-content">
-                  <div class="timeline-date">2026.03.11</div>
-                  <div class="timeline-card">
-                    <div class="timeline-title">21회차 · <span class="badge badge-red" style="font-size:11px;">중단</span></div>
-                    <div class="timeline-stats">
-                      <div class="timeline-stat">소요시간 <span>12분</span></div>
-                      <div class="timeline-stat">완료 운동 <span>2/5</span></div>
-                      <div class="timeline-stat">중단 사유 <span>허리 통증</span></div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div class="timeline-item">
-                <div class="timeline-left"><div class="timeline-dot done"></div><div class="timeline-line"></div></div>
-                <div class="timeline-content">
-                  <div class="timeline-date">2026.03.08</div>
-                  <div class="timeline-card">
-                    <div class="timeline-title">20회차 · <span class="badge badge-green" style="font-size:11px;">완료</span></div>
-                    <div class="timeline-stats">
-                      <div class="timeline-stat">소요시간 <span>38분</span></div>
-                      <div class="timeline-stat">완료 운동 <span>5/5</span></div>
-                      <div class="timeline-stat">총 세트 <span>13세트</span></div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div class="timeline-item">
-                <div class="timeline-left"><div class="timeline-dot"></div></div>
-                <div class="timeline-content">
-                  <div class="timeline-date" style="color:#A0AEC0;cursor:pointer;">이전 이력 19건 더보기 →</div>
-                </div>
+              <div class="detail-panel">
+                <div class="detail-panel-title">🗓 회차별 수행 이력</div>
+                <div class="timeline" id="pd-hist-timeline"></div>
               </div>
             </div>
           </div>
@@ -1042,6 +940,15 @@
         html += '</div></div>';
       }
       document.getElementById('memo-body').innerHTML = html;
+
+      if (idx === 1) {
+        if (!selectedPrxId) {
+          const data = memberPrescriptions[currentMember];
+          if (data && data.list.length) selectedPrxId = data.list[0].id;
+        }
+        renderPrxTimeline();
+        if (selectedPrxId) selectPrx(selectedPrxId);
+      }
     }
 
     /* ── STEP3 좌우 분할 운동 선택 ── */
@@ -1211,6 +1118,177 @@
       '목·어깨':'#805AD5','허리·척추':'#E53E3E','코어':'#E67E22',
       '하체':'#3182CE','상체':'#276749','전신':'#2A69AC'
     };
+
+    /* ── 회원별 처방 이력 데이터 ── */
+    const memberPrescriptions = {
+      '김도산': {
+        phone: '010-1234-5678',
+        list: [
+          {
+            id: 1, name: '디스크시술 5주차', date: '2024.06.27', grade: '중급', trainer: '김트레이너',
+            status: 'active', count: 23,
+            memo: '허리에 무리가 가지 않도록 천천히 진행하세요. 통증 발생 시 즉시 중단. 4주차 이후 강도 점진적 증가 예정.',
+            exercises: [
+              { name:'맥켄지 신전 운동', detail:'3세트 × 10회 · 세트 간 휴식 60초', grade:'필수' },
+              { name:'코어 안정화 운동', detail:'3세트 × 15회 · 세트 간 휴식 45초', grade:'필수' },
+              { name:'고관절 스트레칭', detail:'2세트 × 30초 유지', grade:'권장' },
+              { name:'허리 굴곡 운동', detail:'2세트 × 12회', grade:'권장' },
+              { name:'골반 교정 스트레칭', detail:'1세트 × 60초', grade:'선택' },
+            ],
+            hist: { total:23, done:20, stop:3, rate:'87%', avg:'32분', avgSub:'목표 35분 대비',
+              sessions:[
+                { date:'2026.03.17 (오늘)', round:23, badge:'완료', badgeClass:'badge-green', stats:[['소요시간','34분'],['완료 운동','5/5'],['총 세트','13세트']] },
+                { date:'2026.03.14', round:22, badge:'완료', badgeClass:'badge-green', stats:[['소요시간','29분'],['완료 운동','5/5'],['총 세트','13세트']] },
+                { date:'2026.03.11', round:21, badge:'중단', badgeClass:'badge-red', stats:[['소요시간','12분'],['완료 운동','2/5'],['중단 사유','허리 통증']] },
+                { date:'2026.03.08', round:20, badge:'완료', badgeClass:'badge-green', stats:[['소요시간','38분'],['완료 운동','5/5'],['총 세트','13세트']] },
+              ]
+            }
+          },
+          {
+            id: 2, name: '디스크시술 4주차', date: '2024.05.15', grade: '초급', trainer: '김트레이너',
+            status: 'done', count: 18,
+            memo: '초기 재활 단계. 통증 없는 범위 내에서 천천히 진행.',
+            exercises: [
+              { name:'맥켄지 신전 운동', detail:'2세트 × 8회', grade:'필수' },
+              { name:'고양이-낙타 스트레칭', detail:'3세트 × 10회', grade:'필수' },
+              { name:'데드버그', detail:'2세트 × 8회', grade:'권장' },
+            ],
+            hist: { total:18, done:16, stop:2, rate:'89%', avg:'24분', avgSub:'목표 30분 대비',
+              sessions:[
+                { date:'2024.06.10', round:18, badge:'완료', badgeClass:'badge-green', stats:[['소요시간','25분'],['완료 운동','3/3'],['총 세트','7세트']] },
+                { date:'2024.06.07', round:17, badge:'완료', badgeClass:'badge-green', stats:[['소요시간','22분'],['완료 운동','3/3'],['총 세트','7세트']] },
+                { date:'2024.06.04', round:16, badge:'중단', badgeClass:'badge-red', stats:[['소요시간','8분'],['완료 운동','1/3'],['중단 사유','피로감']] },
+              ]
+            }
+          },
+          {
+            id: 3, name: '디스크시술 3주차', date: '2024.04.01', grade: '초급', trainer: '이트레이너',
+            status: 'done', count: 14,
+            memo: '물리치료 병행 중. 운동 강도 최소화.',
+            exercises: [
+              { name:'고양이-낙타 스트레칭', detail:'2세트 × 10회', grade:'필수' },
+              { name:'버드독', detail:'2세트 × 8회', grade:'권장' },
+            ],
+            hist: { total:14, done:13, stop:1, rate:'93%', avg:'18분', avgSub:'목표 20분 대비',
+              sessions:[
+                { date:'2024.04.25', round:14, badge:'완료', badgeClass:'badge-green', stats:[['소요시간','20분'],['완료 운동','2/2'],['총 세트','4세트']] },
+                { date:'2024.04.22', round:13, badge:'완료', badgeClass:'badge-green', stats:[['소요시간','17분'],['완료 운동','2/2'],['총 세트','4세트']] },
+              ]
+            }
+          },
+          {
+            id: 4, name: '초기 재활 처방', date: '2024.02.15', grade: '초급', trainer: '이트레이너',
+            status: 'done', count: 10,
+            memo: '수술 직후 안정기. 통증 모니터링 최우선.',
+            exercises: [
+              { name:'굿모닝 스트레칭', detail:'2세트 × 30초', grade:'필수' },
+              { name:'척추 회전 스트레칭', detail:'2세트 × 30초', grade:'권장' },
+            ],
+            hist: { total:10, done:9, stop:1, rate:'90%', avg:'15분', avgSub:'',
+              sessions:[
+                { date:'2024.03.20', round:10, badge:'완료', badgeClass:'badge-green', stats:[['소요시간','16분'],['완료 운동','2/2']] },
+                { date:'2024.03.17', round:9, badge:'완료', badgeClass:'badge-green', stats:[['소요시간','14분'],['완료 운동','2/2']] },
+              ]
+            }
+          },
+        ]
+      }
+    };
+
+    let currentMember = '김도산';
+    let selectedPrxId = null;
+
+    function renderPrxTimeline() {
+      const data = memberPrescriptions[currentMember];
+      if (!data) return;
+      document.getElementById('s1-member-sub').textContent = currentMember + ' · ' + data.phone;
+      document.getElementById('prx-count').textContent = data.list.length + '건';
+      const tl = document.getElementById('prx-timeline');
+      tl.innerHTML = data.list.map((p, i) => {
+        const isSel = p.id === selectedPrxId;
+        const isLast = i === data.list.length - 1;
+        const statusBadge = p.status === 'active'
+          ? '<span class="badge badge-green" style="font-size:10px;">활성</span>'
+          : '<span class="badge badge-gray" style="font-size:10px;">완료</span>';
+        const gradeBadge = `<span class="badge badge-blue" style="font-size:10px;">${p.grade}</span>`;
+        return `<div class="prx-tl-item${isSel?' sel':''}" onclick="selectPrx(${p.id})">
+          <div class="prx-tl-left">
+            <div class="prx-tl-dot${isSel?' active':''}"></div>
+            ${!isLast ? '<div class="prx-tl-line"></div>' : ''}
+          </div>
+          <div class="prx-tl-body">
+            <div class="prx-tl-name">${p.name}</div>
+            <div class="prx-tl-date">${p.date} · ${p.count}회</div>
+            <div class="prx-tl-badges">${statusBadge}${gradeBadge}</div>
+          </div>
+        </div>`;
+      }).join('');
+    }
+
+    function selectPrx(id) {
+      selectedPrxId = id;
+      const data = memberPrescriptions[currentMember];
+      const p = data.list.find(x => x.id === id);
+      if (!p) return;
+
+      // 기본 정보
+      document.getElementById('pd-name').textContent = p.name;
+      document.getElementById('pd-date').textContent = p.date;
+      const gradeMap = { '초급':'badge-green', '중급':'badge-blue', '고급':'badge-orange' };
+      document.getElementById('pd-grade').innerHTML = `<span class="badge ${gradeMap[p.grade]||'badge-blue'}">${p.grade}</span>`;
+      document.getElementById('pd-trainer').textContent = p.trainer;
+      document.getElementById('pd-status').innerHTML = p.status === 'active'
+        ? '<span class="badge badge-green">활성</span>'
+        : '<span class="badge badge-gray">완료</span>';
+      document.getElementById('pd-count').textContent = p.count + '회';
+      document.getElementById('pd-memo').textContent = p.memo;
+
+      // 운동 목록
+      const gradeExMap = { '필수':'badge-blue', '권장':'badge-green', '선택':'badge-gray' };
+      document.getElementById('pd-exlist').innerHTML = p.exercises.map((e, i) =>
+        `<div class="ex-item">
+          <div class="ex-num">${i+1}</div>
+          <div class="ex-info">
+            <div class="ex-name">${e.name}</div>
+            <div class="ex-detail">${e.detail}</div>
+          </div>
+          <span class="badge ${gradeExMap[e.grade]||'badge-gray'}">${e.grade}</span>
+        </div>`
+      ).join('');
+
+      // 수행 이력
+      const h = p.hist;
+      document.getElementById('pd-hist-total').textContent = h.total;
+      document.getElementById('pd-hist-rate').textContent = h.rate;
+      document.getElementById('pd-hist-rate-sub').textContent = `▲ 완료 ${h.done}회 / 중단 ${h.stop}회`;
+      document.getElementById('pd-hist-avg').textContent = h.avg;
+      document.getElementById('pd-hist-avg-sub').textContent = h.avgSub;
+      document.getElementById('pd-hist-timeline').innerHTML = h.sessions.map((s, i) => {
+        const isLastSess = i === h.sessions.length - 1;
+        return `<div class="timeline-item">
+          <div class="timeline-left">
+            <div class="timeline-dot done"></div>
+            ${!isLastSess ? '<div class="timeline-line"></div>' : ''}
+          </div>
+          <div class="timeline-content">
+            <div class="timeline-date">${s.date}</div>
+            <div class="timeline-card">
+              <div class="timeline-title">${s.round}회차 · <span class="badge ${s.badgeClass}" style="font-size:11px;">${s.badge}</span></div>
+              <div class="timeline-stats">
+                ${s.stats.map(st => `<div class="timeline-stat">${st[0]} <span>${st[1]}</span></div>`).join('')}
+              </div>
+            </div>
+          </div>
+        </div>`;
+      }).join('') + `<div class="timeline-item">
+        <div class="timeline-left"><div class="timeline-dot"></div></div>
+        <div class="timeline-content">
+          <div class="timeline-date" style="color:#A0AEC0;cursor:pointer;">이전 이력 더보기 →</div>
+        </div>
+      </div>`;
+
+      renderPrxTimeline(); // dot active 갱신
+    }
 
     /* ── 운동 선택 모달 ── */
     let exModalTarget = null;
