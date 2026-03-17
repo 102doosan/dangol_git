@@ -712,8 +712,31 @@
             </div>
           </div>
           <div class="form-row-full">
-            <div class="form-label" style="margin-bottom:8px;">대표 아이콘 (이모지)</div>
-            <input class="form-input" id="partIcon" placeholder="예: 🦶" style="max-width:120px;" />
+            <div class="form-label" style="margin-bottom:8px;">대표 아이콘</div>
+            <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
+              <!-- 이미지 업로드 영역 -->
+              <label for="partIconFile" id="partIconUploadArea" style="display:flex;flex-direction:column;align-items:center;justify-content:center;width:90px;height:90px;border:2px dashed #CBD5E0;border-radius:14px;cursor:pointer;background:#F7F9FC;transition:border-color .2s;position:relative;overflow:hidden;">
+                <img id="partIconPreview" src="" alt="" style="display:none;width:100%;height:100%;object-fit:contain;border-radius:12px;">
+                <span id="partIconPlaceholder" style="font-size:28px;line-height:1;">🖼️</span>
+                <span style="font-size:10px;color:#A0AEC0;margin-top:4px;">클릭하여 업로드</span>
+              </label>
+              <input type="file" id="partIconFile" accept="image/*" style="display:none;" onchange="onPartIconFile(this)">
+              <!-- 구분선 -->
+              <div style="display:flex;flex-direction:column;align-items:center;gap:4px;">
+                <div style="width:1px;height:30px;background:#E2E8F0;"></div>
+                <span style="font-size:11px;color:#A0AEC0;font-weight:700;">또는</span>
+                <div style="width:1px;height:30px;background:#E2E8F0;"></div>
+              </div>
+              <!-- 이모지 직접 입력 -->
+              <div style="display:flex;flex-direction:column;gap:4px;">
+                <span style="font-size:12px;color:#718096;font-weight:600;">이모지 직접 입력</span>
+                <input class="form-input" id="partIcon" placeholder="예: 🦶" style="max-width:90px;font-size:22px;text-align:center;" oninput="onPartIconEmoji(this.value)">
+              </div>
+              <!-- 초기화 -->
+              <button type="button" onclick="clearPartIcon()" style="background:#FED7D7;color:#C53030;border:none;border-radius:8px;padding:6px 12px;cursor:pointer;font-size:12px;font-weight:700;align-self:flex-end;">초기화</button>
+            </div>
+            <!-- 숨겨진 실제 저장값 -->
+            <input type="hidden" id="partIconValue">
           </div>
           <div class="form-row-full">
             <div class="form-label" style="margin-bottom:8px;">대표 색상 <span class="required">*</span></div>
@@ -830,7 +853,7 @@
         const cnt = exercises.filter(e => e[1] === p.key).length;
         return `
         <div class="part-card" id="pc-${p.key}">
-          <div class="part-card-dot" style="background:${p.color}22">${p.icon}</div>
+          <div class="part-card-dot" style="background:${p.color}22">${p.icon && p.icon.startsWith('data:') ? `<img src="${p.icon}" style="width:32px;height:32px;object-fit:contain;border-radius:4px;">` : p.icon}</div>
           <div class="part-card-info">
             <div class="part-card-name">${p.label}</div>
             <div class="part-card-en" style="color:${p.color}">${p.key}</div>
@@ -857,6 +880,40 @@
         }).join('');
     }
 
+    function _setPartIconUI(val) {
+      // val: data URL(이미지) 또는 이모지 문자열
+      document.getElementById('partIconValue').value = val || '';
+      const preview = document.getElementById('partIconPreview');
+      const placeholder = document.getElementById('partIconPlaceholder');
+      const emojiInput = document.getElementById('partIcon');
+      if (val && val.startsWith('data:')) {
+        preview.src = val; preview.style.display = 'block';
+        placeholder.style.display = 'none';
+        emojiInput.value = '';
+      } else {
+        preview.src = ''; preview.style.display = 'none';
+        placeholder.style.display = 'block';
+        emojiInput.value = val || '';
+      }
+    }
+    function onPartIconFile(input) {
+      const file = input.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = e => _setPartIconUI(e.target.result);
+      reader.readAsDataURL(file);
+    }
+    function onPartIconEmoji(val) {
+      // 이모지 입력 시 이미지 프리뷰 초기화
+      document.getElementById('partIconValue').value = val;
+      document.getElementById('partIconPreview').style.display = 'none';
+      document.getElementById('partIconPlaceholder').style.display = 'block';
+    }
+    function clearPartIcon() {
+      document.getElementById('partIconFile').value = '';
+      _setPartIconUI('');
+    }
+
     function openPartForm(key) {
       const form = document.getElementById('partAddForm');
       form.style.display = 'block';
@@ -865,7 +922,7 @@
       document.getElementById('partEditKey').value = '';
       document.getElementById('partNameKo').value = '';
       document.getElementById('partNameEn').value = '';
-      document.getElementById('partIcon').value = '';
+      _setPartIconUI('');
       setFormColor('#5A67D8');
       form.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
@@ -880,7 +937,7 @@
       document.getElementById('partEditKey').value = key;
       document.getElementById('partNameKo').value = p.label;
       document.getElementById('partNameEn').value = p.key;
-      document.getElementById('partIcon').value = p.icon;
+      _setPartIconUI(p.icon || '');
       setFormColor(p.color);
       form.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
@@ -908,7 +965,7 @@
     function savePartForm() {
       const nameKo = document.getElementById('partNameKo').value.trim();
       const nameEn = document.getElementById('partNameEn').value.trim().toLowerCase().replace(/\s+/g,'');
-      const icon   = document.getElementById('partIcon').value.trim() || '🏃';
+      const icon   = document.getElementById('partIconValue').value.trim() || '🏃';
       const color  = document.getElementById('partColorHex').value.trim() || '#5A67D8';
       const editKey = document.getElementById('partEditKey').value;
 
