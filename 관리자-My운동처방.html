@@ -296,8 +296,7 @@
     <button class="nav-btn active" onclick="showScreen(0,this)">① 회원별 처방 현황</button>
     <button class="nav-btn" onclick="showScreen(1,this)">② 처방 상세 조회</button>
     <button class="nav-btn" style="background:#FFF7ED;border-color:#F6AD55;color:#E67E22;" onclick="showScreen(2,this)">③ 처방 등록</button>
-    <button class="nav-btn" onclick="showScreen(3,this)">④ 운동 진행/완료 이력</button>
-    <button class="nav-btn" onclick="showScreen(4,this)">⑤ 처방 신청 접수 관리</button>
+    <button class="nav-btn" onclick="showScreen(3,this)">④ 처방 신청 접수 관리</button>
   </div>
 
   <div class="admin-wrap">
@@ -564,123 +563,102 @@
             </div>
           </div>
         </div>
+
+        <!-- 운동 진행 / 완료 이력 (처방 상세 하단) -->
+        <div style="margin-top:4px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+            <div style="font-size:15px;font-weight:900;color:#1A202C;">📅 운동 진행 / 완료 이력</div>
+            <button class="btn-secondary" style="font-size:12px;padding:6px 14px;">CSV 내보내기</button>
+          </div>
+          <div class="stats-row" style="grid-template-columns:repeat(3,1fr);margin-bottom:16px;">
+            <div class="stat-card">
+              <div class="stat-card-top"><span class="stat-card-label">총 수행 횟수</span><span class="stat-card-icon">🔁</span></div>
+              <div class="stat-card-val">23</div>
+              <div class="stat-card-change" style="color:#A0AEC0;">처방 이후 누적</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-card-top"><span class="stat-card-label">완료율</span><span class="stat-card-icon">✅</span></div>
+              <div class="stat-card-val">87%</div>
+              <div class="stat-card-change change-up">▲ 완료 20회 / 중단 3회</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-card-top"><span class="stat-card-label">평균 소요시간</span><span class="stat-card-icon">⏱</span></div>
+              <div class="stat-card-val">32분</div>
+              <div class="stat-card-change" style="color:#A0AEC0;">목표 35분 대비</div>
+            </div>
+          </div>
+          <div class="detail-panel">
+            <div class="detail-panel-title">🗓 회차별 수행 이력</div>
+            <div class="timeline">
+              <div class="timeline-item">
+                <div class="timeline-left"><div class="timeline-dot done"></div><div class="timeline-line"></div></div>
+                <div class="timeline-content">
+                  <div class="timeline-date">2026.03.17 (오늘)</div>
+                  <div class="timeline-card">
+                    <div class="timeline-title">23회차 · <span class="badge badge-green" style="font-size:11px;">완료</span></div>
+                    <div class="timeline-stats">
+                      <div class="timeline-stat">소요시간 <span>34분</span></div>
+                      <div class="timeline-stat">완료 운동 <span>5/5</span></div>
+                      <div class="timeline-stat">총 세트 <span>13세트</span></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="timeline-item">
+                <div class="timeline-left"><div class="timeline-dot done"></div><div class="timeline-line"></div></div>
+                <div class="timeline-content">
+                  <div class="timeline-date">2026.03.14</div>
+                  <div class="timeline-card">
+                    <div class="timeline-title">22회차 · <span class="badge badge-green" style="font-size:11px;">완료</span></div>
+                    <div class="timeline-stats">
+                      <div class="timeline-stat">소요시간 <span>29분</span></div>
+                      <div class="timeline-stat">완료 운동 <span>5/5</span></div>
+                      <div class="timeline-stat">총 세트 <span>13세트</span></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="timeline-item">
+                <div class="timeline-left"><div class="timeline-dot done"></div><div class="timeline-line"></div></div>
+                <div class="timeline-content">
+                  <div class="timeline-date">2026.03.11</div>
+                  <div class="timeline-card">
+                    <div class="timeline-title">21회차 · <span class="badge badge-red" style="font-size:11px;">중단</span></div>
+                    <div class="timeline-stats">
+                      <div class="timeline-stat">소요시간 <span>12분</span></div>
+                      <div class="timeline-stat">완료 운동 <span>2/5</span></div>
+                      <div class="timeline-stat">중단 사유 <span>허리 통증</span></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="timeline-item">
+                <div class="timeline-left"><div class="timeline-dot done"></div><div class="timeline-line"></div></div>
+                <div class="timeline-content">
+                  <div class="timeline-date">2026.03.08</div>
+                  <div class="timeline-card">
+                    <div class="timeline-title">20회차 · <span class="badge badge-green" style="font-size:11px;">완료</span></div>
+                    <div class="timeline-stats">
+                      <div class="timeline-stat">소요시간 <span>38분</span></div>
+                      <div class="timeline-stat">완료 운동 <span>5/5</span></div>
+                      <div class="timeline-stat">총 세트 <span>13세트</span></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="timeline-item">
+                <div class="timeline-left"><div class="timeline-dot"></div></div>
+                <div class="timeline-content">
+                  <div class="timeline-date" style="color:#A0AEC0;cursor:pointer;">이전 이력 19건 더보기 →</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
-      <!-- ④ 운동 진행 / 완료 이력 -->
+      <!-- ④ 처방 신청 접수 관리 -->
       <div class="screen" id="s3">
-        <div class="page-header">
-          <div>
-            <div class="page-title">운동 진행 / 완료 이력</div>
-            <div class="page-sub">김도산 · 디스크시술 5주차</div>
-          </div>
-          <div class="page-actions">
-            <button class="btn-secondary">CSV 내보내기</button>
-          </div>
-        </div>
-
-        <div class="stats-row" style="grid-template-columns:repeat(3,1fr);">
-          <div class="stat-card">
-            <div class="stat-card-top"><span class="stat-card-label">총 수행 횟수</span><span class="stat-card-icon">🔁</span></div>
-            <div class="stat-card-val">23</div>
-            <div class="stat-card-change" style="color:#A0AEC0;">처방 이후 누적</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-card-top"><span class="stat-card-label">완료율</span><span class="stat-card-icon">✅</span></div>
-            <div class="stat-card-val">87%</div>
-            <div class="stat-card-change change-up">▲ 완료 20회 / 중단 3회</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-card-top"><span class="stat-card-label">평균 소요시간</span><span class="stat-card-icon">⏱</span></div>
-            <div class="stat-card-val">32분</div>
-            <div class="stat-card-change" style="color:#A0AEC0;">목표 35분 대비</div>
-          </div>
-        </div>
-
-        <div class="detail-panel">
-          <div class="detail-panel-title">📅 회차별 수행 이력</div>
-          <div class="timeline">
-            <div class="timeline-item">
-              <div class="timeline-left">
-                <div class="timeline-dot done"></div>
-                <div class="timeline-line"></div>
-              </div>
-              <div class="timeline-content">
-                <div class="timeline-date">2026.03.17 (오늘)</div>
-                <div class="timeline-card">
-                  <div class="timeline-title">23회차 · <span class="badge badge-green" style="font-size:11px;">완료</span></div>
-                  <div class="timeline-stats">
-                    <div class="timeline-stat">소요시간 <span>34분</span></div>
-                    <div class="timeline-stat">완료 운동 <span>5/5</span></div>
-                    <div class="timeline-stat">총 세트 <span>13세트</span></div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="timeline-item">
-              <div class="timeline-left">
-                <div class="timeline-dot done"></div>
-                <div class="timeline-line"></div>
-              </div>
-              <div class="timeline-content">
-                <div class="timeline-date">2026.03.14</div>
-                <div class="timeline-card">
-                  <div class="timeline-title">22회차 · <span class="badge badge-green" style="font-size:11px;">완료</span></div>
-                  <div class="timeline-stats">
-                    <div class="timeline-stat">소요시간 <span>29분</span></div>
-                    <div class="timeline-stat">완료 운동 <span>5/5</span></div>
-                    <div class="timeline-stat">총 세트 <span>13세트</span></div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="timeline-item">
-              <div class="timeline-left">
-                <div class="timeline-dot done"></div>
-                <div class="timeline-line"></div>
-              </div>
-              <div class="timeline-content">
-                <div class="timeline-date">2026.03.11</div>
-                <div class="timeline-card">
-                  <div class="timeline-title">21회차 · <span class="badge badge-red" style="font-size:11px;">중단</span></div>
-                  <div class="timeline-stats">
-                    <div class="timeline-stat">소요시간 <span>12분</span></div>
-                    <div class="timeline-stat">완료 운동 <span>2/5</span></div>
-                    <div class="timeline-stat">중단 사유 <span>허리 통증</span></div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="timeline-item">
-              <div class="timeline-left">
-                <div class="timeline-dot done"></div>
-                <div class="timeline-line"></div>
-              </div>
-              <div class="timeline-content">
-                <div class="timeline-date">2026.03.08</div>
-                <div class="timeline-card">
-                  <div class="timeline-title">20회차 · <span class="badge badge-green" style="font-size:11px;">완료</span></div>
-                  <div class="timeline-stats">
-                    <div class="timeline-stat">소요시간 <span>38분</span></div>
-                    <div class="timeline-stat">완료 운동 <span>5/5</span></div>
-                    <div class="timeline-stat">총 세트 <span>13세트</span></div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="timeline-item">
-              <div class="timeline-left">
-                <div class="timeline-dot"></div>
-              </div>
-              <div class="timeline-content">
-                <div class="timeline-date" style="color:#A0AEC0;">이전 이력 19건 더보기 →</div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- ⑤ 처방 신청 접수 관리 -->
-      <div class="screen" id="s4">
         <div class="page-header">
           <div>
             <div class="page-title">처방 신청 접수 관리</div>
@@ -1028,18 +1006,8 @@
         tags:[["#처방등록","#E67E22"],["#회원선택","#4299E1"],["#운동구성","#9B6DFF"],["#폼","#48BB78"]]
       },
       {
-        title:"④ 운동 진행 / 완료 이력",
+        title:"④ 처방 신청 접수 관리",
         id:"amp04 · 필수 · FE/BE",
-        sections:[
-          { title:"화면 구성", items:["요약 카드 3개 (총 수행 횟수·완료율·평균 소요시간)", "회차별 타임라인 (수행일·완료여부·소요시간·완료 운동수)", "중단 시 사유 표시", "더보기 페이지네이션"] },
-          { title:"동작", items:["각 회차 클릭 → 해당 회차 세부 운동 결과 확인", "[CSV 내보내기] → 이력 데이터 다운로드", "완료/중단 뱃지로 한눈에 현황 파악"] },
-          { title:"API", items:["GET /admin/prescriptions/:id/history?page=", "GET /admin/prescriptions/:id/history/:sessionId"] }
-        ],
-        tags:[["#완료이력","#E67E22"],["#타임라인","#4299E1"],["#완료율","#48BB78"],["#중단사유","#FC8181"]]
-      },
-      {
-        title:"⑤ 처방 신청 접수 관리",
-        id:"amp05 · 필수 · FE/BE",
         sections:[
           { title:"화면 구성", items:["상단 통계 4개 (대기·처리중·이번달 완료·반려)", "상태·트레이너 필터", "신청 카드 목록 (좌측 컬러 바로 상태 구분)", "신청서 내용·신청일·담당트레이너·상태 표시", "대기: 트레이너 지정 드롭다운 + 지정/반려 버튼", "처리중: 완료 처리/반려 버튼"] },
           { title:"동작", items:["트레이너 지정 선택 → [트레이너 지정] 클릭 → 상태 '처리중'으로 변경", "완료 처리 → 상태 '완료', 해당 회원 앱에 처방 노출", "반려 클릭 → 사유 입력 모달 → 회원에게 알림 발송"] },
