@@ -269,7 +269,7 @@
               <tr>
                 <th>회원명</th>
                 <th>처방명</th>
-                <th>처방일</th>
+                <th style="cursor:pointer;color:#E67E22;">처방일 ▼</th>
                 <th>운동 등급</th>
                 <th>담당 트레이너</th>
                 <th>마지막 수행</th>
@@ -278,6 +278,7 @@
               </tr>
             </thead>
             <tbody>
+              <!-- 최근 처방일 순 정렬 -->
               <tr onclick="showScreen(1,document.querySelectorAll('.nav-btn')[1])">
                 <td><div class="td-name">김도산</div><div class="td-sub">010-1234-5678</div></td>
                 <td><div class="td-name">디스크시술 5주차</div></td>
@@ -299,6 +300,16 @@
                 <td><button class="btn-action btn-assign" style="background:#FEEBC8;color:#C05621;">상세보기</button></td>
               </tr>
               <tr>
+                <td><div class="td-name">정유나</div><div class="td-sub">010-5678-9012</div></td>
+                <td><div class="td-name">F, Cx core 2x4</div></td>
+                <td>21.04.08</td>
+                <td><span class="badge badge-blue">중급</span></td>
+                <td>김트레이너</td>
+                <td>2일 전</td>
+                <td><span class="badge badge-green">활성</span></td>
+                <td><button class="btn-action btn-assign" style="background:#FEEBC8;color:#C05621;">상세보기</button></td>
+              </tr>
+              <tr>
                 <td><div class="td-name">최수진</div><div class="td-sub">010-3456-7890</div></td>
                 <td><div class="td-name">다이어트2</div></td>
                 <td>20.10.07</td>
@@ -311,22 +322,12 @@
               <tr>
                 <td><div class="td-name">박현우</div><div class="td-sub">010-4567-8901</div></td>
                 <td><div class="td-name">신청 처리중</div></td>
-                <td>—</td>
+                <td><span style="color:#A0AEC0;">—</span></td>
                 <td><span class="badge badge-gray">미배정</span></td>
                 <td>—</td>
                 <td>—</td>
                 <td><span class="badge badge-blue">대기</span></td>
                 <td><button class="btn-action btn-assign" style="background:#FEEBC8;color:#C05621;">접수확인</button></td>
-              </tr>
-              <tr>
-                <td><div class="td-name">정유나</div><div class="td-sub">010-5678-9012</div></td>
-                <td><div class="td-name">F, Cx core 2x4</div></td>
-                <td>21.04.08</td>
-                <td><span class="badge badge-blue">중급</span></td>
-                <td>김트레이너</td>
-                <td>2일 전</td>
-                <td><span class="badge badge-green">활성</span></td>
-                <td><button class="btn-action btn-assign" style="background:#FEEBC8;color:#C05621;">상세보기</button></td>
               </tr>
             </tbody>
           </table>
