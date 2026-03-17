@@ -193,6 +193,47 @@
     .ex-add-input:focus { border-color: #E67E22; }
     .ex-add-select { border: 1.5px solid #E2E8F0; border-radius: 8px; padding: 7px 8px; font-size: 12px; font-family: 'Noto Sans KR', sans-serif; color: #2D3748; outline: none; background: #fff; width: 100%; }
     .btn-del-ex { background: #FED7D7; color: #C53030; border: none; border-radius: 8px; width: 28px; height: 28px; font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    /* STEP3 좌우 분할 레이아웃 */
+    .step3-wrap { display: grid; grid-template-columns: 280px 1fr; gap: 0; min-height: 480px; border: 1.5px solid #E2E8F0; border-radius: 14px; overflow: hidden; }
+    .step3-left { background: #F7F9FC; border-right: 1.5px solid #E2E8F0; display: flex; flex-direction: column; }
+    .step3-left-head { padding: 14px 14px 10px; border-bottom: 1px solid #E2E8F0; }
+    .step3-left-title { font-size: 12px; font-weight: 900; color: #4A5568; margin-bottom: 8px; letter-spacing: 0.5px; }
+    .step3-search { display: flex; align-items: center; border: 1.5px solid #E2E8F0; border-radius: 8px; background: #fff; padding: 0 10px; gap: 6px; }
+    .step3-search input { border: none; outline: none; font-size: 12px; font-family: 'Noto Sans KR',sans-serif; padding: 8px 0; flex: 1; background: transparent; }
+    .step3-search-icon { color: #A0AEC0; font-size: 13px; }
+    .step3-part-btns { padding: 10px 14px; border-bottom: 1px solid #E2E8F0; display: flex; flex-wrap: wrap; gap: 6px; }
+    .step3-part-btn { padding: 4px 10px; border-radius: 99px; border: 1.5px solid #E2E8F0; background: #fff; font-size: 11px; font-weight: 700; cursor: pointer; font-family: 'Noto Sans KR',sans-serif; color: #718096; transition: all .15s; }
+    .step3-part-btn.active { color: #fff; border-color: transparent; }
+    .step3-ex-list { flex: 1; overflow-y: auto; padding: 8px 8px; }
+    .step3-ex-row { display: flex; align-items: center; gap: 10px; padding: 9px 10px; border-radius: 10px; cursor: pointer; transition: background .12s; margin-bottom: 3px; }
+    .step3-ex-row:hover { background: #EBF4FF; }
+    .step3-ex-row.added { background: #F0FFF4; }
+    .step3-ex-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+    .step3-ex-info { flex: 1; min-width: 0; }
+    .step3-ex-name { font-size: 12px; font-weight: 700; color: #2D3748; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .step3-ex-meta { font-size: 10px; color: #A0AEC0; margin-top: 1px; }
+    .step3-ex-add-btn { width: 22px; height: 22px; border-radius: 50%; border: none; background: #E67E22; color: #fff; font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; opacity: 0; transition: opacity .12s; }
+    .step3-ex-row:hover .step3-ex-add-btn { opacity: 1; }
+    .step3-ex-row.added .step3-ex-add-btn { background: #48BB78; opacity: 1; font-size: 11px; }
+    .step3-right { display: flex; flex-direction: column; background: #fff; }
+    .step3-right-head { padding: 14px 16px 10px; border-bottom: 1px solid #E2E8F0; display: flex; align-items: center; justify-content: space-between; }
+    .step3-right-title { font-size: 12px; font-weight: 900; color: #4A5568; letter-spacing: 0.5px; }
+    .step3-right-cnt { font-size: 11px; color: #A0AEC0; font-weight: 700; }
+    .step3-col-head { display: grid; grid-template-columns: 24px 1fr 80px 90px 80px 28px; gap: 6px; padding: 8px 16px 6px; border-bottom: 1px solid #F0F4F8; }
+    .step3-col-head span { font-size: 10px; font-weight: 800; color: #A0AEC0; letter-spacing: 0.5px; }
+    .step3-selected-list { flex: 1; overflow-y: auto; padding: 8px 12px; }
+    .step3-sel-item { display: grid; grid-template-columns: 24px 1fr 80px 90px 80px 28px; gap: 6px; align-items: center; background: #F7F9FC; border-radius: 10px; padding: 8px 8px; margin-bottom: 6px; }
+    .step3-sel-num { width: 22px; height: 22px; border-radius: 6px; background: #E67E22; color: #fff; font-size: 11px; font-weight: 900; display: flex; align-items: center; justify-content: center; }
+    .step3-sel-name { font-size: 12px; font-weight: 700; color: #2D3748; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .step3-sel-input { border: 1.5px solid #E2E8F0; border-radius: 7px; padding: 5px 8px; font-size: 11px; font-family: 'Noto Sans KR',sans-serif; outline: none; background: #fff; width: 100%; }
+    .step3-sel-input:focus { border-color: #E67E22; }
+    .step3-sel-select { border: 1.5px solid #E2E8F0; border-radius: 7px; padding: 5px 4px; font-size: 11px; font-family: 'Noto Sans KR',sans-serif; outline: none; background: #fff; width: 100%; }
+    .step3-del-btn { width: 22px; height: 22px; border-radius: 6px; background: #FED7D7; color: #C53030; border: none; font-size: 13px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+    .step3-empty { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #A0AEC0; gap: 8px; padding: 40px; }
+    .step3-empty-icon { font-size: 36px; }
+    .step3-empty-text { font-size: 13px; font-weight: 700; }
+    .step3-add-direct { margin: 8px 12px 12px; border: 2px dashed #F6AD55; border-radius: 10px; padding: 9px; text-align: center; font-size: 12px; font-weight: 700; color: #E67E22; cursor: pointer; background: #FFF7ED; }
+    .step3-add-direct:hover { background: #FEEBC8; }
     /* 운동 선택 모달 */
     .ex-name-wrap { display: flex; gap: 4px; }
     .ex-search-btn { flex-shrink: 0; background: #FFF7ED; border: 1.5px solid #F6AD55; border-radius: 8px; padding: 0 10px; font-size: 13px; cursor: pointer; color: #E67E22; white-space: nowrap; }
@@ -881,46 +922,45 @@
         <!-- STEP 3: 운동 구성 -->
         <div class="form-panel">
           <div class="form-panel-title">🏋️ STEP 3 · 운동 동작 구성</div>
-          <div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr auto;gap:8px;padding:0 0 8px;margin-bottom:4px;">
-            <div style="font-size:11px;font-weight:800;color:#A0AEC0;letter-spacing:0.5px;">운동명</div>
-            <div style="font-size:11px;font-weight:800;color:#A0AEC0;letter-spacing:0.5px;">세트</div>
-            <div style="font-size:11px;font-weight:800;color:#A0AEC0;letter-spacing:0.5px;">횟수/시간</div>
-            <div style="font-size:11px;font-weight:800;color:#A0AEC0;letter-spacing:0.5px;">중요도</div>
-            <div style="width:28px;"></div>
+          <div class="step3-wrap">
+            <!-- 왼쪽: 운동 검색 패널 -->
+            <div class="step3-left">
+              <div class="step3-left-head">
+                <div class="step3-left-title">운동 검색</div>
+                <div class="step3-search">
+                  <span class="step3-search-icon">🔍</span>
+                  <input id="step3SearchInput" type="text" placeholder="운동명" oninput="renderStep3List()" autocomplete="off" />
+                </div>
+              </div>
+              <div class="step3-part-btns" id="step3PartBtns">
+                <button class="step3-part-btn active" data-part="" onclick="setStep3Part('',this)">전체</button>
+                <button class="step3-part-btn" data-part="목·어깨" onclick="setStep3Part('목·어깨',this)">목·어깨</button>
+                <button class="step3-part-btn" data-part="허리·척추" onclick="setStep3Part('허리·척추',this)">허리·척추</button>
+                <button class="step3-part-btn" data-part="코어" onclick="setStep3Part('코어',this)">코어</button>
+                <button class="step3-part-btn" data-part="하체" onclick="setStep3Part('하체',this)">하체</button>
+                <button class="step3-part-btn" data-part="상체" onclick="setStep3Part('상체',this)">상체</button>
+                <button class="step3-part-btn" data-part="전신" onclick="setStep3Part('전신',this)">전신</button>
+              </div>
+              <div class="step3-ex-list" id="step3ExList"></div>
+            </div>
+            <!-- 오른쪽: 선택된 운동 -->
+            <div class="step3-right">
+              <div class="step3-right-head">
+                <div class="step3-right-title">선택된 운동</div>
+                <div class="step3-right-cnt" id="step3SelCnt">0개</div>
+              </div>
+              <div class="step3-col-head">
+                <span></span><span>운동명</span><span>세트</span><span>횟수/시간</span><span>중요도</span><span></span>
+              </div>
+              <div class="step3-selected-list" id="step3SelList">
+                <div class="step3-empty" id="step3Empty">
+                  <div class="step3-empty-icon">👈</div>
+                  <div class="step3-empty-text">왼쪽에서 운동을 선택하세요</div>
+                </div>
+              </div>
+              <div class="step3-add-direct" onclick="addStep3Direct()">+ 직접 입력으로 추가</div>
+            </div>
           </div>
-          <div class="ex-add-list" id="ex-add-list">
-            <div class="ex-add-item">
-              <div class="ex-add-num">1</div>
-              <div class="ex-add-fields">
-                <div class="ex-name-wrap"><input class="ex-add-input" type="text" placeholder="운동명 직접 입력" value="맥켄지 신전 운동" autocomplete="off" /><button class="ex-search-btn" type="button" onclick="openExModal(this.previousElementSibling)">🔍 검색</button></div>
-                <input class="ex-add-input" type="text" placeholder="세트" value="3세트" />
-                <input class="ex-add-input" type="text" placeholder="횟수/시간" value="10회" />
-                <select class="ex-add-select"><option>필수</option><option>권장</option><option>선택</option></select>
-              </div>
-              <button class="btn-del-ex">×</button>
-            </div>
-            <div class="ex-add-item">
-              <div class="ex-add-num">2</div>
-              <div class="ex-add-fields">
-                <div class="ex-name-wrap"><input class="ex-add-input" type="text" placeholder="운동명 직접 입력" value="코어 안정화 운동" autocomplete="off" /><button class="ex-search-btn" type="button" onclick="openExModal(this.previousElementSibling)">🔍 검색</button></div>
-                <input class="ex-add-input" type="text" placeholder="세트" value="3세트" />
-                <input class="ex-add-input" type="text" placeholder="횟수/시간" value="15회" />
-                <select class="ex-add-select"><option>필수</option><option>권장</option><option>선택</option></select>
-              </div>
-              <button class="btn-del-ex">×</button>
-            </div>
-            <div class="ex-add-item">
-              <div class="ex-add-num">3</div>
-              <div class="ex-add-fields">
-                <div class="ex-name-wrap"><input class="ex-add-input" type="text" placeholder="운동명 직접 입력" value="고관절 스트레칭" autocomplete="off" /><button class="ex-search-btn" type="button" onclick="openExModal(this.previousElementSibling)">🔍 검색</button></div>
-                <input class="ex-add-input" type="text" placeholder="세트" value="2세트" />
-                <input class="ex-add-input" type="text" placeholder="횟수/시간" value="30초" />
-                <select class="ex-add-select"><option>필수</option><option selected>권장</option><option>선택</option></select>
-              </div>
-              <button class="btn-del-ex">×</button>
-            </div>
-          </div>
-          <button class="btn-add-ex" onclick="addEx()">+ 운동 동작 추가</button>
         </div>
 
         <!-- 트레이너 메모 -->
@@ -1036,30 +1076,103 @@
       document.getElementById('memo-body').innerHTML = html;
     }
 
-    let exCount = 3;
-    function addEx() {
-      exCount++;
-      const list = document.getElementById('ex-add-list');
-      const div = document.createElement('div');
-      div.className = 'ex-add-item';
-      div.innerHTML = `
-        <div class="ex-add-num">${exCount}</div>
-        <div class="ex-add-fields">
-          <div class="ex-name-wrap"><input class="ex-add-input" type="text" placeholder="운동명 직접 입력" autocomplete="off" /><button class="ex-search-btn" type="button" onclick="openExModal(this.previousElementSibling)">🔍 검색</button></div>
-          <input class="ex-add-input" type="text" placeholder="세트" />
-          <input class="ex-add-input" type="text" placeholder="횟수/시간" />
-          <select class="ex-add-select"><option>필수</option><option>권장</option><option>선택</option></select>
-        </div>
-        <button class="btn-del-ex" onclick="this.parentElement.remove();renum()">×</button>
-      `;
-      list.appendChild(div);
+    /* ── STEP3 좌우 분할 운동 선택 ── */
+    let step3Part = '';
+    let step3Items = [
+      { name:'맥켄지 신전 운동', sets:'3세트', reps:'10회', importance:'필수' },
+      { name:'코어 안정화 운동', sets:'3세트', reps:'15회', importance:'필수' },
+      { name:'고관절 스트레칭',  sets:'2세트', reps:'30초', importance:'권장' },
+    ];
+
+    function setStep3Part(part, btn) {
+      step3Part = part;
+      document.querySelectorAll('.step3-part-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      if (part) {
+        const c = acPartColors[part] || '#718096';
+        btn.style.background = c; btn.style.borderColor = c;
+      }
+      renderStep3List();
     }
-    function renum() {
-      document.querySelectorAll('#ex-add-list .ex-add-num').forEach((n,i) => n.textContent = i+1);
-      exCount = document.querySelectorAll('#ex-add-list .ex-add-item').length;
+
+    function renderStep3List() {
+      const q = (document.getElementById('step3SearchInput')?.value || '').trim().toLowerCase();
+      const filtered = acExercises.filter(e => {
+        if (step3Part && e[1] !== step3Part) return false;
+        if (q && !e[0].toLowerCase().includes(q) && !e[1].toLowerCase().includes(q)) return false;
+        return true;
+      });
+      const addedNames = step3Items.map(i => i.name);
+      const html = filtered.map(e => {
+        const c = acPartColors[e[1]] || '#718096';
+        const isAdded = addedNames.includes(e[0]);
+        return `<div class="step3-ex-row${isAdded?' added':''}" onclick="addStep3FromList('${e[0].replace(/'/g,"\\'")}','${e[4]}','${e[5]}')">
+          <div class="step3-ex-dot" style="background:${c}"></div>
+          <div class="step3-ex-info">
+            <div class="step3-ex-name">${e[0]}</div>
+            <div class="step3-ex-meta">${e[1]} · ${e[2]} · ${e[3]}</div>
+          </div>
+          <button class="step3-ex-add-btn">${isAdded ? '✓' : '+'}</button>
+        </div>`;
+      }).join('') || '<div style="padding:20px;text-align:center;font-size:12px;color:#A0AEC0;">운동이 없습니다</div>';
+      document.getElementById('step3ExList').innerHTML = html;
     }
-    document.querySelectorAll('#ex-add-list .btn-del-ex').forEach(btn => {
-      btn.onclick = function(){ this.parentElement.remove(); renum(); };
+
+    function addStep3FromList(name, sets, reps) {
+      if (step3Items.find(i => i.name === name)) return; // 중복 방지
+      step3Items.push({ name, sets, reps, importance:'필수' });
+      renderStep3Selected();
+      renderStep3List();
+    }
+
+    function addStep3Direct() {
+      step3Items.push({ name:'', sets:'', reps:'', importance:'필수' });
+      renderStep3Selected();
+      // 마지막 행 이름 input에 포커스
+      setTimeout(() => {
+        const inputs = document.querySelectorAll('.step3-sel-item .step3-sel-name-input');
+        if (inputs.length) inputs[inputs.length-1].focus();
+      }, 50);
+    }
+
+    function removeStep3Item(idx) {
+      step3Items.splice(idx, 1);
+      renderStep3Selected();
+      renderStep3List();
+    }
+
+    function renderStep3Selected() {
+      const list = document.getElementById('step3SelList');
+      const empty = document.getElementById('step3Empty');
+      document.getElementById('step3SelCnt').textContent = step3Items.length + '개';
+      if (!step3Items.length) {
+        list.innerHTML = `<div class="step3-empty" id="step3Empty"><div class="step3-empty-icon">👈</div><div class="step3-empty-text">왼쪽에서 운동을 선택하세요</div></div>`;
+        return;
+      }
+      list.innerHTML = step3Items.map((item, i) => `
+        <div class="step3-sel-item">
+          <div class="step3-sel-num">${i+1}</div>
+          <input class="step3-sel-input step3-sel-name-input" type="text" value="${item.name}" placeholder="운동명" oninput="step3Items[${i}].name=this.value;renderStep3List()" style="font-weight:700;" />
+          <input class="step3-sel-input" type="text" value="${item.sets}" placeholder="세트" oninput="step3Items[${i}].sets=this.value" />
+          <input class="step3-sel-input" type="text" value="${item.reps}" placeholder="횟수/시간" oninput="step3Items[${i}].reps=this.value" />
+          <select class="step3-sel-select" onchange="step3Items[${i}].importance=this.value">
+            <option${item.importance==='필수'?' selected':''}>필수</option>
+            <option${item.importance==='권장'?' selected':''}>권장</option>
+            <option${item.importance==='선택'?' selected':''}>선택</option>
+          </select>
+          <button class="step3-del-btn" onclick="removeStep3Item(${i})">×</button>
+        </div>`).join('');
+    }
+
+    // 부위 버튼 색상 초기화 (active 비색상 버튼은 기본 스타일 유지)
+    document.querySelectorAll('.step3-part-btn:not(.active)').forEach(b => {
+      b.addEventListener('mouseenter', () => {
+        const c = acPartColors[b.dataset.part] || '#E67E22';
+        b.style.borderColor = c; b.style.color = c;
+      });
+      b.addEventListener('mouseleave', () => {
+        if (!b.classList.contains('active')) { b.style.borderColor = ''; b.style.color = ''; }
+      });
     });
 
     /* ── 운동 자동완성 데이터 (처방운동 동작 구성관리 연동) ── */
@@ -1206,6 +1319,8 @@
     });
 
     showScreen(0, document.querySelector('.nav-btn.active'));
+    renderStep3List();
+    renderStep3Selected();
   </script>
 
   <!-- 운동 선택 모달 -->
