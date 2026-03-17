@@ -151,6 +151,58 @@
     .assign-row { display: flex; align-items: center; gap: 8px; margin-top: 6px; }
     .assign-select { border: 1.5px solid #E2E8F0; border-radius: 8px; padding: 6px 10px; font-size: 12px; font-family: 'Noto Sans KR', sans-serif; color: #4A5568; outline: none; }
 
+    /* 폼 스타일 */
+    .form-panel { background: #fff; border-radius: 14px; box-shadow: 0 1px 6px rgba(0,0,0,0.06); padding: 24px; margin-bottom: 16px; }
+    .form-panel-title { font-size: 15px; font-weight: 900; color: #1A202C; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid #F0F4F8; display: flex; align-items: center; gap: 8px; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+    .form-row-full { margin-bottom: 16px; }
+    .form-group { display: flex; flex-direction: column; gap: 6px; }
+    .form-label { font-size: 12px; font-weight: 800; color: #4A5568; letter-spacing: 0.5px; }
+    .form-label .required { color: #E53E3E; margin-left: 2px; }
+    .form-input { border: 1.5px solid #E2E8F0; border-radius: 10px; padding: 10px 14px; font-size: 13px; font-family: 'Noto Sans KR', sans-serif; color: #2D3748; outline: none; width: 100%; background: #fff; }
+    .form-input:focus { border-color: #E67E22; }
+    .form-select { border: 1.5px solid #E2E8F0; border-radius: 10px; padding: 10px 14px; font-size: 13px; font-family: 'Noto Sans KR', sans-serif; color: #2D3748; outline: none; width: 100%; background: #fff; }
+    .form-select:focus { border-color: #E67E22; }
+    .form-textarea { border: 1.5px solid #E2E8F0; border-radius: 10px; padding: 12px 14px; font-size: 13px; font-family: 'Noto Sans KR', sans-serif; color: #2D3748; outline: none; width: 100%; resize: vertical; min-height: 90px; line-height: 1.6; background: #fff; }
+    .form-textarea:focus { border-color: #E67E22; }
+
+    /* 회원 검색 결과 */
+    .member-search-result { background: #F7F9FC; border-radius: 12px; padding: 14px 16px; display: flex; align-items: center; gap: 14px; margin-top: 8px; }
+    .member-avatar { width: 40px; height: 40px; border-radius: 12px; background: linear-gradient(135deg, #E67E22, #F39C12); display: flex; align-items: center; justify-content: center; font-size: 16px; color: #fff; font-weight: 900; flex-shrink: 0; }
+    .member-info-found { flex: 1; }
+    .member-name-found { font-size: 14px; font-weight: 800; color: #1A202C; }
+    .member-meta-found { font-size: 12px; color: #718096; margin-top: 2px; }
+    .btn-select-member { background: #E67E22; color: #fff; border: none; border-radius: 8px; padding: 7px 14px; font-size: 12px; font-weight: 700; cursor: pointer; font-family: 'Noto Sans KR', sans-serif; white-space: nowrap; }
+
+    /* 운동 등급 선택 */
+    .grade-options { display: flex; gap: 10px; }
+    .grade-option { flex: 1; border: 2px solid #E2E8F0; border-radius: 12px; padding: 12px; text-align: center; cursor: pointer; transition: all 0.2s; background: #fff; }
+    .grade-option:hover { border-color: #E67E22; }
+    .grade-option.selected { border-color: #E67E22; background: #FFF7ED; }
+    .grade-option-icon { font-size: 22px; margin-bottom: 4px; }
+    .grade-option-label { font-size: 13px; font-weight: 800; color: #2D3748; }
+    .grade-option-desc { font-size: 11px; color: #A0AEC0; margin-top: 2px; }
+    .grade-option.selected .grade-option-label { color: #E67E22; }
+
+    /* 운동 동작 추가 */
+    .ex-add-list { display: flex; flex-direction: column; gap: 10px; }
+    .ex-add-item { background: #F7F9FC; border-radius: 12px; padding: 14px 16px; display: flex; align-items: center; gap: 12px; }
+    .ex-add-num { width: 28px; height: 28px; border-radius: 8px; background: #E67E22; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 900; flex-shrink: 0; }
+    .ex-add-fields { flex: 1; display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 8px; }
+    .ex-add-input { border: 1.5px solid #E2E8F0; border-radius: 8px; padding: 7px 10px; font-size: 12px; font-family: 'Noto Sans KR', sans-serif; color: #2D3748; outline: none; background: #fff; width: 100%; }
+    .ex-add-input:focus { border-color: #E67E22; }
+    .ex-add-select { border: 1.5px solid #E2E8F0; border-radius: 8px; padding: 7px 8px; font-size: 12px; font-family: 'Noto Sans KR', sans-serif; color: #2D3748; outline: none; background: #fff; width: 100%; }
+    .btn-del-ex { background: #FED7D7; color: #C53030; border: none; border-radius: 8px; width: 28px; height: 28px; font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .btn-add-ex { background: #FFF7ED; color: #E67E22; border: 2px dashed #F6AD55; border-radius: 12px; padding: 12px; text-align: center; font-size: 13px; font-weight: 700; cursor: pointer; width: 100%; font-family: 'Noto Sans KR', sans-serif; margin-top: 4px; }
+    .btn-add-ex:hover { background: #FEEBC8; }
+
+    /* 하단 버튼 바 */
+    .form-footer { background: #fff; border-radius: 14px; box-shadow: 0 1px 6px rgba(0,0,0,0.06); padding: 18px 24px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+    .form-footer-left { font-size: 13px; color: #A0AEC0; font-weight: 600; }
+    .form-footer-right { display: flex; gap: 10px; }
+    .btn-save { background: linear-gradient(135deg, #E67E22, #F39C12); color: #fff; border: none; border-radius: 10px; padding: 12px 28px; font-size: 14px; font-weight: 800; cursor: pointer; font-family: 'Noto Sans KR', sans-serif; box-shadow: 0 4px 12px rgba(230,126,34,0.35); }
+    .btn-cancel { background: #F0F4F8; color: #4A5568; border: none; border-radius: 10px; padding: 12px 20px; font-size: 14px; font-weight: 700; cursor: pointer; font-family: 'Noto Sans KR', sans-serif; }
+
     /* 페이지네이션 */
     .pagination { display: flex; justify-content: center; gap: 4px; padding: 16px 0 4px; }
     .page-btn { width: 32px; height: 32px; border-radius: 8px; border: 1.5px solid #E2E8F0; background: #fff; font-size: 13px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; color: #718096; }
@@ -171,13 +223,14 @@
 </head>
 <body>
   <h1>💊 관리자 My 운동처방 관리</h1>
-  <p class="subtitle">관리자 앱 · My 운동처방 관리 · 4개 화면 목업</p>
+  <p class="subtitle">관리자 앱 · My 운동처방 관리 · 5개 화면 목업</p>
 
   <div class="nav">
     <button class="nav-btn active" onclick="showScreen(0,this)">① 회원별 처방 현황</button>
     <button class="nav-btn" onclick="showScreen(1,this)">② 처방 상세 조회</button>
     <button class="nav-btn" onclick="showScreen(2,this)">③ 운동 진행/완료 이력</button>
     <button class="nav-btn" onclick="showScreen(3,this)">④ 처방 신청 접수 관리</button>
+    <button class="nav-btn" style="background:#FFF7ED;border-color:#F6AD55;color:#E67E22;" onclick="showScreen(4,this)">⑤ 처방 등록</button>
   </div>
 
   <div class="admin-wrap">
@@ -211,7 +264,7 @@
           </div>
           <div class="page-actions">
             <button class="btn-secondary">내보내기</button>
-            <button class="btn-primary">+ 처방 등록</button>
+            <button class="btn-primary" onclick="showScreen(4,document.querySelectorAll('.nav-btn')[4])">+ 처방 등록</button>
           </div>
         </div>
 
@@ -687,6 +740,196 @@
         </div>
       </div>
 
+      <!-- ⑤ 처방 등록 -->
+      <div class="screen" id="s4">
+        <div class="page-header">
+          <div>
+            <div class="page-title">처방 등록</div>
+            <div class="page-sub">새 운동처방을 작성하고 회원에게 배정합니다</div>
+          </div>
+          <div class="page-actions">
+            <button class="btn-secondary" onclick="showScreen(0,document.querySelectorAll('.nav-btn')[0])">← 목록</button>
+          </div>
+        </div>
+
+        <!-- 진행 단계 -->
+        <div class="form-panel" style="padding:20px 24px;">
+          <div style="display:flex;align-items:center;gap:0;">
+            <div style="display:flex;align-items:center;gap:8px;flex:1;">
+              <div style="width:28px;height:28px;border-radius:50%;background:#E67E22;color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:900;flex-shrink:0;">1</div>
+              <span style="font-size:13px;font-weight:800;color:#E67E22;">회원 선택</span>
+            </div>
+            <div style="flex:1;height:2px;background:#F6AD55;margin:0 4px;"></div>
+            <div style="display:flex;align-items:center;gap:8px;flex:1;">
+              <div style="width:28px;height:28px;border-radius:50%;background:#F6AD55;color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:900;flex-shrink:0;">2</div>
+              <span style="font-size:13px;font-weight:700;color:#F6AD55;">처방 기본 정보</span>
+            </div>
+            <div style="flex:1;height:2px;background:#E2E8F0;margin:0 4px;"></div>
+            <div style="display:flex;align-items:center;gap:8px;flex:1;">
+              <div style="width:28px;height:28px;border-radius:50%;background:#E2E8F0;color:#A0AEC0;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:900;flex-shrink:0;">3</div>
+              <span style="font-size:13px;font-weight:700;color:#A0AEC0;">운동 구성</span>
+            </div>
+            <div style="flex:1;height:2px;background:#E2E8F0;margin:0 4px;"></div>
+            <div style="display:flex;align-items:center;gap:8px;flex:1;">
+              <div style="width:28px;height:28px;border-radius:50%;background:#E2E8F0;color:#A0AEC0;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:900;flex-shrink:0;">4</div>
+              <span style="font-size:13px;font-weight:700;color:#A0AEC0;">저장 완료</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- STEP 1: 회원 선택 -->
+        <div class="form-panel">
+          <div class="form-panel-title">👤 STEP 1 · 회원 선택</div>
+          <div class="form-row-full">
+            <div class="form-group">
+              <div class="form-label">회원 검색 <span class="required">*</span></div>
+              <div style="display:flex;gap:8px;">
+                <input class="form-input" type="text" placeholder="회원명 또는 전화번호 입력" value="박현우" style="flex:1;" />
+                <button style="background:#E67E22;color:#fff;border:none;border-radius:10px;padding:10px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Noto Sans KR',sans-serif;white-space:nowrap;">검색</button>
+              </div>
+            </div>
+          </div>
+          <!-- 검색 결과 -->
+          <div class="member-search-result">
+            <div class="member-avatar">박</div>
+            <div class="member-info-found">
+              <div class="member-name-found">박현우</div>
+              <div class="member-meta-found">010-4567-8901 · 강남점 · 가입 2024.01.15 · 이전 처방 없음</div>
+            </div>
+            <button class="btn-select-member">✓ 선택됨</button>
+          </div>
+        </div>
+
+        <!-- STEP 2: 처방 기본 정보 -->
+        <div class="form-panel">
+          <div class="form-panel-title">📋 STEP 2 · 처방 기본 정보</div>
+          <div class="form-row">
+            <div class="form-group">
+              <div class="form-label">처방명 <span class="required">*</span></div>
+              <input class="form-input" type="text" placeholder="예: 디스크시술 재활 1단계" value="허리 디스크 재활 1단계" />
+            </div>
+            <div class="form-group">
+              <div class="form-label">담당 트레이너 <span class="required">*</span></div>
+              <select class="form-select">
+                <option>트레이너 선택</option>
+                <option selected>김트레이너</option>
+                <option>박트레이너</option>
+                <option>이트레이너</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <div class="form-label">처방 시작일 <span class="required">*</span></div>
+              <input class="form-input" type="text" placeholder="YYYY.MM.DD" value="2026.03.17" />
+            </div>
+            <div class="form-group">
+              <div class="form-label">처방 종료일 (선택)</div>
+              <input class="form-input" type="text" placeholder="YYYY.MM.DD" />
+            </div>
+          </div>
+          <div class="form-row-full">
+            <div class="form-group">
+              <div class="form-label">운동 등급 <span class="required">*</span></div>
+              <div class="grade-options">
+                <div class="grade-option selected">
+                  <div class="grade-option-icon">🌱</div>
+                  <div class="grade-option-label">초급</div>
+                  <div class="grade-option-desc">낮은 강도 · 기초 동작</div>
+                </div>
+                <div class="grade-option">
+                  <div class="grade-option-icon">💪</div>
+                  <div class="grade-option-label">중급</div>
+                  <div class="grade-option-desc">보통 강도 · 복합 동작</div>
+                </div>
+                <div class="grade-option">
+                  <div class="grade-option-icon">🔥</div>
+                  <div class="grade-option-label">고급</div>
+                  <div class="grade-option-desc">높은 강도 · 심화 동작</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- STEP 3: 운동 구성 -->
+        <div class="form-panel">
+          <div class="form-panel-title">🏋️ STEP 3 · 운동 동작 구성</div>
+          <div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr auto;gap:8px;padding:0 0 8px;margin-bottom:4px;">
+            <div style="font-size:11px;font-weight:800;color:#A0AEC0;letter-spacing:0.5px;">운동명</div>
+            <div style="font-size:11px;font-weight:800;color:#A0AEC0;letter-spacing:0.5px;">세트</div>
+            <div style="font-size:11px;font-weight:800;color:#A0AEC0;letter-spacing:0.5px;">횟수/시간</div>
+            <div style="font-size:11px;font-weight:800;color:#A0AEC0;letter-spacing:0.5px;">중요도</div>
+            <div style="width:28px;"></div>
+          </div>
+          <div class="ex-add-list" id="ex-add-list">
+            <div class="ex-add-item">
+              <div class="ex-add-num">1</div>
+              <div class="ex-add-fields">
+                <input class="ex-add-input" type="text" placeholder="운동명 입력" value="맥켄지 신전 운동" />
+                <input class="ex-add-input" type="text" placeholder="세트" value="3세트" />
+                <input class="ex-add-input" type="text" placeholder="횟수/시간" value="10회" />
+                <select class="ex-add-select">
+                  <option>필수</option>
+                  <option>권장</option>
+                  <option>선택</option>
+                </select>
+              </div>
+              <button class="btn-del-ex">×</button>
+            </div>
+            <div class="ex-add-item">
+              <div class="ex-add-num">2</div>
+              <div class="ex-add-fields">
+                <input class="ex-add-input" type="text" placeholder="운동명 입력" value="코어 안정화 운동" />
+                <input class="ex-add-input" type="text" placeholder="세트" value="3세트" />
+                <input class="ex-add-input" type="text" placeholder="횟수/시간" value="15회" />
+                <select class="ex-add-select">
+                  <option>필수</option>
+                  <option>권장</option>
+                  <option>선택</option>
+                </select>
+              </div>
+              <button class="btn-del-ex">×</button>
+            </div>
+            <div class="ex-add-item">
+              <div class="ex-add-num">3</div>
+              <div class="ex-add-fields">
+                <input class="ex-add-input" type="text" placeholder="운동명 입력" value="고관절 스트레칭" />
+                <input class="ex-add-input" type="text" placeholder="세트" value="2세트" />
+                <input class="ex-add-input" type="text" placeholder="횟수/시간" value="30초" />
+                <select class="ex-add-select">
+                  <option>필수</option>
+                  <option selected>권장</option>
+                  <option>선택</option>
+                </select>
+              </div>
+              <button class="btn-del-ex">×</button>
+            </div>
+          </div>
+          <button class="btn-add-ex" onclick="addEx()">+ 운동 동작 추가</button>
+        </div>
+
+        <!-- 트레이너 메모 -->
+        <div class="form-panel">
+          <div class="form-panel-title">📝 트레이너 메모 (선택)</div>
+          <div class="form-row-full">
+            <div class="form-group">
+              <div class="form-label">주의사항 / 처방 노트</div>
+              <textarea class="form-textarea" placeholder="회원에게 전달할 주의사항이나 처방 관련 메모를 입력하세요...">허리에 무리가 가지 않도록 천천히 진행하세요. 통증 발생 시 즉시 중단하고 트레이너에게 알려주세요. 4주차 이후 강도를 점진적으로 높일 예정입니다.</textarea>
+            </div>
+          </div>
+        </div>
+
+        <!-- 저장 버튼 -->
+        <div class="form-footer">
+          <div class="form-footer-left">* 필수 항목을 모두 입력해야 저장됩니다</div>
+          <div class="form-footer-right">
+            <button class="btn-cancel" onclick="showScreen(0,document.querySelectorAll('.nav-btn')[0])">취소</button>
+            <button class="btn-save">💾 처방 저장</button>
+          </div>
+        </div>
+      </div>
+
     </div><!-- main end -->
   </div><!-- admin-wrap end -->
 
@@ -739,6 +982,16 @@
           { title:"API", items:["GET /admin/prescription-requests?status=&trainer=", "PATCH /admin/prescription-requests/:id/assign", "PATCH /admin/prescription-requests/:id/complete", "PATCH /admin/prescription-requests/:id/reject"] }
         ],
         tags:[["#신청접수","#E67E22"],["#트레이너지정","#4299E1"],["#완료처리","#48BB78"],["#반려","#FC8181"]]
+      },
+      {
+        title:"⑤ 처방 등록",
+        id:"amp05 · 필수 · FE/BE",
+        sections:[
+          { title:"화면 구성", items:["4단계 진행 표시줄 (회원 선택→처방 기본 정보→운동 구성→저장 완료)", "STEP 1: 회원 검색 + 검색 결과 카드 (선택 확인)", "STEP 2: 처방명·담당 트레이너·처방 시작일·종료일·운동 등급 선택(초급/중급/고급)", "STEP 3: 운동 동작 목록 (운동명·세트·횟수·중요도) + 행 삭제/추가 버튼", "트레이너 메모 텍스트 영역", "하단 취소 / 처방 저장 버튼"] },
+          { title:"동작", items:["[검색] → 회원 목록 팝업 또는 인라인 결과 표시 → 선택 확정", "운동 등급 카드 클릭 → 선택 강조", "[+ 운동 동작 추가] → 새 행 추가", "[×] → 해당 운동 행 삭제", "[처방 저장] → 유효성 검사 후 저장, 회원 앱에 처방 노출", "[취소] → 목록 화면으로 이동"] },
+          { title:"API", items:["GET /admin/members?search=", "POST /admin/prescriptions (처방 저장)"] }
+        ],
+        tags:[["#처방등록","#E67E22"],["#회원선택","#4299E1"],["#운동구성","#9B6DFF"],["#폼","#48BB78"]]
       }
     ];
 
@@ -768,6 +1021,34 @@
       }
       document.getElementById('memo-body').innerHTML = html;
     }
+
+    let exCount = 3;
+    function addEx() {
+      exCount++;
+      const list = document.getElementById('ex-add-list');
+      const div = document.createElement('div');
+      div.className = 'ex-add-item';
+      div.innerHTML = `
+        <div class="ex-add-num">${exCount}</div>
+        <div class="ex-add-fields">
+          <input class="ex-add-input" type="text" placeholder="운동명 입력" />
+          <input class="ex-add-input" type="text" placeholder="세트" />
+          <input class="ex-add-input" type="text" placeholder="횟수/시간" />
+          <select class="ex-add-select">
+            <option>필수</option><option>권장</option><option>선택</option>
+          </select>
+        </div>
+        <button class="btn-del-ex" onclick="this.parentElement.remove();renum()">×</button>
+      `;
+      list.appendChild(div);
+    }
+    function renum() {
+      document.querySelectorAll('#ex-add-list .ex-add-num').forEach((n,i) => n.textContent = i+1);
+      exCount = document.querySelectorAll('#ex-add-list .ex-add-item').length;
+    }
+    document.querySelectorAll('#ex-add-list .btn-del-ex').forEach(btn => {
+      btn.onclick = function(){ this.parentElement.remove(); renum(); };
+    });
 
     showScreen(0, document.querySelector('.nav-btn.active'));
   </script>
