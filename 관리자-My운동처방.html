@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>관리자 My 운동처방 관리</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Noto Sans KR', sans-serif; background: #F0F4F8; color: #1A202C; min-height: 100vh; padding: 24px 20px 48px; }
+
+    h1 { font-size: 20px; font-weight: 900; margin-bottom: 4px; }
+    .subtitle { font-size: 13px; color: #718096; margin-bottom: 20px; }
+
+    .nav { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 28px; }
+    .nav-btn {
+      padding: 8px 18px; border-radius: 99px; border: 2px solid #E2E8F0;
+      background: #fff; font-size: 13px; font-weight: 700; cursor: pointer;
+      font-family: 'Noto Sans KR', sans-serif; color: #718096; transition: all 0.2s;
+    }
+    .nav-btn.active { background: #E67E22; border-color: #E67E22; color: #fff; box-shadow: 0 4px 12px rgba(230,126,34,0.35); }
+
+    /* 관리자 레이아웃: 좌측 사이드바 + 우측 콘텐츠 */
+    .admin-wrap { display: flex; gap: 20px; align-items: flex-start; }
+
+    /* 사이드바 */
+    .sidebar {
+      width: 220px; flex-shrink: 0; background: #1E2A3A; border-radius: 16px;
+      padding: 20px 0; color: #fff; min-height: 600px;
+    }
+    .sidebar-logo { padding: 0 20px 16px; border-bottom: 1px solid #2D3F54; margin-bottom: 12px; }
+    .sidebar-logo-title { font-size: 15px; font-weight: 900; color: #fff; }
+    .sidebar-logo-sub { font-size: 11px; color: #718096; margin-top: 2px; }
+    .sidebar-section { font-size: 10px; font-weight: 800; color: #4A6080; letter-spacing: 1.5px; padding: 8px 20px 4px; }
+    .sidebar-item {
+      display: flex; align-items: center; gap: 10px; padding: 10px 20px;
+      font-size: 13px; font-weight: 600; color: #A0AEC0; cursor: pointer; transition: all 0.15s;
+    }
+    .sidebar-item:hover { background: #2D3F54; color: #fff; }
+    .sidebar-item.active { background: #E67E22; color: #fff; border-right: 3px solid #F39C12; }
+    .sidebar-item-icon { font-size: 16px; width: 20px; text-align: center; }
+
+    /* 메인 콘텐츠 */
+    .main { flex: 1; min-width: 0; }
+
+    /* 화면들 */
+    .screen { display: none; }
+    .screen.active { display: block; }
+
+    /* 공통 페이지 헤더 */
+    .page-header { background: #fff; border-radius: 16px; padding: 20px 24px; margin-bottom: 16px; box-shadow: 0 1px 6px rgba(0,0,0,0.06); display: flex; align-items: center; justify-content: space-between; }
+    .page-title { font-size: 18px; font-weight: 900; color: #1A202C; }
+    .page-sub { font-size: 13px; color: #A0AEC0; margin-top: 2px; }
+    .page-actions { display: flex; gap: 8px; }
+    .btn-primary { background: #E67E22; color: #fff; border: none; border-radius: 10px; padding: 10px 18px; font-size: 13px; font-weight: 700; cursor: pointer; font-family: 'Noto Sans KR', sans-serif; }
+    .btn-secondary { background: #F0F4F8; color: #4A5568; border: none; border-radius: 10px; padding: 10px 18px; font-size: 13px; font-weight: 700; cursor: pointer; font-family: 'Noto Sans KR', sans-serif; }
+
+    /* 통계 카드 */
+    .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 16px; }
+    .stat-card { background: #fff; border-radius: 14px; padding: 16px 18px; box-shadow: 0 1px 6px rgba(0,0,0,0.06); }
+    .stat-card-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+    .stat-card-label { font-size: 12px; color: #A0AEC0; font-weight: 700; }
+    .stat-card-icon { font-size: 20px; }
+    .stat-card-val { font-size: 26px; font-weight: 900; color: #1A202C; }
+    .stat-card-change { font-size: 12px; margin-top: 4px; font-weight: 600; }
+    .change-up { color: #38A169; }
+    .change-down { color: #E53E3E; }
+
+    /* 검색바 */
+    .search-bar { background: #fff; border-radius: 14px; padding: 16px 20px; margin-bottom: 16px; box-shadow: 0 1px 6px rgba(0,0,0,0.06); display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+    .search-input { flex: 1; min-width: 200px; border: 1.5px solid #E2E8F0; border-radius: 10px; padding: 10px 14px; font-size: 13px; font-family: 'Noto Sans KR', sans-serif; outline: none; color: #2D3748; }
+    .search-input:focus { border-color: #E67E22; }
+    .filter-select { border: 1.5px solid #E2E8F0; border-radius: 10px; padding: 10px 12px; font-size: 13px; font-family: 'Noto Sans KR', sans-serif; color: #4A5568; outline: none; background: #fff; }
+
+    /* 테이블 */
+    .table-wrap { background: #fff; border-radius: 14px; box-shadow: 0 1px 6px rgba(0,0,0,0.06); overflow: hidden; margin-bottom: 16px; }
+    .table-header { display: flex; align-items: center; justify-content: space-between; padding: 16px 20px 12px; border-bottom: 1px solid #F0F4F8; }
+    .table-title { font-size: 14px; font-weight: 800; color: #2D3748; }
+    .table-count { font-size: 12px; color: #A0AEC0; font-weight: 600; }
+    table { width: 100%; border-collapse: collapse; }
+    thead th { background: #F7F9FC; padding: 12px 16px; text-align: left; font-size: 12px; font-weight: 800; color: #718096; letter-spacing: 0.5px; }
+    tbody tr { border-bottom: 1px solid #F0F4F8; transition: background 0.15s; cursor: pointer; }
+    tbody tr:last-child { border-bottom: none; }
+    tbody tr:hover { background: #FAFBFC; }
+    tbody td { padding: 13px 16px; font-size: 13px; color: #2D3748; vertical-align: middle; }
+    .td-name { font-weight: 700; }
+    .td-sub { font-size: 11px; color: #A0AEC0; margin-top: 2px; }
+
+    /* 뱃지 */
+    .badge { display: inline-block; padding: 3px 10px; border-radius: 99px; font-size: 11px; font-weight: 700; }
+    .badge-green  { background: #C6F6D5; color: #276749; }
+    .badge-orange { background: #FEEBC8; color: #C05621; }
+    .badge-blue   { background: #BEE3F8; color: #2A69AC; }
+    .badge-red    { background: #FED7D7; color: #C53030; }
+    .badge-gray   { background: #EDF2F7; color: #718096; }
+    .badge-purple { background: #E9D8FD; color: #6B46C1; }
+
+    /* 상세 패널 */
+    .detail-panel { background: #fff; border-radius: 14px; box-shadow: 0 1px 6px rgba(0,0,0,0.06); padding: 24px; margin-bottom: 16px; }
+    .detail-panel-title { font-size: 15px; font-weight: 900; color: #1A202C; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid #F0F4F8; display: flex; align-items: center; gap: 8px; }
+    .detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+    .detail-field { }
+    .detail-field-label { font-size: 11px; color: #A0AEC0; font-weight: 700; margin-bottom: 4px; letter-spacing: 0.5px; }
+    .detail-field-val { font-size: 14px; color: #2D3748; font-weight: 600; }
+
+    /* 운동 목록 */
+    .ex-list { display: flex; flex-direction: column; gap: 8px; }
+    .ex-item { display: flex; align-items: center; gap: 14px; background: #F7F9FC; border-radius: 12px; padding: 12px 16px; }
+    .ex-num { width: 28px; height: 28px; border-radius: 8px; background: #E67E22; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 900; flex-shrink: 0; }
+    .ex-info { flex: 1; }
+    .ex-name { font-size: 14px; font-weight: 700; color: #2D3748; }
+    .ex-detail { font-size: 12px; color: #A0AEC0; margin-top: 2px; }
+    .ex-grade { font-size: 12px; font-weight: 700; }
+
+    /* 이력 타임라인 */
+    .timeline { display: flex; flex-direction: column; gap: 0; }
+    .timeline-item { display: flex; gap: 16px; padding-bottom: 20px; position: relative; }
+    .timeline-item:last-child { padding-bottom: 0; }
+    .timeline-left { display: flex; flex-direction: column; align-items: center; width: 40px; flex-shrink: 0; }
+    .timeline-dot { width: 14px; height: 14px; border-radius: 50%; border: 2px solid #E67E22; background: #fff; z-index: 1; flex-shrink: 0; }
+    .timeline-dot.done { background: #E67E22; }
+    .timeline-line { width: 2px; background: #E2E8F0; flex: 1; margin-top: 4px; }
+    .timeline-content { flex: 1; }
+    .timeline-date { font-size: 12px; color: #A0AEC0; font-weight: 600; margin-bottom: 4px; }
+    .timeline-card { background: #F7F9FC; border-radius: 12px; padding: 12px 16px; }
+    .timeline-title { font-size: 14px; font-weight: 700; color: #2D3748; margin-bottom: 4px; }
+    .timeline-sub { font-size: 12px; color: #718096; }
+    .timeline-stats { display: flex; gap: 12px; margin-top: 8px; flex-wrap: wrap; }
+    .timeline-stat { font-size: 12px; color: #4A5568; font-weight: 600; }
+    .timeline-stat span { color: #E67E22; font-weight: 800; }
+
+    /* 신청 접수 카드 */
+    .request-list { display: flex; flex-direction: column; gap: 10px; }
+    .request-card { background: #F7F9FC; border-radius: 14px; padding: 16px 20px; display: flex; align-items: flex-start; gap: 16px; border-left: 4px solid #E2E8F0; }
+    .request-card.pending  { border-left-color: #F6AD55; }
+    .request-card.process  { border-left-color: #4299E1; }
+    .request-card.complete { border-left-color: #48BB78; }
+    .request-card.rejected { border-left-color: #FC8181; }
+    .request-info { flex: 1; }
+    .request-member { font-size: 14px; font-weight: 800; color: #1A202C; margin-bottom: 4px; }
+    .request-desc { font-size: 13px; color: #4A5568; line-height: 1.5; margin-bottom: 8px; }
+    .request-meta { display: flex; gap: 12px; flex-wrap: wrap; }
+    .request-meta-item { font-size: 12px; color: #A0AEC0; font-weight: 600; }
+    .request-actions { display: flex; flex-direction: column; gap: 6px; align-items: flex-end; }
+    .btn-action { border: none; border-radius: 8px; padding: 7px 14px; font-size: 12px; font-weight: 700; cursor: pointer; font-family: 'Noto Sans KR', sans-serif; white-space: nowrap; }
+    .btn-assign  { background: #BEE3F8; color: #2A69AC; }
+    .btn-complete { background: #C6F6D5; color: #276749; }
+    .btn-reject  { background: #FED7D7; color: #C53030; }
+
+    /* 트레이너 지정 드롭다운 */
+    .assign-row { display: flex; align-items: center; gap: 8px; margin-top: 6px; }
+    .assign-select { border: 1.5px solid #E2E8F0; border-radius: 8px; padding: 6px 10px; font-size: 12px; font-family: 'Noto Sans KR', sans-serif; color: #4A5568; outline: none; }
+
+    /* 페이지네이션 */
+    .pagination { display: flex; justify-content: center; gap: 4px; padding: 16px 0 4px; }
+    .page-btn { width: 32px; height: 32px; border-radius: 8px; border: 1.5px solid #E2E8F0; background: #fff; font-size: 13px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; color: #718096; }
+    .page-btn.active { background: #E67E22; border-color: #E67E22; color: #fff; }
+
+    /* 메모판 */
+    .memo-panel { background: #fff; border-radius: 16px; padding: 22px; box-shadow: 0 1px 6px rgba(0,0,0,0.06); min-height: 200px; }
+    .memo-panel-title { font-size: 14px; font-weight: 900; color: #2D3748; margin-bottom: 4px; }
+    .memo-panel-id { font-size: 12px; color: #A0AEC0; font-weight: 600; margin-bottom: 14px; }
+    .memo-divider { height: 1px; background: #F0F4F8; margin-bottom: 14px; }
+    .memo-section-title { font-size: 11px; font-weight: 800; color: #A0AEC0; letter-spacing: 1px; margin-bottom: 8px; }
+    .memo-item { display: flex; gap: 8px; margin-bottom: 7px; align-items: flex-start; }
+    .memo-dot { width: 6px; height: 6px; border-radius: 50%; background: #E67E22; margin-top: 5px; flex-shrink: 0; }
+    .memo-text { font-size: 13px; color: #4A5568; line-height: 1.6; }
+    .memo-tag { display: inline-block; padding: 3px 10px; border-radius: 99px; font-size: 11px; font-weight: 700; margin: 2px 2px; }
+    .memo-section { margin-bottom: 18px; }
+  </style>
+</head>
+<body>
+  <h1>💊 관리자 My 운동처방 관리</h1>
+  <p class="subtitle">관리자 앱 · My 운동처방 관리 · 4개 화면 목업</p>
+
+  <div class="nav">
+    <button class="nav-btn active" onclick="showScreen(0,this)">① 회원별 처방 현황</button>
+    <button class="nav-btn" onclick="showScreen(1,this)">② 처방 상세 조회</button>
+    <button class="nav-btn" onclick="showScreen(2,this)">③ 운동 진행/완료 이력</button>
+    <button class="nav-btn" onclick="showScreen(3,this)">④ 처방 신청 접수 관리</button>
+  </div>
+
+  <div class="admin-wrap">
+    <!-- 사이드바 -->
+    <div class="sidebar">
+      <div class="sidebar-logo">
+        <div class="sidebar-logo-title">💼 헬스케어 관리자</div>
+        <div class="sidebar-logo-sub">Admin Dashboard</div>
+      </div>
+      <div class="sidebar-section">회원 관리</div>
+      <div class="sidebar-item"><span class="sidebar-item-icon">👥</span>회원 목록</div>
+      <div class="sidebar-section">운동처방</div>
+      <div class="sidebar-item active"><span class="sidebar-item-icon">💊</span>My 운동처방 관리</div>
+      <div class="sidebar-item"><span class="sidebar-item-icon">📝</span>운동처방 관리</div>
+      <div class="sidebar-section">콘텐츠</div>
+      <div class="sidebar-item"><span class="sidebar-item-icon">🏋️</span>운동법 관리</div>
+      <div class="sidebar-item"><span class="sidebar-item-icon">🔄</span>마이루틴 관리</div>
+      <div class="sidebar-section">기타</div>
+      <div class="sidebar-item"><span class="sidebar-item-icon">📊</span>대시보드</div>
+      <div class="sidebar-item"><span class="sidebar-item-icon">⚙️</span>설정</div>
+    </div>
+
+    <!-- 메인 콘텐츠 -->
+    <div class="main">
+
+      <!-- ① 회원별 My 운동처방 현황 -->
+      <div class="screen active" id="s0">
+        <div class="page-header">
+          <div>
+            <div class="page-title">회원별 My 운동처방 현황</div>
+            <div class="page-sub">회원 검색 후 해당 회원의 처방 내역을 조회합니다</div>
+          </div>
+          <div class="page-actions">
+            <button class="btn-secondary">내보내기</button>
+            <button class="btn-primary">+ 처방 등록</button>
+          </div>
+        </div>
+
+        <div class="stats-row">
+          <div class="stat-card">
+            <div class="stat-card-top"><span class="stat-card-label">전체 처방 회원</span><span class="stat-card-icon">👤</span></div>
+            <div class="stat-card-val">248</div>
+            <div class="stat-card-change change-up">▲ 12명 (이번달)</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-card-top"><span class="stat-card-label">활성 처방</span><span class="stat-card-icon">✅</span></div>
+            <div class="stat-card-val">183</div>
+            <div class="stat-card-change change-up">▲ 8건</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-card-top"><span class="stat-card-label">신청 대기</span><span class="stat-card-icon">⏳</span></div>
+            <div class="stat-card-val">14</div>
+            <div class="stat-card-change change-down">▲ 3건 미처리</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-card-top"><span class="stat-card-label">이번달 완료 운동</span><span class="stat-card-icon">🏃</span></div>
+            <div class="stat-card-val">1,042</div>
+            <div class="stat-card-change change-up">▲ 15%</div>
+          </div>
+        </div>
+
+        <div class="search-bar">
+          <input class="search-input" type="text" placeholder="🔍  회원명 또는 전화번호 검색" />
+          <select class="filter-select">
+            <option>전체 지점</option>
+            <option>강남점</option>
+            <option>서초점</option>
+          </select>
+          <select class="filter-select">
+            <option>전체 등급</option>
+            <option>초급</option>
+            <option>중급</option>
+            <option>고급</option>
+          </select>
+          <select class="filter-select">
+            <option>전체 상태</option>
+            <option>활성</option>
+            <option>완료</option>
+            <option>대기</option>
+          </select>
+        </div>
+
+        <div class="table-wrap">
+          <div class="table-header">
+            <span class="table-title">처방 회원 목록</span>
+            <span class="table-count">총 248명</span>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>회원명</th>
+                <th>처방명</th>
+                <th>처방일</th>
+                <th>운동 등급</th>
+                <th>담당 트레이너</th>
+                <th>마지막 수행</th>
+                <th>상태</th>
+                <th>관리</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr onclick="showScreen(1,document.querySelectorAll('.nav-btn')[1])">
+                <td><div class="td-name">김도산</div><div class="td-sub">010-1234-5678</div></td>
+                <td><div class="td-name">디스크시술 5주차</div></td>
+                <td>24.06.27</td>
+                <td><span class="badge badge-blue">중급</span></td>
+                <td>김트레이너</td>
+                <td>오늘</td>
+                <td><span class="badge badge-green">활성</span></td>
+                <td><button class="btn-action btn-assign" style="background:#FEEBC8;color:#C05621;">상세보기</button></td>
+              </tr>
+              <tr>
+                <td><div class="td-name">이민준</div><div class="td-sub">010-2345-6789</div></td>
+                <td><div class="td-name">F, Core 3x2</div></td>
+                <td>24.03.28</td>
+                <td><span class="badge badge-green">초급</span></td>
+                <td>박트레이너</td>
+                <td>3일 전</td>
+                <td><span class="badge badge-green">활성</span></td>
+                <td><button class="btn-action btn-assign" style="background:#FEEBC8;color:#C05621;">상세보기</button></td>
+              </tr>
+              <tr>
+                <td><div class="td-name">최수진</div><div class="td-sub">010-3456-7890</div></td>
+                <td><div class="td-name">다이어트2</div></td>
+                <td>20.10.07</td>
+                <td><span class="badge badge-orange">고급</span></td>
+                <td>이트레이너</td>
+                <td>1주 전</td>
+                <td><span class="badge badge-gray">완료</span></td>
+                <td><button class="btn-action btn-assign" style="background:#FEEBC8;color:#C05621;">상세보기</button></td>
+              </tr>
+              <tr>
+                <td><div class="td-name">박현우</div><div class="td-sub">010-4567-8901</div></td>
+                <td><div class="td-name">신청 처리중</div></td>
+                <td>—</td>
+                <td><span class="badge badge-gray">미배정</span></td>
+                <td>—</td>
+                <td>—</td>
+                <td><span class="badge badge-blue">대기</span></td>
+                <td><button class="btn-action btn-assign" style="background:#FEEBC8;color:#C05621;">접수확인</button></td>
+              </tr>
+              <tr>
+                <td><div class="td-name">정유나</div><div class="td-sub">010-5678-9012</div></td>
+                <td><div class="td-name">F, Cx core 2x4</div></td>
+                <td>21.04.08</td>
+                <td><span class="badge badge-blue">중급</span></td>
+                <td>김트레이너</td>
+                <td>2일 전</td>
+                <td><span class="badge badge-green">활성</span></td>
+                <td><button class="btn-action btn-assign" style="background:#FEEBC8;color:#C05621;">상세보기</button></td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="pagination">
+            <button class="page-btn active">1</button>
+            <button class="page-btn">2</button>
+            <button class="page-btn">3</button>
+            <button class="page-btn">›</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ② 처방 상세 조회 -->
+      <div class="screen" id="s1">
+        <div class="page-header">
+          <div>
+            <div class="page-title">처방 상세 조회</div>
+            <div class="page-sub">김도산 · 디스크시술 5주차</div>
+          </div>
+          <div class="page-actions">
+            <button class="btn-secondary" onclick="showScreen(0,document.querySelectorAll('.nav-btn')[0])">← 목록</button>
+            <button class="btn-primary">처방 수정</button>
+          </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
+          <div class="detail-panel">
+            <div class="detail-panel-title">📋 처방 기본 정보</div>
+            <div class="detail-grid">
+              <div class="detail-field">
+                <div class="detail-field-label">회원명</div>
+                <div class="detail-field-val">김도산</div>
+              </div>
+              <div class="detail-field">
+                <div class="detail-field-label">연락처</div>
+                <div class="detail-field-val">010-1234-5678</div>
+              </div>
+              <div class="detail-field">
+                <div class="detail-field-label">처방명</div>
+                <div class="detail-field-val">디스크시술 5주차</div>
+              </div>
+              <div class="detail-field">
+                <div class="detail-field-label">처방일</div>
+                <div class="detail-field-val">2024.06.27</div>
+              </div>
+              <div class="detail-field">
+                <div class="detail-field-label">운동 등급</div>
+                <div class="detail-field-val"><span class="badge badge-blue">중급</span></div>
+              </div>
+              <div class="detail-field">
+                <div class="detail-field-label">담당 트레이너</div>
+                <div class="detail-field-val">김트레이너</div>
+              </div>
+              <div class="detail-field">
+                <div class="detail-field-label">상태</div>
+                <div class="detail-field-val"><span class="badge badge-green">활성</span></div>
+              </div>
+              <div class="detail-field">
+                <div class="detail-field-label">총 수행 횟수</div>
+                <div class="detail-field-val">23회</div>
+              </div>
+            </div>
+            <div class="detail-field" style="margin-top:4px;">
+              <div class="detail-field-label">트레이너 메모</div>
+              <div style="background:#F7F9FC;border-radius:10px;padding:12px;font-size:13px;color:#4A5568;line-height:1.6;margin-top:6px;">
+                허리에 무리가 가지 않도록 천천히 진행하세요. 통증 발생 시 즉시 중단. 4주차 이후 강도 점진적 증가 예정.
+              </div>
+            </div>
+          </div>
+
+          <div class="detail-panel">
+            <div class="detail-panel-title">🏋️ 처방 운동 목록</div>
+            <div class="ex-list">
+              <div class="ex-item">
+                <div class="ex-num">1</div>
+                <div class="ex-info">
+                  <div class="ex-name">맥켄지 신전 운동</div>
+                  <div class="ex-detail">3세트 × 10회 · 세트 간 휴식 60초</div>
+                </div>
+                <span class="badge badge-blue">필수</span>
+              </div>
+              <div class="ex-item">
+                <div class="ex-num">2</div>
+                <div class="ex-info">
+                  <div class="ex-name">코어 안정화 운동</div>
+                  <div class="ex-detail">3세트 × 15회 · 세트 간 휴식 45초</div>
+                </div>
+                <span class="badge badge-blue">필수</span>
+              </div>
+              <div class="ex-item">
+                <div class="ex-num">3</div>
+                <div class="ex-info">
+                  <div class="ex-name">고관절 스트레칭</div>
+                  <div class="ex-detail">2세트 × 30초 유지</div>
+                </div>
+                <span class="badge badge-green">권장</span>
+              </div>
+              <div class="ex-item">
+                <div class="ex-num">4</div>
+                <div class="ex-info">
+                  <div class="ex-name">허리 굴곡 운동</div>
+                  <div class="ex-detail">2세트 × 12회</div>
+                </div>
+                <span class="badge badge-green">권장</span>
+              </div>
+              <div class="ex-item">
+                <div class="ex-num">5</div>
+                <div class="ex-info">
+                  <div class="ex-name">골반 교정 스트레칭</div>
+                  <div class="ex-detail">1세트 × 60초</div>
+                </div>
+                <span class="badge badge-gray">선택</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ③ 운동 진행 / 완료 이력 -->
+      <div class="screen" id="s2">
+        <div class="page-header">
+          <div>
+            <div class="page-title">운동 진행 / 완료 이력</div>
+            <div class="page-sub">김도산 · 디스크시술 5주차</div>
+          </div>
+          <div class="page-actions">
+            <button class="btn-secondary">CSV 내보내기</button>
+          </div>
+        </div>
+
+        <div class="stats-row" style="grid-template-columns:repeat(3,1fr);">
+          <div class="stat-card">
+            <div class="stat-card-top"><span class="stat-card-label">총 수행 횟수</span><span class="stat-card-icon">🔁</span></div>
+            <div class="stat-card-val">23</div>
+            <div class="stat-card-change" style="color:#A0AEC0;">처방 이후 누적</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-card-top"><span class="stat-card-label">완료율</span><span class="stat-card-icon">✅</span></div>
+            <div class="stat-card-val">87%</div>
+            <div class="stat-card-change change-up">▲ 완료 20회 / 중단 3회</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-card-top"><span class="stat-card-label">평균 소요시간</span><span class="stat-card-icon">⏱</span></div>
+            <div class="stat-card-val">32분</div>
+            <div class="stat-card-change" style="color:#A0AEC0;">목표 35분 대비</div>
+          </div>
+        </div>
+
+        <div class="detail-panel">
+          <div class="detail-panel-title">📅 회차별 수행 이력</div>
+          <div class="timeline">
+            <div class="timeline-item">
+              <div class="timeline-left">
+                <div class="timeline-dot done"></div>
+                <div class="timeline-line"></div>
+              </div>
+              <div class="timeline-content">
+                <div class="timeline-date">2026.03.17 (오늘)</div>
+                <div class="timeline-card">
+                  <div class="timeline-title">23회차 · <span class="badge badge-green" style="font-size:11px;">완료</span></div>
+                  <div class="timeline-stats">
+                    <div class="timeline-stat">소요시간 <span>34분</span></div>
+                    <div class="timeline-stat">완료 운동 <span>5/5</span></div>
+                    <div class="timeline-stat">총 세트 <span>13세트</span></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="timeline-item">
+              <div class="timeline-left">
+                <div class="timeline-dot done"></div>
+                <div class="timeline-line"></div>
+              </div>
+              <div class="timeline-content">
+                <div class="timeline-date">2026.03.14</div>
+                <div class="timeline-card">
+                  <div class="timeline-title">22회차 · <span class="badge badge-green" style="font-size:11px;">완료</span></div>
+                  <div class="timeline-stats">
+                    <div class="timeline-stat">소요시간 <span>29분</span></div>
+                    <div class="timeline-stat">완료 운동 <span>5/5</span></div>
+                    <div class="timeline-stat">총 세트 <span>13세트</span></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="timeline-item">
+              <div class="timeline-left">
+                <div class="timeline-dot done"></div>
+                <div class="timeline-line"></div>
+              </div>
+              <div class="timeline-content">
+                <div class="timeline-date">2026.03.11</div>
+                <div class="timeline-card">
+                  <div class="timeline-title">21회차 · <span class="badge badge-red" style="font-size:11px;">중단</span></div>
+                  <div class="timeline-stats">
+                    <div class="timeline-stat">소요시간 <span>12분</span></div>
+                    <div class="timeline-stat">완료 운동 <span>2/5</span></div>
+                    <div class="timeline-stat">중단 사유 <span>허리 통증</span></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="timeline-item">
+              <div class="timeline-left">
+                <div class="timeline-dot done"></div>
+                <div class="timeline-line"></div>
+              </div>
+              <div class="timeline-content">
+                <div class="timeline-date">2026.03.08</div>
+                <div class="timeline-card">
+                  <div class="timeline-title">20회차 · <span class="badge badge-green" style="font-size:11px;">완료</span></div>
+                  <div class="timeline-stats">
+                    <div class="timeline-stat">소요시간 <span>38분</span></div>
+                    <div class="timeline-stat">완료 운동 <span>5/5</span></div>
+                    <div class="timeline-stat">총 세트 <span>13세트</span></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="timeline-item">
+              <div class="timeline-left">
+                <div class="timeline-dot"></div>
+              </div>
+              <div class="timeline-content">
+                <div class="timeline-date" style="color:#A0AEC0;">이전 이력 19건 더보기 →</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ④ 처방 신청 접수 관리 -->
+      <div class="screen" id="s3">
+        <div class="page-header">
+          <div>
+            <div class="page-title">처방 신청 접수 관리</div>
+            <div class="page-sub">회원이 요청한 처방 신청을 처리합니다</div>
+          </div>
+          <div class="page-actions">
+            <select class="filter-select">
+              <option>전체 상태</option>
+              <option>대기</option>
+              <option>처리중</option>
+              <option>완료</option>
+              <option>반려</option>
+            </select>
+            <select class="filter-select">
+              <option>전체 트레이너</option>
+              <option>김트레이너</option>
+              <option>박트레이너</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="stats-row">
+          <div class="stat-card">
+            <div class="stat-card-top"><span class="stat-card-label">대기</span><span class="stat-card-icon">⏳</span></div>
+            <div class="stat-card-val" style="color:#F6AD55;">14</div>
+            <div class="stat-card-change change-down">미처리 신청</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-card-top"><span class="stat-card-label">처리중</span><span class="stat-card-icon">🔄</span></div>
+            <div class="stat-card-val" style="color:#4299E1;">7</div>
+            <div class="stat-card-change" style="color:#A0AEC0;">트레이너 작업중</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-card-top"><span class="stat-card-label">이번달 완료</span><span class="stat-card-icon">✅</span></div>
+            <div class="stat-card-val" style="color:#48BB78;">52</div>
+            <div class="stat-card-change change-up">▲ 전월 대비 +8</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-card-top"><span class="stat-card-label">반려</span><span class="stat-card-icon">❌</span></div>
+            <div class="stat-card-val" style="color:#FC8181;">3</div>
+            <div class="stat-card-change" style="color:#A0AEC0;">이번달</div>
+          </div>
+        </div>
+
+        <div class="detail-panel">
+          <div class="detail-panel-title">📨 신청 목록</div>
+          <div class="request-list">
+
+            <div class="request-card pending">
+              <div class="request-info">
+                <div class="request-member">박현우 <span style="font-size:12px;font-weight:400;color:#A0AEC0;">· 010-4567-8901</span></div>
+                <div class="request-desc">허리 디스크 재활 운동 처방을 받고 싶습니다. 최근 병원에서 L4-L5 추간판 탈출증 진단을 받았고 수술 없이 재활을 원합니다.</div>
+                <div class="request-meta">
+                  <span class="request-meta-item">📅 신청일: 2026.03.17</span>
+                  <span class="request-meta-item">🏥 강남점</span>
+                  <span class="request-meta-item">이전 처방: 없음</span>
+                </div>
+                <div class="assign-row">
+                  <span style="font-size:12px;font-weight:700;color:#4A5568;">담당 트레이너:</span>
+                  <select class="assign-select">
+                    <option>트레이너 선택</option>
+                    <option>김트레이너</option>
+                    <option>박트레이너</option>
+                    <option>이트레이너</option>
+                  </select>
+                </div>
+              </div>
+              <div class="request-actions">
+                <span class="badge badge-orange">대기</span>
+                <button class="btn-action btn-assign">트레이너 지정</button>
+                <button class="btn-action btn-reject">반려</button>
+              </div>
+            </div>
+
+            <div class="request-card process">
+              <div class="request-info">
+                <div class="request-member">한소희 <span style="font-size:12px;font-weight:400;color:#A0AEC0;">· 010-6789-0123</span></div>
+                <div class="request-desc">무릎 통증으로 하체 강화 운동이 필요합니다. 연골 연화증 진단 후 물리치료와 병행하고 싶습니다.</div>
+                <div class="request-meta">
+                  <span class="request-meta-item">📅 신청일: 2026.03.15</span>
+                  <span class="request-meta-item">🏥 서초점</span>
+                  <span class="request-meta-item">담당: 이트레이너</span>
+                </div>
+              </div>
+              <div class="request-actions">
+                <span class="badge badge-blue">처리중</span>
+                <button class="btn-action btn-complete">완료 처리</button>
+                <button class="btn-action btn-reject">반려</button>
+              </div>
+            </div>
+
+            <div class="request-card complete">
+              <div class="request-info">
+                <div class="request-member">오민석 <span style="font-size:12px;font-weight:400;color:#A0AEC0;">· 010-7890-1234</span></div>
+                <div class="request-desc">다이어트 목적 유산소·근력 복합 운동 처방 요청</div>
+                <div class="request-meta">
+                  <span class="request-meta-item">📅 신청일: 2026.03.10</span>
+                  <span class="request-meta-item">📅 완료일: 2026.03.12</span>
+                  <span class="request-meta-item">담당: 박트레이너</span>
+                </div>
+              </div>
+              <div class="request-actions">
+                <span class="badge badge-green">완료</span>
+                <button class="btn-action" style="background:#F7F9FC;color:#718096;">처방 보기</button>
+              </div>
+            </div>
+
+            <div class="request-card rejected">
+              <div class="request-info">
+                <div class="request-member">윤지현 <span style="font-size:12px;font-weight:400;color:#A0AEC0;">· 010-8901-2345</span></div>
+                <div class="request-desc">어깨 충돌 증후군 재활 처방 요청</div>
+                <div class="request-meta">
+                  <span class="request-meta-item">📅 신청일: 2026.03.08</span>
+                  <span class="request-meta-item">반려 사유: 전문 병원 치료 우선 권장</span>
+                </div>
+              </div>
+              <div class="request-actions">
+                <span class="badge badge-red">반려</span>
+                <button class="btn-action" style="background:#F7F9FC;color:#718096;">사유 보기</button>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+    </div><!-- main end -->
+  </div><!-- admin-wrap end -->
+
+  <!-- 메모판 -->
+  <div class="memo-panel" style="margin-top:20px;" id="memo-panel">
+    <div class="memo-panel-title" id="memo-title">① 회원별 My 운동처방 현황</div>
+    <div class="memo-panel-id" id="memo-id">amp01 · 필수 · FE/BE</div>
+    <div class="memo-divider"></div>
+    <div id="memo-body"></div>
+  </div>
+
+  <script>
+    const memos = [
+      {
+        title:"① 회원별 My 운동처방 현황",
+        id:"amp01 · 필수 · FE/BE",
+        sections:[
+          { title:"화면 구성", items:["상단 통계 카드 4개 (처방 회원 수·활성 처방·신청 대기·완료 운동)", "회원 검색 + 지점·등급·상태 필터", "처방 회원 목록 테이블 (회원명·처방명·처방일·등급·담당·마지막 수행·상태)", "행 클릭 → 처방 상세 조회로 이동"] },
+          { title:"동작", items:["회원명/전화번호 검색 → 실시간 필터링", "테이블 행 클릭 → 처방 상세 화면", "[+ 처방 등록] → 신규 처방 등록 폼", "[내보내기] → CSV 다운로드"] },
+          { title:"API", items:["GET /admin/prescriptions?memberId=&status=&grade=&branch=", "GET /admin/prescriptions/stats"] }
+        ],
+        tags:[["#회원검색","#E67E22"],["#처방목록","#4299E1"],["#통계","#48BB78"]]
+      },
+      {
+        title:"② 처방 상세 조회",
+        id:"amp02 · 필수 · FE/BE",
+        sections:[
+          { title:"화면 구성", items:["처방 기본 정보 (회원명·연락처·처방명·처방일·등급·담당·상태·수행횟수)", "트레이너 메모 영역", "처방 운동 목록 (순서·운동명·세트×횟수·필수/권장/선택)"] },
+          { title:"동작", items:["[처방 수정] → 수정 가능 필드 활성화", "[← 목록] → 회원별 처방 현황으로 이동", "사용자 앱에서 회원이 보는 뷰와 동일한 내용 표시"] },
+          { title:"API", items:["GET /admin/prescriptions/:id", "PUT /admin/prescriptions/:id"] }
+        ],
+        tags:[["#처방상세","#E67E22"],["#운동목록","#9B6DFF"],["#트레이너메모","#48BB78"]]
+      },
+      {
+        title:"③ 운동 진행 / 완료 이력",
+        id:"amp03 · 필수 · FE/BE",
+        sections:[
+          { title:"화면 구성", items:["요약 카드 3개 (총 수행 횟수·완료율·평균 소요시간)", "회차별 타임라인 (수행일·완료여부·소요시간·완료 운동수)", "중단 시 사유 표시", "더보기 페이지네이션"] },
+          { title:"동작", items:["각 회차 클릭 → 해당 회차 세부 운동 결과 확인", "[CSV 내보내기] → 이력 데이터 다운로드", "완료/중단 뱃지로 한눈에 현황 파악"] },
+          { title:"API", items:["GET /admin/prescriptions/:id/history?page=", "GET /admin/prescriptions/:id/history/:sessionId"] }
+        ],
+        tags:[["#완료이력","#E67E22"],["#타임라인","#4299E1"],["#완료율","#48BB78"],["#중단사유","#FC8181"]]
+      },
+      {
+        title:"④ 처방 신청 접수 관리",
+        id:"amp04 · 필수 · FE/BE",
+        sections:[
+          { title:"화면 구성", items:["상단 통계 4개 (대기·처리중·이번달 완료·반려)", "상태·트레이너 필터", "신청 카드 목록 (좌측 컬러 바로 상태 구분)", "신청서 내용·신청일·담당트레이너·상태 표시", "대기: 트레이너 지정 드롭다운 + 지정/반려 버튼", "처리중: 완료 처리/반려 버튼"] },
+          { title:"동작", items:["트레이너 지정 선택 → [트레이너 지정] 클릭 → 상태 '처리중'으로 변경", "완료 처리 → 상태 '완료', 해당 회원 앱에 처방 노출", "반려 클릭 → 사유 입력 모달 → 회원에게 알림 발송"] },
+          { title:"API", items:["GET /admin/prescription-requests?status=&trainer=", "PATCH /admin/prescription-requests/:id/assign", "PATCH /admin/prescription-requests/:id/complete", "PATCH /admin/prescription-requests/:id/reject"] }
+        ],
+        tags:[["#신청접수","#E67E22"],["#트레이너지정","#4299E1"],["#완료처리","#48BB78"],["#반려","#FC8181"]]
+      }
+    ];
+
+    function showScreen(idx, btn) {
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+      document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.sidebar-item').forEach(b => b.classList.remove('active'));
+      document.getElementById('s'+idx).classList.add('active');
+      btn.classList.add('active');
+      document.querySelectorAll('.sidebar-item')[1].classList.add('active');
+
+      const m = memos[idx];
+      document.getElementById('memo-title').textContent = m.title;
+      document.getElementById('memo-id').textContent = m.id;
+      let html = '';
+      m.sections.forEach(sec => {
+        html += `<div class="memo-section"><div class="memo-section-title">${sec.title}</div>`;
+        sec.items.forEach(it => {
+          html += `<div class="memo-item"><div class="memo-dot"></div><div class="memo-text">${it}</div></div>`;
+        });
+        html += '</div>';
+      });
+      if(m.tags) {
+        html += '<div class="memo-section"><div class="memo-section-title">태그</div><div>';
+        m.tags.forEach(([l,c]) => { html += `<span class="memo-tag" style="background:${c}22;color:${c};">${l}</span>`; });
+        html += '</div></div>';
+      }
+      document.getElementById('memo-body').innerHTML = html;
+    }
+
+    showScreen(0, document.querySelector('.nav-btn.active'));
+  </script>
+</body>
+</html>
