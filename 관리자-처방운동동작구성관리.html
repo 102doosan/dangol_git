@@ -196,6 +196,27 @@
     .top5-meta { font-size: 11px; color: #A0AEC0; margin-top: 1px; }
     .top5-cnt { font-size: 14px; font-weight: 900; color: #5A67D8; }
 
+    /* 부위 관리 화면 */
+    .part-manage-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; margin-bottom: 24px; }
+    .part-card { background: #fff; border-radius: 14px; box-shadow: 0 1px 6px rgba(0,0,0,0.07); padding: 20px; display: flex; align-items: center; gap: 16px; border: 2px solid transparent; transition: box-shadow .2s; }
+    .part-card:hover { box-shadow: 0 4px 14px rgba(0,0,0,0.1); }
+    .part-card-dot { width: 44px; height: 44px; border-radius: 50%; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 20px; }
+    .part-card-info { flex: 1; min-width: 0; }
+    .part-card-name { font-size: 15px; font-weight: 900; color: #1A202C; margin-bottom: 2px; }
+    .part-card-en { font-size: 12px; color: #A0AEC0; font-weight: 600; margin-bottom: 6px; }
+    .part-card-cnt { font-size: 12px; font-weight: 700; }
+    .part-card-actions { display: flex; gap: 6px; flex-shrink: 0; }
+    .btn-part-edit { background: #EBF4FF; color: #5A67D8; border: none; border-radius: 8px; padding: 6px 12px; font-size: 12px; font-weight: 700; cursor: pointer; font-family: 'Noto Sans KR', sans-serif; }
+    .btn-part-del  { background: #FFF5F5; color: #E53E3E; border: none; border-radius: 8px; padding: 6px 12px; font-size: 12px; font-weight: 700; cursor: pointer; font-family: 'Noto Sans KR', sans-serif; }
+    .part-add-form { background: #fff; border-radius: 14px; box-shadow: 0 1px 6px rgba(0,0,0,0.07); padding: 24px; border: 2px dashed #CBD5E0; }
+    .part-add-form.editing { border-color: #5A67D8; border-style: solid; }
+    .part-add-title { font-size: 15px; font-weight: 900; color: #1A202C; margin-bottom: 18px; padding-bottom: 12px; border-bottom: 1px solid #F0F4F8; }
+    .color-palette { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 8px; }
+    .color-swatch { width: 30px; height: 30px; border-radius: 50%; cursor: pointer; border: 3px solid transparent; transition: all .15s; }
+    .color-swatch.selected { border-color: #1A202C; transform: scale(1.15); }
+    .color-custom { display: flex; align-items: center; gap: 8px; margin-top: 10px; }
+    .color-custom input[type=color] { width: 36px; height: 36px; border: none; border-radius: 8px; cursor: pointer; padding: 0; background: none; }
+
     /* 메모판 */
     .memo-panel { background: #fff; border-radius: 16px; padding: 22px; box-shadow: 0 1px 6px rgba(0,0,0,0.06); min-height: 180px; margin-top: 20px; }
     .memo-panel-title { font-size: 14px; font-weight: 900; color: #2D3748; margin-bottom: 4px; }
@@ -217,6 +238,7 @@
     <button class="nav-btn active" onclick="showScreen(0,this)">① 운동 동작 목록</button>
     <button class="nav-btn" onclick="showScreen(1,this)">② 운동 동작 등록/수정</button>
     <button class="nav-btn" onclick="showScreen(2,this)">③ 부위별 현황 통계</button>
+    <button class="nav-btn" onclick="showScreen(3,this)">④ 운동 부위 관리</button>
   </div>
 
   <div class="admin-wrap">
@@ -660,6 +682,66 @@
         </div>
       </div>
 
+      <!-- ④ 운동 부위 관리 -->
+      <div class="screen" id="s3">
+        <div class="page-header">
+          <div>
+            <div class="page-title">운동 부위 관리</div>
+            <div class="page-sub">운동 부위를 추가·수정·삭제합니다</div>
+          </div>
+          <div class="page-actions">
+            <button class="btn-primary" onclick="openPartForm()">+ 부위 추가</button>
+          </div>
+        </div>
+
+        <!-- 현재 부위 목록 -->
+        <div class="part-manage-grid" id="partGrid"></div>
+
+        <!-- 추가/수정 폼 -->
+        <div class="part-add-form" id="partAddForm" style="display:none">
+          <div class="part-add-title" id="partFormTitle">새 운동 부위 추가</div>
+          <input type="hidden" id="partEditKey" value="">
+          <div class="form-row">
+            <div class="form-group">
+              <div class="form-label">부위명 (한국어) <span class="required">*</span></div>
+              <input class="form-input" id="partNameKo" placeholder="예: 발목·발" />
+            </div>
+            <div class="form-group">
+              <div class="form-label">부위명 (영문) <span class="required">*</span></div>
+              <input class="form-input" id="partNameEn" placeholder="예: ankle" />
+            </div>
+          </div>
+          <div class="form-row-full">
+            <div class="form-label" style="margin-bottom:8px;">대표 아이콘 (이모지)</div>
+            <input class="form-input" id="partIcon" placeholder="예: 🦶" style="max-width:120px;" />
+          </div>
+          <div class="form-row-full">
+            <div class="form-label" style="margin-bottom:8px;">대표 색상 <span class="required">*</span></div>
+            <div class="color-palette" id="colorPalette">
+              <div class="color-swatch" style="background:#805AD5" data-color="#805AD5" onclick="selectSwatch(this)"></div>
+              <div class="color-swatch" style="background:#E53E3E" data-color="#E53E3E" onclick="selectSwatch(this)"></div>
+              <div class="color-swatch" style="background:#E67E22" data-color="#E67E22" onclick="selectSwatch(this)"></div>
+              <div class="color-swatch" style="background:#3182CE" data-color="#3182CE" onclick="selectSwatch(this)"></div>
+              <div class="color-swatch" style="background:#276749" data-color="#276749" onclick="selectSwatch(this)"></div>
+              <div class="color-swatch" style="background:#2A69AC" data-color="#2A69AC" onclick="selectSwatch(this)"></div>
+              <div class="color-swatch" style="background:#D53F8C" data-color="#D53F8C" onclick="selectSwatch(this)"></div>
+              <div class="color-swatch" style="background:#D69E2E" data-color="#D69E2E" onclick="selectSwatch(this)"></div>
+              <div class="color-swatch" style="background:#319795" data-color="#319795" onclick="selectSwatch(this)"></div>
+              <div class="color-swatch" style="background:#744210" data-color="#744210" onclick="selectSwatch(this)"></div>
+            </div>
+            <div class="color-custom">
+              <span style="font-size:12px;color:#718096;font-weight:700;">직접 입력:</span>
+              <input type="color" id="partColorPicker" value="#5A67D8" oninput="onColorPick(this.value)" />
+              <input class="form-input" id="partColorHex" value="#5A67D8" placeholder="#000000" style="max-width:110px;font-size:13px;" oninput="onColorHex(this.value)" />
+            </div>
+          </div>
+          <div style="margin-top:20px;display:flex;gap:10px;justify-content:flex-end;">
+            <button class="btn-cancel" onclick="closePartForm()">취소</button>
+            <button class="btn-save" onclick="savePartForm()">💾 저장</button>
+          </div>
+        </div>
+      </div>
+
     </div><!-- main end -->
   </div><!-- admin-wrap end -->
 
@@ -702,6 +784,16 @@
           { title:"API", items:["GET /admin/exercises/stats", "GET /admin/exercises/popular?limit=5"] }
         ],
         tags:[["#통계","#5A67D8"],["#도넛차트","#E53E3E"],["#TOP5","#F6AD55"],["#부위별","#48BB78"]]
+      },
+      {
+        title:"④ 운동 부위 관리",
+        id:"ap04 · 필수 · FE/BE",
+        sections:[
+          { title:"화면 구성", items:["등록된 부위 카드 목록 (부위명·영문키·색상·운동 수)", "부위 추가 폼 (한국어명·영문키·아이콘·색상 팔레트)", "색상 직접 입력 (#HEX) 또는 컬러피커"] },
+          { title:"동작", items:["[+ 부위 추가] → 추가 폼 펼치기", "[수정] → 해당 부위 정보 폼에 채워짐", "[삭제] → 등록 운동 있으면 삭제 차단", "저장 시 ① 목록 탭과 동적 동기화"] },
+          { title:"API", items:["GET /admin/parts", "POST /admin/parts", "PUT /admin/parts/:key", "DELETE /admin/parts/:key"] }
+        ],
+        tags:[["#부위관리","#5A67D8"],["#동적추가","#48BB78"],["#색상팔레트","#D53F8C"]]
       }
     ];
 
@@ -728,6 +820,131 @@
         html += '</div></div>';
       }
       document.getElementById('memo-body').innerHTML = html;
+      if (idx === 3) renderPartGrid();
+    }
+
+    /* ── 부위 관리 ── */
+    function renderPartGrid() {
+      const grid = document.getElementById('partGrid');
+      grid.innerHTML = parts.map(p => {
+        const cnt = exercises.filter(e => e[1] === p.key).length;
+        return `
+        <div class="part-card" id="pc-${p.key}">
+          <div class="part-card-dot" style="background:${p.color}22">${p.icon}</div>
+          <div class="part-card-info">
+            <div class="part-card-name">${p.label}</div>
+            <div class="part-card-en" style="color:${p.color}">${p.key}</div>
+            <div class="part-card-cnt" style="color:${p.color}">운동 ${cnt}개 등록됨</div>
+          </div>
+          <div class="part-card-actions">
+            <button class="btn-part-edit" onclick="editPart('${p.key}')">수정</button>
+            <button class="btn-part-del" onclick="deletePart('${p.key}')">삭제</button>
+          </div>
+        </div>`;
+      }).join('');
+      // 탭도 동기화
+      rebuildTabs();
+    }
+
+    function rebuildTabs() {
+      const tabBar = document.getElementById('part-tabs');
+      if (!tabBar) return;
+      const current = tabBar.querySelector('.tab-btn.active')?.dataset.part || 'all';
+      tabBar.innerHTML = `<button class="tab-btn${current==='all'?' active':''}" data-part="all" onclick="filterTab(this,'all')">전체 <span id="cnt-all" class="tab-cnt">${exercises.length}</span></button>` +
+        parts.map(p => {
+          const cnt = exercises.filter(e => e[1] === p.key).length;
+          return `<button class="tab-btn${current===p.key?' active':''}" data-part="${p.key}" onclick="filterTab(this,'${p.key}')" style="${current===p.key?'border-bottom-color:'+p.color+';color:'+p.color:''}">${p.label} <span style="font-size:11px;opacity:.7">${cnt}</span></button>`;
+        }).join('');
+    }
+
+    function openPartForm(key) {
+      const form = document.getElementById('partAddForm');
+      form.style.display = 'block';
+      form.classList.remove('editing');
+      document.getElementById('partFormTitle').textContent = '새 운동 부위 추가';
+      document.getElementById('partEditKey').value = '';
+      document.getElementById('partNameKo').value = '';
+      document.getElementById('partNameEn').value = '';
+      document.getElementById('partIcon').value = '';
+      setFormColor('#5A67D8');
+      form.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function editPart(key) {
+      const p = parts.find(x => x.key === key);
+      if (!p) return;
+      const form = document.getElementById('partAddForm');
+      form.style.display = 'block';
+      form.classList.add('editing');
+      document.getElementById('partFormTitle').textContent = '부위 수정 — ' + p.label;
+      document.getElementById('partEditKey').value = key;
+      document.getElementById('partNameKo').value = p.label;
+      document.getElementById('partNameEn').value = p.key;
+      document.getElementById('partIcon').value = p.icon;
+      setFormColor(p.color);
+      form.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function deletePart(key) {
+      const p = parts.find(x => x.key === key);
+      const cnt = exercises.filter(e => e[1] === key).length;
+      if (cnt > 0) {
+        alert(`"${p.label}" 부위에 등록된 운동이 ${cnt}개 있어 삭제할 수 없습니다.\n운동을 먼저 다른 부위로 이동하거나 삭제해 주세요.`);
+        return;
+      }
+      if (!confirm(`"${p.label}" 부위를 삭제하시겠습니까?`)) return;
+      parts = parts.filter(x => x.key !== key);
+      renderPartGrid();
+    }
+
+    function savePartForm() {
+      const nameKo = document.getElementById('partNameKo').value.trim();
+      const nameEn = document.getElementById('partNameEn').value.trim().toLowerCase().replace(/\s+/g,'');
+      const icon   = document.getElementById('partIcon').value.trim() || '🏃';
+      const color  = document.getElementById('partColorHex').value.trim() || '#5A67D8';
+      const editKey = document.getElementById('partEditKey').value;
+
+      if (!nameKo || !nameEn) { alert('부위명(한국어·영문) 모두 입력해 주세요.'); return; }
+
+      if (editKey) {
+        const p = parts.find(x => x.key === editKey);
+        if (p) { p.label = nameKo; p.key = nameEn; p.icon = icon; p.color = color; }
+      } else {
+        if (parts.find(x => x.key === nameEn)) { alert('이미 같은 영문 키가 존재합니다.'); return; }
+        parts.push({ key: nameEn, label: nameKo, icon, color });
+      }
+      closePartForm();
+      renderPartGrid();
+    }
+
+    function closePartForm() {
+      document.getElementById('partAddForm').style.display = 'none';
+    }
+
+    function setFormColor(hex) {
+      document.getElementById('partColorHex').value = hex;
+      document.getElementById('partColorPicker').value = hex;
+      document.querySelectorAll('.color-swatch').forEach(s => {
+        s.classList.toggle('selected', s.dataset.color === hex);
+      });
+    }
+
+    function selectSwatch(el) {
+      setFormColor(el.dataset.color);
+    }
+
+    function onColorPick(hex) {
+      document.getElementById('partColorHex').value = hex;
+      document.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('selected'));
+    }
+
+    function onColorHex(val) {
+      if (/^#[0-9A-Fa-f]{6}$/.test(val)) {
+        document.getElementById('partColorPicker').value = val;
+        document.querySelectorAll('.color-swatch').forEach(s => {
+          s.classList.toggle('selected', s.dataset.color === val);
+        });
+      }
     }
 
     // ── 운동 데이터 [운동명, 부위코드, 유형, 난이도, 세트, 횟수/시간, 설명] ──────────
@@ -1042,14 +1259,19 @@
       ['크롤링 래터럴','full','재활','중급','3세트','10m','측면 크롤링 전신 협응'],
     ];
 
-    const partInfo = {
-      neck:  { label:'목·어깨',   color:'#805AD5' },
-      back:  { label:'허리·척추', color:'#E53E3E' },
-      core:  { label:'코어',      color:'#E67E22' },
-      lower: { label:'하체',      color:'#3182CE' },
-      upper: { label:'상체',      color:'#276749' },
-      full:  { label:'전신',      color:'#2A69AC' },
-    };
+    // 부위 데이터 — 동적 관리 (key, label, icon, color)
+    let parts = [
+      { key:'neck',  label:'목·어깨',   icon:'🧏', color:'#805AD5' },
+      { key:'back',  label:'허리·척추', icon:'🦴', color:'#E53E3E' },
+      { key:'core',  label:'코어',      icon:'💪', color:'#E67E22' },
+      { key:'lower', label:'하체',      icon:'🦵', color:'#3182CE' },
+      { key:'upper', label:'상체',      icon:'🏋️', color:'#276749' },
+      { key:'full',  label:'전신',      icon:'🧍', color:'#2A69AC' },
+    ];
+    // partInfo 호환 getter
+    const partInfo = new Proxy({}, {
+      get(_, key) { return parts.find(p => p.key === key) || { label: key, color: '#718096' }; }
+    });
     const typeBadge = {
       '재활':'badge-green', '근력':'badge-orange', '스트레칭':'badge-teal', '유산소':'badge-purple'
     };
