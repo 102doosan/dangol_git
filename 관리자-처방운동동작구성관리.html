@@ -371,17 +371,17 @@
           <div class="form-row">
             <div class="form-group">
               <div class="form-label">운동명 <span class="required">*</span></div>
-              <input class="form-input" type="text" placeholder="예: 맥켄지 신전 운동" value="맥켄지 신전 운동" />
+              <input class="form-input" id="exName" type="text" placeholder="예: 맥켄지 신전 운동" value="" />
             </div>
             <div class="form-group">
               <div class="form-label">영문명 (선택)</div>
-              <input class="form-input" type="text" placeholder="예: McKenzie Extension" value="McKenzie Extension" />
+              <input class="form-input" id="exNameEn" type="text" placeholder="예: McKenzie Extension" value="" />
             </div>
           </div>
           <div class="form-row-full">
             <div class="form-group">
               <div class="form-label">운동 설명 <span class="required">*</span></div>
-              <textarea class="form-textarea" placeholder="동작 방법, 목적 등을 간략히 설명하세요...">요추를 신전시켜 디스크 내압을 낮추는 재활 운동. 엎드린 자세에서 팔꿈치로 몸을 지지하며 천천히 상체를 들어올립니다.</textarea>
+              <textarea class="form-textarea" id="exDesc" placeholder="동작 방법, 목적 등을 간략히 설명하세요..."></textarea>
             </div>
           </div>
         </div>
@@ -389,28 +389,28 @@
         <!-- 부위 선택 -->
         <div class="form-panel">
           <div class="form-panel-title">🦴 운동 부위 선택 <span class="required">*</span></div>
-          <div class="part-options">
-            <div class="part-option" onclick="selectPart(this)">
+          <div class="part-options" id="exPartOptions">
+            <div class="part-option" data-key="neck" onclick="selectPart(this)">
               <div class="part-option-dot" style="background:#805AD5;"></div>
               <div class="part-option-label">목·어깨</div>
             </div>
-            <div class="part-option selected" onclick="selectPart(this)">
+            <div class="part-option" data-key="back" onclick="selectPart(this)">
               <div class="part-option-dot" style="background:#E53E3E;"></div>
               <div class="part-option-label">허리·척추</div>
             </div>
-            <div class="part-option" onclick="selectPart(this)">
+            <div class="part-option" data-key="core" onclick="selectPart(this)">
               <div class="part-option-dot" style="background:#E67E22;"></div>
               <div class="part-option-label">코어</div>
             </div>
-            <div class="part-option" onclick="selectPart(this)">
+            <div class="part-option" data-key="lower" onclick="selectPart(this)">
               <div class="part-option-dot" style="background:#3182CE;"></div>
               <div class="part-option-label">하체</div>
             </div>
-            <div class="part-option" onclick="selectPart(this)">
+            <div class="part-option" data-key="upper" onclick="selectPart(this)">
               <div class="part-option-dot" style="background:#276749;"></div>
               <div class="part-option-label">상체</div>
             </div>
-            <div class="part-option" onclick="selectPart(this)">
+            <div class="part-option" data-key="full" onclick="selectPart(this)">
               <div class="part-option-dot" style="background:#2A69AC;"></div>
               <div class="part-option-label">전신</div>
             </div>
@@ -457,11 +457,11 @@
           <div class="form-row">
             <div class="form-group">
               <div class="form-label">기본 세트 수 <span class="required">*</span></div>
-              <input class="form-input" type="number" placeholder="예: 3" value="3" min="1" max="10" />
+              <input class="form-input" id="exSets" type="number" placeholder="예: 3" min="1" max="10" />
             </div>
             <div class="form-group">
               <div class="form-label">기본 횟수 / 시간 <span class="required">*</span></div>
-              <input class="form-input" type="text" placeholder="예: 10회  또는  30초" value="10회" />
+              <input class="form-input" id="exReps" type="text" placeholder="예: 10회  또는  30초" />
             </div>
           </div>
           <div class="form-row">
@@ -482,7 +482,7 @@
           <div class="form-row-full">
             <div class="form-group">
               <div class="form-label">주의 / 금기 사항</div>
-              <textarea class="form-textarea" placeholder="이 운동 시 주의해야 할 사항이나 금기 조건을 입력하세요...">통증이 악화되면 즉시 중단. 급성 염증기에는 시행하지 않도록 합니다. 목 부위에 방사통 발생 시 중단 후 트레이너에게 보고.</textarea>
+              <textarea class="form-textarea" id="exNote" placeholder="이 운동 시 주의해야 할 사항이나 금기 조건을 입력하세요..."></textarea>
             </div>
           </div>
         </div>
@@ -530,7 +530,7 @@
           <div class="form-footer-left">* 운동명, 부위, 유형, 난이도, 기본 세트·횟수는 필수 입력 항목입니다</div>
           <div style="display:flex;gap:10px;">
             <button class="btn-cancel" onclick="showScreen(0,document.querySelectorAll('.nav-btn')[0])">취소</button>
-            <button class="btn-save">💾 저장</button>
+            <button class="btn-save" onclick="saveExercise()">💾 저장</button>
           </div>
         </div>
       </div>
@@ -940,6 +940,46 @@
       _setPartIconUI(p.icon || '');
       setFormColor(p.color);
       form.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function saveExercise() {
+      const name  = document.getElementById('exName').value.trim();
+      const desc  = document.getElementById('exDesc').value.trim();
+      const sets  = document.getElementById('exSets').value.trim();
+      const reps  = document.getElementById('exReps').value.trim();
+
+      const partEl = document.querySelector('#exPartOptions .part-option.selected');
+      const typeEl = document.querySelector('.type-option.selected');
+      const levelEl = document.querySelector('.level-option.selected');
+
+      if (!name) { alert('운동명을 입력해 주세요.'); return; }
+      if (!partEl) { alert('운동 부위를 선택해 주세요.'); return; }
+      if (!typeEl) { alert('운동 유형을 선택해 주세요.'); return; }
+      if (!levelEl) { alert('난이도를 선택해 주세요.'); return; }
+      if (!sets) { alert('기본 세트 수를 입력해 주세요.'); return; }
+      if (!reps) { alert('기본 횟수/시간을 입력해 주세요.'); return; }
+
+      const partKey   = partEl.dataset.key;
+      const typeText  = typeEl.textContent.replace(/^[^\s]+\s/,'').trim(); // 이모지 제거
+      const levelText = levelEl.querySelector('.level-option-label').textContent.trim();
+      const setsText  = sets + '세트';
+
+      exercises.push([name, partKey, typeText, levelText, setsText, reps, desc]);
+      updateStats();
+
+      // 폼 초기화
+      document.getElementById('exName').value = '';
+      document.getElementById('exNameEn').value = '';
+      document.getElementById('exDesc').value = '';
+      document.getElementById('exSets').value = '';
+      document.getElementById('exReps').value = '';
+      document.getElementById('exNote').value = '';
+      document.querySelectorAll('#exPartOptions .part-option').forEach(el => el.classList.remove('selected'));
+      document.querySelectorAll('.type-option').forEach(el => el.classList.remove('selected'));
+      document.querySelectorAll('.level-option').forEach(el => el.classList.remove('selected'));
+
+      alert(`"${name}" 운동이 등록되었습니다.`);
+      showScreen(0, document.querySelectorAll('.nav-btn')[0]);
     }
 
     function deleteEx(name) {
