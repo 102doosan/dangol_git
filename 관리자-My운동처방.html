@@ -1411,22 +1411,43 @@
           </div>
         </div>
 
-        <!-- 운동 목록 수정 -->
+        <!-- 운동 목록 수정 - step3 방식 -->
         <div class="detail-panel" style="margin-bottom:16px;">
           <div class="detail-panel-title">🏋️ 처방 운동 목록</div>
-          <div id="ep-exlist">
-            ${p.exercises.map((e, i) => `
-            <div class="ex-item" style="margin-bottom:8px;" id="ep-ex-${i}">
-              <div class="ex-num">${i+1}</div>
-              <div class="ex-info" style="flex:1;">
-                <input class="form-input" style="margin-bottom:4px;" value="${e.name}" id="ep-ex-name-${i}">
-                <input class="form-input" style="font-size:12px;" value="${e.detail}" id="ep-ex-detail-${i}">
+          <div class="step3-wrap" style="min-height:380px;">
+            <!-- 왼쪽: 운동 검색 -->
+            <div class="step3-left">
+              <div class="step3-left-head">
+                <div class="step3-left-title">운동 검색</div>
+                <div class="step3-search">
+                  <span class="step3-search-icon">🔍</span>
+                  <input id="epStep3Search" type="text" placeholder="운동명" oninput="renderEpStep3List()" autocomplete="off" />
+                </div>
               </div>
-              <select class="form-select" style="width:70px;font-size:12px;" id="ep-ex-grade-${i}">${exGradeOpts(e.grade)}</select>
-              <button onclick="removeEditEx(${i})" style="background:#FED7D7;color:#C53030;border:none;border-radius:8px;padding:6px 10px;cursor:pointer;font-size:12px;margin-left:4px;">✕</button>
-            </div>`).join('')}
+              <div class="step3-part-btns" id="epStep3PartBtns">
+                <button class="step3-part-btn active" data-part="" onclick="setEpStep3Part('',this)">전체</button>
+                <button class="step3-part-btn" data-part="목·어깨" onclick="setEpStep3Part('목·어깨',this)">목·어깨</button>
+                <button class="step3-part-btn" data-part="허리·척추" onclick="setEpStep3Part('허리·척추',this)">허리·척추</button>
+                <button class="step3-part-btn" data-part="코어" onclick="setEpStep3Part('코어',this)">코어</button>
+                <button class="step3-part-btn" data-part="하체" onclick="setEpStep3Part('하체',this)">하체</button>
+                <button class="step3-part-btn" data-part="상체" onclick="setEpStep3Part('상체',this)">상체</button>
+                <button class="step3-part-btn" data-part="전신" onclick="setEpStep3Part('전신',this)">전신</button>
+              </div>
+              <div class="step3-ex-list" id="epStep3ExList"></div>
+            </div>
+            <!-- 오른쪽: 선택된 운동 -->
+            <div class="step3-right">
+              <div class="step3-right-head">
+                <div class="step3-right-title">선택된 운동</div>
+                <div class="step3-right-cnt" id="epStep3SelCnt">${p.exercises.length}개</div>
+              </div>
+              <div class="step3-col-head">
+                <span></span><span>운동명</span><span>세트</span><span>횟수/시간</span><span>중요도</span><span></span>
+              </div>
+              <div class="step3-selected-list" id="epStep3SelList"></div>
+              <div class="step3-add-direct" onclick="addEpStep3Direct()">+ 직접 입력으로 추가</div>
+            </div>
           </div>
-          <button onclick="addEditEx()" style="background:#F7F9FC;border:1.5px dashed #CBD5E0;border-radius:10px;padding:10px;width:100%;cursor:pointer;font-size:13px;color:#718096;margin-top:8px;">+ 운동 추가</button>
         </div>
 
         <div style="display:flex;gap:10px;justify-content:flex-end;padding-bottom:16px;">
@@ -1436,6 +1457,20 @@
 
       // 초기 미리보기 렌더링
       updateAlertPreview();
+
+      // step3 운동 목록 초기화
+      epStep3Part = '';
+      epStep3Items = p.exercises.map(e => {
+        const parts = e.detail.match(/^(\d+세트)\s*[×x]\s*(.+)$/);
+        return {
+          name: e.name,
+          sets: parts ? parts[1].replace('세트','') : '',
+          reps: parts ? parts[2].trim() : e.detail,
+          importance: e.grade || '필수'
+        };
+      });
+      renderEpStep3Selected();
+      renderEpStep3List();
     }
 
     function updateAlertPreview() {
@@ -1460,30 +1495,89 @@
       ).join('');
     }
 
-    let editExList = null;
-    function removeEditEx(idx) {
-      const data = memberPrescriptions[currentMember];
-      const p = data.list.find(x => x.id === selectedPrxId);
-      if (!p || p.exercises.length <= 1) return;
-      // 현재 편집 중인 값 수집 후 해당 항목 삭제
-      p.exercises = p.exercises.filter((_, i) => i !== idx);
-      editPrx();
+    /* ── 처방 수정 전용 step3 운동 선택 ── */
+    let epStep3Part = '';
+    let epStep3Items = [];
+
+    function setEpStep3Part(part, btn) {
+      epStep3Part = part;
+      document.querySelectorAll('#epStep3PartBtns .step3-part-btn').forEach(b => {
+        b.classList.remove('active');
+        b.style.background = ''; b.style.borderColor = '';
+      });
+      btn.classList.add('active');
+      if (part) { const c = acPartColors[part]||'#718096'; btn.style.background=c; btn.style.borderColor=c; }
+      renderEpStep3List();
     }
-    function addEditEx() {
-      const data = memberPrescriptions[currentMember];
-      const p = data.list.find(x => x.id === selectedPrxId);
-      if (!p) return;
-      // 현재 입력값 저장 후 항목 추가
-      _syncEditExToData(p);
-      p.exercises.push({ name:'새 운동', detail:'3세트 × 10회', grade:'선택' });
-      editPrx();
+
+    function renderEpStep3List() {
+      const q = (document.getElementById('epStep3Search')?.value||'').trim().toLowerCase();
+      const filtered = acExercises.filter(e => {
+        if (epStep3Part && e[1] !== epStep3Part) return false;
+        if (q && !e[0].toLowerCase().includes(q) && !e[1].toLowerCase().includes(q)) return false;
+        return true;
+      });
+      const addedNames = epStep3Items.map(i => i.name);
+      const html = filtered.map(e => {
+        const c = acPartColors[e[1]]||'#718096';
+        const isAdded = addedNames.includes(e[0]);
+        return `<div class="step3-ex-row${isAdded?' added':''}" onclick="addEpStep3FromList('${e[0].replace(/'/g,"\\'")}','${e[4]}','${e[5]}')">
+          <div class="step3-ex-dot" style="background:${c}"></div>
+          <div class="step3-ex-info">
+            <div class="step3-ex-name">${e[0]}</div>
+            <div class="step3-ex-meta">${e[1]} · ${e[2]} · ${e[3]}</div>
+          </div>
+          <button class="step3-ex-add-btn">${isAdded?'✓':'+'}</button>
+        </div>`;
+      }).join('') || '<div style="padding:20px;text-align:center;font-size:12px;color:#A0AEC0;">운동이 없습니다</div>';
+      const el = document.getElementById('epStep3ExList');
+      if (el) el.innerHTML = html;
     }
-    function _syncEditExToData(p) {
-      p.exercises = p.exercises.map((e, i) => ({
-        name: document.getElementById('ep-ex-name-'+i)?.value || e.name,
-        detail: document.getElementById('ep-ex-detail-'+i)?.value || e.detail,
-        grade: document.getElementById('ep-ex-grade-'+i)?.value || e.grade,
-      }));
+
+    function addEpStep3FromList(name, sets, reps) {
+      if (epStep3Items.find(i => i.name === name)) return;
+      epStep3Items.push({ name, sets, reps, importance:'필수' });
+      renderEpStep3Selected();
+      renderEpStep3List();
+    }
+
+    function addEpStep3Direct() {
+      epStep3Items.push({ name:'', sets:'', reps:'', importance:'필수' });
+      renderEpStep3Selected();
+      setTimeout(() => {
+        const inputs = document.querySelectorAll('#epStep3SelList .step3-sel-name-input');
+        if (inputs.length) inputs[inputs.length-1].focus();
+      }, 50);
+    }
+
+    function removeEpStep3Item(idx) {
+      epStep3Items.splice(idx, 1);
+      renderEpStep3Selected();
+      renderEpStep3List();
+    }
+
+    function renderEpStep3Selected() {
+      const list = document.getElementById('epStep3SelList');
+      if (!list) return;
+      const cnt = document.getElementById('epStep3SelCnt');
+      if (cnt) cnt.textContent = epStep3Items.length + '개';
+      if (!epStep3Items.length) {
+        list.innerHTML = `<div class="step3-empty"><div class="step3-empty-icon">👈</div><div class="step3-empty-text">왼쪽에서 운동을 선택하세요</div></div>`;
+        return;
+      }
+      list.innerHTML = epStep3Items.map((item, i) => `
+        <div class="step3-sel-item">
+          <div class="step3-sel-num">${i+1}</div>
+          <input class="step3-sel-input step3-sel-name-input" type="text" value="${item.name}" placeholder="운동명" oninput="epStep3Items[${i}].name=this.value;renderEpStep3List()" style="font-weight:700;" />
+          <input class="step3-sel-input" type="text" value="${item.sets}" placeholder="세트" oninput="epStep3Items[${i}].sets=this.value" />
+          <input class="step3-sel-input" type="text" value="${item.reps}" placeholder="횟수/시간" oninput="epStep3Items[${i}].reps=this.value" />
+          <select class="step3-sel-select" onchange="epStep3Items[${i}].importance=this.value">
+            <option${item.importance==='필수'?' selected':''}>필수</option>
+            <option${item.importance==='권장'?' selected':''}>권장</option>
+            <option${item.importance==='선택'?' selected':''}>선택</option>
+          </select>
+          <button class="step3-del-btn" onclick="removeEpStep3Item(${i})">×</button>
+        </div>`).join('');
     }
 
     function savePrx() {
@@ -1501,7 +1595,11 @@
         const el = document.getElementById('ep-sfma-alert-'+i);
         return el && el.value ? parseInt(el.value) : null;
       }).filter(v => v !== null);
-      _syncEditExToData(p);
+      p.exercises = epStep3Items.map(item => ({
+        name: item.name,
+        detail: item.sets ? `${item.sets}세트 × ${item.reps}` : item.reps,
+        grade: item.importance
+      }));
       selectPrx(selectedPrxId);
     }
     function cancelEditPrx() {
