@@ -1414,9 +1414,9 @@
         <!-- 운동 목록 수정 - step3 방식 -->
         <div class="detail-panel" style="margin-bottom:16px;">
           <div class="detail-panel-title">🏋️ 처방 운동 목록</div>
-          <div class="step3-wrap" style="min-height:380px;">
+          <div class="step3-wrap" style="height:480px;">
             <!-- 왼쪽: 운동 검색 -->
-            <div class="step3-left">
+            <div class="step3-left" style="overflow:hidden;display:flex;flex-direction:column;">
               <div class="step3-left-head">
                 <div class="step3-left-title">운동 검색</div>
                 <div class="step3-search">
@@ -1436,7 +1436,7 @@
               <div class="step3-ex-list" id="epStep3ExList"></div>
             </div>
             <!-- 오른쪽: 선택된 운동 -->
-            <div class="step3-right" style="display:flex;flex-direction:column;">
+            <div class="step3-right" style="display:flex;flex-direction:column;height:100%;overflow:hidden;">
               <div class="step3-right-head">
                 <div class="step3-right-title">선택된 운동</div>
                 <div class="step3-right-cnt" id="epStep3SelCnt">${p.exercises.length}개</div>
