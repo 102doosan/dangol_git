@@ -704,8 +704,8 @@
               <div class="form-label">회원 검색 <span class="required">*</span></div>
               <div style="display:flex;gap:8px;">
                 <input class="form-input" id="acMemberSearchInput" type="text" placeholder="회원명 또는 전화번호 입력" style="flex:1;"
-                  oninput="renderAcMemberSearch()" onkeydown="if(event.key==='Enter')renderAcMemberSearch()" />
-                <button onclick="renderAcMemberSearch()" style="background:#E67E22;color:#fff;border:none;border-radius:10px;padding:10px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Noto Sans KR',sans-serif;white-space:nowrap;">검색</button>
+                  oninput="onMemberSearchInput()" onkeydown="if(event.key==='Enter')renderAcMemberSearch(true)" />
+                <button onclick="renderAcMemberSearch(true)" style="background:#E67E22;color:#fff;border:none;border-radius:10px;padding:10px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Noto Sans KR',sans-serif;white-space:nowrap;">검색</button>
               </div>
             </div>
           </div>
@@ -1150,10 +1150,21 @@
       alert(`"${name}" 처방이 등록되었습니다.`);
     }
 
-    function renderAcMemberSearch() {
+    function onMemberSearchInput() {
       const q = (document.getElementById('acMemberSearchInput')?.value || '').trim();
       if (!q) {
-        openMemberModal();
+        // 백스페이스 등으로 입력 지워지면 결과만 초기화 (모달 열지 않음)
+        const result = document.getElementById('acMemberSearchResult');
+        if (result) result.innerHTML = '';
+        return;
+      }
+      renderAcMemberSearch(false);
+    }
+
+    function renderAcMemberSearch(allowModal) {
+      const q = (document.getElementById('acMemberSearchInput')?.value || '').trim();
+      if (!q) {
+        if (allowModal) openMemberModal();
         return;
       }
       const result = document.getElementById('acMemberSearchResult');
