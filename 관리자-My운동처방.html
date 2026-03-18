@@ -559,24 +559,24 @@
 
         <div class="stats-row">
           <div class="stat-card">
-            <div class="stat-card-top"><span class="stat-card-label">대기</span><span class="stat-card-icon">⏳</span></div>
-            <div class="stat-card-val" style="color:#F6AD55;">14</div>
-            <div class="stat-card-change change-down">미처리 신청</div>
+            <div class="stat-card-top"><span class="stat-card-label">전체 회원</span><span class="stat-card-icon">👤</span></div>
+            <div class="stat-card-val" id="s3-val-total">-</div>
+            <div class="stat-card-change change-up" id="s3-sub-total">전체</div>
           </div>
           <div class="stat-card">
-            <div class="stat-card-top"><span class="stat-card-label">처리중</span><span class="stat-card-icon">🔄</span></div>
-            <div class="stat-card-val" style="color:#4299E1;">7</div>
-            <div class="stat-card-change" style="color:#A0AEC0;">트레이너 작업중</div>
+            <div class="stat-card-top"><span class="stat-card-label">활성 처방</span><span class="stat-card-icon">✅</span></div>
+            <div class="stat-card-val" style="color:#48BB78;" id="s3-val-active">-</div>
+            <div class="stat-card-change change-up">처방 진행중</div>
           </div>
           <div class="stat-card">
-            <div class="stat-card-top"><span class="stat-card-label">이번달 완료</span><span class="stat-card-icon">✅</span></div>
-            <div class="stat-card-val" style="color:#48BB78;">52</div>
-            <div class="stat-card-change change-up">▲ 전월 대비 +8</div>
+            <div class="stat-card-top"><span class="stat-card-label">처방 없음</span><span class="stat-card-icon">⏳</span></div>
+            <div class="stat-card-val" style="color:#F6AD55;" id="s3-val-none">-</div>
+            <div class="stat-card-change change-down">미처방 회원</div>
           </div>
           <div class="stat-card">
-            <div class="stat-card-top"><span class="stat-card-label">반려</span><span class="stat-card-icon">❌</span></div>
-            <div class="stat-card-val" style="color:#FC8181;">3</div>
-            <div class="stat-card-change" style="color:#A0AEC0;">이번달</div>
+            <div class="stat-card-top"><span class="stat-card-label">완료 처방</span><span class="stat-card-icon">🏃</span></div>
+            <div class="stat-card-val" style="color:#4299E1;" id="s3-val-done">-</div>
+            <div class="stat-card-change" style="color:#A0AEC0;">처방 완료 회원</div>
           </div>
         </div>
 
@@ -2004,11 +2004,23 @@
       const active = all.filter(m => m.list && m.list.some(p => p.status === 'active')).length;
       const none = all.filter(m => !m.list || m.list.length === 0).length;
       const done = all.filter(m => m.list && m.list.length > 0 && !m.list.some(p => p.status === 'active')).length;
+      // 1탭 카드
       document.getElementById('sc-val-all').textContent = total;
       document.getElementById('sc-val-active').textContent = active;
       document.getElementById('sc-val-none').textContent = none;
       document.getElementById('sc-val-done').textContent = done;
       document.getElementById('sc-sub-all').textContent = `전체 ${total}명 보기`;
+      // 4탭 카드 (동일 데이터)
+      const s3Total = document.getElementById('s3-val-total');
+      const s3Active = document.getElementById('s3-val-active');
+      const s3None = document.getElementById('s3-val-none');
+      const s3Done = document.getElementById('s3-val-done');
+      const s3Sub = document.getElementById('s3-sub-total');
+      if (s3Total) s3Total.textContent = total;
+      if (s3Active) s3Active.textContent = active;
+      if (s3None) s3None.textContent = none;
+      if (s3Done) s3Done.textContent = done;
+      if (s3Sub) s3Sub.textContent = `총 ${total}명`;
     }
 
     showScreen(0, document.querySelector('.nav-btn.active'));
