@@ -1238,6 +1238,63 @@
       const p = data.list.find(x => x.id === id);
       if (!p) return;
 
+      // 편집 폼에서 돌아올 때 원본 뷰 구조 복원
+      if (!document.getElementById('pd-name')) {
+        document.getElementById('prx-detail').innerHTML = `
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
+            <div class="detail-panel">
+              <div class="detail-panel-title">📋 처방 기본 정보</div>
+              <div class="detail-grid">
+                <div class="detail-field"><div class="detail-field-label">처방명</div><div class="detail-field-val" id="pd-name">—</div></div>
+                <div class="detail-field"><div class="detail-field-label">처방일</div><div class="detail-field-val" id="pd-date">—</div></div>
+                <div class="detail-field"><div class="detail-field-label">운동 등급</div><div class="detail-field-val" id="pd-grade">—</div></div>
+                <div class="detail-field"><div class="detail-field-label">담당 트레이너</div><div class="detail-field-val" id="pd-trainer">—</div></div>
+                <div class="detail-field"><div class="detail-field-label">상태</div><div class="detail-field-val" id="pd-status">—</div></div>
+                <div class="detail-field"><div class="detail-field-label">총 수행 횟수</div><div class="detail-field-val" id="pd-count">—</div></div>
+              </div>
+              <div class="detail-field" style="margin-top:4px;">
+                <div class="detail-field-label">트레이너 메모</div>
+                <div id="pd-memo" style="background:#F7F9FC;border-radius:10px;padding:12px;font-size:13px;color:#4A5568;line-height:1.6;margin-top:6px;"></div>
+              </div>
+            </div>
+            <div class="detail-panel">
+              <div class="detail-panel-title">🏋️ 처방 운동 목록</div>
+              <div class="ex-list" id="pd-exlist"></div>
+            </div>
+          </div>
+          <div class="detail-panel" style="margin-bottom:16px;background:linear-gradient(135deg,#FFFAF0,#FFF7ED);">
+            <div class="detail-panel-title">🔬 SFMA 검사 알림 설정</div>
+            <div id="pd-sfma-card"></div>
+          </div>
+          <div>
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+              <div style="font-size:15px;font-weight:900;color:#1A202C;">📅 운동 수행 이력</div>
+              <button class="btn-secondary" style="font-size:12px;padding:6px 14px;">CSV 내보내기</button>
+            </div>
+            <div class="stats-row" style="grid-template-columns:repeat(3,1fr);margin-bottom:16px;">
+              <div class="stat-card">
+                <div class="stat-card-top"><span class="stat-card-label">총 수행 횟수</span><span class="stat-card-icon">🔁</span></div>
+                <div class="stat-card-val" id="pd-hist-total">—</div>
+                <div class="stat-card-change" style="color:#A0AEC0;">처방 이후 누적</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-card-top"><span class="stat-card-label">완료율</span><span class="stat-card-icon">✅</span></div>
+                <div class="stat-card-val" id="pd-hist-rate">—</div>
+                <div class="stat-card-change change-up" id="pd-hist-rate-sub"></div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-card-top"><span class="stat-card-label">평균 소요시간</span><span class="stat-card-icon">⏱</span></div>
+                <div class="stat-card-val" id="pd-hist-avg">—</div>
+                <div class="stat-card-change" style="color:#A0AEC0;" id="pd-hist-avg-sub"></div>
+              </div>
+            </div>
+            <div class="detail-panel">
+              <div class="detail-panel-title">🗓 회차별 수행 이력</div>
+              <div class="timeline" id="pd-hist-timeline"></div>
+            </div>
+          </div>`;
+      }
+
       // 기본 정보
       document.getElementById('pd-name').textContent = p.name;
       document.getElementById('pd-date').textContent = p.date;
