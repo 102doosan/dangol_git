@@ -734,20 +734,14 @@
             <div class="form-group">
               <div class="form-label">회원 검색 <span class="required">*</span></div>
               <div style="display:flex;gap:8px;">
-                <input class="form-input" type="text" placeholder="회원명 또는 전화번호 입력" value="박현우" style="flex:1;" />
-                <button style="background:#E67E22;color:#fff;border:none;border-radius:10px;padding:10px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Noto Sans KR',sans-serif;white-space:nowrap;">검색</button>
+                <input class="form-input" id="acMemberSearchInput" type="text" placeholder="회원명 또는 전화번호 입력" style="flex:1;"
+                  oninput="renderAcMemberSearch()" onkeydown="if(event.key==='Enter')renderAcMemberSearch()" />
+                <button onclick="renderAcMemberSearch()" style="background:#E67E22;color:#fff;border:none;border-radius:10px;padding:10px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Noto Sans KR',sans-serif;white-space:nowrap;">검색</button>
               </div>
             </div>
           </div>
           <!-- 검색 결과 -->
-          <div class="member-search-result">
-            <div class="member-avatar">박</div>
-            <div class="member-info-found">
-              <div class="member-name-found">박현우</div>
-              <div class="member-meta-found">010-4567-8901 · 강남점 · 가입 2024.01.15 · 이전 처방 없음</div>
-            </div>
-            <button class="btn-select-member">✓ 선택됨</button>
-          </div>
+          <div id="acMemberSearchResult" style="margin-top:8px;display:flex;flex-direction:column;gap:8px;"></div>
         </div>
 
         <!-- STEP 2: 처방 기본 정보 -->
@@ -1204,6 +1198,49 @@
 
     let currentMember = '김도산';
     let selectedPrxId = null;
+    let acSelectedMember = null; // 처방 등록 시 선택된 회원
+
+    function renderAcMemberSearch() {
+      const q = (document.getElementById('acMemberSearchInput')?.value || '').trim();
+      const result = document.getElementById('acMemberSearchResult');
+      if (!result) return;
+
+      const allMembers = Object.entries(memberPrescriptions).map(([name, data]) => ({
+        name, phone: data.phone, prxCount: data.list.length
+      }));
+
+      const filtered = q
+        ? allMembers.filter(m => m.name.includes(q) || m.phone.includes(q))
+        : [];
+
+      if (!q) {
+        result.innerHTML = '<div style="font-size:12px;color:#A0AEC0;padding:8px 0;">회원명 또는 전화번호를 입력하세요</div>';
+        return;
+      }
+      if (!filtered.length) {
+        result.innerHTML = '<div style="font-size:12px;color:#A0AEC0;padding:8px 0;">검색 결과가 없습니다</div>';
+        return;
+      }
+
+      result.innerHTML = filtered.map(m => {
+        const isSelected = acSelectedMember === m.name;
+        return `<div class="member-search-result" style="cursor:pointer;" onclick="selectAcMember('${m.name.replace(/'/g,"\\'")}')">
+          <div class="member-avatar">${m.name[0]}</div>
+          <div class="member-info-found">
+            <div class="member-name-found">${m.name}</div>
+            <div class="member-meta-found">${m.phone} · 기존 처방 ${m.prxCount}건</div>
+          </div>
+          <button class="btn-select-member" style="background:${isSelected?'#48BB78':'#E67E22'};">
+            ${isSelected ? '✓ 선택됨' : '선택'}
+          </button>
+        </div>`;
+      }).join('');
+    }
+
+    function selectAcMember(name) {
+      acSelectedMember = name;
+      renderAcMemberSearch();
+    }
 
     function renderPrxTimeline() {
       const data = memberPrescriptions[currentMember];
