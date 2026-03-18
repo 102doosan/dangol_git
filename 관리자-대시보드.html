@@ -613,5 +613,26 @@
     </div>
   </div>
 
+  <script src="data.js"></script>
+  <script>
+    // data.js 로드 후 실제 회원 통계로 대시보드 숫자 업데이트
+    (function() {
+      if (!window.APP_DATA) return;
+      const s = APP_DATA.stats();
+      // 헤더 전체 회원 수
+      const miniVals = document.querySelectorAll('.dash-stat-mini-val');
+      if (miniVals[0]) miniVals[0].textContent = s.total;
+      // 통계 카드: SFMA 도래
+      const cardVals = document.querySelectorAll('.stat-card-val');
+      if (cardVals[1]) cardVals[1].textContent = s.sfmaDue;
+      // 이번달 신규
+      if (cardVals[2]) cardVals[2].textContent = s.thisMonth;
+      // 회원 현황 도넛 범례
+      const legendNums = document.querySelectorAll('.legend-num');
+      if (legendNums[0]) legendNums[0].textContent = s.active;
+      if (legendNums[1]) legendNums[1].textContent = s.noPrx;
+    })();
+  </script>
+
 </body>
 </html>
