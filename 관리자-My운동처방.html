@@ -180,6 +180,27 @@
     .form-label .required { color: #E53E3E; margin-left: 2px; }
     .form-input { border: 1.5px solid #E2E8F0; border-radius: 10px; padding: 10px 14px; font-size: 13px; font-family: 'Noto Sans KR', sans-serif; color: #2D3748; outline: none; width: 100%; background: #fff; }
     .form-input:focus { border-color: #E67E22; }
+    .date-picker-wrap { position: relative; }
+    .date-picker-wrap .date-input { padding-right: 36px; }
+    .date-icon { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); cursor: pointer; font-size: 16px; user-select: none; }
+    .date-picker-popup { display: none; position: absolute; top: calc(100% + 6px); left: 0; z-index: 9999; background: #fff; border: 1.5px solid #E2E8F0; border-radius: 14px; box-shadow: 0 8px 32px rgba(0,0,0,0.13); padding: 14px; width: 280px; }
+    .date-picker-popup.open { display: block; }
+    .dp-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+    .dp-nav { background: none; border: none; cursor: pointer; font-size: 18px; color: #555; padding: 2px 8px; border-radius: 6px; }
+    .dp-nav:hover { background: #f5f5f5; }
+    .dp-title { font-size: 14px; font-weight: 700; color: #2D3748; }
+    .dp-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; }
+    .dp-dow { text-align: center; font-size: 11px; font-weight: 700; color: #999; padding: 4px 0; }
+    .dp-dow:first-child { color: #E53E3E; }
+    .dp-dow:last-child { color: #3182CE; }
+    .dp-day { text-align: center; padding: 5px 2px; font-size: 12px; cursor: pointer; border-radius: 6px; color: #2D3748; }
+    .dp-day:hover { background: #FFF3E0; }
+    .dp-day.today { font-weight: 700; color: #E67E22; }
+    .dp-day.selected { background: #E67E22; color: #fff !important; border-radius: 6px; }
+    .dp-day.other-month { color: #ccc; }
+    .dp-day.sun { color: #E53E3E; }
+    .dp-day.sat { color: #3182CE; }
+    .dp-day.selected.sun, .dp-day.selected.sat { color: #fff !important; }
     .form-select { border: 1.5px solid #E2E8F0; border-radius: 10px; padding: 10px 14px; font-size: 13px; font-family: 'Noto Sans KR', sans-serif; color: #2D3748; outline: none; width: 100%; background: #fff; }
     .form-select:focus { border-color: #E67E22; }
     .form-textarea { border: 1.5px solid #E2E8F0; border-radius: 10px; padding: 12px 14px; font-size: 13px; font-family: 'Noto Sans KR', sans-serif; color: #2D3748; outline: none; width: 100%; resize: vertical; min-height: 90px; line-height: 1.6; background: #fff; }
@@ -713,11 +734,19 @@
           <div class="form-row">
             <div class="form-group">
               <div class="form-label">처방 시작일 <span class="required">*</span></div>
-              <input class="form-input" id="acPrxDate" type="text" placeholder="YYYY.MM.DD" />
+              <div class="date-picker-wrap">
+                <input class="form-input date-input" id="acPrxDate" type="text" placeholder="YYYY.MM.DD" autocomplete="off" oninput="formatDateInput(this)" onfocus="openDatePicker('acPrxDate','dpStart')" />
+                <span class="date-icon" onclick="openDatePicker('acPrxDate','dpStart')">📅</span>
+                <div class="date-picker-popup" id="dpStart"></div>
+              </div>
             </div>
             <div class="form-group">
               <div class="form-label">처방 종료일 (선택)</div>
-              <input class="form-input" type="text" placeholder="YYYY.MM.DD" />
+              <div class="date-picker-wrap">
+                <input class="form-input date-input" id="acPrxEnd" type="text" placeholder="YYYY.MM.DD" autocomplete="off" oninput="formatDateInput(this)" onfocus="openDatePicker('acPrxEnd','dpEnd')" />
+                <span class="date-icon" onclick="openDatePicker('acPrxEnd','dpEnd')">📅</span>
+                <div class="date-picker-popup" id="dpEnd"></div>
+              </div>
             </div>
           </div>
           <div class="form-row-full">
@@ -1987,6 +2016,128 @@
       const countEl = document.querySelector('.table-count');
       if (countEl) countEl.textContent = `총 ${rows.length}명`;
     }
+
+    /* ── 날짜 피커 ── */
+    const _dpState = {}; // { popupId: { year, month } }
+
+    function openDatePicker(inputId, popupId) {
+      // 다른 피커 닫기
+      document.querySelectorAll('.date-picker-popup.open').forEach(el => {
+        if (el.id !== popupId) el.classList.remove('open');
+      });
+      const popup = document.getElementById(popupId);
+      if (!popup) return;
+      if (popup.classList.contains('open')) return;
+      // 현재 입력값 파싱
+      const val = document.getElementById(inputId)?.value || '';
+      const m = val.match(/^(\d{4})\.(\d{2})\.(\d{2})$/);
+      const today = new Date();
+      const year = m ? parseInt(m[1]) : today.getFullYear();
+      const month = m ? parseInt(m[2]) - 1 : today.getMonth();
+      _dpState[popupId] = { year, month, inputId };
+      renderDatePicker(popupId);
+      popup.classList.add('open');
+    }
+
+    function renderDatePicker(popupId) {
+      const st = _dpState[popupId];
+      if (!st) return;
+      const { year, month, inputId } = st;
+      const popup = document.getElementById(popupId);
+      const today = new Date();
+      const selVal = document.getElementById(inputId)?.value || '';
+      const selM = selVal.match(/^(\d{4})\.(\d{2})\.(\d{2})$/);
+
+      const firstDay = new Date(year, month, 1).getDay();
+      const daysInMonth = new Date(year, month + 1, 0).getDate();
+      const daysInPrev = new Date(year, month, 0).getDate();
+      const monthNames = ['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월'];
+
+      let cells = '';
+      // 이전 달
+      for (let i = firstDay - 1; i >= 0; i--) {
+        const d = daysInPrev - i;
+        const dow = (firstDay - 1 - i) % 7;
+        cells += `<div class="dp-day other-month${dow===0?' sun':dow===6?' sat':''}">${d}</div>`;
+      }
+      // 이번 달
+      for (let d = 1; d <= daysInMonth; d++) {
+        const dow = (firstDay + d - 1) % 7;
+        const isToday = today.getFullYear()===year && today.getMonth()===month && today.getDate()===d;
+        const isSel = selM && parseInt(selM[1])===year && parseInt(selM[2])-1===month && parseInt(selM[3])===d;
+        const cls = ['dp-day',
+          dow===0?'sun':dow===6?'sat':'',
+          isToday&&!isSel?'today':'',
+          isSel?'selected':''
+        ].filter(Boolean).join(' ');
+        cells += `<div class="${cls}" onclick="pickDate('${popupId}',${year},${month+1},${d})">${d}</div>`;
+      }
+      // 다음 달 채우기
+      const total = firstDay + daysInMonth;
+      const remain = total % 7 === 0 ? 0 : 7 - (total % 7);
+      for (let d = 1; d <= remain; d++) {
+        const dow = (total + d - 1) % 7;
+        cells += `<div class="dp-day other-month${dow===0?' sun':dow===6?' sat':''}">${d}</div>`;
+      }
+
+      popup.innerHTML = `
+        <div class="dp-header">
+          <button class="dp-nav" onclick="dpMove('${popupId}',-1)">‹</button>
+          <span class="dp-title">${year}년 ${monthNames[month]}</span>
+          <button class="dp-nav" onclick="dpMove('${popupId}',1)">›</button>
+        </div>
+        <div class="dp-grid">
+          <div class="dp-dow">일</div><div class="dp-dow">월</div><div class="dp-dow">화</div>
+          <div class="dp-dow">수</div><div class="dp-dow">목</div><div class="dp-dow">금</div><div class="dp-dow">토</div>
+          ${cells}
+        </div>`;
+    }
+
+    function dpMove(popupId, dir) {
+      const st = _dpState[popupId];
+      if (!st) return;
+      st.month += dir;
+      if (st.month > 11) { st.month = 0; st.year++; }
+      if (st.month < 0) { st.month = 11; st.year--; }
+      renderDatePicker(popupId);
+    }
+
+    function pickDate(popupId, year, month, day) {
+      const st = _dpState[popupId];
+      if (!st) return;
+      const mm = String(month).padStart(2,'0');
+      const dd = String(day).padStart(2,'0');
+      const input = document.getElementById(st.inputId);
+      if (input) { input.value = `${year}.${mm}.${dd}`; }
+      document.getElementById(popupId)?.classList.remove('open');
+    }
+
+    function formatDateInput(input) {
+      let v = input.value.replace(/[^0-9]/g, '');
+      if (v.length > 4) v = v.slice(0,4) + '.' + v.slice(4);
+      if (v.length > 7) v = v.slice(0,7) + '.' + v.slice(7);
+      if (v.length > 10) v = v.slice(0,10);
+      input.value = v;
+      // 달력 동기화
+      const wrap = input.closest('.date-picker-wrap');
+      const popup = wrap?.querySelector('.date-picker-popup');
+      if (popup && popup.classList.contains('open')) {
+        const m = v.match(/^(\d{4})\.(\d{2})\.(\d{2})$/);
+        if (m) {
+          _dpState[popup.id].year = parseInt(m[1]);
+          _dpState[popup.id].month = parseInt(m[2]) - 1;
+          renderDatePicker(popup.id);
+        }
+      }
+    }
+
+    // 외부 클릭 시 피커 닫기
+    document.addEventListener('mousedown', e => {
+      document.querySelectorAll('.date-picker-popup.open').forEach(popup => {
+        const wrap = popup.closest('.date-picker-wrap');
+        if (wrap && !wrap.contains(e.target)) popup.classList.remove('open');
+      });
+    });
 
     showScreen(0, document.querySelector('.nav-btn.active'));
     renderStep3List();
