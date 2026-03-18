@@ -541,124 +541,30 @@
             <div class="page-title">처방 신청 접수 관리</div>
             <div class="page-sub">회원이 요청한 처방 신청을 처리합니다</div>
           </div>
-          <div class="page-actions">
-            <select class="filter-select">
-              <option>전체 상태</option>
-              <option>대기</option>
-              <option>처리중</option>
-              <option>완료</option>
-              <option>반려</option>
-            </select>
-            <select class="filter-select">
-              <option>전체 트레이너</option>
-              <option>김트레이너</option>
-              <option>박트레이너</option>
-            </select>
-          </div>
         </div>
 
-        <div class="stats-row">
-          <div class="stat-card">
-            <div class="stat-card-top"><span class="stat-card-label">전체 회원</span><span class="stat-card-icon">👤</span></div>
-            <div class="stat-card-val" id="s3-val-total">-</div>
-            <div class="stat-card-change change-up" id="s3-sub-total">전체</div>
+        <!-- 3단계 카드 -->
+        <div class="stats-row" style="grid-template-columns:repeat(3,1fr);">
+          <div class="stat-card" id="rc-new" style="cursor:pointer;border:2px solid transparent;" onclick="filterRequests('new')" onmouseover="this.style.borderColor='#E67E22'" onmouseout="if(currentRcFilter!=='new')this.style.borderColor='transparent'">
+            <div class="stat-card-top"><span class="stat-card-label">📩 신청자</span></div>
+            <div class="stat-card-val" style="color:#F6AD55;" id="rc-cnt-new">-</div>
+            <div class="stat-card-change change-down">처방 미등록 · 신규 신청</div>
           </div>
-          <div class="stat-card">
-            <div class="stat-card-top"><span class="stat-card-label">활성 처방</span><span class="stat-card-icon">✅</span></div>
-            <div class="stat-card-val" style="color:#48BB78;" id="s3-val-active">-</div>
-            <div class="stat-card-change change-up">처방 진행중</div>
+          <div class="stat-card" id="rc-process" style="cursor:pointer;border:2px solid transparent;" onclick="filterRequests('process')" onmouseover="this.style.borderColor='#E67E22'" onmouseout="if(currentRcFilter!=='process')this.style.borderColor='transparent'">
+            <div class="stat-card-top"><span class="stat-card-label">🔄 진행중</span></div>
+            <div class="stat-card-val" style="color:#4299E1;" id="rc-cnt-process">-</div>
+            <div class="stat-card-change" style="color:#4299E1;">처방 활성 진행중</div>
           </div>
-          <div class="stat-card">
-            <div class="stat-card-top"><span class="stat-card-label">처방 없음</span><span class="stat-card-icon">⏳</span></div>
-            <div class="stat-card-val" style="color:#F6AD55;" id="s3-val-none">-</div>
-            <div class="stat-card-change change-down">미처방 회원</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-card-top"><span class="stat-card-label">완료 처방</span><span class="stat-card-icon">🏃</span></div>
-            <div class="stat-card-val" style="color:#4299E1;" id="s3-val-done">-</div>
-            <div class="stat-card-change" style="color:#A0AEC0;">처방 완료 회원</div>
+          <div class="stat-card" id="rc-done" style="cursor:pointer;border:2px solid transparent;" onclick="filterRequests('done')" onmouseover="this.style.borderColor='#E67E22'" onmouseout="if(currentRcFilter!=='done')this.style.borderColor='transparent'">
+            <div class="stat-card-top"><span class="stat-card-label">✅ 처리완료</span></div>
+            <div class="stat-card-val" style="color:#48BB78;" id="rc-cnt-done">-</div>
+            <div class="stat-card-change change-up">처방 완료 회원</div>
           </div>
         </div>
 
         <div class="detail-panel">
-          <div class="detail-panel-title">📨 신청 목록</div>
-          <div class="request-list">
-
-            <div class="request-card pending">
-              <div class="request-info">
-                <div class="request-member">박현우 <span style="font-size:12px;font-weight:400;color:#A0AEC0;">· 010-4567-8901</span></div>
-                <div class="request-desc">허리 디스크 재활 운동 처방을 받고 싶습니다. 최근 병원에서 L4-L5 추간판 탈출증 진단을 받았고 수술 없이 재활을 원합니다.</div>
-                <div class="request-meta">
-                  <span class="request-meta-item">📅 신청일: 2026.03.17</span>
-                  <span class="request-meta-item">🏥 강남점</span>
-                  <span class="request-meta-item">이전 처방: 없음</span>
-                </div>
-                <div class="assign-row">
-                  <span style="font-size:12px;font-weight:700;color:#4A5568;">담당 트레이너:</span>
-                  <select class="assign-select">
-                    <option>트레이너 선택</option>
-                    <option>김트레이너</option>
-                    <option>박트레이너</option>
-                    <option>이트레이너</option>
-                  </select>
-                </div>
-              </div>
-              <div class="request-actions">
-                <span class="badge badge-orange">대기</span>
-                <button class="btn-action btn-assign">트레이너 지정</button>
-                <button class="btn-action btn-reject">반려</button>
-              </div>
-            </div>
-
-            <div class="request-card process">
-              <div class="request-info">
-                <div class="request-member">한소희 <span style="font-size:12px;font-weight:400;color:#A0AEC0;">· 010-6789-0123</span></div>
-                <div class="request-desc">무릎 통증으로 하체 강화 운동이 필요합니다. 연골 연화증 진단 후 물리치료와 병행하고 싶습니다.</div>
-                <div class="request-meta">
-                  <span class="request-meta-item">📅 신청일: 2026.03.15</span>
-                  <span class="request-meta-item">🏥 서초점</span>
-                  <span class="request-meta-item">담당: 이트레이너</span>
-                </div>
-              </div>
-              <div class="request-actions">
-                <span class="badge badge-blue">처리중</span>
-                <button class="btn-action btn-complete">완료 처리</button>
-                <button class="btn-action btn-reject">반려</button>
-              </div>
-            </div>
-
-            <div class="request-card complete">
-              <div class="request-info">
-                <div class="request-member">오민석 <span style="font-size:12px;font-weight:400;color:#A0AEC0;">· 010-7890-1234</span></div>
-                <div class="request-desc">다이어트 목적 유산소·근력 복합 운동 처방 요청</div>
-                <div class="request-meta">
-                  <span class="request-meta-item">📅 신청일: 2026.03.10</span>
-                  <span class="request-meta-item">📅 완료일: 2026.03.12</span>
-                  <span class="request-meta-item">담당: 박트레이너</span>
-                </div>
-              </div>
-              <div class="request-actions">
-                <span class="badge badge-green">완료</span>
-                <button class="btn-action" style="background:#F7F9FC;color:#718096;">처방 보기</button>
-              </div>
-            </div>
-
-            <div class="request-card rejected">
-              <div class="request-info">
-                <div class="request-member">윤지현 <span style="font-size:12px;font-weight:400;color:#A0AEC0;">· 010-8901-2345</span></div>
-                <div class="request-desc">어깨 충돌 증후군 재활 처방 요청</div>
-                <div class="request-meta">
-                  <span class="request-meta-item">📅 신청일: 2026.03.08</span>
-                  <span class="request-meta-item">반려 사유: 전문 병원 치료 우선 권장</span>
-                </div>
-              </div>
-              <div class="request-actions">
-                <span class="badge badge-red">반려</span>
-                <button class="btn-action" style="background:#F7F9FC;color:#718096;">사유 보기</button>
-              </div>
-            </div>
-
-          </div>
+          <div class="detail-panel-title" id="rc-list-title">📨 전체 신청 목록</div>
+          <div class="request-list" id="rcList"></div>
         </div>
       </div>
 
@@ -1998,6 +1904,92 @@
       renderMemberTable();
     }
 
+    /* ── 처방 신청 접수 관리 (4탭) ── */
+    let currentRcFilter = 'all';
+
+    function initRequestCards() {
+      const all = Object.entries(memberPrescriptions);
+      // 신청자: 처방 없는 회원
+      const newList = all.filter(([, m]) => !m.list || m.list.length === 0);
+      // 진행중: 활성 처방 있는 회원
+      const processList = all.filter(([, m]) => m.list && m.list.some(p => p.status === 'active'));
+      // 처리완료: 처방 있고 모두 완료
+      const doneList = all.filter(([, m]) => m.list && m.list.length > 0 && !m.list.some(p => p.status === 'active'));
+
+      document.getElementById('rc-cnt-new').textContent = newList.length;
+      document.getElementById('rc-cnt-process').textContent = processList.length;
+      document.getElementById('rc-cnt-done').textContent = doneList.length;
+
+      // 기본: 신청자 목록 표시
+      filterRequests('new');
+    }
+
+    function filterRequests(type) {
+      currentRcFilter = type;
+      const all = Object.entries(memberPrescriptions);
+
+      // 카드 하이라이트
+      ['new','process','done'].forEach(t => {
+        const card = document.getElementById('rc-' + t);
+        if (card) card.style.borderColor = t === type ? '#E67E22' : 'transparent';
+      });
+
+      let list, title;
+      if (type === 'new') {
+        list = all.filter(([, m]) => !m.list || m.list.length === 0);
+        title = '📩 신청자 목록 — 처방 미등록 회원';
+      } else if (type === 'process') {
+        list = all.filter(([, m]) => m.list && m.list.some(p => p.status === 'active'));
+        title = '🔄 진행중 목록 — 처방 진행중 회원';
+      } else {
+        list = all.filter(([, m]) => m.list && m.list.length > 0 && !m.list.some(p => p.status === 'active'));
+        title = '✅ 처리완료 목록 — 처방 완료 회원';
+      }
+
+      document.getElementById('rc-list-title').textContent = title;
+      const container = document.getElementById('rcList');
+      if (!list.length) {
+        container.innerHTML = '<div style="padding:32px;text-align:center;color:#A0AEC0;">해당 회원이 없습니다</div>';
+        return;
+      }
+
+      container.innerHTML = list.map(([name, m]) => {
+        const latest = m.list && m.list[0];
+        const borderColor = type === 'new' ? '#F6AD55' : type === 'process' ? '#4299E1' : '#48BB78';
+        const badgeHtml = type === 'new'
+          ? '<span class="badge badge-orange">신청자</span>'
+          : type === 'process'
+            ? '<span class="badge badge-blue">진행중</span>'
+            : '<span class="badge badge-green">완료</span>';
+
+        const metaHtml = type === 'new'
+          ? `<span class="request-meta-item">🏥 ${m.branch}</span><span class="request-meta-item">📅 가입일: ${m.joinDate}</span><span class="request-meta-item">처방 이력 없음</span>`
+          : type === 'process'
+            ? `<span class="request-meta-item">🏥 ${m.branch}</span><span class="request-meta-item">📋 처방명: ${latest.name}</span><span class="request-meta-item">담당: ${latest.trainer}</span>`
+            : `<span class="request-meta-item">🏥 ${m.branch}</span><span class="request-meta-item">📋 처방명: ${latest.name}</span><span class="request-meta-item">담당: ${latest.trainer}</span><span class="request-meta-item">📅 처방일: ${latest.date}</span>`;
+
+        const actionsHtml = type === 'new'
+          ? `<button class="btn-action btn-assign" onclick="currentMember='${name}';showScreen(2,document.querySelectorAll('.nav-btn')[2])">+ 처방 등록</button>`
+          : type === 'process'
+            ? `<button class="btn-action btn-complete" onclick="currentMember='${name}';selectedPrxId=${latest.id};showScreen(1,document.querySelectorAll('.nav-btn')[1]);renderPrxTimeline();selectPrx(${latest.id});setTimeout(()=>editPrx(),50)">처방 보기</button>`
+            : `<button class="btn-action" style="background:#F7F9FC;color:#718096;" onclick="currentMember='${name}';selectedPrxId=${latest.id};showScreen(1,document.querySelectorAll('.nav-btn')[1]);renderPrxTimeline();selectPrx(${latest.id})">처방 보기</button>`;
+
+        return `<div class="request-card" style="border-left-color:${borderColor}">
+          <div class="request-info">
+            <div class="request-member">${name} <span style="font-size:12px;font-weight:400;color:#A0AEC0;">· ${m.phone}</span></div>
+            ${type === 'process' ? `<div class="request-desc">${latest.memo || '처방 진행 중입니다.'}</div>` : ''}
+            ${type === 'done' && latest ? `<div class="request-desc">${latest.memo || ''}</div>` : ''}
+            <div class="request-meta">${metaHtml}</div>
+            ${type === 'new' ? `<div class="assign-row"><span style="font-size:12px;font-weight:700;color:#4A5568;">담당 트레이너:</span><select class="assign-select"><option>트레이너 선택</option><option>김트레이너</option><option>박트레이너</option><option>이트레이너</option></select></div>` : ''}
+          </div>
+          <div class="request-actions">
+            ${badgeHtml}
+            ${actionsHtml}
+          </div>
+        </div>`;
+      }).join('');
+    }
+
     function initStatCards() {
       const all = Object.values(memberPrescriptions);
       const total = all.length;
@@ -2010,17 +2002,6 @@
       document.getElementById('sc-val-none').textContent = none;
       document.getElementById('sc-val-done').textContent = done;
       document.getElementById('sc-sub-all').textContent = `전체 ${total}명 보기`;
-      // 4탭 카드 (동일 데이터)
-      const s3Total = document.getElementById('s3-val-total');
-      const s3Active = document.getElementById('s3-val-active');
-      const s3None = document.getElementById('s3-val-none');
-      const s3Done = document.getElementById('s3-val-done');
-      const s3Sub = document.getElementById('s3-sub-total');
-      if (s3Total) s3Total.textContent = total;
-      if (s3Active) s3Active.textContent = active;
-      if (s3None) s3None.textContent = none;
-      if (s3Done) s3Done.textContent = done;
-      if (s3Sub) s3Sub.textContent = `총 ${total}명`;
     }
 
     showScreen(0, document.querySelector('.nav-btn.active'));
@@ -2028,6 +2009,7 @@
     renderStep3Selected();
     renderMemberTable();
     initStatCards();
+    initRequestCards();
   </script>
 
   <!-- 운동 선택 모달 -->
