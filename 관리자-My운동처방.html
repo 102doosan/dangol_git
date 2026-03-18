@@ -1819,7 +1819,10 @@
           <td>${r.trainer}</td>
           <td>${r.lastDone}</td>
           <td>${statusBadge}</td>
-          <td><button class="btn-secondary" style="padding:4px 10px;font-size:12px;" onclick="event.stopPropagation();currentMember='${r.name}';showScreen(2,document.querySelectorAll('.nav-btn')[2])">+ 신규 처방</button></td>
+          <td>${r.id !== null
+            ? `<button class="btn-secondary" style="padding:4px 10px;font-size:12px;" onclick="event.stopPropagation();currentMember='${r.name}';selectedPrxId=${r.id};showScreen(1,document.querySelectorAll('.nav-btn')[1]);renderPrxTimeline();selectPrx(${r.id});setTimeout(()=>editPrx(),50)">✏️ 수정</button>`
+            : `<button class="btn-primary" style="padding:4px 10px;font-size:12px;" onclick="event.stopPropagation();currentMember='${r.name}';showScreen(2,document.querySelectorAll('.nav-btn')[2])">+ 처방 등록</button>`
+          }</td>
         </tr>`;
       }).join('');
       const countEl = document.querySelector('.table-count');
