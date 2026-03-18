@@ -57,7 +57,9 @@
 
     /* 통계 카드 */
     .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 16px; }
-    .stat-card { background: #fff; border-radius: 14px; padding: 16px 18px; box-shadow: 0 1px 6px rgba(0,0,0,0.06); }
+    .stat-card { background: #fff; border-radius: 14px; padding: 16px 18px; box-shadow: 0 1px 6px rgba(0,0,0,0.06); cursor: pointer; transition: box-shadow .18s, border .18s; border: 2px solid transparent; }
+    .stat-card:hover { box-shadow: 0 4px 16px rgba(230,126,34,0.15); border-color: #E67E22; }
+    .stat-card.active-filter { border-color: #E67E22; box-shadow: 0 4px 16px rgba(230,126,34,0.2); background: #FFF8F0; }
     .stat-card-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
     .stat-card-label { font-size: 12px; color: #A0AEC0; font-weight: 700; }
     .stat-card-icon { font-size: 20px; }
@@ -375,25 +377,25 @@
         </div>
 
         <div class="stats-row">
-          <div class="stat-card">
+          <div class="stat-card" id="sc-all" onclick="filterByCard('all')">
             <div class="stat-card-top"><span class="stat-card-label">전체 처방 회원</span><span class="stat-card-icon">👤</span></div>
-            <div class="stat-card-val">248</div>
-            <div class="stat-card-change change-up">▲ 12명 (이번달)</div>
+            <div class="stat-card-val" id="sc-val-all">-</div>
+            <div class="stat-card-change change-up" id="sc-sub-all">전체 보기</div>
           </div>
-          <div class="stat-card">
+          <div class="stat-card" id="sc-active" onclick="filterByCard('active')">
             <div class="stat-card-top"><span class="stat-card-label">활성 처방</span><span class="stat-card-icon">✅</span></div>
-            <div class="stat-card-val">183</div>
-            <div class="stat-card-change change-up">▲ 8건</div>
+            <div class="stat-card-val" id="sc-val-active">-</div>
+            <div class="stat-card-change change-up">클릭하여 활성 조회</div>
           </div>
-          <div class="stat-card">
-            <div class="stat-card-top"><span class="stat-card-label">신청 대기</span><span class="stat-card-icon">⏳</span></div>
-            <div class="stat-card-val">14</div>
-            <div class="stat-card-change change-down">▲ 3건 미처리</div>
+          <div class="stat-card" id="sc-none" onclick="filterByCard('none')">
+            <div class="stat-card-top"><span class="stat-card-label">처방 없는 회원</span><span class="stat-card-icon">⏳</span></div>
+            <div class="stat-card-val" id="sc-val-none">-</div>
+            <div class="stat-card-change change-down">클릭하여 조회</div>
           </div>
-          <div class="stat-card">
-            <div class="stat-card-top"><span class="stat-card-label">이번달 완료 운동</span><span class="stat-card-icon">🏃</span></div>
-            <div class="stat-card-val">1,042</div>
-            <div class="stat-card-change change-up">▲ 15%</div>
+          <div class="stat-card" id="sc-done" onclick="filterByCard('done')">
+            <div class="stat-card-top"><span class="stat-card-label">완료 처방 회원</span><span class="stat-card-icon">🏃</span></div>
+            <div class="stat-card-val" id="sc-val-done">-</div>
+            <div class="stat-card-change change-up">클릭하여 완료 조회</div>
           </div>
         </div>
 
@@ -1985,10 +1987,35 @@
       }
     });
 
+    function filterByCard(type) {
+      // 카드 활성 스타일
+      ['all','active','none','done'].forEach(t => {
+        document.getElementById('sc-' + t)?.classList.toggle('active-filter', t === type);
+      });
+      // 상태 필터 셀렉트 연동
+      const sel = document.getElementById('filterStatus');
+      if (sel) sel.value = type === 'all' ? '' : type;
+      renderMemberTable();
+    }
+
+    function initStatCards() {
+      const all = Object.values(memberPrescriptions);
+      const total = all.length;
+      const active = all.filter(m => m.list && m.list.some(p => p.status === 'active')).length;
+      const none = all.filter(m => !m.list || m.list.length === 0).length;
+      const done = all.filter(m => m.list && m.list.length > 0 && !m.list.some(p => p.status === 'active')).length;
+      document.getElementById('sc-val-all').textContent = total;
+      document.getElementById('sc-val-active').textContent = active;
+      document.getElementById('sc-val-none').textContent = none;
+      document.getElementById('sc-val-done').textContent = done;
+      document.getElementById('sc-sub-all').textContent = `전체 ${total}명 보기`;
+    }
+
     showScreen(0, document.querySelector('.nav-btn.active'));
     renderStep3List();
     renderStep3Selected();
     renderMemberTable();
+    initStatCards();
   </script>
 
   <!-- 운동 선택 모달 -->
