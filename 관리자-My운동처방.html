@@ -398,23 +398,24 @@
         </div>
 
         <div class="search-bar">
-          <input class="search-input" type="text" placeholder="🔍  회원명 또는 전화번호 검색" />
-          <select class="filter-select">
-            <option>전체 지점</option>
-            <option>강남점</option>
-            <option>서초점</option>
+          <input class="search-input" id="memberListSearch" type="text" placeholder="🔍  회원명 또는 전화번호 검색" oninput="renderMemberTable()" />
+          <select class="filter-select" id="filterBranch" onchange="renderMemberTable()">
+            <option value="">전체 지점</option>
+            <option value="강남점">강남점</option>
+            <option value="서초점">서초점</option>
+            <option value="마포점">마포점</option>
           </select>
-          <select class="filter-select">
-            <option>전체 등급</option>
-            <option>초급</option>
-            <option>중급</option>
-            <option>고급</option>
+          <select class="filter-select" id="filterGrade" onchange="renderMemberTable()">
+            <option value="">전체 등급</option>
+            <option value="초급">초급</option>
+            <option value="중급">중급</option>
+            <option value="고급">고급</option>
           </select>
-          <select class="filter-select">
-            <option>전체 상태</option>
-            <option>활성</option>
-            <option>완료</option>
-            <option>대기</option>
+          <select class="filter-select" id="filterStatus" onchange="renderMemberTable()">
+            <option value="">전체 상태</option>
+            <option value="active">활성</option>
+            <option value="done">완료</option>
+            <option value="none">없음</option>
           </select>
         </div>
 
@@ -1788,6 +1789,12 @@
     function renderMemberTable() {
       const tbody = document.getElementById('memberTableBody');
       if (!tbody) return;
+      // 필터 값 읽기
+      const searchQ = (document.getElementById('memberListSearch')?.value || '').trim().toLowerCase();
+      const filterBranch = document.getElementById('filterBranch')?.value || '';
+      const filterGrade = document.getElementById('filterGrade')?.value || '';
+      const filterStatus = document.getElementById('filterStatus')?.value || '';
+
       const rows = [];
       for (const [name, info] of Object.entries(memberPrescriptions)) {
         if (!info.list || info.list.length === 0) {
@@ -1803,7 +1810,23 @@
             trainer: latest.trainer, lastDone: lastSession, status: latest.status, id: latest.id });
         }
       }
-      tbody.innerHTML = rows.map(r => {
+      // 필터 적용
+      const filtered = rows.filter(r => {
+        if (searchQ && !r.name.toLowerCase().includes(searchQ) && !r.phone.includes(searchQ)) return false;
+        if (filterBranch && r.branch !== filterBranch) return false;
+        if (filterGrade && r.grade !== filterGrade) return false;
+        if (filterStatus && r.status !== filterStatus) return false;
+        return true;
+      });
+
+      if (!filtered.length) {
+        tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:32px;color:#A0AEC0;">조회된 회원이 없습니다</td></tr>';
+        const countEl = document.querySelector('.table-count');
+        if (countEl) countEl.textContent = '총 0명';
+        return;
+      }
+
+      tbody.innerHTML = filtered.map(r => {
         const statusBadge = r.status === 'active'
           ? '<span class="badge badge-green">활성</span>'
           : r.status === 'none'
@@ -1830,7 +1853,7 @@
         </tr>`;
       }).join('');
       const countEl = document.querySelector('.table-count');
-      if (countEl) countEl.textContent = `총 ${rows.length}명`;
+      if (countEl) countEl.textContent = `총 ${filtered.length}명`;
     }
 
     /* ── 날짜 피커 ── */
