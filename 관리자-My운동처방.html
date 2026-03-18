@@ -1202,44 +1202,74 @@
 
     function renderAcMemberSearch() {
       const q = (document.getElementById('acMemberSearchInput')?.value || '').trim();
+      if (!q) {
+        openMemberModal();
+        return;
+      }
       const result = document.getElementById('acMemberSearchResult');
       if (!result) return;
-
       const allMembers = Object.entries(memberPrescriptions).map(([name, data]) => ({
         name, phone: data.phone, prxCount: data.list.length
       }));
-
-      const filtered = q
-        ? allMembers.filter(m => m.name.includes(q) || m.phone.includes(q))
-        : [];
-
-      if (!q) {
-        result.innerHTML = '<div style="font-size:12px;color:#A0AEC0;padding:8px 0;">회원명 또는 전화번호를 입력하세요</div>';
-        return;
-      }
+      const filtered = allMembers.filter(m => m.name.includes(q) || m.phone.includes(q));
       if (!filtered.length) {
         result.innerHTML = '<div style="font-size:12px;color:#A0AEC0;padding:8px 0;">검색 결과가 없습니다</div>';
         return;
       }
+      result.innerHTML = filtered.map(m => _memberRow(m)).join('');
+    }
 
-      result.innerHTML = filtered.map(m => {
-        const isSelected = acSelectedMember === m.name;
-        return `<div class="member-search-result" style="cursor:pointer;" onclick="selectAcMember('${m.name.replace(/'/g,"\\'")}')">
-          <div class="member-avatar">${m.name[0]}</div>
-          <div class="member-info-found">
-            <div class="member-name-found">${m.name}</div>
-            <div class="member-meta-found">${m.phone} · 기존 처방 ${m.prxCount}건</div>
-          </div>
-          <button class="btn-select-member" style="background:${isSelected?'#48BB78':'#E67E22'};">
-            ${isSelected ? '✓ 선택됨' : '선택'}
-          </button>
-        </div>`;
-      }).join('');
+    function _memberRow(m) {
+      const isSelected = acSelectedMember === m.name;
+      return `<div class="member-search-result" style="cursor:pointer;margin-bottom:6px;" onclick="selectAcMember('${m.name.replace(/'/g,"\\'")}')">
+        <div class="member-avatar">${m.name[0]}</div>
+        <div class="member-info-found">
+          <div class="member-name-found">${m.name}</div>
+          <div class="member-meta-found">${m.phone} · 기존 처방 ${m.prxCount}건</div>
+        </div>
+        <button class="btn-select-member" style="background:${isSelected?'#48BB78':'#E67E22'};">
+          ${isSelected ? '✓ 선택됨' : '선택'}
+        </button>
+      </div>`;
     }
 
     function selectAcMember(name) {
       acSelectedMember = name;
-      renderAcMemberSearch();
+      // 인라인 결과 갱신
+      const q = (document.getElementById('acMemberSearchInput')?.value || '').trim();
+      if (q) renderAcMemberSearch();
+      // 모달 내 갱신
+      renderMemberModalList();
+      // 모달 닫기 + 입력창에 이름 채우기
+      document.getElementById('acMemberSearchInput').value = name;
+      closeMemberModal();
+      // 선택된 회원 인라인 표시
+      document.getElementById('acMemberSearchResult').innerHTML = _memberRow(
+        { name, phone: memberPrescriptions[name].phone, prxCount: memberPrescriptions[name].list.length }
+      );
+    }
+
+    function openMemberModal() {
+      document.getElementById('memberModalSearch').value = '';
+      renderMemberModalList();
+      document.getElementById('memberModalOverlay').classList.add('open');
+    }
+    function closeMemberModal() {
+      document.getElementById('memberModalOverlay').classList.remove('open');
+    }
+    function renderMemberModalList() {
+      const q = (document.getElementById('memberModalSearch')?.value || '').trim();
+      const allMembers = Object.entries(memberPrescriptions).map(([name, data]) => ({
+        name, phone: data.phone, prxCount: data.list.length
+      }));
+      const filtered = q
+        ? allMembers.filter(m => m.name.includes(q) || m.phone.includes(q))
+        : allMembers; // 빈 검색어 → 전체(최근 등록 순)
+      const cnt = document.getElementById('memberModalCount');
+      if (cnt) cnt.textContent = q ? `검색 결과 ${filtered.length}명` : `최근 등록 회원 · 전체 ${filtered.length}명`;
+      document.getElementById('memberModalList').innerHTML = filtered.length
+        ? filtered.map(m => _memberRow(m)).join('')
+        : '<div style="font-size:12px;color:#A0AEC0;padding:20px 0;text-align:center;">검색 결과가 없습니다</div>';
     }
 
     function renderPrxTimeline() {
@@ -1780,6 +1810,19 @@
   </script>
 
   <!-- 운동 선택 모달 -->
+  <!-- 회원 선택 모달 -->
+  <div class="ex-modal-overlay" id="memberModalOverlay" onclick="if(event.target===this)closeMemberModal()">
+    <div class="ex-modal" style="width:520px;">
+      <div class="ex-modal-header">
+        <div class="ex-modal-title">👤 회원 선택</div>
+        <input class="ex-modal-search-input" id="memberModalSearch" type="text" placeholder="🔍  회원명 또는 전화번호 검색..." oninput="renderMemberModalList()" autocomplete="off" />
+        <button class="ex-modal-close" onclick="closeMemberModal()">✕</button>
+      </div>
+      <div style="padding:10px 24px 6px;font-size:11px;font-weight:800;color:#A0AEC0;border-bottom:1px solid #F0F4F8;" id="memberModalCount">최근 등록 회원</div>
+      <div style="overflow-y:auto;flex:1;padding:12px 24px 20px;" id="memberModalList"></div>
+    </div>
+  </div>
+
   <div class="ex-modal-overlay" id="exModalOverlay" onclick="if(event.target===this)closeExModal()">
     <div class="ex-modal">
       <div class="ex-modal-header">
