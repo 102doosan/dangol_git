@@ -1192,10 +1192,13 @@
 
     function renderAcMemberSearch(allowModal) {
       const q = (document.getElementById('acMemberSearchInput')?.value || '').trim();
-      if (!q) {
-        if (allowModal) openMemberModal();
+      if (allowModal) {
+        // 검색 버튼: 항상 모달 오픈 (검색어 있으면 모달에서 필터링)
+        openMemberModal(q);
         return;
       }
+      // 타이핑 중: 인라인 드롭다운
+      if (!q) return;
       _showInlineSearch(q);
     }
 
@@ -1226,8 +1229,9 @@
       renderMemberModalList();
     }
 
-    function openMemberModal() {
-      document.getElementById('memberModalSearch').value = '';
+    function openMemberModal(initQ) {
+      const modalSearch = document.getElementById('memberModalSearch');
+      if (modalSearch) modalSearch.value = initQ || '';
       renderMemberModalList();
       document.getElementById('memberModalOverlay').classList.add('open');
     }
