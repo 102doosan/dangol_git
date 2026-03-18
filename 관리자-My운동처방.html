@@ -704,13 +704,13 @@
               <div class="form-label">회원 검색 <span class="required">*</span></div>
               <div style="display:flex;gap:8px;">
                 <input class="form-input" id="acMemberSearchInput" type="text" placeholder="회원명 또는 전화번호 입력" style="flex:1;"
-                  oninput="onMemberSearchInput()" onkeydown="if(event.key==='Enter')renderAcMemberSearch(true)" />
+                  oninput="onMemberSearchInput()" onkeydown="if(event.key==='Enter'){event.preventDefault();onMemberSearchInput();}" />
                 <button onclick="renderAcMemberSearch(true)" style="background:#E67E22;color:#fff;border:none;border-radius:10px;padding:10px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Noto Sans KR',sans-serif;white-space:nowrap;">검색</button>
               </div>
             </div>
           </div>
-          <!-- 검색 결과 -->
-          <div id="acMemberSearchResult" style="margin-top:8px;display:flex;flex-direction:column;gap:8px;"></div>
+          <!-- 인라인 검색 드롭다운 -->
+          <div id="acMemberSearchResult" style="display:none;position:relative;z-index:100;margin-top:4px;background:#fff;border:1.5px solid #E2E8F0;border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,0.10);overflow:hidden;max-height:280px;overflow-y:auto;"></div>
         </div>
 
         <!-- STEP 2: 처방 기본 정보 -->
@@ -1152,13 +1152,42 @@
 
     function onMemberSearchInput() {
       const q = (document.getElementById('acMemberSearchInput')?.value || '').trim();
+      const result = document.getElementById('acMemberSearchResult');
+      if (!result) return;
       if (!q) {
-        // 백스페이스 등으로 입력 지워지면 결과만 초기화 (모달 열지 않음)
-        const result = document.getElementById('acMemberSearchResult');
-        if (result) result.innerHTML = '';
+        result.style.display = 'none';
+        result.innerHTML = '';
         return;
       }
-      renderAcMemberSearch(false);
+      _showInlineSearch(q);
+    }
+
+    function _showInlineSearch(q) {
+      const result = document.getElementById('acMemberSearchResult');
+      if (!result) return;
+      const allMembers = Object.entries(memberPrescriptions).map(([name, data]) => ({
+        name, phone: data.phone, prxCount: data.list.length
+      }));
+      const filtered = allMembers.filter(m => m.name.includes(q) || m.phone.includes(q));
+      if (!filtered.length) {
+        result.style.display = 'block';
+        result.innerHTML = '<div style="padding:14px 16px;font-size:13px;color:#A0AEC0;">검색 결과가 없습니다</div>';
+        return;
+      }
+      result.style.display = 'block';
+      result.innerHTML = filtered.map(m => {
+        const isSelected = acSelectedMember === m.name;
+        return `<div onclick="selectAcMember('${m.name.replace(/'/g,"\\'")}',true)"
+          style="display:flex;align-items:center;gap:12px;padding:10px 16px;cursor:pointer;border-bottom:1px solid #F0F4F8;transition:background .15s;"
+          onmouseover="this.style.background='#FFF8F0'" onmouseout="this.style.background='#fff'">
+          <div style="width:34px;height:34px;border-radius:50%;background:#E67E22;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;flex-shrink:0;">${m.name[0]}</div>
+          <div style="flex:1;min-width:0;">
+            <div style="font-size:14px;font-weight:700;color:#2D3748;">${m.name}</div>
+            <div style="font-size:12px;color:#A0AEC0;">${m.phone} · 기존 처방 ${m.prxCount}건</div>
+          </div>
+          <div style="font-size:12px;font-weight:700;color:${isSelected?'#48BB78':'#E67E22'};">${isSelected?'✓ 선택됨':'선택'}</div>
+        </div>`;
+      }).join('');
     }
 
     function renderAcMemberSearch(allowModal) {
@@ -1167,17 +1196,7 @@
         if (allowModal) openMemberModal();
         return;
       }
-      const result = document.getElementById('acMemberSearchResult');
-      if (!result) return;
-      const allMembers = Object.entries(memberPrescriptions).map(([name, data]) => ({
-        name, phone: data.phone, prxCount: data.list.length
-      }));
-      const filtered = allMembers.filter(m => m.name.includes(q) || m.phone.includes(q));
-      if (!filtered.length) {
-        result.innerHTML = '<div style="font-size:12px;color:#A0AEC0;padding:8px 0;">검색 결과가 없습니다</div>';
-        return;
-      }
-      result.innerHTML = filtered.map(m => _memberRow(m)).join('');
+      _showInlineSearch(q);
     }
 
     function _memberRow(m) {
@@ -1194,20 +1213,17 @@
       </div>`;
     }
 
-    function selectAcMember(name) {
+    function selectAcMember(name, fromInline) {
       acSelectedMember = name;
-      // 인라인 결과 갱신
-      const q = (document.getElementById('acMemberSearchInput')?.value || '').trim();
-      if (q) renderAcMemberSearch();
-      // 모달 내 갱신
-      renderMemberModalList();
-      // 모달 닫기 + 입력창에 이름 채우기
-      document.getElementById('acMemberSearchInput').value = name;
+      const inp = document.getElementById('acMemberSearchInput');
+      const result = document.getElementById('acMemberSearchResult');
+      // 입력창에 이름 채우기
+      if (inp) inp.value = name;
+      // 드롭다운/모달 닫기
+      if (result) { result.style.display = 'none'; result.innerHTML = ''; }
       closeMemberModal();
-      // 선택된 회원 인라인 표시
-      document.getElementById('acMemberSearchResult').innerHTML = _memberRow(
-        { name, phone: memberPrescriptions[name].phone, prxCount: memberPrescriptions[name].list.length }
-      );
+      // 모달 내 목록 선택 상태 갱신
+      renderMemberModalList();
     }
 
     function openMemberModal() {
@@ -1924,12 +1940,19 @@
       }
     }
 
-    // 외부 클릭 시 피커 닫기
+    // 외부 클릭 시 피커 & 회원 검색 드롭다운 닫기
     document.addEventListener('mousedown', e => {
+      // 날짜 피커
       document.querySelectorAll('.date-picker-popup.open').forEach(popup => {
         const wrap = popup.closest('.date-picker-wrap');
         if (wrap && !wrap.contains(e.target)) popup.classList.remove('open');
       });
+      // 회원 검색 드롭다운
+      const result = document.getElementById('acMemberSearchResult');
+      const searchWrap = document.getElementById('acMemberSearchInput')?.closest('div');
+      if (result && result.style.display !== 'none' && searchWrap && !searchWrap.contains(e.target) && !result.contains(e.target)) {
+        result.style.display = 'none';
+      }
     });
 
     showScreen(0, document.querySelector('.nav-btn.active'));
