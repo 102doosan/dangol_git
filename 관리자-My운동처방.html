@@ -1436,7 +1436,7 @@
               <div class="step3-ex-list" id="epStep3ExList"></div>
             </div>
             <!-- 오른쪽: 선택된 운동 -->
-            <div class="step3-right">
+            <div class="step3-right" style="display:flex;flex-direction:column;">
               <div class="step3-right-head">
                 <div class="step3-right-title">선택된 운동</div>
                 <div class="step3-right-cnt" id="epStep3SelCnt">${p.exercises.length}개</div>
@@ -1444,15 +1444,15 @@
               <div class="step3-col-head">
                 <span></span><span>운동명</span><span>세트</span><span>횟수/시간</span><span>중요도</span><span></span>
               </div>
-              <div class="step3-selected-list" id="epStep3SelList"></div>
+              <div class="step3-selected-list" id="epStep3SelList" style="flex:1;overflow-y:auto;"></div>
               <div class="step3-add-direct" onclick="addEpStep3Direct()">+ 직접 입력으로 추가</div>
+              <!-- 저장/취소 버튼 패널 내부에 배치 -->
+              <div style="display:flex;gap:10px;justify-content:flex-end;padding:12px 16px;border-top:1px solid #F0F4F8;background:#fff;">
+                <button class="btn-cancel" onclick="cancelEditPrx()">취소</button>
+                <button class="btn-primary" onclick="savePrx()" style="padding:10px 24px;font-size:14px;">💾 저장</button>
+              </div>
             </div>
           </div>
-        </div>
-
-        <div style="display:flex;gap:10px;justify-content:flex-end;padding-bottom:16px;">
-          <button class="btn-cancel" onclick="cancelEditPrx()">취소</button>
-          <button class="btn-primary" onclick="savePrx()">저장</button>
         </div>`;
 
       // 초기 미리보기 렌더링
