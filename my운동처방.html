@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>화면 디자인</title>
+  <title>My 운동처방</title>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet" />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -20,232 +20,292 @@
 
     /* ── 상단 툴바 ── */
     .toolbar {
-      width: 100%;
-      max-width: 1100px;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      flex-wrap: wrap;
+      width: 100%; max-width: 1100px;
+      display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
     }
-    .toolbar-title {
-      font-size: 18px; font-weight: 900; color: #fff;
-      margin-right: auto;
-    }
+    .toolbar-title { font-size: 18px; font-weight: 900; color: #fff; margin-right: auto; }
     .screen-btn {
       padding: 7px 16px; border-radius: 99px; border: none; cursor: pointer;
       font-size: 12px; font-weight: 700; font-family: 'Noto Sans KR', sans-serif;
-      background: #2A2A4A; color: #A0AEC0;
-      transition: all 0.2s;
+      background: #2A2A4A; color: #A0AEC0; transition: all 0.2s;
     }
     .screen-btn.active { background: #4F9CF9; color: #fff; }
     .screen-btn:hover:not(.active) { background: #3A3A5A; color: #fff; }
 
-    /* ── 폰 프레임 + 캔버스 나란히 ── */
-    .workspace {
-      width: 100%;
-      max-width: 1100px;
-      display: flex;
-      gap: 32px;
-      align-items: flex-start;
-    }
-
-    /* ── 폰 프레임 ── */
+    /* ── 폰 프레임 + 메모판 ── */
+    .workspace { width: 100%; max-width: 1100px; display: flex; gap: 32px; align-items: flex-start; }
     .phone-wrap { flex-shrink: 0; }
     .phone {
-      width: 375px;
-      height: 740px;
-      background: #fff;
+      width: 375px; height: 740px; background: #fff;
       border-radius: 44px;
       box-shadow: 0 0 0 10px #111, 0 30px 80px rgba(0,0,0,0.6);
-      overflow: hidden;
-      position: relative;
-      display: flex;
-      flex-direction: column;
+      overflow: hidden; position: relative; display: flex; flex-direction: column;
     }
     .phone-notch {
       position: absolute; top: 0; left: 50%; transform: translateX(-50%);
-      width: 120px; height: 28px; background: #111; border-radius: 0 0 18px 18px;
-      z-index: 10;
+      width: 120px; height: 28px; background: #111; border-radius: 0 0 18px 18px; z-index: 10;
     }
-    .phone-screen {
-      flex: 1;
-      overflow: hidden;
-      position: relative;
-      margin-top: 28px;
-    }
+    .phone-screen { flex: 1; overflow: hidden; position: relative; margin-top: 28px; }
     .screen-frame {
-      position: absolute; inset: 0;
-      display: none;
-      flex-direction: column;
-      background: #f0f4f8;
-      overflow-y: auto;
+      position: absolute; inset: 0; display: none;
+      flex-direction: column; background: #F0F4F8; overflow-y: auto;
     }
     .screen-frame.active { display: flex; }
 
-    /* ── 우측 메모판 ── */
+    /* ── 메모판 ── */
     .memo-panel {
-      flex: 1;
-      background: #16213E;
-      border-radius: 20px;
-      padding: 24px;
-      min-height: 600px;
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
+      flex: 1; background: #16213E; border-radius: 20px; padding: 24px;
+      min-height: 600px; display: flex; flex-direction: column; gap: 16px;
     }
     .memo-panel h3 { font-size: 14px; font-weight: 800; color: #76E4F7; letter-spacing: 1px; }
-    .memo-field {
-      background: #0F3460;
-      border-radius: 12px;
-      padding: 14px 16px;
-    }
-    .memo-field label {
-      display: block; font-size: 11px; font-weight: 700; color: #4F9CF9;
-      margin-bottom: 6px; letter-spacing: 0.5px;
-    }
+    .memo-field { background: #0F3460; border-radius: 12px; padding: 14px 16px; }
+    .memo-field label { display: block; font-size: 11px; font-weight: 700; color: #4F9CF9; margin-bottom: 6px; letter-spacing: 0.5px; }
     .memo-field textarea, .memo-field input {
       width: 100%; background: transparent; border: none; outline: none;
-      color: #E2E8F0; font-family: 'Noto Sans KR', sans-serif;
-      font-size: 13px; resize: none;
+      color: #E2E8F0; font-family: 'Noto Sans KR', sans-serif; font-size: 13px; resize: none;
     }
     .memo-field textarea { min-height: 80px; line-height: 1.6; }
     .memo-divider { height: 1px; background: #1E3A5F; }
 
     /* ── 공통 앱 컴포넌트 ── */
     .app-header {
-      background: #3B6FF0;
-      color: #fff;
-      padding: 14px 20px 14px;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      flex-shrink: 0;
+      background: #3B6FF0; color: #fff;
+      padding: 14px 20px; display: flex; align-items: center; gap: 12px; flex-shrink: 0;
     }
     .app-header .back { font-size: 18px; cursor: pointer; opacity: 0.9; }
     .app-header .title { font-size: 17px; font-weight: 700; }
     .app-body { flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 12px; }
-    .app-bottom-tab {
-      background: #fff;
-      border-top: 1px solid #E2E8F0;
-      padding: 10px 0 14px;
-      display: flex;
-      justify-content: center;
-      flex-shrink: 0;
-    }
-    .tab-item { display: flex; flex-direction: column; align-items: center; gap: 3px; font-size: 10px; color: #A0AEC0; font-weight: 700; }
-    .tab-item.on { color: #3B6FF0; }
-    .tab-icon { font-size: 22px; }
 
-    /* ── 카드 컴포넌트 ── */
-    .pcard {
-      background: #fff;
-      border-radius: 16px;
-      padding: 16px;
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+    /* ── 목록 화면 ── */
+    .list-header {
+      background: linear-gradient(135deg, #3B6FF0 0%, #6B46C1 100%);
+      padding: 32px 20px 24px; flex-shrink: 0;
     }
+    .list-header-greeting { font-size: 13px; color: rgba(255,255,255,0.75); margin-bottom: 4px; }
+    .list-header-name { font-size: 20px; font-weight: 900; color: #fff; }
+    .list-header-sub { font-size: 12px; color: rgba(255,255,255,0.65); margin-top: 6px; }
+    .list-header-badge {
+      display: inline-flex; align-items: center; gap: 5px;
+      background: rgba(255,255,255,0.18); border-radius: 99px;
+      padding: 4px 10px; font-size: 11px; font-weight: 700; color: #fff;
+      margin-top: 10px;
+    }
+
+    /* ── 처방 카드 ── */
+    .pcard {
+      background: #fff; border-radius: 16px; padding: 14px 16px;
+      display: flex; align-items: center; gap: 14px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+      cursor: pointer; transition: transform .15s, box-shadow .15s;
+    }
+    .pcard:hover { transform: translateY(-1px); box-shadow: 0 4px 14px rgba(0,0,0,0.12); }
+    .pcard.done { opacity: 0.65; }
     .pcard-thumb {
-      width: 56px; height: 56px; border-radius: 14px;
+      width: 52px; height: 52px; border-radius: 14px;
       overflow: hidden; flex-shrink: 0;
       display: flex; align-items: center; justify-content: center;
     }
-    .pcard-thumb svg { width: 56px; height: 56px; }
-    .pcard-info { flex: 1; }
-    .pcard-name { font-size: 15px; font-weight: 700; color: #1A202C; }
-    .pcard-date { font-size: 12px; color: #A0AEC0; margin-top: 2px; }
-    .pcard-actions { display: flex; align-items: center; gap: 8px; }
+    .pcard-thumb svg { width: 52px; height: 52px; }
+    .pcard-info { flex: 1; min-width: 0; }
+    .pcard-name { font-size: 14px; font-weight: 700; color: #1A202C; }
+    .pcard-date { font-size: 11px; color: #A0AEC0; margin-top: 2px; }
+    .pcard-tags { display: flex; gap: 5px; margin-top: 6px; flex-wrap: wrap; }
+    .tag {
+      font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 99px;
+    }
+    .tag-active { background: #EBF8FF; color: #3B6FF0; }
+    .tag-done   { background: #F0F4F8; color: #A0AEC0; }
+    .tag-grade  { background: #FFF8E7; color: #D69E2E; }
+    .pcard-actions { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
     .btn-start {
-      background: #3B6FF0; color: #fff;
-      border: none; border-radius: 99px;
-      padding: 8px 18px; font-size: 13px; font-weight: 700;
-      cursor: pointer; font-family: 'Noto Sans KR', sans-serif;
+      background: #3B6FF0; color: #fff; border: none; border-radius: 99px;
+      padding: 7px 14px; font-size: 12px; font-weight: 700; cursor: pointer;
+      font-family: 'Noto Sans KR', sans-serif; white-space: nowrap;
+    }
+    .btn-done-badge {
+      background: #E2E8F0; color: #718096; border-radius: 99px;
+      padding: 6px 12px; font-size: 11px; font-weight: 700;
     }
     .btn-more { font-size: 18px; color: #CBD5E0; cursor: pointer; }
 
+    /* ── 진행바 (목록 상단) ── */
+    .progress-banner {
+      margin: 0 16px; background: #EBF8FF; border-radius: 14px; padding: 12px 16px;
+      border-left: 4px solid #3B6FF0;
+    }
+    .progress-banner-label { font-size: 11px; font-weight: 700; color: #3B6FF0; margin-bottom: 6px; }
+    .progress-bar-bg { height: 6px; background: #BEE3F8; border-radius: 99px; overflow: hidden; }
+    .progress-bar-fill { height: 100%; background: #3B6FF0; border-radius: 99px; }
+    .progress-banner-sub { font-size: 11px; color: #4A90D9; margin-top: 5px; font-weight: 600; }
+
+    /* ── 상세 화면 ── */
+    .detail-header {
+      background: linear-gradient(135deg, #3B6FF0 0%, #7B61FF 100%);
+      color: #fff; padding: 20px 16px 24px; flex-shrink: 0;
+    }
+    .detail-header .back { font-size: 18px; margin-bottom: 10px; cursor: pointer; opacity: 0.9; display: flex; align-items: center; gap: 4px; }
+    .detail-header .name { font-size: 19px; font-weight: 900; }
+    .detail-header .meta { font-size: 12px; opacity: 0.8; margin-top: 4px; }
+    .detail-header-tags { display: flex; gap: 6px; margin-top: 10px; flex-wrap: wrap; }
+    .dtag {
+      display: inline-block; font-size: 10px; font-weight: 700; padding: 3px 9px; border-radius: 99px;
+      background: rgba(255,255,255,0.22); color: #fff;
+    }
+    .detail-body { padding: 16px; display: flex; flex-direction: column; gap: 12px; overflow-y: auto; flex: 1; }
+    .section-title { font-size: 12px; font-weight: 800; color: #A0AEC0; letter-spacing: 0.5px; text-transform: uppercase; padding: 0 2px 4px; border-bottom: 1px solid #E2E8F0; }
+    .ex-row {
+      background: #fff; border-radius: 14px; padding: 14px 16px;
+      display: flex; align-items: center; gap: 14px;
+      box-shadow: 0 1px 6px rgba(0,0,0,0.06);
+    }
+    .ex-num { width: 28px; height: 28px; border-radius: 50%; background: #3B6FF0; color: #fff; font-size: 12px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .ex-num.secondary { background: #E2E8F0; color: #718096; }
+    .ex-row-info { flex: 1; }
+    .ex-row-name { font-size: 14px; font-weight: 700; color: #1A202C; }
+    .ex-row-detail { font-size: 12px; color: #A0AEC0; margin-top: 2px; }
+    .ex-row-grade { font-size: 10px; font-weight: 700; padding: 1px 7px; border-radius: 99px; }
+    .grade-essential { background: #EBF8FF; color: #3B6FF0; }
+    .grade-recommend { background: #F0FFF4; color: #38A169; }
+    .grade-optional   { background: #F7F9FC; color: #A0AEC0; }
+    .memo-card { background: #FFF8E7; border-radius: 14px; padding: 14px 16px; border-left: 4px solid #F6AD55; }
+    .memo-card .label { font-size: 11px; font-weight: 700; color: #F6AD55; margin-bottom: 6px; }
+    .memo-card .text { font-size: 13px; color: #744210; line-height: 1.7; }
+    .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .info-item { background: #fff; border-radius: 12px; padding: 12px 14px; box-shadow: 0 1px 4px rgba(0,0,0,0.05); }
+    .info-item-label { font-size: 10px; font-weight: 700; color: #A0AEC0; margin-bottom: 4px; }
+    .info-item-val { font-size: 14px; font-weight: 700; color: #2D3748; }
+
     /* ── 진행 화면 ── */
-    .progress-top { background: #fff; padding: 12px 16px; display: flex; align-items: center; justify-content: space-between; }
+    .progress-top {
+      background: #fff; padding: 12px 16px;
+      display: flex; align-items: center; justify-content: space-between; flex-shrink: 0;
+    }
     .progress-steps { display: flex; gap: 4px; }
     .step-dot { width: 24px; height: 4px; border-radius: 99px; background: #E2E8F0; }
     .step-dot.done { background: #3B6FF0; }
     .step-dot.current { background: #3B6FF0; opacity: 0.5; }
-    .ex-card {
-      background: #fff; border-radius: 20px; overflow: hidden;
-      box-shadow: 0 4px 16px rgba(0,0,0,0.1);
-    }
-    .ex-img { width: 100%; height: 200px; background: linear-gradient(135deg, #3B6FF0 0%, #7B61FF 100%); display: flex; align-items: center; justify-content: center; font-size: 60px; }
-    .ex-info { padding: 16px; }
+    .ex-card { background: #fff; border-radius: 20px; overflow: hidden; box-shadow: 0 4px 16px rgba(0,0,0,0.1); }
+    .ex-img { width: 100%; height: 190px; display: flex; align-items: center; justify-content: center; }
+    .ex-info { padding: 14px 16px; }
     .ex-name { font-size: 18px; font-weight: 900; color: #1A202C; }
-    .ex-desc { font-size: 13px; color: #718096; margin-top: 4px; }
+    .ex-tip { font-size: 12px; color: #718096; margin-top: 4px; line-height: 1.5; }
     .set-counter {
       background: #fff; border-radius: 16px; padding: 16px;
       display: flex; align-items: center; justify-content: space-between;
     }
-    .set-label { font-size: 13px; color: #718096; font-weight: 600; }
-    .set-num { font-size: 28px; font-weight: 900; color: #3B6FF0; }
+    .set-label { font-size: 12px; color: #718096; font-weight: 600; }
+    .set-num { font-size: 26px; font-weight: 900; color: #3B6FF0; }
     .set-controls { display: flex; gap: 8px; align-items: center; }
     .set-btn { width: 36px; height: 36px; border-radius: 50%; border: 2px solid #3B6FF0; background: #fff; color: #3B6FF0; font-size: 20px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; }
     .btn-next {
       background: #3B6FF0; color: #fff; border: none; border-radius: 16px;
-      padding: 16px; font-size: 16px; font-weight: 700; cursor: pointer;
-      font-family: 'Noto Sans KR', sans-serif; width: 100%;
-      margin: 0 16px 16px; width: calc(100% - 32px); flex-shrink: 0;
+      padding: 16px; font-size: 15px; font-weight: 700; cursor: pointer;
+      font-family: 'Noto Sans KR', sans-serif; width: calc(100% - 32px);
+      margin: 0 16px 16px; flex-shrink: 0;
     }
 
     /* ── 완료 화면 ── */
     .complete-body {
       flex: 1; display: flex; flex-direction: column;
       align-items: center; justify-content: center;
-      padding: 24px; gap: 16px; background: #f0f4f8;
+      padding: 24px; gap: 14px;
     }
-    .complete-icon { font-size: 72px; }
     .complete-title { font-size: 22px; font-weight: 900; color: #1A202C; }
-    .complete-sub { font-size: 14px; color: #718096; }
-    .stat-row { display: flex; gap: 12px; width: 100%; }
+    .complete-sub { font-size: 14px; color: #718096; text-align: center; line-height: 1.6; }
+    .stat-row { display: flex; gap: 10px; width: 100%; }
     .stat-card { flex: 1; background: #fff; border-radius: 16px; padding: 14px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.07); }
-    .stat-val { font-size: 22px; font-weight: 900; color: #3B6FF0; }
-    .stat-lbl { font-size: 11px; color: #A0AEC0; margin-top: 2px; font-weight: 700; }
+    .stat-val { font-size: 20px; font-weight: 900; color: #3B6FF0; }
+    .stat-lbl { font-size: 10px; color: #A0AEC0; margin-top: 2px; font-weight: 700; }
     .btn-home {
       background: #3B6FF0; color: #fff; border: none; border-radius: 16px;
-      padding: 16px; font-size: 15px; font-weight: 700; cursor: pointer;
+      padding: 15px; font-size: 15px; font-weight: 700; cursor: pointer;
       font-family: 'Noto Sans KR', sans-serif; width: 100%;
     }
     .btn-outline {
       background: #fff; color: #3B6FF0; border: 2px solid #3B6FF0; border-radius: 16px;
-      padding: 14px; font-size: 15px; font-weight: 700; cursor: pointer;
+      padding: 13px; font-size: 14px; font-weight: 700; cursor: pointer;
       font-family: 'Noto Sans KR', sans-serif; width: 100%;
     }
 
-    /* ── 상세 화면 ── */
-    .detail-header {
-      background: linear-gradient(135deg, #3B6FF0 0%, #7B61FF 100%);
-      color: #fff; padding: 20px 16px 24px;
+    /* ── 동영상 ── */
+    .ex-video-wrap { position:relative; background:#111; height:190px; overflow:hidden; flex-shrink:0; }
+    .ex-video-wrap iframe, .ex-video-wrap video { width:100%; height:190px; object-fit:cover; border:none; }
+    .ex-play-overlay {
+      position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+      background:rgba(0,0,0,0.38); cursor:pointer;
     }
-    .detail-header .back { font-size: 18px; margin-bottom: 12px; cursor: pointer; opacity: 0.9; }
-    .detail-header .name { font-size: 20px; font-weight: 900; }
-    .detail-header .meta { font-size: 12px; opacity: 0.8; margin-top: 4px; }
-    .detail-body { padding: 16px; display: flex; flex-direction: column; gap: 12px; }
-    .ex-row {
-      background: #fff; border-radius: 14px; padding: 14px 16px;
-      display: flex; align-items: center; gap: 14px;
-      box-shadow: 0 1px 6px rgba(0,0,0,0.06);
+    .ex-play-btn {
+      width:62px; height:62px; border-radius:50%;
+      background:rgba(255,255,255,0.92); display:flex; align-items:center; justify-content:center;
+      transition:transform .15s; box-shadow:0 4px 20px rgba(0,0,0,0.4);
     }
-    .ex-num { width: 28px; height: 28px; border-radius: 50%; background: #3B6FF0; color: #fff; font-size: 13px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-    .ex-row-info { flex: 1; }
-    .ex-row-name { font-size: 14px; font-weight: 700; color: #1A202C; }
-    .ex-row-detail { font-size: 12px; color: #A0AEC0; margin-top: 2px; }
-    .memo-card { background: #FFF8E7; border-radius: 14px; padding: 14px 16px; border-left: 4px solid #F6AD55; }
-    .memo-card .label { font-size: 11px; font-weight: 700; color: #F6AD55; margin-bottom: 6px; }
-    .memo-card .text { font-size: 13px; color: #744210; line-height: 1.6; }
+    .ex-play-btn:hover { transform:scale(1.1); }
+
+    /* ── 자동 진행 바 ── */
+    .auto-bar {
+      background:#2B4DB5; padding:8px 14px; flex-shrink:0;
+      display:flex; align-items:center; gap:10px;
+    }
+    .auto-bar-track { flex:1; background:rgba(255,255,255,0.25); border-radius:99px; height:5px; overflow:hidden; }
+    .auto-bar-fill { height:100%; background:#fff; border-radius:99px; transition:width 1s linear; }
+    .btn-auto {
+      background:rgba(255,255,255,0.15); color:#fff; border:1.5px solid rgba(255,255,255,0.5);
+      border-radius:99px; padding:4px 12px; font-size:11px; font-weight:700; cursor:pointer;
+      font-family:'Noto Sans KR',sans-serif; white-space:nowrap;
+    }
+    .btn-auto-start {
+      background:#EBF8FF; color:#3B6FF0; border:none; border-radius:99px;
+      padding:6px 14px; font-size:11px; font-weight:700; cursor:pointer;
+      font-family:'Noto Sans KR',sans-serif; white-space:nowrap;
+    }
+
+    /* ── 세트 타이머 오버레이 ── */
+    .set-timer-overlay {
+      position:absolute; inset:0;
+      display:flex; flex-direction:column; align-items:center; justify-content:center;
+      background:rgba(0,0,0,0.62); gap:6px;
+    }
+    .set-timer-ring {
+      width:80px; height:80px; border-radius:50%;
+      border:4px solid rgba(255,255,255,0.2);
+      display:flex; align-items:center; justify-content:center; position:relative;
+    }
+    .set-timer-ring svg { position:absolute; top:-4px; left:-4px; transform:rotate(-90deg); }
+    .set-timer-num { font-size:28px; font-weight:900; color:#fff; z-index:1; }
+    .set-timer-label { font-size:12px; font-weight:700; color:rgba(255,255,255,0.85); }
+    .set-timer-done-btn {
+      background:#48BB78; color:#fff; border:none; border-radius:99px;
+      padding:7px 20px; font-size:13px; font-weight:700; cursor:pointer;
+      font-family:'Noto Sans KR',sans-serif; margin-top:4px;
+    }
+
+    /* ── 트레이너 메모 화면 ── */
+    .trainer-memo-card {
+      background: #fff; border-radius: 16px; padding: 20px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+    }
+    .trainer-row { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; }
+    .trainer-avatar { width: 40px; height: 40px; border-radius: 50%; background: #3B6FF0; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
+    .trainer-name { font-size: 14px; font-weight: 700; color: #1A202C; }
+    .trainer-date { font-size: 12px; color: #A0AEC0; }
+    .memo-text { font-size: 13px; color: #2D3748; line-height: 1.85; }
+    .memo-warn { margin-top: 16px; padding-top: 14px; border-top: 1px solid #E2E8F0; font-size: 11px; color: #A0AEC0; }
+    .alert-box {
+      background: #FFF5F5; border-left: 4px solid #FC8181; border-radius: 12px; padding: 12px 14px;
+      font-size: 12px; color: #C53030; line-height: 1.6;
+    }
+    .next-check-box {
+      background: #EBF8FF; border-left: 4px solid #63B3ED; border-radius: 12px; padding: 12px 14px;
+      font-size: 12px; color: #2B6CB0; line-height: 1.6; font-weight: 600;
+    }
   </style>
 </head>
 <body>
 
 <div class="toolbar">
-  <span class="toolbar-title">📱 화면 디자인</span>
-  <button class="screen-btn active" onclick="switchScreen('list')">목록</button>
-  <button class="screen-btn" onclick="switchScreen('detail')">상세</button>
+  <span class="toolbar-title">📱 My 운동처방 — 김도산</span>
+  <button class="screen-btn active" onclick="switchScreen('list')">처방 목록</button>
+  <button class="screen-btn" onclick="switchScreen('detail')">처방 상세</button>
   <button class="screen-btn" onclick="switchScreen('exercise')">운동 진행</button>
   <button class="screen-btn" onclick="switchScreen('complete')">완료</button>
   <button class="screen-btn" onclick="switchScreen('memo')">트레이너 메모</button>
@@ -259,445 +319,227 @@
       <div class="phone-notch"></div>
       <div class="phone-screen">
 
-        <!-- ① 목록 화면 -->
+        <!-- ① 처방 목록 화면 -->
         <div class="screen-frame active" id="screen-list">
-          <div class="app-header">
-            <span class="back">←</span>
-            <span class="title">운동처방</span>
+          <!-- 프로필 헤더 -->
+          <div class="list-header">
+            <div class="list-header-greeting">안녕하세요 👋</div>
+            <div class="list-header-name">김도산 회원님</div>
+            <div class="list-header-sub">강남점 · 올바르고 건강한 운동=단골</div>
+            <div class="list-header-badge">💊 운동처방 4건 보유</div>
           </div>
-          <div class="app-body">
-            <!-- 디스크시술 5주차: 3D 척추 글로우 일러스트 -->
-            <div class="pcard">
+
+          <!-- 진행 중인 처방 배너 -->
+          <div style="padding:12px 16px 4px;">
+            <div class="progress-banner">
+              <div class="progress-banner-label">🔥 현재 진행 중 — 디스크시술 5주차</div>
+              <div class="progress-bar-bg">
+                <div class="progress-bar-fill" style="width:78%;"></div>
+              </div>
+              <div class="progress-banner-sub">23회 수행 중 · 마지막 2026.03.17</div>
+            </div>
+          </div>
+
+          <div class="app-body" style="padding:12px 16px;">
+
+            <!-- ① 디스크시술 5주차 (활성) -->
+            <div class="pcard" onclick="openDetail(0)">
               <div class="pcard-thumb">
                 <svg viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg">
                   <defs>
-                    <radialGradient id="bgRadial" cx="50%" cy="50%" r="70%">
-                      <stop offset="0%"   stop-color="#1A7A8A"/>
-                      <stop offset="60%"  stop-color="#0D5570"/>
-                      <stop offset="100%" stop-color="#062040"/>
+                    <radialGradient id="bgR1" cx="50%" cy="50%" r="70%">
+                      <stop offset="0%" stop-color="#1A7A8A"/><stop offset="60%" stop-color="#0D5570"/><stop offset="100%" stop-color="#062040"/>
                     </radialGradient>
-                    <radialGradient id="glowRed" cx="50%" cy="50%" r="50%">
-                      <stop offset="0%"  stop-color="#ffffff" stop-opacity="0.95"/>
-                      <stop offset="40%" stop-color="#ffe066" stop-opacity="0.7"/>
-                      <stop offset="100%" stop-color="#ff6600" stop-opacity="0"/>
+                    <radialGradient id="glowY" cx="50%" cy="50%" r="50%">
+                      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.95"/><stop offset="40%" stop-color="#ffe066" stop-opacity="0.7"/><stop offset="100%" stop-color="#ff6600" stop-opacity="0"/>
                     </radialGradient>
-                    <linearGradient id="vertTop" x1="0" y1="0" x2="1" y2="1">
-                      <stop offset="0%" stop-color="#A8E6F0"/>
-                      <stop offset="100%" stop-color="#5BB8D4"/>
-                    </linearGradient>
-                    <linearGradient id="vertSide" x1="0" y1="0" x2="1" y2="0">
-                      <stop offset="0%" stop-color="#3A9FBF"/>
-                      <stop offset="100%" stop-color="#1D6A88"/>
-                    </linearGradient>
-                    <filter id="glow">
-                      <feGaussianBlur stdDeviation="1.5" result="blur"/>
-                      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
-                    </filter>
+                    <linearGradient id="vTop" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#A8E6F0"/><stop offset="100%" stop-color="#5BB8D4"/></linearGradient>
+                    <linearGradient id="vSide" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#3A9FBF"/><stop offset="100%" stop-color="#1D6A88"/></linearGradient>
+                    <filter id="gf1"><feGaussianBlur stdDeviation="1.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
                   </defs>
-                  <!-- 배경 -->
-                  <rect width="56" height="56" fill="url(#bgRadial)"/>
-
-                  <!-- 척추뼈 5개 (3D 원통 느낌: 상면 타원 + 측면 사각) -->
-                  <!-- 뼈 1 -->
-                  <rect x="18" y="5"  width="20" height="6" rx="1" fill="url(#vertSide)"/>
-                  <ellipse cx="28" cy="5"  rx="10" ry="2.5" fill="url(#vertTop)"/>
-                  <ellipse cx="28" cy="11" rx="10" ry="2.5" fill="#3A8FAF" opacity="0.6"/>
-                  <!-- 디스크 1 -->
+                  <rect width="56" height="56" fill="url(#bgR1)"/>
+                  <rect x="18" y="5"  width="20" height="6" rx="1" fill="url(#vSide)"/><ellipse cx="28" cy="5"  rx="10" ry="2.5" fill="url(#vTop)"/><ellipse cx="28" cy="11" rx="10" ry="2.5" fill="#3A8FAF" opacity="0.6"/>
                   <ellipse cx="28" cy="13" rx="8" ry="1.8" fill="#1E5F7A"/>
-
-                  <!-- 뼈 2 -->
-                  <rect x="18" y="14" width="20" height="6" rx="1" fill="url(#vertSide)"/>
-                  <ellipse cx="28" cy="14" rx="10" ry="2.5" fill="url(#vertTop)"/>
-                  <ellipse cx="28" cy="20" rx="10" ry="2.5" fill="#3A8FAF" opacity="0.6"/>
-                  <!-- 디스크 2 -->
+                  <rect x="18" y="14" width="20" height="6" rx="1" fill="url(#vSide)"/><ellipse cx="28" cy="14" rx="10" ry="2.5" fill="url(#vTop)"/><ellipse cx="28" cy="20" rx="10" ry="2.5" fill="#3A8FAF" opacity="0.6"/>
                   <ellipse cx="28" cy="22" rx="8" ry="1.8" fill="#1E5F7A"/>
-
-                  <!-- 뼈 3 (강조 - 시술 부위) -->
-                  <rect x="17" y="23" width="22" height="7" rx="1" fill="#4AACCF"/>
-                  <ellipse cx="28" cy="23" rx="11" ry="2.8" fill="#7FD4E8"/>
-                  <ellipse cx="28" cy="30" rx="11" ry="2.8" fill="#3A9FBF" opacity="0.7"/>
-                  <!-- 강조 디스크 (글로우) -->
-                  <ellipse cx="28" cy="32" rx="9" ry="2.2" fill="#0A4060"/>
-                  <ellipse cx="28" cy="32" rx="9" ry="2.2" fill="url(#glowRed)" filter="url(#glow)"/>
-
-                  <!-- 뼈 4 -->
-                  <rect x="18" y="33" width="20" height="6" rx="1" fill="url(#vertSide)"/>
-                  <ellipse cx="28" cy="33" rx="10" ry="2.5" fill="url(#vertTop)"/>
-                  <ellipse cx="28" cy="39" rx="10" ry="2.5" fill="#3A8FAF" opacity="0.6"/>
-                  <!-- 디스크 4 -->
-                  <ellipse cx="28" cy="41" rx="8" ry="1.8" fill="#1E5F7A"/>
-
-                  <!-- 뼈 5 -->
-                  <rect x="18" y="42" width="20" height="6" rx="1" fill="url(#vertSide)"/>
-                  <ellipse cx="28" cy="42" rx="10" ry="2.5" fill="url(#vertTop)"/>
-                  <ellipse cx="28" cy="48" rx="10" ry="2.5" fill="#3A8FAF" opacity="0.5"/>
-
-                  <!-- 좌측 진동파형 -->
-                  <path d="M14 20 Q11 22 14 24 Q17 26 14 28 Q11 30 14 32 Q17 34 14 36" stroke="#5CE8F8" stroke-width="1.2" fill="none" opacity="0.7"/>
-                  <path d="M10 22 Q7 25 10 28 Q13 31 10 34" stroke="#5CE8F8" stroke-width="0.8" fill="none" opacity="0.4"/>
-                  <!-- 우측 진동파형 -->
-                  <path d="M42 20 Q45 22 42 24 Q39 26 42 28 Q45 30 42 32 Q39 34 42 36" stroke="#5CE8F8" stroke-width="1.2" fill="none" opacity="0.7"/>
-                  <path d="M46 22 Q49 25 46 28 Q43 31 46 34" stroke="#5CE8F8" stroke-width="0.8" fill="none" opacity="0.4"/>
-
-                  <!-- 글로우 중심점 -->
-                  <circle cx="28" cy="32" r="3" fill="url(#glowRed)" opacity="0.9"/>
+                  <rect x="17" y="23" width="22" height="7" rx="1" fill="#4AACCF"/><ellipse cx="28" cy="23" rx="11" ry="2.8" fill="#7FD4E8"/><ellipse cx="28" cy="30" rx="11" ry="2.8" fill="#3A9FBF" opacity="0.7"/>
+                  <ellipse cx="28" cy="32" rx="9" ry="2.2" fill="#0A4060"/><ellipse cx="28" cy="32" rx="9" ry="2.2" fill="url(#glowY)" filter="url(#gf1)"/>
+                  <rect x="18" y="33" width="20" height="6" rx="1" fill="url(#vSide)"/><ellipse cx="28" cy="33" rx="10" ry="2.5" fill="url(#vTop)"/>
+                  <rect x="18" y="42" width="20" height="6" rx="1" fill="url(#vSide)"/><ellipse cx="28" cy="42" rx="10" ry="2.5" fill="url(#vTop)"/>
+                  <circle cx="28" cy="32" r="3" fill="url(#glowY)" opacity="0.9"/>
                 </svg>
               </div>
               <div class="pcard-info">
                 <div class="pcard-name">디스크시술 5주차</div>
-                <div class="pcard-date">24.06.27</div>
+                <div class="pcard-date">2024.06.27 시작</div>
+                <div class="pcard-tags">
+                  <span class="tag tag-active">● 진행중</span>
+                  <span class="tag tag-grade">중급</span>
+                  <span class="tag" style="background:#F0FFF4;color:#38A169;">3가지 운동</span>
+                </div>
               </div>
               <div class="pcard-actions">
-                <button class="btn-start" onclick="switchScreen('detail')">시작</button>
-                <span class="btn-more">⋮</span>
+                <button class="btn-start" onclick="event.stopPropagation();switchScreen('exercise')">시작</button>
               </div>
             </div>
 
-            <!-- F, Core, 3x2: 인체+쉴드 글로우 -->
-            <div class="pcard">
+            <!-- ② 디스크시술 4주차 (완료) -->
+            <div class="pcard done" onclick="openDetail(1)" style="cursor:pointer;">
               <div class="pcard-thumb">
                 <svg viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg">
                   <defs>
-                    <radialGradient id="coreBg" cx="50%" cy="40%" r="65%">
-                      <stop offset="0%"   stop-color="#1A8A9A"/>
-                      <stop offset="55%"  stop-color="#0D5060"/>
-                      <stop offset="100%" stop-color="#061820"/>
-                    </radialGradient>
-                    <radialGradient id="shieldGlow" cx="50%" cy="50%" r="50%">
-                      <stop offset="0%"   stop-color="#ffffff" stop-opacity="1"/>
-                      <stop offset="30%"  stop-color="#7FFFD4" stop-opacity="0.8"/>
-                      <stop offset="100%" stop-color="#00CED1" stop-opacity="0"/>
-                    </radialGradient>
-                    <radialGradient id="bodyAura" cx="50%" cy="42%" r="50%">
-                      <stop offset="0%"   stop-color="#40E0D0" stop-opacity="0.25"/>
-                      <stop offset="100%" stop-color="#00CED1" stop-opacity="0"/>
-                    </radialGradient>
-                    <filter id="gf2">
-                      <feGaussianBlur stdDeviation="1.4" result="b"/>
-                      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
-                    </filter>
+                    <linearGradient id="bg2" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#2D5A8E"/><stop offset="100%" stop-color="#1A3A5C"/></linearGradient>
                   </defs>
-
-                  <!-- 배경 -->
-                  <rect width="56" height="56" fill="url(#coreBg)"/>
-
-                  <!-- 인체 오라 -->
-                  <ellipse cx="28" cy="32" rx="14" ry="21" fill="url(#bodyAura)"/>
-
-                  <!-- 인체 실루엣 아웃라인 -->
-                  <!-- 머리 -->
-                  <circle cx="28" cy="8" r="5.5" fill="none" stroke="#5CE8F8" stroke-width="1.3" opacity="0.75"/>
-                  <!-- 목 -->
-                  <line x1="28" y1="13.5" x2="28" y2="17" stroke="#5CE8F8" stroke-width="1.5" opacity="0.65"/>
-                  <!-- 어깨 라인 -->
-                  <path d="M18 19 Q23 17 28 17 Q33 17 38 19" stroke="#5CE8F8" stroke-width="1.4" fill="none" opacity="0.7"/>
-                  <!-- 왼팔 -->
-                  <path d="M18 19 L13 30 L14 36" stroke="#5CE8F8" stroke-width="1.2" stroke-linecap="round" fill="none" opacity="0.55"/>
-                  <!-- 오른팔 -->
-                  <path d="M38 19 L43 30 L42 36" stroke="#5CE8F8" stroke-width="1.2" stroke-linecap="round" fill="none" opacity="0.55"/>
-                  <!-- 몸통 윤곽 -->
-                  <path d="M18 19 L20 36 L36 36 L38 19" stroke="#5CE8F8" stroke-width="1.2" fill="#5CE8F8" fill-opacity="0.06" opacity="0.6"/>
-                  <!-- 왼다리 -->
-                  <path d="M20 36 L18 48 L21 52" stroke="#5CE8F8" stroke-width="1.4" stroke-linecap="round" fill="none" opacity="0.55"/>
-                  <!-- 오른다리 -->
-                  <path d="M36 36 L38 48 L35 52" stroke="#5CE8F8" stroke-width="1.4" stroke-linecap="round" fill="none" opacity="0.55"/>
-
-                  <!-- 쉴드 외부 글로우 -->
-                  <polygon points="28,19 37,27 28,37 19,27" fill="url(#shieldGlow)" opacity="0.35" filter="url(#gf2)"/>
-                  <!-- 쉴드 외곽선 -->
-                  <polygon points="28,19 37,27 28,37 19,27" fill="none" stroke="#40E0D0" stroke-width="1.4" opacity="0.9"/>
-                  <!-- 쉴드 내부 선 -->
-                  <polygon points="28,22 34,27 28,33 22,27" fill="none" stroke="#A0FFF0" stroke-width="0.9" opacity="0.75"/>
-                  <!-- 쉴드 중앙 다이아몬드 -->
-                  <polygon points="28,24 32,27 28,31 24,27" fill="#7FFFD4" opacity="0.5"/>
-                  <!-- 중앙 광점 -->
-                  <circle cx="28" cy="27" r="2.5" fill="url(#shieldGlow)" filter="url(#gf2)"/>
-                  <circle cx="28" cy="27" r="1.2" fill="#ffffff" opacity="1"/>
-
-                  <!-- 쉴드 방사선 4방향 -->
-                  <line x1="28" y1="14" x2="28" y2="18" stroke="#40E0D0" stroke-width="0.9" opacity="0.6"/>
-                  <line x1="28" y1="36" x2="28" y2="40" stroke="#40E0D0" stroke-width="0.9" opacity="0.6"/>
-                  <line x1="14" y1="27" x2="18" y2="27" stroke="#40E0D0" stroke-width="0.9" opacity="0.6"/>
-                  <line x1="38" y1="27" x2="42" y2="27" stroke="#40E0D0" stroke-width="0.9" opacity="0.6"/>
-                  <!-- 대각선 방사 -->
-                  <line x1="19" y1="19" x2="22" y2="22" stroke="#40E0D0" stroke-width="0.7" opacity="0.4"/>
-                  <line x1="37" y1="19" x2="34" y2="22" stroke="#40E0D0" stroke-width="0.7" opacity="0.4"/>
-                  <line x1="19" y1="35" x2="22" y2="32" stroke="#40E0D0" stroke-width="0.7" opacity="0.4"/>
-                  <line x1="37" y1="35" x2="34" y2="32" stroke="#40E0D0" stroke-width="0.7" opacity="0.4"/>
+                  <rect width="56" height="56" fill="url(#bg2)" rx="4"/>
+                  <ellipse cx="28" cy="22" rx="10" ry="12" fill="none" stroke="#6BAED6" stroke-width="1.5" opacity="0.8"/>
+                  <line x1="28" y1="10" x2="28" y2="34" stroke="#4FC3F7" stroke-width="1.2" opacity="0.6"/>
+                  <line x1="18" y1="22" x2="38" y2="22" stroke="#4FC3F7" stroke-width="1.2" opacity="0.6"/>
+                  <circle cx="28" cy="22" r="3" fill="#4FC3F7" opacity="0.9"/>
+                  <path d="M20 38 Q28 34 36 38 Q28 42 20 38Z" fill="#5DADE2" opacity="0.5"/>
+                  <text x="28" y="52" text-anchor="middle" font-size="8" fill="#AED6F1" font-family="sans-serif" font-weight="bold">REHAB</text>
                 </svg>
               </div>
               <div class="pcard-info">
-                <div class="pcard-name">F, Core, 3x2, +</div>
-                <div class="pcard-date">24.03.28</div>
+                <div class="pcard-name">디스크시술 4주차</div>
+                <div class="pcard-date">2024.05.15 · 18회 완료</div>
+                <div class="pcard-tags">
+                  <span class="tag tag-done">✓ 완료</span>
+                  <span class="tag tag-grade">초급</span>
+                </div>
               </div>
               <div class="pcard-actions">
-                <button class="btn-start">시작</button>
-                <span class="btn-more">⋮</span>
+                <span class="btn-done-badge">완료</span>
               </div>
             </div>
 
-            <!-- F, Cx core, 2x4: 메르카바 + 인체 -->
-            <div class="pcard">
+            <!-- ③ 디스크시술 3주차 (완료) -->
+            <div class="pcard done" onclick="openDetail(2)" style="cursor:pointer;">
               <div class="pcard-thumb">
                 <svg viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg">
                   <defs>
-                    <linearGradient id="cxBg" x1="0" y1="0" x2="0.8" y2="1">
-                      <stop offset="0%"   stop-color="#1A9A9A"/>
-                      <stop offset="50%"  stop-color="#2A5080"/>
-                      <stop offset="100%" stop-color="#3A1A6E"/>
-                    </linearGradient>
-                    <radialGradient id="cxGlow" cx="50%" cy="48%" r="45%">
-                      <stop offset="0%"   stop-color="#A0F0FF" stop-opacity="0.3"/>
-                      <stop offset="100%" stop-color="#A0F0FF" stop-opacity="0"/>
-                    </radialGradient>
-                    <filter id="gf3">
-                      <feGaussianBlur stdDeviation="1" result="b"/>
-                      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
-                    </filter>
+                    <linearGradient id="bg3" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#285E61"/><stop offset="100%" stop-color="#1A3A3C"/></linearGradient>
                   </defs>
-
-                  <!-- 배경 -->
-                  <rect width="56" height="56" fill="url(#cxBg)"/>
-                  <!-- 중앙 오라 -->
-                  <ellipse cx="28" cy="28" rx="18" ry="20" fill="url(#cxGlow)"/>
-
-                  <!-- 별(메르카바) - 위 삼각형 -->
-                  <polygon points="28,7 42,31 14,31" fill="none" stroke="#7FFFD4" stroke-width="1.3" opacity="0.85"/>
-                  <!-- 별(메르카바) - 아래 삼각형 -->
-                  <polygon points="28,49 14,25 42,25" fill="none" stroke="#7FFFD4" stroke-width="1.3" opacity="0.85"/>
-
-                  <!-- 내부 작은 육각형 -->
-                  <polygon points="28,17 34,21 34,29 28,33 22,29 22,21" fill="none" stroke="#A0FFF0" stroke-width="0.8" opacity="0.6"/>
-
-                  <!-- 인체 실루엣 (서있는 자세) -->
-                  <!-- 머리 -->
-                  <circle cx="28" cy="14" r="3.5" fill="none" stroke="#C8F0FF" stroke-width="1.2" opacity="0.9"/>
-                  <!-- 몸통 (목~허리) -->
-                  <line x1="28" y1="17.5" x2="28" y2="30" stroke="#C8F0FF" stroke-width="1.3" opacity="0.8"/>
-                  <!-- 어깨 / 팔 -->
-                  <line x1="19" y1="21" x2="37" y2="21" stroke="#C8F0FF" stroke-width="1.2" opacity="0.75"/>
-                  <line x1="19" y1="21" x2="16" y2="29" stroke="#C8F0FF" stroke-width="1.1" stroke-linecap="round" opacity="0.7"/>
-                  <line x1="37" y1="21" x2="40" y2="29" stroke="#C8F0FF" stroke-width="1.1" stroke-linecap="round" opacity="0.7"/>
-                  <!-- 다리 -->
-                  <line x1="28" y1="30" x2="22" y2="42" stroke="#C8F0FF" stroke-width="1.2" stroke-linecap="round" opacity="0.75"/>
-                  <line x1="28" y1="30" x2="34" y2="42" stroke="#C8F0FF" stroke-width="1.2" stroke-linecap="round" opacity="0.75"/>
-
-                  <!-- 하단 중앙 원(에너지 포인트) -->
-                  <circle cx="28" cy="46" r="2" fill="none" stroke="#7FFFD4" stroke-width="1" opacity="0.8"/>
-                  <circle cx="28" cy="46" r="0.8" fill="#7FFFD4" opacity="0.9"/>
-
-                  <!-- 상단 광점 -->
-                  <circle cx="28" cy="7" r="1.5" fill="#7FFFD4" opacity="0.7" filter="url(#gf3)"/>
+                  <rect width="56" height="56" fill="url(#bg3)" rx="4"/>
+                  <circle cx="28" cy="20" r="8" fill="none" stroke="#4FD1C5" stroke-width="1.5"/>
+                  <line x1="28" y1="12" x2="28" y2="28" stroke="#4FD1C5" stroke-width="1"/>
+                  <line x1="20" y1="20" x2="36" y2="20" stroke="#4FD1C5" stroke-width="1"/>
+                  <path d="M16 32 Q28 27 40 32 L40 44 Q28 49 16 44Z" fill="#2C7A7B" opacity="0.5"/>
+                  <path d="M18 34 Q28 30 38 34 L38 42 Q28 46 18 42Z" fill="#4FD1C5" opacity="0.3"/>
+                  <text x="28" y="52" text-anchor="middle" font-size="7" fill="#81E6D9" font-family="sans-serif" font-weight="bold">CORE</text>
                 </svg>
               </div>
               <div class="pcard-info">
-                <div class="pcard-name">F, Cx core, 2x4, +</div>
-                <div class="pcard-date">21.04.08</div>
+                <div class="pcard-name">디스크시술 3주차</div>
+                <div class="pcard-date">2024.04.01 · 14회 완료</div>
+                <div class="pcard-tags">
+                  <span class="tag tag-done">✓ 완료</span>
+                  <span class="tag tag-grade">초급</span>
+                </div>
               </div>
               <div class="pcard-actions">
-                <button class="btn-start">시작</button>
-                <span class="btn-more">⋮</span>
+                <span class="btn-done-badge">완료</span>
               </div>
             </div>
 
-            <!-- 다이어트2: 영양/식단 일러스트 -->
-            <div class="pcard">
+            <!-- ④ 초기 재활 처방 (완료) -->
+            <div class="pcard done" onclick="openDetail(3)" style="cursor:pointer;">
               <div class="pcard-thumb">
                 <svg viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg">
                   <defs>
-                    <linearGradient id="dietGrad" x1="0" y1="0" x2="1" y2="1">
-                      <stop offset="0%" stop-color="#B45309"/>
-                      <stop offset="100%" stop-color="#7C3A0F"/>
-                    </linearGradient>
+                    <linearGradient id="bg4" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#553C9A"/><stop offset="100%" stop-color="#2D1B69"/></linearGradient>
                   </defs>
-                  <rect width="56" height="56" fill="url(#dietGrad)"/>
-                  <!-- 접시 -->
-                  <ellipse cx="28" cy="36" rx="20" ry="4" fill="#6B3A10" opacity="0.6"/>
-                  <ellipse cx="28" cy="35" rx="19" ry="3.5" fill="#8B4513" opacity="0.4"/>
-                  <!-- 그릇 그림자 -->
-                  <ellipse cx="28" cy="32" rx="16" ry="10" fill="#A0522D" opacity="0.3"/>
-                  <!-- 샐러드 잎 1 -->
-                  <ellipse cx="22" cy="26" rx="7" ry="5" fill="#27AE60" transform="rotate(-20 22 26)"/>
-                  <!-- 샐러드 잎 2 -->
-                  <ellipse cx="34" cy="25" rx="7" ry="5" fill="#2ECC71" transform="rotate(15 34 25)"/>
-                  <!-- 샐러드 잎 3 -->
-                  <ellipse cx="28" cy="23" rx="6" ry="4" fill="#27AE60" transform="rotate(-5 28 23)"/>
-                  <!-- 토마토 -->
-                  <circle cx="24" cy="29" r="4" fill="#E74C3C"/>
-                  <rect x="23" y="24" width="2" height="3" rx="1" fill="#27AE60"/>
-                  <!-- 단백질(달걀) -->
-                  <ellipse cx="34" cy="30" rx="4.5" ry="3.5" fill="#F5CBA7"/>
-                  <circle cx="34" cy="30" r="2" fill="#F39C12"/>
-                  <!-- 포크 -->
-                  <line x1="10" y1="12" x2="10" y2="44" stroke="#D4AF8C" stroke-width="2" stroke-linecap="round"/>
-                  <line x1="8"  y1="12" x2="8"  y2="22" stroke="#D4AF8C" stroke-width="1.5" stroke-linecap="round"/>
-                  <line x1="12" y1="12" x2="12" y2="22" stroke="#D4AF8C" stroke-width="1.5" stroke-linecap="round"/>
-                  <!-- 칼로리 표시 -->
-                  <rect x="38" y="10" width="14" height="10" rx="3" fill="#F39C12" opacity="0.85"/>
-                  <text x="45" y="18" text-anchor="middle" font-size="6" font-weight="bold" fill="#fff" font-family="sans-serif">kcal</text>
+                  <rect width="56" height="56" fill="url(#bg4)" rx="4"/>
+                  <circle cx="28" cy="16" r="6" fill="none" stroke="#B794F4" stroke-width="1.5"/>
+                  <line x1="28" y1="22" x2="28" y2="36" stroke="#B794F4" stroke-width="1.5"/>
+                  <line x1="18" y1="26" x2="38" y2="26" stroke="#B794F4" stroke-width="1.3"/>
+                  <line x1="28" y1="36" x2="20" y2="48" stroke="#B794F4" stroke-width="1.3"/>
+                  <line x1="28" y1="36" x2="36" y2="48" stroke="#B794F4" stroke-width="1.3"/>
+                  <circle cx="28" cy="28" r="4" fill="#805AD5" opacity="0.4"/>
+                  <text x="28" y="56" text-anchor="middle" font-size="6" fill="#D6BCFA" font-family="sans-serif" font-weight="bold">START</text>
                 </svg>
               </div>
               <div class="pcard-info">
-                <div class="pcard-name">다이어트2</div>
-                <div class="pcard-date">20.10.07</div>
+                <div class="pcard-name">초기 재활 처방</div>
+                <div class="pcard-date">2024.02.15 · 10회 완료</div>
+                <div class="pcard-tags">
+                  <span class="tag tag-done">✓ 완료</span>
+                  <span class="tag tag-grade">초급</span>
+                </div>
               </div>
               <div class="pcard-actions">
-                <button class="btn-start">시작</button>
-                <span class="btn-more">⋮</span>
+                <span class="btn-done-badge">완료</span>
               </div>
             </div>
+
           </div>
         </div>
 
-        <!-- ② 상세 화면 -->
+        <!-- ② 처방 상세 화면 (동적 렌더링) -->
         <div class="screen-frame" id="screen-detail">
-          <div class="detail-header">
-            <div class="back" onclick="switchScreen('list')">← 운동처방</div>
-            <div class="name">디스크시술 5주차</div>
-            <div class="meta">처방일 24.06.27 · 담당: 김트레이너</div>
-          </div>
-          <div class="detail-body" style="overflow-y:auto; flex:1;">
-            <div class="ex-row">
-              <div class="ex-num">1</div>
-              <div class="ex-row-info">
-                <div class="ex-row-name">맥켄지 신전 운동</div>
-                <div class="ex-row-detail">3세트 × 10회</div>
-              </div>
-              <span style="font-size:18px; color:#CBD5E0;">▶</span>
-            </div>
-            <div class="ex-row">
-              <div class="ex-num">2</div>
-              <div class="ex-row-info">
-                <div class="ex-row-name">코어 안정화 운동</div>
-                <div class="ex-row-detail">3세트 × 15회</div>
-              </div>
-              <span style="font-size:18px; color:#CBD5E0;">▶</span>
-            </div>
-            <div class="ex-row">
-              <div class="ex-num">3</div>
-              <div class="ex-row-info">
-                <div class="ex-row-name">고관절 스트레칭</div>
-                <div class="ex-row-detail">2세트 × 30초</div>
-              </div>
-              <span style="font-size:18px; color:#CBD5E0;">▶</span>
-            </div>
-            <div class="memo-card">
-              <div class="label">📝 트레이너 메모</div>
-              <div class="text">허리에 무리가 가지 않도록 천천히 진행하세요. 통증 발생 시 즉시 중단.</div>
-            </div>
-          </div>
-          <div style="padding: 12px 16px; background:#f0f4f8; flex-shrink:0;">
-            <button class="btn-home" onclick="switchScreen('exercise')">시작하기</button>
-          </div>
+          <!-- renderDetail() 로 채워짐 -->
         </div>
 
-        <!-- ③ 운동 진행 화면 -->
-        <div class="screen-frame" id="screen-exercise" style="background:#f0f4f8;">
-          <div class="progress-top" style="flex-shrink:0;">
-            <span style="font-size:13px; color:#718096; font-weight:700;">2 / 5</span>
-            <div class="progress-steps">
-              <div class="step-dot done"></div>
-              <div class="step-dot current"></div>
-              <div class="step-dot"></div>
-              <div class="step-dot"></div>
-              <div class="step-dot"></div>
-            </div>
-            <span style="font-size:13px; color:#3B6FF0; font-weight:700;">일시정지</span>
-          </div>
-          <div class="app-body" style="padding: 12px;">
-            <div class="ex-card">
-              <div class="ex-img" style="padding:0; background:none;">
-                <svg viewBox="0 0 343 200" width="343" height="200" xmlns="http://www.w3.org/2000/svg">
-                  <defs>
-                    <linearGradient id="exBg" x1="0" y1="0" x2="1" y2="1">
-                      <stop offset="0%" stop-color="#1A3A6A"/>
-                      <stop offset="100%" stop-color="#0A1F3D"/>
-                    </linearGradient>
-                  </defs>
-                  <rect width="343" height="200" fill="url(#exBg)"/>
-                  <!-- 바닥 매트 -->
-                  <rect x="30" y="148" width="283" height="12" rx="6" fill="#2A5A9A" opacity="0.5"/>
-                  <!-- 인체 실루엣: 바닥에 누운 코어 운동 자세 (크런치) -->
-                  <!-- 다리 -->
-                  <path d="M100 148 Q130 140 155 132 Q160 130 165 148" fill="#4A90D9"/>
-                  <path d="M210 148 Q220 130 225 125 Q230 122 255 130 Q265 134 270 148" fill="#4A90D9"/>
-                  <!-- 상체 들어올린 자세 -->
-                  <path d="M155 132 Q185 118 215 125" stroke="#6BAED6" stroke-width="18" stroke-linecap="round" fill="none"/>
-                  <!-- 머리 -->
-                  <circle cx="225" cy="115" r="18" fill="#5A9DC8"/>
-                  <!-- 팔 뒤에 깍지 -->
-                  <path d="M215 128 Q200 108 208 98 Q218 90 230 98 Q238 104 235 115" stroke="#6BAED6" stroke-width="12" stroke-linecap="round" fill="none"/>
-                  <!-- 복부 강조선 -->
-                  <path d="M160 135 Q185 125 210 128" stroke="#AED6F1" stroke-width="1.5" stroke-dasharray="4 3" opacity="0.6" fill="none"/>
-                  <!-- 코어 강조 원 -->
-                  <circle cx="185" cy="130" r="22" fill="none" stroke="#4FC3F7" stroke-width="1.5" opacity="0.4"/>
-                  <circle cx="185" cy="130" r="14" fill="#4FC3F7" opacity="0.1"/>
-                  <!-- 근육 라인 -->
-                  <path d="M170 128 L172 138" stroke="#AED6F1" stroke-width="1" opacity="0.5"/>
-                  <path d="M180 125 L182 136" stroke="#AED6F1" stroke-width="1" opacity="0.5"/>
-                  <path d="M190 124 L192 135" stroke="#AED6F1" stroke-width="1" opacity="0.5"/>
-                  <path d="M200 126 L202 136" stroke="#AED6F1" stroke-width="1" opacity="0.5"/>
-                  <!-- 숨쉬기 화살표 -->
-                  <text x="60" y="90" font-size="11" fill="#4FC3F7" font-family="sans-serif" opacity="0.8">복압 유지</text>
-                  <line x1="80" y1="100" x2="155" y2="128" stroke="#4FC3F7" stroke-width="1" stroke-dasharray="3 2" opacity="0.5"/>
-                  <!-- 상단 라벨 -->
-                  <rect x="20" y="14" width="90" height="22" rx="11" fill="#4FC3F7" opacity="0.15"/>
-                  <text x="65" y="29" text-anchor="middle" font-size="11" fill="#4FC3F7" font-family="sans-serif" font-weight="bold">CORE EXERCISE</text>
-                </svg>
-              </div>
-              <div class="ex-info">
-                <div class="ex-name">코어 안정화 운동</div>
-                <div class="ex-desc">복부에 힘을 주고 허리를 바닥에 밀착시키세요.</div>
-              </div>
-            </div>
-            <div class="set-counter">
-              <div>
-                <div class="set-label">현재 세트</div>
-                <div class="set-num">2 / 3</div>
-              </div>
-              <div>
-                <div class="set-label">횟수</div>
-                <div class="set-num">15 회</div>
-              </div>
-              <div class="set-controls">
-                <button class="set-btn">−</button>
-                <span style="font-size:18px; font-weight:900; color:#1A202C; min-width:28px; text-align:center;">12</span>
-                <button class="set-btn">+</button>
-              </div>
+        <!-- ③ 운동 진행 화면 (동적) -->
+        <div class="screen-frame" id="screen-exercise" style="background:#F0F4F8;">
+          <!-- 상단 바 -->
+          <div class="progress-top">
+            <span style="font-size:13px;color:#718096;font-weight:700;" id="ex-progress-label">1 / 8</span>
+            <div class="progress-steps" id="ex-dots"></div>
+            <div style="display:flex;align-items:center;gap:8px;">
+              <button class="btn-auto-start" id="btn-auto-toggle" onclick="toggleAutoPlay()">▶ 자동진행</button>
+              <span style="font-size:13px;color:#3B6FF0;font-weight:700;cursor:pointer;" onclick="exitExercise()">✕</span>
             </div>
           </div>
-          <button class="btn-next" onclick="switchScreen('complete')">다음 운동 →</button>
+
+          <!-- 자동 진행 바 (숨김) -->
+          <div class="auto-bar" id="auto-bar" style="display:none;">
+            <span style="color:#fff;font-size:12px;font-weight:700;white-space:nowrap;" id="auto-label">자동진행 중</span>
+            <button class="btn-auto" onclick="stopAutoPlay()">■ 중지</button>
+          </div>
+
+          <!-- 운동 목록 네비게이션 (가로 스크롤) -->
+          <div style="background:#fff;border-bottom:1px solid #E2E8F0;padding:10px 12px;flex-shrink:0;">
+            <div id="ex-nav-list" style="display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;"></div>
+          </div>
+
+          <!-- 운동 본문 -->
+          <div class="app-body" style="padding:12px;" id="ex-body">
+            <!-- JS로 렌더링 -->
+          </div>
+          <button class="btn-next" id="ex-next-btn">다음 운동 →</button>
         </div>
 
         <!-- ④ 완료 화면 -->
         <div class="screen-frame" id="screen-complete">
           <div class="complete-body">
-            <div class="complete-icon">
-              <svg viewBox="0 0 80 80" width="80" height="80" xmlns="http://www.w3.org/2000/svg">
-                <circle cx="40" cy="40" r="38" fill="#EBF8FF" stroke="#3B6FF0" stroke-width="2"/>
-                <circle cx="40" cy="40" r="28" fill="#3B6FF0" opacity="0.1"/>
-                <!-- 체크마크 -->
-                <polyline points="22,42 34,54 58,28" fill="none" stroke="#3B6FF0" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
-              </svg>
-            </div>
-            <div class="complete-title">운동 완료!</div>
-            <div class="complete-sub">디스크시술 5주차 · 오늘도 잘 하셨어요</div>
+            <svg viewBox="0 0 80 80" width="72" height="72" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="40" cy="40" r="38" fill="#EBF8FF" stroke="#3B6FF0" stroke-width="2"/>
+              <circle cx="40" cy="40" r="28" fill="#3B6FF0" opacity="0.1"/>
+              <polyline points="22,42 34,54 58,28" fill="none" stroke="#3B6FF0" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <div class="complete-title">운동 완료! 🎉</div>
+            <div class="complete-sub">디스크시술 5주차 · 24회차<br>오늘도 정말 잘 하셨어요, 김도산 회원님!</div>
             <div class="stat-row">
               <div class="stat-card">
-                <div class="stat-val">28분</div>
-                <div class="stat-lbl">총 운동시간</div>
+                <div class="stat-val" id="stat-time">—</div>
+                <div class="stat-lbl">운동시간</div>
               </div>
               <div class="stat-card">
-                <div class="stat-val">5개</div>
+                <div class="stat-val" id="stat-count">—</div>
                 <div class="stat-lbl">완료 운동</div>
               </div>
               <div class="stat-card">
-                <div class="stat-val">142</div>
-                <div class="stat-lbl">칼로리</div>
+                <div class="stat-val" id="stat-sets">—</div>
+                <div class="stat-lbl">총 세트</div>
               </div>
             </div>
+            <!-- SFMA 알림 -->
+            <div class="next-check-box" style="width:100%;">
+              📊 SFMA 검사까지 <strong>1회</strong> 남았습니다!<br>
+              다음 운동 후 김트레이너에게 알림이 발송됩니다.
+            </div>
             <button class="btn-home" onclick="switchScreen('list')">홈으로 돌아가기</button>
-            <button class="btn-outline" onclick="switchScreen('list')">처방 목록으로</button>
+            <button class="btn-outline" onclick="switchScreen('detail')">처방 내용 보기</button>
           </div>
         </div>
 
@@ -708,22 +550,33 @@
             <span class="title">트레이너 메모</span>
           </div>
           <div class="app-body">
-            <div style="background:#fff; border-radius:16px; padding:20px; box-shadow:0 2px 8px rgba(0,0,0,0.07);">
-              <div style="display:flex; align-items:center; gap:10px; margin-bottom:16px;">
-                <div style="width:40px;height:40px;border-radius:50%;background:#3B6FF0;display:flex;align-items:center;justify-content:center;font-size:18px;">👨‍⚕️</div>
+            <div class="trainer-memo-card">
+              <div class="trainer-row">
+                <div class="trainer-avatar">👨‍⚕️</div>
                 <div>
-                  <div style="font-size:14px;font-weight:700;color:#1A202C;">김트레이너</div>
-                  <div style="font-size:12px;color:#A0AEC0;">24.06.27 작성</div>
+                  <div class="trainer-name">김트레이너</div>
+                  <div class="trainer-date">2024.06.27 작성 · 디스크시술 5주차</div>
                 </div>
               </div>
-              <div style="font-size:14px;color:#2D3748;line-height:1.8;">
-                허리에 무리가 가지 않도록 천천히 진행하세요.<br><br>
-                맥켄지 운동 시 통증이 느껴지면 즉시 중단하고 연락 주세요.<br><br>
-                코어 운동은 호흡을 유지하면서 복압을 잡는 것이 중요합니다.
+              <div class="memo-text">
+                물리치료 병행 중이므로 운동 강도를 최소화하세요.<br><br>
+                <strong>맥켄지 신전 운동</strong> 시 허리에 날카로운 통증이 느껴지면 즉시 중단하고 연락 주세요. 뻐근함 정도는 괜찮습니다.<br><br>
+                <strong>코어 안정화 운동</strong>은 호흡을 유지하면서 복압을 잡는 것이 핵심입니다. 숨을 참지 마세요.<br><br>
+                <strong>고관절 스트레칭</strong>은 무리하지 않고 가동 범위 내에서만 진행합니다.
               </div>
-              <div style="margin-top:16px; padding-top:16px; border-top:1px solid #E2E8F0; font-size:12px; color:#A0AEC0;">
-                ⚠ 트레이너 메모는 수정할 수 없습니다.
-              </div>
+              <div class="memo-warn">⚠ 트레이너 메모는 수정할 수 없습니다.</div>
+            </div>
+
+            <div class="alert-box">
+              🚨 주의사항<br>
+              L4-L5 추간판 탈출 진단 · 수술 없이 재활 중<br>
+              격렬한 굴곡 동작 금지 · 복압 유지 필수
+            </div>
+
+            <div class="next-check-box">
+              📅 다음 SFMA 검사<br>
+              25회 도달 시 (현재 23회) — 약 2회 후<br>
+              자동 알림: 회원 앱 + 김트레이너
             </div>
           </div>
         </div>
@@ -738,55 +591,748 @@
 
     <div class="memo-field">
       <label>현재 화면</label>
-      <input type="text" id="memo-screen-name" value="목록 화면" readonly />
+      <input type="text" id="memo-screen-name" value="처방 목록 화면" readonly />
     </div>
 
     <div class="memo-divider"></div>
 
     <div class="memo-field">
-      <label>화면 설명 / 목적</label>
-      <textarea placeholder="이 화면의 역할과 목적을 입력하세요..."></textarea>
+      <label>환자 정보</label>
+      <textarea readonly>김도산 · 강남점 · 010-1234-5678
+가입일: 2024.01.10
+처방 이력: 4건 (활성 1, 완료 3)</textarea>
     </div>
 
     <div class="memo-field">
-      <label>주요 컴포넌트</label>
-      <textarea placeholder="버튼, 카드, 탭 등 사용하는 UI 요소..."></textarea>
+      <label>현재 처방 — 디스크시술 5주차</label>
+      <textarea readonly>처방일: 2024.06.27
+등급: 중급 / 담당: 김트레이너
+운동: 맥켄지 신전(3×10), 코어안정화(3×15), 고관절(2×30초)
+총 수행: 23회 / SFMA 기준: 25회
+알림: 7회 전, 3회 전</textarea>
     </div>
 
     <div class="memo-field">
-      <label>UX 고려사항</label>
-      <textarea placeholder="사용자 행동 흐름, 예외 처리, 피드백..."></textarea>
+      <label>UX 흐름</label>
+      <textarea readonly>목록 → 진행중 처방 배너 강조
+→ 카드 클릭 → 상세 조회
+→ "오늘 운동 시작" → 운동 진행
+→ 완료 → SFMA 알림 카운트 표시</textarea>
     </div>
 
     <div class="memo-field">
       <label>개발 메모</label>
-      <textarea placeholder="API, 상태 관리, 조건부 렌더링 등..."></textarea>
+      <textarea readonly>memberPrescriptions['김도산'] 데이터 사용
+SFMA 카운터: sfmaAfter - 수행횟수
+알림: sfmaAlertDays 배열 → 진행 중 표시
+완료 처방은 opacity:0.65 + 시작버튼 숨김</textarea>
     </div>
   </div>
 
 </div><!-- workspace -->
 
 <script>
+  // ── 처방 운동 데이터 (8개) ──
+  const exercises = [
+    {
+      name: '맥켄지 신전 운동', label: 'MCKENZIE EXT',
+      sets: 3, reps: '10회', grade: '필수',
+      tip: '엎드려 팔꿈치로 몸을 지지하고 상체를 천천히 들어올립니다.<br>허리에 날카로운 통증 시 즉시 중단하세요.',
+      svgColor: '#1A3A6A', accent: '#4FC3F7',
+      renderSvg() { return `<svg viewBox="0 0 343 190" width="343" height="190" xmlns="http://www.w3.org/2000/svg">
+        <defs><linearGradient id="bg0" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#1A3A6A"/><stop offset="100%" stop-color="#0A1F3D"/></linearGradient></defs>
+        <rect width="343" height="190" fill="url(#bg0)"/>
+        <rect x="30" y="150" width="283" height="10" rx="5" fill="#2A5A9A" opacity="0.4"/>
+        <path d="M90 150 Q170 142 250 150" stroke="#5A9DC8" stroke-width="20" stroke-linecap="round" fill="none"/>
+        <path d="M170 140 Q200 122 230 102" stroke="#6BAED6" stroke-width="16" stroke-linecap="round" fill="none"/>
+        <circle cx="238" cy="95" r="16" fill="#5A9DC8"/>
+        <line x1="130" y1="144" x2="110" y2="157" stroke="#4FC3F7" stroke-width="8" stroke-linecap="round"/>
+        <line x1="170" y1="140" x2="155" y2="155" stroke="#4FC3F7" stroke-width="8" stroke-linecap="round"/>
+        <path d="M130 144 Q170 132 210 114 Q220 109 230 102" stroke="#FFD700" stroke-width="2" stroke-dasharray="5 3" opacity="0.6" fill="none"/>
+        <rect x="16" y="12" width="110" height="22" rx="11" fill="#4FC3F7" opacity="0.15"/>
+        <text x="71" y="27" text-anchor="middle" font-size="11" fill="#4FC3F7" font-family="sans-serif" font-weight="bold">MCKENZIE EXT</text>
+        <text x="245" y="72" font-size="10" fill="#FFD700" font-family="sans-serif" opacity="0.9">↑ 신전</text>
+      </svg>`; }
+    },
+    {
+      name: '코어 안정화 운동', label: 'CORE STABILIZE',
+      sets: 3, reps: '15회', grade: '필수',
+      tip: '복부에 힘을 주고 허리를 바닥에 밀착시키세요.<br>호흡을 참지 말고 자연스럽게 유지합니다.',
+      svgColor: '#1A3A6A', accent: '#4FC3F7',
+      renderSvg() { return `<svg viewBox="0 0 343 190" width="343" height="190" xmlns="http://www.w3.org/2000/svg">
+        <defs><linearGradient id="bg1" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#1A3A6A"/><stop offset="100%" stop-color="#0A1F3D"/></linearGradient></defs>
+        <rect width="343" height="190" fill="url(#bg1)"/>
+        <rect x="30" y="142" width="283" height="12" rx="6" fill="#2A5A9A" opacity="0.5"/>
+        <path d="M100 142 Q130 134 155 126 Q160 124 165 142" fill="#4A90D9"/>
+        <path d="M210 142 Q220 124 225 119 Q230 116 255 124 Q265 128 270 142" fill="#4A90D9"/>
+        <path d="M155 126 Q185 112 215 119" stroke="#6BAED6" stroke-width="18" stroke-linecap="round" fill="none"/>
+        <circle cx="225" cy="109" r="18" fill="#5A9DC8"/>
+        <path d="M215 122 Q200 102 208 92 Q218 84 230 92 Q238 98 235 109" stroke="#6BAED6" stroke-width="12" stroke-linecap="round" fill="none"/>
+        <circle cx="185" cy="124" r="22" fill="none" stroke="#4FC3F7" stroke-width="1.5" opacity="0.4"/>
+        <circle cx="185" cy="124" r="14" fill="#4FC3F7" opacity="0.1"/>
+        <text x="60" y="86" font-size="11" fill="#4FC3F7" font-family="sans-serif" opacity="0.8">복압 유지</text>
+        <line x1="80" y1="95" x2="155" y2="122" stroke="#4FC3F7" stroke-width="1" stroke-dasharray="3 2" opacity="0.5"/>
+        <rect x="20" y="12" width="110" height="22" rx="11" fill="#4FC3F7" opacity="0.15"/>
+        <text x="75" y="27" text-anchor="middle" font-size="11" fill="#4FC3F7" font-family="sans-serif" font-weight="bold">CORE STABILIZE</text>
+      </svg>`; }
+    },
+    {
+      name: '고관절 스트레칭', label: 'HIP STRETCH',
+      sets: 2, reps: '30초', grade: '권장',
+      tip: '가동 범위 내에서만 무리하지 않게 진행하세요.<br>좌우 각 30초씩 유지합니다.',
+      svgColor: '#1E4A3A', accent: '#48BB78',
+      renderSvg() { return `<svg viewBox="0 0 343 190" width="343" height="190" xmlns="http://www.w3.org/2000/svg">
+        <defs><linearGradient id="bg2" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#1E4A3A"/><stop offset="100%" stop-color="#0A2418"/></linearGradient></defs>
+        <rect width="343" height="190" fill="url(#bg2)"/>
+        <rect x="30" y="150" width="283" height="10" rx="5" fill="#2A6A4A" opacity="0.4"/>
+        <line x1="130" y1="150" x2="155" y2="100" stroke="#48BB78" stroke-width="14" stroke-linecap="round"/>
+        <path d="M195 150 L220 110 L240 150" stroke="#48BB78" stroke-width="14" stroke-linecap="round" fill="none"/>
+        <line x1="155" y1="100" x2="195" y2="75" stroke="#68D391" stroke-width="16" stroke-linecap="round"/>
+        <circle cx="200" cy="62" r="16" fill="#48BB78"/>
+        <line x1="165" y1="90" x2="145" y2="108" stroke="#68D391" stroke-width="8" stroke-linecap="round"/>
+        <line x1="185" y1="82" x2="210" y2="95" stroke="#68D391" stroke-width="8" stroke-linecap="round"/>
+        <circle cx="175" cy="108" r="20" fill="none" stroke="#9AE6B4" stroke-width="2" opacity="0.5"/>
+        <circle cx="175" cy="108" r="10" fill="#9AE6B4" opacity="0.15"/>
+        <text x="85" y="95" font-size="10" fill="#9AE6B4" font-family="sans-serif" opacity="0.9">← 뒤로 당기기</text>
+        <rect x="16" y="12" width="90" height="22" rx="11" fill="#48BB78" opacity="0.2"/>
+        <text x="61" y="27" text-anchor="middle" font-size="11" fill="#9AE6B4" font-family="sans-serif" font-weight="bold">HIP STRETCH</text>
+      </svg>`; }
+    },
+    {
+      name: '버드독', label: 'BIRD DOG',
+      sets: 3, reps: '10회', grade: '필수',
+      tip: '네발기기 자세에서 반대쪽 팔·다리를 수평으로 뻗으세요.<br>허리가 흔들리지 않도록 복부에 힘을 유지합니다.',
+      svgColor: '#2D1B69', accent: '#B794F4',
+      renderSvg() { return `<svg viewBox="0 0 343 190" width="343" height="190" xmlns="http://www.w3.org/2000/svg">
+        <defs><linearGradient id="bg3" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#2D1B69"/><stop offset="100%" stop-color="#1A0F3D"/></linearGradient></defs>
+        <rect width="343" height="190" fill="url(#bg3)"/>
+        <rect x="30" y="152" width="283" height="10" rx="5" fill="#4A2A8A" opacity="0.4"/>
+        <!-- 네발기기 몸통 -->
+        <path d="M130 120 Q190 110 240 118" stroke="#B794F4" stroke-width="18" stroke-linecap="round" fill="none"/>
+        <!-- 머리 -->
+        <circle cx="250" cy="108" r="16" fill="#9F7AEA"/>
+        <!-- 오른팔 앞으로 뻗음 -->
+        <line x1="240" y1="112" x2="295" y2="95" stroke="#D6BCFA" stroke-width="10" stroke-linecap="round"/>
+        <!-- 왼다리 뒤로 뻗음 -->
+        <line x1="130" y1="118" x2="75" y2="102" stroke="#D6BCFA" stroke-width="10" stroke-linecap="round"/>
+        <!-- 지지 왼팔 -->
+        <line x1="175" y1="116" x2="172" y2="152" stroke="#9F7AEA" stroke-width="10" stroke-linecap="round"/>
+        <!-- 지지 오른다리 -->
+        <line x1="200" y1="116" x2="204" y2="152" stroke="#9F7AEA" stroke-width="10" stroke-linecap="round"/>
+        <!-- 수평 강조선 -->
+        <line x1="75" y1="100" x2="295" y2="100" stroke="#D6BCFA" stroke-width="1" stroke-dasharray="5 4" opacity="0.4"/>
+        <rect x="16" y="12" width="80" height="22" rx="11" fill="#9F7AEA" opacity="0.2"/>
+        <text x="56" y="27" text-anchor="middle" font-size="11" fill="#D6BCFA" font-family="sans-serif" font-weight="bold">BIRD DOG</text>
+      </svg>`; }
+    },
+    {
+      name: '브리지 운동', label: 'GLUTE BRIDGE',
+      sets: 3, reps: '12회', grade: '필수',
+      tip: '등을 바닥에 붙이고 무릎을 세운 뒤 엉덩이를 들어올립니다.<br>엉덩이를 조이며 2초간 유지하세요.',
+      svgColor: '#1A3A1A', accent: '#68D391',
+      renderSvg() { return `<svg viewBox="0 0 343 190" width="343" height="190" xmlns="http://www.w3.org/2000/svg">
+        <defs><linearGradient id="bg4" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#1A3A1A"/><stop offset="100%" stop-color="#0A200A"/></linearGradient></defs>
+        <rect width="343" height="190" fill="url(#bg4)"/>
+        <rect x="30" y="152" width="283" height="10" rx="5" fill="#2A5A2A" opacity="0.4"/>
+        <!-- 상체/등 바닥 -->
+        <path d="M70 152 Q130 148 160 152" stroke="#4A904A" stroke-width="18" stroke-linecap="round" fill="none"/>
+        <!-- 머리 -->
+        <circle cx="65" cy="143" r="15" fill="#48BB78"/>
+        <!-- 허리 들어올림 -->
+        <path d="M160 148 Q200 115 240 148" stroke="#68D391" stroke-width="18" stroke-linecap="round" fill="none"/>
+        <!-- 다리 -->
+        <line x1="240" y1="148" x2="255" y2="152" stroke="#4A904A" stroke-width="14" stroke-linecap="round"/>
+        <!-- 엉덩이 강조 -->
+        <circle cx="200" cy="122" r="18" fill="none" stroke="#9AE6B4" stroke-width="2" opacity="0.5"/>
+        <!-- 화살표 위로 -->
+        <text x="195" y="100" font-size="12" fill="#9AE6B4" font-family="sans-serif" opacity="0.9">↑ 들어올리기</text>
+        <rect x="16" y="12" width="110" height="22" rx="11" fill="#48BB78" opacity="0.2"/>
+        <text x="71" y="27" text-anchor="middle" font-size="11" fill="#9AE6B4" font-family="sans-serif" font-weight="bold">GLUTE BRIDGE</text>
+      </svg>`; }
+    },
+    {
+      name: '캣-카우 스트레칭', label: 'CAT-COW',
+      sets: 2, reps: '10회', grade: '권장',
+      tip: '네발기기 자세에서 등을 둥글게 말았다 펴는 동작을 반복합니다.<br>호흡에 맞춰 천천히 진행하세요.',
+      svgColor: '#3A2A1A', accent: '#F6AD55',
+      renderSvg() { return `<svg viewBox="0 0 343 190" width="343" height="190" xmlns="http://www.w3.org/2000/svg">
+        <defs><linearGradient id="bg5" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#3A2A1A"/><stop offset="100%" stop-color="#1A1008"/></linearGradient></defs>
+        <rect width="343" height="190" fill="url(#bg5)"/>
+        <rect x="30" y="152" width="283" height="10" rx="5" fill="#6A4A2A" opacity="0.4"/>
+        <!-- 캣(등 둥글게): 왼쪽 -->
+        <path d="M60 120 Q100 95 140 120" stroke="#F6AD55" stroke-width="16" stroke-linecap="round" fill="none"/>
+        <circle cx="55" cy="128" r="12" fill="#ED8936"/>
+        <line x1="62" y1="124" x2="62" y2="152" stroke="#D97706" stroke-width="8" stroke-linecap="round"/>
+        <line x1="136" y1="124" x2="136" y2="152" stroke="#D97706" stroke-width="8" stroke-linecap="round"/>
+        <text x="100" y="82" text-anchor="middle" font-size="10" fill="#FBD38D" font-family="sans-serif">↑ CAT</text>
+        <!-- 카우(등 오목하게): 오른쪽 -->
+        <path d="M190 112 Q230 132 270 112" stroke="#68D391" stroke-width="16" stroke-linecap="round" fill="none"/>
+        <circle cx="275" cy="104" r="12" fill="#48BB78"/>
+        <line x1="194" y1="116" x2="194" y2="152" stroke="#2F855A" stroke-width="8" stroke-linecap="round"/>
+        <line x1="266" y1="116" x2="266" y2="152" stroke="#2F855A" stroke-width="8" stroke-linecap="round"/>
+        <text x="230" y="98" text-anchor="middle" font-size="10" fill="#9AE6B4" font-family="sans-serif">↓ COW</text>
+        <!-- 구분선 -->
+        <line x1="171" y1="60" x2="171" y2="160" stroke="#555" stroke-width="1" stroke-dasharray="4 3" opacity="0.4"/>
+        <rect x="16" y="12" width="80" height="22" rx="11" fill="#F6AD55" opacity="0.2"/>
+        <text x="56" y="27" text-anchor="middle" font-size="11" fill="#FBD38D" font-family="sans-serif" font-weight="bold">CAT-COW</text>
+      </svg>`; }
+    },
+    {
+      name: '데드버그', label: 'DEAD BUG',
+      sets: 3, reps: '8회', grade: '필수',
+      tip: '누운 자세에서 팔·다리를 동시에 뻗으며 허리를 바닥에 유지합니다.<br>허리가 들리면 즉시 동작을 줄이세요.',
+      svgColor: '#1A1F3A', accent: '#63B3ED',
+      renderSvg() { return `<svg viewBox="0 0 343 190" width="343" height="190" xmlns="http://www.w3.org/2000/svg">
+        <defs><linearGradient id="bg6" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#1A1F3A"/><stop offset="100%" stop-color="#0A0F1E"/></linearGradient></defs>
+        <rect width="343" height="190" fill="url(#bg6)"/>
+        <rect x="30" y="118" width="283" height="10" rx="5" fill="#2A3A6A" opacity="0.5"/>
+        <!-- 누운 몸통 -->
+        <path d="M100 118 Q171 110 240 118" stroke="#4A6ABF" stroke-width="20" stroke-linecap="round" fill="none"/>
+        <!-- 머리 -->
+        <circle cx="88" cy="112" r="16" fill="#4A6ABF"/>
+        <!-- 양팔 위로 뻗음 -->
+        <line x1="130" y1="108" x2="105" y2="65" stroke="#63B3ED" stroke-width="10" stroke-linecap="round"/>
+        <line x1="210" y1="108" x2="235" y2="65" stroke="#63B3ED" stroke-width="10" stroke-linecap="round"/>
+        <!-- 다리 위로 굽힘 -->
+        <path d="M155 116 L145 80 L165 75" stroke="#90CDF4" stroke-width="10" stroke-linecap="round" fill="none"/>
+        <path d="M195 116 L205 80 L185 75" stroke="#90CDF4" stroke-width="10" stroke-linecap="round" fill="none"/>
+        <!-- 바닥 허리 강조 -->
+        <line x1="100" y1="122" x2="240" y2="122" stroke="#63B3ED" stroke-width="1.5" stroke-dasharray="5 3" opacity="0.5"/>
+        <text x="171" y="148" text-anchor="middle" font-size="10" fill="#90CDF4" font-family="sans-serif" opacity="0.8">허리 바닥 밀착</text>
+        <rect x="16" y="12" width="80" height="22" rx="11" fill="#63B3ED" opacity="0.15"/>
+        <text x="56" y="27" text-anchor="middle" font-size="11" fill="#90CDF4" font-family="sans-serif" font-weight="bold">DEAD BUG</text>
+      </svg>`; }
+    },
+    {
+      name: '어깨 외회전 밴드', label: 'BAND EXT ROT',
+      sets: 3, reps: '15회', grade: '선택',
+      tip: '팔꿈치를 90도로 굽혀 옆구리에 고정하고 팔을 바깥으로 돌립니다.<br>어깨 앞쪽에 통증이 없는 범위 내에서만 진행하세요.',
+      svgColor: '#3A1A2D', accent: '#F687B3',
+      renderSvg() { return `<svg viewBox="0 0 343 190" width="343" height="190" xmlns="http://www.w3.org/2000/svg">
+        <defs><linearGradient id="bg7" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#3A1A2D"/><stop offset="100%" stop-color="#1A0815"/></linearGradient></defs>
+        <rect width="343" height="190" fill="url(#bg7)"/>
+        <!-- 서있는 자세 -->
+        <circle cx="171" cy="38" r="20" fill="#B83280"/>
+        <line x1="171" y1="58" x2="171" y2="130" stroke="#D53F8C" stroke-width="18" stroke-linecap="round"/>
+        <line x1="171" y1="130" x2="148" y2="175" stroke="#B83280" stroke-width="14" stroke-linecap="round"/>
+        <line x1="171" y1="130" x2="194" y2="175" stroke="#B83280" stroke-width="14" stroke-linecap="round"/>
+        <!-- 왼팔 (팔꿈치 90도) -->
+        <line x1="155" y1="80" x2="118" y2="80" stroke="#D53F8C" stroke-width="12" stroke-linecap="round"/>
+        <line x1="118" y1="80" x2="118" y2="110" stroke="#F687B3" stroke-width="10" stroke-linecap="round"/>
+        <!-- 오른팔 (외회전) -->
+        <line x1="187" y1="80" x2="224" y2="80" stroke="#D53F8C" stroke-width="12" stroke-linecap="round"/>
+        <line x1="224" y1="80" x2="255" y2="65" stroke="#F687B3" stroke-width="10" stroke-linecap="round"/>
+        <!-- 밴드 -->
+        <path d="M118 108 Q171 122 224 80" stroke="#FBB6CE" stroke-width="3" stroke-dasharray="6 3" fill="none" opacity="0.8"/>
+        <!-- 회전 화살표 -->
+        <text x="255" y="58" font-size="10" fill="#FBB6CE" font-family="sans-serif" opacity="0.9">↗ 외회전</text>
+        <rect x="16" y="12" width="105" height="22" rx="11" fill="#D53F8C" opacity="0.2"/>
+        <text x="68" y="27" text-anchor="middle" font-size="11" fill="#FBB6CE" font-family="sans-serif" font-weight="bold">BAND EXT ROT</text>
+      </svg>`; }
+    }
+  ];
+
+  // ── 처방 데이터 ──
+  const prescriptionData = [
+    {
+      idx: 0, name: '디스크시술 5주차', status: 'active',
+      trainer: '김트레이너', branch: '강남점', date: '2024.06.27', grade: '중급',
+      totalCount: 23, lastDate: '2026.03.17', sfma: '25회 후', alertInfo: '7회 · 3회 전',
+      exList: [
+        {num:1, name:'맥켄지 신전 운동',   detail:'3세트 × 10회', grade:'필수', exIdx:0},
+        {num:2, name:'코어 안정화 운동',   detail:'3세트 × 15회', grade:'필수', exIdx:1},
+        {num:3, name:'고관절 스트레칭',    detail:'2세트 × 30초', grade:'권장', exIdx:2},
+        {num:4, name:'버드독',             detail:'3세트 × 10회', grade:'필수', exIdx:3},
+        {num:5, name:'브리지 운동',        detail:'3세트 × 12회', grade:'필수', exIdx:4},
+        {num:6, name:'캣-카우 스트레칭',   detail:'2세트 × 10회', grade:'권장', exIdx:5},
+        {num:7, name:'데드버그',           detail:'3세트 × 8회',  grade:'필수', exIdx:6},
+        {num:8, name:'어깨 외회전 밴드',   detail:'3세트 × 15회', grade:'선택', exIdx:7},
+      ],
+      memo: '물리치료 병행 중. 운동 강도 최소화.<br><br>맥켄지 운동 시 통증이 느껴지면 즉시 중단하고 연락 주세요. 코어 운동은 호흡을 유지하며 복압을 잡는 것이 중요합니다.',
+      alertMsg: '⚠️ SFMA 검사까지 <strong>2회</strong> 남았습니다.<br>다음 검사: 25회 도달 시 김트레이너에게 자동 알림 발송',
+    },
+    {
+      idx: 1, name: '디스크시술 4주차', status: 'done',
+      trainer: '김트레이너', branch: '강남점', date: '2024.05.15', grade: '초급',
+      totalCount: 18, lastDate: '2024.06.26', sfma: '완료', alertInfo: '—',
+      exList: [
+        {num:1, name:'맥켄지 신전 운동',  detail:'3세트 × 8회',  grade:'필수'},
+        {num:2, name:'코어 안정화 운동',  detail:'2세트 × 10회', grade:'필수'},
+        {num:3, name:'고관절 스트레칭',   detail:'2세트 × 20초', grade:'권장'},
+        {num:4, name:'브리지 운동',       detail:'2세트 × 10회', grade:'필수'},
+        {num:5, name:'캣-카우 스트레칭',  detail:'2세트 × 8회',  grade:'권장'},
+      ],
+      memo: '초기 재활 완료 후 단계 상향. 통증 없을 시 세트 추가 가능합니다.',
+      alertMsg: null,
+    },
+    {
+      idx: 2, name: '디스크시술 3주차', status: 'done',
+      trainer: '김트레이너', branch: '강남점', date: '2024.04.01', grade: '초급',
+      totalCount: 14, lastDate: '2024.05.14', sfma: '완료', alertInfo: '—',
+      exList: [
+        {num:1, name:'맥켄지 신전 운동',  detail:'2세트 × 6회',  grade:'필수'},
+        {num:2, name:'고관절 스트레칭',   detail:'2세트 × 15초', grade:'권장'},
+        {num:3, name:'브리지 운동',       detail:'2세트 × 8회',  grade:'필수'},
+        {num:4, name:'캣-카우 스트레칭',  detail:'1세트 × 6회',  grade:'권장'},
+      ],
+      memo: '재활 2단계 시작. 통증 감소 확인 후 동작 확장.',
+      alertMsg: null,
+    },
+    {
+      idx: 3, name: '초기 재활 처방', status: 'done',
+      trainer: '김트레이너', branch: '강남점', date: '2024.02.15', grade: '초급',
+      totalCount: 10, lastDate: '2024.03.31', sfma: '완료', alertInfo: '—',
+      exList: [
+        {num:1, name:'고관절 스트레칭',   detail:'1세트 × 10초', grade:'권장'},
+        {num:2, name:'캣-카우 스트레칭',  detail:'1세트 × 5회',  grade:'권장'},
+        {num:3, name:'브리지 운동',       detail:'1세트 × 6회',  grade:'권장'},
+      ],
+      memo: '수술 후 초기 재활. 매우 가벼운 동작만 허용. 통증 시 즉시 중단.',
+      alertMsg: null,
+    },
+  ];
+
+  let currentPrescIdx = 0;
+
+  function openDetail(idx) {
+    currentPrescIdx = idx;
+    switchScreen('detail');
+  }
+
+  function renderDetail() {
+    const p = prescriptionData[currentPrescIdx];
+    const isDone = p.status === 'done';
+    const gradeColors = { '필수': ['#EBF8FF','#3B6FF0'], '권장': ['#F0FFF4','#38A169'], '선택': ['#FFF5F5','#E53E3E'] };
+
+    const exRowsHtml = p.exList.map(e => {
+      const [bg, fg] = gradeColors[e.grade] || ['#F0F4F8','#718096'];
+      const numCls = e.grade === '필수' ? 'ex-num' : 'ex-num secondary';
+      const clickable = (!isDone && e.exIdx !== undefined)
+        ? `onclick="currentExIdx=${e.exIdx};switchScreen('exercise')" style="cursor:pointer;"`
+        : '';
+      return `<div class="ex-row" ${clickable}>
+        <div class="${numCls}">${e.num}</div>
+        <div class="ex-row-info">
+          <div class="ex-row-name">${e.name}</div>
+          <div class="ex-row-detail">${e.detail}</div>
+        </div>
+        <span class="ex-row-grade" style="background:${bg};color:${fg};">${e.grade}</span>
+      </div>`;
+    }).join('');
+
+    const doneNotice = isDone ? `
+      <div style="background:#F0FFF4;border-left:4px solid #48BB78;border-radius:12px;padding:12px 14px;font-size:12px;color:#276749;font-weight:600;">
+        ✅ 처방 완료 — ${p.totalCount}회 수행 · 마지막 ${p.lastDate}
+      </div>` : '';
+
+    const bottomBtn = isDone
+      ? `<button class="btn-outline" onclick="switchScreen('list')">← 처방 목록으로</button>`
+      : `<button class="btn-home" onclick="switchScreen('exercise')">오늘 운동 시작하기</button>`;
+
+    document.getElementById('screen-detail').innerHTML = `
+      <div class="detail-header" style="background:${isDone ? 'linear-gradient(135deg,#4A5568 0%,#2D3748 100%)' : 'linear-gradient(135deg,#3B6FF0 0%,#7B61FF 100%)'};">
+        <div class="back" onclick="switchScreen('list')">← 처방 목록</div>
+        <div class="name">${p.name}</div>
+        <div class="meta">담당: ${p.trainer} · ${p.branch}</div>
+        <div class="detail-header-tags">
+          <span class="dtag">${isDone ? '✓ 완료' : '● 진행중'}</span>
+          <span class="dtag">${p.grade}</span>
+          <span class="dtag">${p.date} 처방</span>
+        </div>
+      </div>
+      <div class="detail-body">
+        ${doneNotice}
+        <div class="info-grid">
+          <div class="info-item"><div class="info-item-label">총 수행 횟수</div><div class="info-item-val">${p.totalCount}회</div></div>
+          <div class="info-item"><div class="info-item-label">마지막 수행</div><div class="info-item-val">${p.lastDate}</div></div>
+          <div class="info-item"><div class="info-item-label">SFMA 기준</div><div class="info-item-val">${p.sfma}</div></div>
+          <div class="info-item"><div class="info-item-label">알림 시점</div><div class="info-item-val">${p.alertInfo}</div></div>
+        </div>
+        <div class="section-title">운동 목록 (${p.exList.length}가지)</div>
+        ${exRowsHtml}
+        <div class="memo-card">
+          <div class="label">📝 트레이너 메모 — ${p.trainer}</div>
+          <div class="text">${p.memo}</div>
+        </div>
+        ${p.alertMsg ? `<div class="alert-box">${p.alertMsg}</div>` : ''}
+      </div>
+      <div style="padding:12px 16px 16px;background:#F0F4F8;flex-shrink:0;">${bottomBtn}</div>
+    `;
+  }
+
+  let currentExIdx = 0;
+  let currentSetCount = exercises.map(() => 1);
+  let exerciseStartTime = null;  // 운동 시작 시각
+
+  // ── 자동 진행 상태 ──
+  let autoPlayActive = false;
+  let autoPlaySeconds = 45;
+  let autoPlayRemain = 45;
+  let autoPlayInterval = null;
+
+  function goExercise(idx) {
+    clearInterval(setTimerInterval);
+    currentExIdx = idx;
+    if (autoPlayActive) resetAutoTimer();
+    renderExercise();
+  }
+
+  // ── 영상 재생 ──
+  function startVideo() {
+    const overlay = document.getElementById('ex-play-overlay');
+    const videoEl = document.getElementById('ex-video-el');
+    const iframeEl = document.getElementById('ex-iframe-el');
+    if (overlay) overlay.style.display = 'none';
+    if (videoEl) { videoEl.style.display = 'block'; videoEl.play(); }
+    if (iframeEl) {
+      const src = iframeEl.getAttribute('data-src');
+      iframeEl.src = src + (src.includes('?') ? '&' : '?') + 'autoplay=1';
+      iframeEl.style.display = 'block';
+    }
+  }
+
+  function _buildMediaHtml(ex) {
+    const playBtn = (onclick) => `
+      <div class="ex-play-overlay" id="ex-play-overlay" onclick="${onclick}">
+        <div class="ex-play-btn">
+          <svg viewBox="0 0 24 24" width="34" height="34"><polygon points="7,4 21,12 7,20" fill="#1A202C"/></svg>
+        </div>
+      </div>`;
+
+    try {
+      const raw = localStorage.getItem('exVideo_' + ex.name);
+      if (raw) {
+        const vd = JSON.parse(raw);
+        if (vd.type === 'youtube') {
+          return `<div class="ex-video-wrap">
+            <iframe id="ex-iframe-el" data-src="${vd.src}" src="" frameborder="0" allow="autoplay;encrypted-media" allowfullscreen></iframe>
+            ${playBtn('startVideo()')}
+          </div>`;
+        } else {
+          return `<div class="ex-video-wrap">
+            <video id="ex-video-el" src="${vd.src}" playsinline style="display:none;width:100%;height:190px;object-fit:cover;"></video>
+            ${playBtn('startVideo()')}
+          </div>`;
+        }
+      }
+    } catch(e) {}
+
+    // SVG 일러스트 + 플레이 버튼 오버레이
+    return `<div style="position:relative;height:190px;overflow:hidden;">
+      <div class="ex-img" style="background:none;padding:0;height:190px;">${ex.renderSvg()}</div>
+      ${playBtn('startSetTimer()')}
+    </div>`;
+  }
+
+  function renderExercise() {
+    const ex = exercises[currentExIdx];
+    const total = exercises.length;
+
+    // 진행 표시
+    document.getElementById('ex-progress-label').textContent = `${currentExIdx + 1} / ${total}`;
+
+    // 도트
+    document.getElementById('ex-dots').innerHTML = exercises.map((e, i) => {
+      let cls = i < currentExIdx ? 'step-dot done' : i === currentExIdx ? 'step-dot current' : 'step-dot';
+      return `<div class="${cls}" style="cursor:pointer;" onclick="goExercise(${i})"></div>`;
+    }).join('');
+
+    // 상단 네비게이션 리스트
+    document.getElementById('ex-nav-list').innerHTML = exercises.map((e, i) => {
+      const isCurrent = i === currentExIdx;
+      const isDone = i < currentExIdx;
+      return `<div onclick="goExercise(${i})" style="
+        flex-shrink:0; display:flex; align-items:center; gap:7px;
+        padding:6px 12px; border-radius:99px; cursor:pointer; transition:all .2s;
+        background:${isCurrent ? '#3B6FF0' : isDone ? '#F0FFF4' : '#F0F4F8'};
+        border:1.5px solid ${isCurrent ? '#3B6FF0' : isDone ? '#48BB78' : '#E2E8F0'};
+      ">
+        <span style="
+          width:20px;height:20px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;
+          font-size:10px;font-weight:700;
+          background:${isCurrent ? 'rgba(255,255,255,0.25)' : isDone ? '#48BB78' : '#E2E8F0'};
+          color:${isCurrent ? '#fff' : isDone ? '#fff' : '#718096'};
+        ">${isDone ? '✓' : i + 1}</span>
+        <span style="font-size:12px;font-weight:700;white-space:nowrap;color:${isCurrent ? '#fff' : isDone ? '#38A169' : '#4A5568'};">
+          ${e.name}
+        </span>
+        <span style="font-size:10px;color:${isCurrent ? 'rgba(255,255,255,0.75)' : '#A0AEC0'};white-space:nowrap;">
+          ${e.sets}×${e.reps}
+        </span>
+      </div>`;
+    }).join('');
+
+    const cs = currentSetCount[currentExIdx];
+
+    // 본문 렌더링 (영상 or SVG)
+    document.getElementById('ex-body').innerHTML = `
+      <div class="ex-card">
+        ${_buildMediaHtml(ex)}
+        <div class="ex-info">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+            <div class="ex-name">${ex.name}</div>
+            <span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:99px;background:${ex.grade==='필수'?'#EBF8FF':ex.grade==='권장'?'#F0FFF4':'#FFF5F5'};color:${ex.grade==='필수'?'#3B6FF0':ex.grade==='권장'?'#38A169':'#E53E3E'};">${ex.grade}</span>
+          </div>
+          <div class="ex-tip">${ex.tip}</div>
+        </div>
+      </div>
+      <div class="set-counter">
+        <div>
+          <div class="set-label">현재 세트</div>
+          <div class="set-num" id="ex-set-display">${cs} / ${ex.sets}</div>
+        </div>
+        <div>
+          <div class="set-label">목표</div>
+          <div class="set-num">${ex.reps}</div>
+        </div>
+        <div class="set-controls">
+          <button class="set-btn" onclick="changeSet(-1)">−</button>
+          <span style="font-size:20px;font-weight:900;color:#1A202C;min-width:30px;text-align:center;" id="ex-rep-count">0</span>
+          <button class="set-btn" onclick="changeSet(1)">+</button>
+        </div>
+      </div>
+    `;
+
+    // 다음 버튼
+    const nextBtn = document.getElementById('ex-next-btn');
+    if (currentExIdx < total - 1) {
+      nextBtn.textContent = `다음 운동 → ${exercises[currentExIdx + 1].name}`;
+      nextBtn.onclick = () => { currentSetCount[currentExIdx] = exercises[currentExIdx].sets; goExercise(currentExIdx + 1); };
+    } else {
+      nextBtn.textContent = '운동 완료 🎉';
+      nextBtn.onclick = () => { currentSetCount[currentExIdx] = exercises[currentExIdx].sets; stopAutoPlay(); switchScreen('complete'); };
+    }
+  }
+
+  function changeSet(delta) {
+    const newVal = Math.max(0, Math.min(99, (parseInt(document.getElementById('ex-rep-count').textContent) || 0) + delta));
+    document.getElementById('ex-rep-count').textContent = newVal;
+  }
+
+  // ── 세트 타이머 ──
+  let setTimerInterval = null;
+  let setTimerRemain = 0;
+  const SET_TIMER_SECS = 30; // 기본 30초 카운트다운
+
+  function startSetTimer() {
+    const overlay = document.getElementById('ex-play-overlay');
+    if (overlay) overlay.style.display = 'none';
+
+    setTimerRemain = SET_TIMER_SECS;
+    _renderSetTimerOverlay();
+
+    clearInterval(setTimerInterval);
+    setTimerInterval = setInterval(() => {
+      setTimerRemain--;
+      _updateSetTimerUI();
+      if (setTimerRemain <= 0) {
+        clearInterval(setTimerInterval);
+        _completeSetTimer();
+      }
+    }, 1000);
+  }
+
+  function _renderSetTimerOverlay() {
+    const imgWrap = document.querySelector('#ex-body .ex-img, #ex-body [style*="height:190px"]');
+    if (!imgWrap) return;
+
+    // position:relative 보장
+    imgWrap.style.position = 'relative';
+
+    const existing = document.getElementById('set-timer-overlay');
+    if (existing) existing.remove();
+
+    const div = document.createElement('div');
+    div.id = 'set-timer-overlay';
+    div.className = 'set-timer-overlay';
+    div.innerHTML = `
+      <div class="set-timer-ring">
+        <svg width="88" height="88" viewBox="0 0 88 88">
+          <circle id="stc" cx="44" cy="44" r="38" fill="none" stroke="#3B6FF0" stroke-width="5"
+            stroke-dasharray="238.76" stroke-dashoffset="0" stroke-linecap="round"/>
+        </svg>
+        <span class="set-timer-num" id="set-timer-num">${setTimerRemain}</span>
+      </div>
+      <span class="set-timer-label">세트 진행 중...</span>
+      <button class="set-timer-done-btn" onclick="completeSetEarly()">✓ 완료</button>
+    `;
+    imgWrap.appendChild(div);
+  }
+
+  function _updateSetTimerUI() {
+    const numEl = document.getElementById('set-timer-num');
+    const circle = document.getElementById('stc');
+    if (numEl) numEl.textContent = setTimerRemain;
+    if (circle) {
+      const circumference = 238.76;
+      const offset = circumference * (1 - setTimerRemain / SET_TIMER_SECS);
+      circle.style.strokeDashoffset = offset;
+    }
+  }
+
+  function _completeSetTimer() {
+    const overlay = document.getElementById('set-timer-overlay');
+    if (overlay) {
+      overlay.innerHTML = `
+        <div style="background:#48BB78;border-radius:50%;width:64px;height:64px;display:flex;align-items:center;justify-content:center;">
+          <svg viewBox="0 0 24 24" width="36" height="36"><polyline points="4,12 9,17 20,6" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <span class="set-timer-label" style="color:#fff;font-size:14px;">세트 완료!</span>
+      `;
+      // 세트 카운터 증가
+      const ex = exercises[currentExIdx];
+      const cur = currentSetCount[currentExIdx];
+      const isLastSet = cur >= ex.sets;
+      if (!isLastSet) {
+        currentSetCount[currentExIdx]++;
+        document.getElementById('ex-set-display').textContent = `${currentSetCount[currentExIdx]} / ${ex.sets}`;
+      }
+
+      setTimeout(() => {
+        if (overlay) overlay.remove();
+
+        if (autoPlayActive) {
+          if (isLastSet) {
+            // 마지막 세트 완료 → 다음 운동으로
+            _updateAutoLabel();
+            if (currentExIdx < exercises.length - 1) {
+              currentExIdx++;
+              renderExercise();
+              setTimeout(() => startSetTimer(), 600);
+            } else {
+              stopAutoPlay();
+              switchScreen('complete');
+            }
+          } else {
+            // 다음 세트 자동 시작
+            _updateAutoLabel();
+            setTimeout(() => startSetTimer(), 800);
+          }
+        } else {
+          const playOverlay = document.getElementById('ex-play-overlay');
+          if (playOverlay) playOverlay.style.display = 'flex';
+        }
+      }, 1200);
+    }
+  }
+
+  function _updateAutoLabel() {
+    const ex = exercises[currentExIdx];
+    const setDone = currentSetCount[currentExIdx];
+    const lbl = document.getElementById('auto-label');
+    if (lbl) lbl.textContent = `자동진행 · ${currentExIdx + 1}/${exercises.length}번 운동 · ${setDone}/${ex.sets}세트`;
+  }
+
+  function completeSetEarly() {
+    clearInterval(setTimerInterval);
+    _completeSetTimer();
+  }
+
+  // ── 자동 진행 ──
+  function toggleAutoPlay() {
+    autoPlayActive ? stopAutoPlay() : startAutoPlay();
+  }
+
+  function startAutoPlay() {
+    autoPlayActive = true;
+    document.getElementById('auto-bar').style.display = 'flex';
+    document.getElementById('btn-auto-toggle').textContent = '■ 자동중지';
+    document.getElementById('btn-auto-toggle').style.background = '#FED7D7';
+    document.getElementById('btn-auto-toggle').style.color = '#C53030';
+    _updateAutoLabel();
+    // 세트 타이머 자동 시작
+    startSetTimer();
+  }
+
+  function stopAutoPlay() {
+    autoPlayActive = false;
+    clearInterval(autoPlayInterval);
+    autoPlayInterval = null;
+    clearInterval(setTimerInterval);
+    setTimerInterval = null;
+    const timerOverlay = document.getElementById('set-timer-overlay');
+    if (timerOverlay) timerOverlay.remove();
+    const playOverlay = document.getElementById('ex-play-overlay');
+    if (playOverlay) playOverlay.style.display = 'flex';
+    document.getElementById('auto-bar').style.display = 'none';
+    const btn = document.getElementById('btn-auto-toggle');
+    if (btn) { btn.textContent = '▶ 자동진행'; btn.style.background = ''; btn.style.color = ''; }
+  }
+
+  function resetAutoTimer() {
+    autoPlayRemain = autoPlaySeconds;
+    _updateAutoBar();
+  }
+
+  function _updateAutoBar() {
+    const pct = (autoPlayRemain / autoPlaySeconds) * 100;
+    const fill = document.getElementById('auto-fill');
+    const timer = document.getElementById('auto-timer');
+    if (fill) fill.style.width = pct + '%';
+    if (timer) timer.textContent = autoPlayRemain;
+  }
+
+  function _autoTick() {
+    // 세트 완료 기반으로 전환 — 타이머 자동 넘김 사용 안 함
+  }
+
+  function exitExercise() {
+    stopAutoPlay();
+    switchScreen('detail');
+  }
+
+  // ── 화면 전환 ──
   const screenNames = {
-    list: '목록 화면',
-    detail: '상세 화면',
+    list: '처방 목록 화면',
+    detail: '처방 상세 화면',
     exercise: '운동 진행 화면',
     complete: '완료 화면',
     memo: '트레이너 메모 화면',
   };
 
   function switchScreen(id) {
+    if (id !== 'exercise') stopAutoPlay();
     document.querySelectorAll('.screen-frame').forEach(el => el.classList.remove('active'));
     document.querySelectorAll('.screen-btn').forEach(el => el.classList.remove('active'));
-
     document.getElementById('screen-' + id).classList.add('active');
     document.querySelectorAll('.screen-btn').forEach(btn => {
-      if (btn.getAttribute('onclick').includes("'" + id + "'")) {
-        btn.classList.add('active');
-      }
+      if (btn.getAttribute('onclick').includes("'" + id + "'")) btn.classList.add('active');
     });
-
     document.getElementById('memo-screen-name').value = screenNames[id] || id;
+    if (id === 'detail') {
+      renderDetail();
+    }
+    if (id === 'exercise') {
+      currentExIdx = 0;
+      currentSetCount = exercises.map(() => 1);
+      exerciseStartTime = Date.now();
+      renderExercise();
+    }
+    if (id === 'complete') {
+      _renderCompleteStats();
+    }
+  }
+
+  function _renderCompleteStats() {
+    // 완료 운동 수: 현재 운동까지 포함 (다음 운동으로 안 넘어갔어도 현재 운동은 완료로 처리)
+    const completedCount = currentExIdx + 1;
+
+    // 총 세트: 완료된 운동들의 세트 합계 (현재 운동은 목표 세트로 카운트)
+    let totalSets = 0;
+    for (let i = 0; i < completedCount; i++) {
+      totalSets += (i < currentExIdx) ? exercises[i].sets : currentSetCount[i];
+    }
+
+    // 운동 시간
+    let timeStr = '—';
+    if (exerciseStartTime) {
+      const mins = Math.round((Date.now() - exerciseStartTime) / 60000);
+      timeStr = mins < 1 ? '1분 미만' : mins + '분';
+    }
+
+    document.getElementById('stat-time').textContent = timeStr;
+    document.getElementById('stat-count').textContent = completedCount + '개';
+    document.getElementById('stat-sets').textContent = totalSets + '세트';
   }
 </script>
 

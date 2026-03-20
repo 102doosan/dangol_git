@@ -3,8 +3,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>마이루틴 화면 디자인</title>
+  <title>마이루틴</title>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet" />
+  <script src="data.js"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     body {
@@ -14,8 +15,6 @@
       display: flex; flex-direction: column; align-items: center;
       padding: 24px 16px 48px; gap: 24px;
     }
-
-    /* ── 툴바 ── */
     .toolbar {
       width: 100%; max-width: 1200px;
       display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
@@ -29,12 +28,11 @@
     .screen-btn.active { background: #9B6DFF; color: #fff; }
     .screen-btn:hover:not(.active) { background: #3A3A5A; color: #fff; }
 
-    /* ── 워크스페이스 ── */
     .workspace { width: 100%; max-width: 1200px; display: flex; gap: 32px; align-items: flex-start; }
 
-    /* ── 폰 프레임 ── */
+    /* 폰 프레임 */
     .phone {
-      width: 375px; min-height: 740px; background: #fff;
+      width: 375px; height: 780px; background: #fff;
       border-radius: 44px;
       box-shadow: 0 0 0 10px #111, 0 30px 80px rgba(0,0,0,0.6);
       overflow: hidden; position: relative;
@@ -53,7 +51,7 @@
     }
     .screen-frame.active { display: flex; }
 
-    /* ── 메모판 ── */
+    /* 메모판 */
     .memo-panel {
       flex: 1; background: #16213E; border-radius: 20px; padding: 24px;
       min-height: 600px; display: flex; flex-direction: column; gap: 14px;
@@ -68,358 +66,353 @@
     .memo-field textarea { min-height: 70px; line-height: 1.6; }
     .memo-divider { height: 1px; background: #1E3A5F; }
 
-    /* ── 공통 앱 헤더 ── */
+    /* 공통 */
     .app-header {
       background: #6B46C1; color: #fff;
       padding: 14px 20px;
       display: flex; align-items: center; gap: 12px; flex-shrink: 0;
     }
-    .app-header .back { font-size: 18px; cursor: pointer; opacity: 0.9; }
+    .app-header .back { font-size: 20px; cursor: pointer; opacity: 0.9; line-height: 1; }
     .app-header .title { font-size: 17px; font-weight: 700; }
-    .app-header .right-btn {
-      margin-left: auto; font-size: 22px; cursor: pointer; opacity: 0.9;
-    }
-    .app-body { flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 12px; }
+    .app-header .right { margin-left: auto; font-size: 13px; font-weight: 700; opacity: 0.9; cursor: pointer; }
+    .app-body { flex: 1; overflow-y: auto; padding: 14px 14px 20px; display: flex; flex-direction: column; gap: 10px; }
 
-    /* ── 탭 공통 ── */
+    /* 탭 */
     .tab-bar {
-      background: #fff; border-bottom: 1px solid #E2E8F0;
+      background: #fff; border-bottom: 1px solid #E9E3FF;
       display: flex; flex-shrink: 0;
     }
     .tab-item {
-      flex: 1; padding: 13px 0; text-align: center;
+      flex: 1; padding: 12px 0; text-align: center;
       font-size: 13px; font-weight: 700; color: #A0AEC0;
       border-bottom: 3px solid transparent; cursor: pointer; transition: all 0.15s;
     }
     .tab-item.on { color: #9B6DFF; border-bottom-color: #9B6DFF; }
 
-    /* ────────────────────────────────────────
-       ① 마이루틴 홈 — 내 루틴 탭
-    ──────────────────────────────────────── */
+    /* 홈 상단 */
     .home-top {
       background: linear-gradient(135deg, #553C9A 0%, #9B6DFF 60%, #B794F4 100%);
-      padding: 16px 20px 24px; flex-shrink: 0;
+      padding: 20px 18px 20px; flex-shrink: 0;
     }
     .home-top .ht-sub { font-size: 12px; opacity: 0.8; margin-bottom: 4px; color: #fff; }
-    .home-top .ht-title { font-size: 20px; font-weight: 900; color: #fff; }
-    .home-top .ht-stats {
-      display: flex; gap: 14px; margin-top: 12px;
-    }
+    .home-top .ht-title { font-size: 20px; font-weight: 900; color: #fff; line-height: 1.3; }
+    .ht-stats { display: flex; gap: 10px; margin-top: 12px; }
     .ht-stat {
-      background: rgba(255,255,255,0.18); border-radius: 12px;
-      padding: 8px 14px; text-align: center;
+      background: rgba(255,255,255,0.18); border-radius: 10px;
+      padding: 8px 12px; text-align: center;
     }
     .ht-stat .sv { font-size: 18px; font-weight: 900; color: #fff; }
     .ht-stat .sl { font-size: 10px; color: rgba(255,255,255,0.75); margin-top: 2px; font-weight: 700; }
     .streak-bar {
-      display: flex; align-items: center; gap: 6px;
-      background: rgba(255,255,255,0.18); border-radius: 12px;
-      padding: 8px 14px; flex: 1;
+      display: flex; align-items: center; gap: 8px;
+      background: rgba(255,255,255,0.18); border-radius: 10px;
+      padding: 8px 12px; flex: 1;
     }
-    .streak-fire { font-size: 18px; }
-    .streak-txt { font-size: 12px; color: #fff; font-weight: 700; }
-    .streak-num { font-size: 18px; font-weight: 900; color: #FFE082; }
 
+    /* 루틴 카드 */
     .routine-card {
-      background: #fff; border-radius: 18px;
-      box-shadow: 0 2px 12px rgba(155,109,255,0.12);
-      overflow: hidden; cursor: pointer;
+      background: #fff; border-radius: 16px;
+      box-shadow: 0 2px 10px rgba(155,109,255,0.12);
+      cursor: pointer;
+      border: 1.5px solid transparent; transition: border-color 0.15s;
     }
-    .rc-top {
-      padding: 16px 16px 12px;
-      display: flex; align-items: flex-start; gap: 12px;
-    }
+    .routine-card:hover { border-color: #B794F4; }
+    .rc-top { padding: 14px 14px 10px; display: flex; align-items: flex-start; gap: 10px; }
     .rc-icon {
-      width: 48px; height: 48px; border-radius: 14px;
+      width: 44px; height: 44px; border-radius: 12px;
       display: flex; align-items: center; justify-content: center;
-      font-size: 24px; flex-shrink: 0;
+      font-size: 22px; flex-shrink: 0;
     }
     .ri-purple { background: #EDE9FE; }
     .ri-green  { background: #F0FFF4; }
-    .ri-red    { background: #FFF5F5; }
+    .ri-orange { background: #FFFAF0; }
     .ri-blue   { background: #EBF8FF; }
-    .rc-info { flex: 1; }
-    .rc-name { font-size: 15px; font-weight: 800; color: #1A202C; }
+    .rc-info { flex: 1; min-width: 0; }
+    .rc-name { font-size: 14px; font-weight: 800; color: #1A202C; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .rc-source { font-size: 11px; color: #9B6DFF; font-weight: 700; margin-top: 2px; }
-    .rc-meta { font-size: 12px; color: #A0AEC0; margin-top: 3px; }
-    .rc-more { font-size: 20px; color: #CBD5E0; cursor: pointer; }
+    .rc-meta { font-size: 11px; color: #A0AEC0; margin-top: 2px; }
     .rc-bottom {
-      border-top: 1px solid #F7FAFC;
-      padding: 10px 16px;
+      border-top: 1px solid #F7F3FF; padding: 9px 14px;
       display: flex; align-items: center; justify-content: space-between;
     }
-    .rc-tags { display: flex; gap: 6px; flex-wrap: wrap; }
-    .rc-tag {
-      font-size: 11px; font-weight: 700; padding: 3px 10px;
-      border-radius: 99px; background: #EDE9FE; color: #6B46C1;
-    }
+    .rc-tags { display: flex; gap: 5px; flex-wrap: wrap; flex: 1; }
+    .rc-tag { font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 99px; background: #EDE9FE; color: #6B46C1; }
     .rc-tag.green { background: #C6F6D5; color: #276749; }
-    .rc-tag.red   { background: #FED7D7; color: #742A2A; }
+    .rc-tag.orange { background: #FEEBC8; color: #C05621; }
     .btn-start-sm {
-      background: #9B6DFF; color: #fff; border: none; border-radius: 10px;
-      padding: 7px 16px; font-size: 12px; font-weight: 700; cursor: pointer;
-      font-family: 'Noto Sans KR', sans-serif;
+      background: #9B6DFF; color: #fff; border: none; border-radius: 8px;
+      padding: 6px 14px; font-size: 12px; font-weight: 700; cursor: pointer;
+      font-family: 'Noto Sans KR', sans-serif; white-space: nowrap; flex-shrink: 0;
     }
-    .btn-add-routine {
-      margin: 4px 0 8px; background: #EDE9FE; color: #6B46C1;
-      border: 2px dashed #B794F4; border-radius: 16px;
-      padding: 16px; font-size: 14px; font-weight: 700; cursor: pointer;
-      text-align: center;
+    .section-label {
+      font-size: 11px; font-weight: 800; color: #9B6DFF; letter-spacing: 1px;
+      padding: 6px 0 2px;
     }
-
-    /* ────────────────────────────────────────
-       ② 최근 운동 탭
-    ──────────────────────────────────────── */
-    .recent-item {
-      background: #fff; border-radius: 16px; padding: 14px 16px;
-      box-shadow: 0 1px 8px rgba(0,0,0,0.06); cursor: pointer;
-      display: flex; gap: 12px; align-items: center;
-    }
-    .ri-date-box {
-      background: #EDE9FE; border-radius: 12px; padding: 8px 10px;
-      text-align: center; min-width: 42px; flex-shrink: 0;
-    }
-    .ri-date-box .rd { font-size: 18px; font-weight: 900; color: #6B46C1; line-height: 1; }
-    .ri-date-box .rm { font-size: 10px; color: #9B6DFF; font-weight: 700; margin-top: 2px; }
-    .ri-info { flex: 1; }
-    .ri-name { font-size: 14px; font-weight: 700; color: #1A202C; }
-    .ri-detail { font-size: 12px; color: #A0AEC0; margin-top: 3px; }
-    .ri-right { text-align: right; }
-    .ri-time { font-size: 13px; font-weight: 800; color: #9B6DFF; }
-    .ri-redo {
-      margin-top: 6px; font-size: 10px; background: #EDE9FE; color: #6B46C1;
-      padding: 3px 8px; border-radius: 99px; font-weight: 700; white-space: nowrap;
+    .empty-card {
+      background: #fff; border-radius: 14px; padding: 24px 16px; text-align: center;
+      color: #A0AEC0; font-size: 13px; font-weight: 700;
+      border: 2px dashed #D6BCFA;
     }
 
-    /* ────────────────────────────────────────
-       ③ 루틴 상세
-    ──────────────────────────────────────── */
+    /* 루틴 상세 */
     .detail-hero {
       background: linear-gradient(135deg, #553C9A, #9B6DFF);
-      padding: 20px 20px 28px; color: #fff; flex-shrink: 0;
+      padding: 18px 18px 22px; color: #fff; flex-shrink: 0;
     }
-    .detail-hero .back { font-size: 18px; cursor: pointer; margin-bottom: 12px; display: block; }
-    .detail-hero .dh-source { font-size: 11px; opacity: 0.8; margin-bottom: 4px; }
-    .detail-hero .dh-name { font-size: 22px; font-weight: 900; }
-    .detail-hero .dh-stats {
-      display: flex; gap: 16px; margin-top: 12px;
-    }
-    .dh-stat { font-size: 13px; opacity: 0.85; }
-    .dh-stat span { font-weight: 800; font-size: 15px; opacity: 1; }
-    .ex-list-item {
-      background: #fff; border-radius: 14px; padding: 14px 16px;
-      display: flex; align-items: center; gap: 12px;
-      box-shadow: 0 1px 6px rgba(0,0,0,0.06);
-    }
-    .el-num {
-      width: 28px; height: 28px; border-radius: 50%;
-      background: #9B6DFF; color: #fff; font-size: 12px; font-weight: 700;
-      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
-    }
-    .el-icon { font-size: 24px; width: 36px; text-align: center; flex-shrink: 0; }
-    .el-info { flex: 1; }
-    .el-name { font-size: 14px; font-weight: 700; color: #1A202C; }
-    .el-detail { font-size: 12px; color: #A0AEC0; margin-top: 2px; }
-    .el-play { font-size: 20px; color: #CBD5E0; }
-    .achieve-row {
-      background: #fff; border-radius: 14px; padding: 14px 16px;
-      box-shadow: 0 1px 6px rgba(0,0,0,0.06);
-      display: flex; gap: 10px;
-    }
-    .ach-box { flex: 1; background: #F5F0FF; border-radius: 10px; padding: 10px; text-align: center; }
-    .ach-val { font-size: 18px; font-weight: 900; color: #9B6DFF; }
+    .detail-hero .back { font-size: 20px; cursor: pointer; margin-bottom: 10px; display: inline-block; opacity: 0.9; }
+    .dh-source { font-size: 11px; opacity: 0.8; margin-bottom: 4px; font-weight: 700; }
+    .dh-name { font-size: 20px; font-weight: 900; line-height: 1.3; }
+    .dh-stats { display: flex; gap: 14px; margin-top: 10px; }
+    .dh-stat { font-size: 12px; opacity: 0.85; }
+    .dh-stat span { font-weight: 800; font-size: 14px; opacity: 1; }
+    .achieve-row { background: #fff; border-radius: 14px; padding: 12px 14px; box-shadow: 0 1px 6px rgba(0,0,0,0.06); display: flex; gap: 8px; }
+    .ach-box { flex: 1; background: #F5F0FF; border-radius: 10px; padding: 9px 6px; text-align: center; }
+    .ach-val { font-size: 16px; font-weight: 900; color: #9B6DFF; }
     .ach-lbl { font-size: 10px; color: #B794F4; font-weight: 700; margin-top: 2px; }
-    .btn-start-full {
-      background: #9B6DFF; color: #fff; border: none; border-radius: 16px;
-      padding: 16px; font-size: 16px; font-weight: 700; cursor: pointer;
-      font-family: 'Noto Sans KR', sans-serif; width: calc(100% - 32px);
-      margin: 0 16px 16px; flex-shrink: 0;
-    }
-
-    /* ────────────────────────────────────────
-       ④ 운동 따라하기
-    ──────────────────────────────────────── */
-    .progress-bar-top {
-      background: #fff; padding: 12px 16px;
-      display: flex; align-items: center; justify-content: space-between; flex-shrink: 0;
-    }
-    .step-dots { display: flex; gap: 4px; }
-    .step-dot { width: 28px; height: 4px; border-radius: 99px; background: #E2E8F0; }
-    .step-dot.done { background: #9B6DFF; }
-    .step-dot.now  { background: #9B6DFF; opacity: 0.45; }
-    .ex-card {
-      background: #fff; border-radius: 20px; overflow: hidden;
-      box-shadow: 0 4px 16px rgba(155,109,255,0.15);
-    }
-    .ex-img {
-      width: 100%; height: 190px;
-      background: linear-gradient(135deg, #553C9A 0%, #9B6DFF 100%);
-      display: flex; align-items: center; justify-content: center; font-size: 64px;
-    }
-    .ex-body { padding: 14px 16px; }
-    .ex-title { font-size: 18px; font-weight: 900; color: #1A202C; }
-    .ex-desc  { font-size: 12px; color: #718096; margin-top: 4px; line-height: 1.5; }
-    .counter-row { display: flex; gap: 10px; }
-    .counter-box {
-      flex: 1; background: #fff; border-radius: 14px; padding: 14px;
-      box-shadow: 0 1px 8px rgba(0,0,0,0.06);
-    }
-    .counter-label { font-size: 11px; font-weight: 700; color: #A0AEC0; margin-bottom: 6px; }
-    .counter-val { font-size: 28px; font-weight: 900; color: #9B6DFF; text-align: center; }
-    .counter-controls { display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 8px; }
-    .cnt-btn {
-      width: 32px; height: 32px; border-radius: 50%;
-      border: 2px solid #9B6DFF; background: #fff; color: #9B6DFF;
-      font-size: 18px; font-weight: 700; cursor: pointer;
-      display: flex; align-items: center; justify-content: center;
-    }
-    .btn-next {
-      background: #9B6DFF; color: #fff; border: none; border-radius: 14px;
-      padding: 15px; font-size: 15px; font-weight: 700; cursor: pointer;
-      font-family: 'Noto Sans KR', sans-serif;
-      margin: 0 16px 16px; width: calc(100% - 32px); flex-shrink: 0;
-    }
-    .rest-badge {
-      background: #F0FFF4; color: #276749; border-radius: 99px;
-      padding: 4px 12px; font-size: 11px; font-weight: 700; margin-left: auto;
-    }
-
-    /* ────────────────────────────────────────
-       ⑤ 루틴 만들기
-    ──────────────────────────────────────── */
-    .make-sub {
-      background: #EDE9FE; padding: 10px 16px;
-      font-size: 12px; color: #553C9A; font-weight: 700; flex-shrink: 0;
-      border-bottom: 1px solid #D6BCFA;
-    }
-    .input-field {
-      background: #fff; border-radius: 14px; padding: 14px 16px;
-      box-shadow: 0 1px 6px rgba(0,0,0,0.06);
-    }
-    .input-field label { display: block; font-size: 11px; font-weight: 800; color: #9B6DFF; margin-bottom: 6px; }
-    .input-field input, .input-field select {
-      width: 100%; border: none; outline: none; border-bottom: 2px solid #E2E8F0;
-      font-size: 15px; font-weight: 700; color: #1A202C; padding: 4px 0;
-      font-family: 'Noto Sans KR', sans-serif; background: transparent;
-    }
-    .input-field input:focus, .input-field select:focus { border-bottom-color: #9B6DFF; }
-    .cycle-options { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
-    .cycle-chip {
-      padding: 6px 14px; border-radius: 99px; font-size: 12px; font-weight: 700;
-      border: 2px solid #E2E8F0; background: #fff; color: #718096; cursor: pointer;
-    }
-    .cycle-chip.on { background: #9B6DFF; color: #fff; border-color: #9B6DFF; }
-    .make-ex-item {
-      background: #fff; border-radius: 14px; padding: 13px 16px;
+    .ex-list-item {
+      background: #fff; border-radius: 13px; padding: 12px 14px;
       display: flex; align-items: center; gap: 10px;
       box-shadow: 0 1px 6px rgba(0,0,0,0.06);
     }
-    .drag { font-size: 18px; color: #CBD5E0; cursor: grab; }
-    .make-num {
-      width: 24px; height: 24px; border-radius: 50%;
+    .el-num {
+      width: 26px; height: 26px; border-radius: 50%;
       background: #9B6DFF; color: #fff; font-size: 11px; font-weight: 700;
       display: flex; align-items: center; justify-content: center; flex-shrink: 0;
     }
-    .make-info { flex: 1; }
-    .make-name   { font-size: 13px; font-weight: 700; color: #1A202C; }
-    .make-detail { font-size: 11px; color: #A0AEC0; margin-top: 2px; }
-    .make-del { font-size: 18px; color: #FC8181; cursor: pointer; }
-    .add-ex-btn {
-      border: 2px dashed #D6BCFA; border-radius: 14px; padding: 14px;
-      text-align: center; color: #9B6DFF; font-size: 13px; font-weight: 700; cursor: pointer;
-      background: #EDE9FE;
-    }
-    .btn-save {
+    .el-icon { font-size: 22px; flex-shrink: 0; }
+    .el-info { flex: 1; min-width: 0; }
+    .el-name { font-size: 13px; font-weight: 700; color: #1A202C; }
+    .el-detail { font-size: 11px; color: #A0AEC0; margin-top: 2px; }
+    .btn-start-full {
       background: #9B6DFF; color: #fff; border: none; border-radius: 14px;
       padding: 15px; font-size: 15px; font-weight: 700; cursor: pointer;
+      font-family: 'Noto Sans KR', sans-serif;
+      margin: 0 14px 14px; flex-shrink: 0;
+    }
+
+    /* ── 운동 따라하기 ── */
+    .play-top {
+      background: #fff; padding: 12px 16px;
+      display: flex; align-items: center; justify-content: space-between; flex-shrink: 0;
+      border-bottom: 1px solid #F0EAFF;
+    }
+    .play-top-info { font-size: 12px; font-weight: 700; color: #718096; }
+    .step-dots { display: flex; gap: 4px; }
+    .step-dot { width: 26px; height: 4px; border-radius: 99px; background: #E9E3FF; }
+    .step-dot.done { background: #9B6DFF; }
+    .step-dot.now  { background: #B794F4; }
+    .auto-bar {
+      background: #553C9A; padding: 8px 16px;
+      display: flex; align-items: center; justify-content: space-between; flex-shrink: 0;
+    }
+    .auto-label { font-size: 12px; font-weight: 700; color: #E9D8FD; }
+    .btn-auto-stop {
+      background: rgba(255,255,255,0.15); border: none; border-radius: 8px;
+      color: #fff; font-size: 11px; font-weight: 700; padding: 4px 10px; cursor: pointer;
+      font-family: 'Noto Sans KR', sans-serif;
+    }
+    .ex-play-card {
+      background: #fff; border-radius: 18px; overflow: hidden;
+      box-shadow: 0 4px 16px rgba(155,109,255,0.15);
+    }
+    .ex-play-img {
+      width: 100%; height: 185px; position: relative;
+      background: linear-gradient(135deg, #553C9A 0%, #9B6DFF 100%);
+      display: flex; align-items: center; justify-content: center; font-size: 64px;
+    }
+    /* 이미지 위 재생 오버레이 */
+    .ex-play-overlay {
+      position: absolute; inset: 0; background: rgba(30,10,60,0.45);
+      display: flex; align-items: center; justify-content: center; cursor: pointer;
+    }
+    .ex-play-btn {
+      width: 60px; height: 60px; border-radius: 50%;
+      background: rgba(255,255,255,0.92); display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    }
+    .ex-play-btn-icon { font-size: 24px; margin-left: 4px; color: #6B46C1; }
+    /* 세트 타이머 오버레이 */
+    .set-timer-overlay {
+      position: absolute; inset: 0; background: rgba(30,10,60,0.72);
+      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px;
+    }
+    .set-timer-ring { position: relative; display: flex; align-items: center; justify-content: center; }
+    .set-timer-num {
+      position: absolute; font-size: 26px; font-weight: 900; color: #fff;
+    }
+    .set-timer-label { font-size: 12px; font-weight: 700; color: #E9D8FD; }
+    .set-timer-done-btn {
+      background: #9B6DFF; border: none; border-radius: 20px; padding: 6px 18px;
+      color: #fff; font-size: 12px; font-weight: 700; cursor: pointer;
+      font-family: 'Noto Sans KR', sans-serif;
+    }
+    .ex-play-body { padding: 12px 14px; }
+    .ex-play-title { font-size: 17px; font-weight: 900; color: #1A202C; }
+    .ex-play-desc  { font-size: 11px; color: #718096; margin-top: 4px; line-height: 1.5; }
+    .counter-row { display: flex; gap: 8px; margin-top: 10px; }
+    .counter-box {
+      flex: 1; background: #F5F0FF; border-radius: 12px; padding: 10px 8px;
+    }
+    .counter-label { font-size: 10px; font-weight: 700; color: #9B6DFF; margin-bottom: 4px; text-align: center; }
+    .counter-val { font-size: 20px; font-weight: 900; color: #553C9A; text-align: center; }
+    .counter-sub { font-size: 10px; color: #B794F4; text-align: center; margin-top: 2px; }
+    .counter-controls { display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 4px; }
+    .cnt-btn {
+      width: 28px; height: 28px; border-radius: 50%;
+      border: 2px solid #9B6DFF; background: #fff; color: #9B6DFF;
+      font-size: 16px; font-weight: 700; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Noto Sans KR', sans-serif;
+    }
+    .btn-auto-play {
+      background: linear-gradient(135deg, #553C9A, #9B6DFF);
+      color: #fff; border: none; border-radius: 10px;
+      padding: 9px 14px; font-size: 12px; font-weight: 700; cursor: pointer;
+      font-family: 'Noto Sans KR', sans-serif; white-space: nowrap;
+    }
+    .btn-next-ex {
+      background: #9B6DFF; color: #fff; border: none; border-radius: 12px;
+      padding: 13px; font-size: 14px; font-weight: 700; cursor: pointer;
+      font-family: 'Noto Sans KR', sans-serif;
+      margin: 0 14px 14px; flex-shrink: 0;
+    }
+    .play-action-row {
+      padding: 10px 14px 0; display: flex; gap: 8px; align-items: center;
+    }
+
+    /* 완료 화면 */
+    .complete-wrap {
+      flex: 1; display: flex; flex-direction: column; align-items: center;
+      justify-content: center; gap: 16px; padding: 20px;
+    }
+    .complete-circle {
+      width: 90px; height: 90px; border-radius: 50%;
+      background: linear-gradient(135deg, #553C9A, #9B6DFF);
+      display: flex; align-items: center; justify-content: center; font-size: 40px;
+      box-shadow: 0 8px 24px rgba(155,109,255,0.4);
+    }
+    .complete-title { font-size: 22px; font-weight: 900; color: #1A202C; }
+    .complete-sub { font-size: 13px; color: #718096; text-align: center; line-height: 1.5; }
+    .complete-stats {
+      display: flex; gap: 10px; width: 100%;
+    }
+    .cs-box {
+      flex: 1; background: #fff; border-radius: 14px; padding: 12px 8px; text-align: center;
+      box-shadow: 0 2px 10px rgba(155,109,255,0.1);
+    }
+    .cs-val { font-size: 20px; font-weight: 900; color: #9B6DFF; }
+    .cs-lbl { font-size: 10px; font-weight: 700; color: #B794F4; margin-top: 3px; }
+    .btn-home-after {
+      background: #9B6DFF; color: #fff; border: none; border-radius: 14px;
+      padding: 14px; font-size: 15px; font-weight: 700; cursor: pointer;
+      font-family: 'Noto Sans KR', sans-serif; width: 100%;
+    }
+    .btn-outline-after {
+      background: #fff; color: #9B6DFF; border: 2px solid #9B6DFF; border-radius: 14px;
+      padding: 12px; font-size: 13px; font-weight: 700; cursor: pointer;
       font-family: 'Noto Sans KR', sans-serif; width: 100%;
     }
 
-    /* ────────────────────────────────────────
-       ⑥ 달성 이력
-    ──────────────────────────────────────── */
-    .history-cal {
-      background: #fff; border-radius: 16px; padding: 16px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.07);
+    /* 최근 운동 */
+    .recent-item {
+      background: #fff; border-radius: 14px; padding: 12px 14px;
+      box-shadow: 0 1px 8px rgba(0,0,0,0.06); cursor: pointer;
+      display: flex; gap: 10px; align-items: center;
     }
-    .hc-title { font-size: 13px; font-weight: 800; color: #4A5568; margin-bottom: 12px; }
-    .hc-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
+    .ri-date-box {
+      background: #EDE9FE; border-radius: 10px; padding: 7px 8px;
+      text-align: center; min-width: 38px; flex-shrink: 0;
+    }
+    .ri-date-box .rd { font-size: 17px; font-weight: 900; color: #6B46C1; line-height: 1; }
+    .ri-date-box .rm { font-size: 10px; color: #9B6DFF; font-weight: 700; margin-top: 2px; }
+    .ri-info { flex: 1; }
+    .ri-name { font-size: 13px; font-weight: 700; color: #1A202C; }
+    .ri-detail { font-size: 11px; color: #A0AEC0; margin-top: 2px; }
+    .ri-right { text-align: right; flex-shrink: 0; }
+    .ri-time { font-size: 13px; font-weight: 800; color: #9B6DFF; }
+    .ri-redo {
+      margin-top: 5px; font-size: 10px; background: #EDE9FE; color: #6B46C1;
+      padding: 2px 7px; border-radius: 99px; font-weight: 700;
+    }
+
+    /* 달성 이력 */
+    .streak-card {
+      background: linear-gradient(135deg, #553C9A, #9B6DFF);
+      border-radius: 14px; padding: 16px;
+      display: flex; align-items: center; gap: 14px;
+      box-shadow: 0 4px 16px rgba(155,109,255,0.25);
+    }
+    .sc-fire { font-size: 36px; }
+    .sc-val  { font-size: 28px; font-weight: 900; color: #fff; }
+    .sc-lbl  { font-size: 12px; color: rgba(255,255,255,0.8); margin-top: 2px; }
+    .sc-best { font-size: 11px; color: #FFE082; margin-top: 4px; font-weight: 700; }
+    .history-cal { background: #fff; border-radius: 14px; padding: 14px; box-shadow: 0 2px 10px rgba(0,0,0,0.07); }
+    .hc-title { font-size: 13px; font-weight: 800; color: #4A5568; margin-bottom: 10px; }
+    .hc-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; }
     .hc-cell {
-      aspect-ratio: 1; border-radius: 8px; background: #EDF2F7;
+      aspect-ratio: 1; border-radius: 7px; background: #EDF2F7;
       display: flex; align-items: center; justify-content: center;
       font-size: 10px; font-weight: 700; color: #A0AEC0;
     }
     .hc-cell.done { background: #9B6DFF; color: #fff; }
-    .hc-cell.today { background: #553C9A; color: #fff; }
+    .hc-cell.today { background: #553C9A; color: #fff; font-weight: 900; }
     .hc-cell.skip  { background: #FED7D7; color: #742A2A; }
-    .streak-card {
-      background: linear-gradient(135deg, #553C9A, #9B6DFF);
-      border-radius: 16px; padding: 20px;
-      display: flex; align-items: center; gap: 16px;
-      box-shadow: 0 4px 16px rgba(155,109,255,0.25);
-    }
-    .sc-fire { font-size: 40px; }
-    .sc-info { flex: 1; }
-    .sc-val  { font-size: 32px; font-weight: 900; color: #fff; }
-    .sc-lbl  { font-size: 13px; color: rgba(255,255,255,0.8); margin-top: 2px; }
-    .sc-best { font-size: 11px; color: #FFE082; margin-top: 6px; font-weight: 700; }
     .history-row {
-      background: #fff; border-radius: 14px; padding: 14px 16px;
-      display: flex; align-items: center; gap: 12px;
+      background: #fff; border-radius: 13px; padding: 12px 14px;
+      display: flex; align-items: center; gap: 10px;
       box-shadow: 0 1px 6px rgba(0,0,0,0.06);
     }
-    .hr-icon { font-size: 22px; }
-    .hr-info { flex: 1; }
-    .hr-name { font-size: 14px; font-weight: 700; color: #1A202C; }
-    .hr-date { font-size: 12px; color: #A0AEC0; margin-top: 2px; }
-    .hr-done { font-size: 13px; font-weight: 800; color: #9B6DFF; }
     .alarm-item {
-      background: #fff; border-radius: 14px; padding: 14px 16px;
-      display: flex; align-items: center; gap: 12px;
+      background: #fff; border-radius: 13px; padding: 12px 14px;
+      display: flex; align-items: center; gap: 10px;
       box-shadow: 0 1px 6px rgba(0,0,0,0.06);
     }
     .ai-info { flex: 1; }
-    .ai-name { font-size: 14px; font-weight: 700; color: #1A202C; }
-    .ai-time { font-size: 12px; color: #9B6DFF; margin-top: 3px; font-weight: 700; }
+    .ai-name { font-size: 13px; font-weight: 700; color: #1A202C; }
+    .ai-time { font-size: 11px; color: #9B6DFF; margin-top: 2px; font-weight: 700; }
     .toggle {
-      width: 44px; height: 24px; border-radius: 99px; background: #9B6DFF;
-      position: relative; cursor: pointer; flex-shrink: 0;
+      width: 40px; height: 22px; border-radius: 99px; background: #9B6DFF;
+      position: relative; cursor: pointer; flex-shrink: 0; transition: background 0.2s;
     }
     .toggle::after {
       content: ''; position: absolute; right: 3px; top: 3px;
-      width: 18px; height: 18px; border-radius: 50%; background: #fff;
+      width: 16px; height: 16px; border-radius: 50%; background: #fff; transition: all 0.2s;
     }
     .toggle.off { background: #CBD5E0; }
     .toggle.off::after { right: auto; left: 3px; }
+    .day-chip {
+      flex:1; text-align:center; padding:6px 0; border-radius:8px;
+      font-size:12px; font-weight:700; cursor:pointer;
+      background:#F5F0FF; color:#B794F4; border:1.5px solid #EDE9FE; transition:all .15s;
+    }
+    .day-chip.on { background:#9B6DFF; color:#fff; border-color:#9B6DFF; }
   </style>
 </head>
 <body>
 
 <div class="toolbar">
-  <span class="toolbar-title">🔄 마이루틴 화면 디자인</span>
-  <button class="screen-btn active" onclick="go('home')">① 내 루틴</button>
-  <button class="screen-btn" onclick="go('recent')">② 최근 운동</button>
-  <button class="screen-btn" onclick="go('detail')">③ 루틴 상세</button>
-  <button class="screen-btn" onclick="go('play')">④ 운동 따라하기</button>
-  <button class="screen-btn" onclick="go('make')">⑤ 루틴 만들기</button>
-  <button class="screen-btn" onclick="go('history')">⑥ 달성 이력·알림</button>
+  <span class="toolbar-title">🔄 마이루틴</span>
+  <button class="screen-btn active" onclick="switchScreen('home')">① 내 루틴 홈</button>
+  <button class="screen-btn" onclick="switchScreen('detail')">② 루틴 상세</button>
+  <button class="screen-btn" onclick="switchScreen('play')">③ 운동 따라하기</button>
+  <button class="screen-btn" onclick="switchScreen('complete')">④ 완료</button>
+  <button class="screen-btn" onclick="switchScreen('recent')">⑤ 최근 운동</button>
+  <button class="screen-btn" onclick="switchScreen('history')">⑥ 달성 이력</button>
 </div>
 
 <div class="workspace">
-
-  <!-- 폰 프레임 -->
   <div class="phone">
     <div class="phone-notch"></div>
     <div class="phone-screen">
 
-      <!-- ① 내 루틴 탭 -->
+      <!-- ① 내 루틴 홈 -->
       <div class="screen-frame active" id="screen-home">
         <div class="home-top">
           <div class="ht-sub">🔄 마이루틴</div>
           <div class="ht-title">나만의 운동을<br>시작해 보세요</div>
           <div class="ht-stats">
             <div class="ht-stat">
-              <div class="sv">4</div>
+              <div class="sv" id="home-stat-count">—</div>
               <div class="sl">저장 루틴</div>
             </div>
             <div class="ht-stat">
@@ -427,319 +420,206 @@
               <div class="sl">총 수행</div>
             </div>
             <div class="streak-bar">
-              <span class="streak-fire">🔥</span>
+              <span style="font-size:18px;">🔥</span>
               <div>
-                <div class="streak-txt">연속 달성</div>
-                <div style="display:flex; align-items:baseline; gap:3px;">
-                  <span class="streak-num">5</span>
-                  <span style="font-size:11px; color:#fff; opacity:0.8;">일</span>
+                <div style="font-size:11px;color:#fff;font-weight:700;">연속 달성</div>
+                <div style="display:flex;align-items:baseline;gap:3px;">
+                  <span style="font-size:18px;font-weight:900;color:#FFE082;">5</span>
+                  <span style="font-size:11px;color:#fff;opacity:0.8;">일</span>
                 </div>
               </div>
             </div>
           </div>
         </div>
-        <div class="tab-bar">
-          <div class="tab-item on">내 루틴</div>
-          <div class="tab-item" onclick="go('recent')">최근 운동</div>
+        <!-- 퀵 메뉴 버튼 -->
+        <div style="display:flex;gap:8px;padding:10px 14px 0;background:#fff;flex-shrink:0;">
+          <div onclick="switchScreen('recent')" style="
+            flex:1;display:flex;align-items:center;gap:6px;overflow:hidden;
+            background:#F5F0FF;border-radius:12px;padding:10px 10px;cursor:pointer;
+            border:1.5px solid #EDE9FE;transition:border-color .15s;"
+            onmouseover="this.style.borderColor='#9B6DFF'" onmouseout="this.style.borderColor='#EDE9FE'">
+            <span style="font-size:18px;flex-shrink:0;">🕐</span>
+            <div style="min-width:0;overflow:hidden;">
+              <div style="font-size:11px;font-weight:800;color:#553C9A;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">최근 운동</div>
+              <div style="font-size:9px;color:#B794F4;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">이전 기록</div>
+            </div>
+          </div>
+          <div onclick="switchScreen('history')" style="
+            flex:1;display:flex;align-items:center;gap:6px;overflow:hidden;
+            background:#F5F0FF;border-radius:12px;padding:10px 10px;cursor:pointer;
+            border:1.5px solid #EDE9FE;transition:border-color .15s;"
+            onmouseover="this.style.borderColor='#9B6DFF'" onmouseout="this.style.borderColor='#EDE9FE'">
+            <span style="font-size:18px;flex-shrink:0;">🔥</span>
+            <div style="min-width:0;overflow:hidden;">
+              <div style="font-size:11px;font-weight:800;color:#553C9A;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">달성 이력</div>
+              <div style="font-size:9px;color:#B794F4;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">스트릭·캘린더</div>
+            </div>
+          </div>
+          <div onclick="goToAlarmList()" style="
+            flex:1;display:flex;align-items:center;gap:6px;overflow:hidden;
+            background:#F5F0FF;border-radius:12px;padding:10px 10px;cursor:pointer;
+            border:1.5px solid #EDE9FE;transition:border-color .15s;"
+            onmouseover="this.style.borderColor='#9B6DFF'" onmouseout="this.style.borderColor='#EDE9FE'">
+            <span style="font-size:18px;flex-shrink:0;">🔔</span>
+            <div style="min-width:0;overflow:hidden;">
+              <div style="font-size:11px;font-weight:800;color:#553C9A;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">알림 설정</div>
+              <div style="font-size:9px;color:#B794F4;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">루틴별 알림</div>
+            </div>
+          </div>
         </div>
-        <div class="app-body">
-          <div class="routine-card" onclick="go('detail')">
-            <div class="rc-top">
-              <div class="rc-icon ri-purple">💊</div>
-              <div class="rc-info">
-                <div class="rc-name">디스크 시술 초기 재활</div>
-                <div class="rc-source">재활운동에서 만든 루틴</div>
-                <div class="rc-meta">운동 3개 · 약 22분</div>
-              </div>
-              <span class="rc-more">⋮</span>
-            </div>
-            <div class="rc-bottom">
-              <div class="rc-tags">
-                <span class="rc-tag">초기</span>
-                <span class="rc-tag">허리</span>
-              </div>
-              <button class="btn-start-sm" onclick="event.stopPropagation(); go('play')">시작</button>
-            </div>
-          </div>
-          <div class="routine-card" onclick="go('detail')">
-            <div class="rc-top">
-              <div class="rc-icon ri-green">🤸</div>
-              <div class="rc-info">
-                <div class="rc-name">어깨 스트레칭 루틴</div>
-                <div class="rc-source">운동법에서 만든 루틴</div>
-                <div class="rc-meta">운동 3개 · 약 17분</div>
-              </div>
-              <span class="rc-more">⋮</span>
-            </div>
-            <div class="rc-bottom">
-              <div class="rc-tags">
-                <span class="rc-tag green">어깨</span>
-                <span class="rc-tag green">초급</span>
-              </div>
-              <button class="btn-start-sm" onclick="event.stopPropagation(); go('play')">시작</button>
-            </div>
-          </div>
-          <div class="routine-card" onclick="go('detail')">
-            <div class="rc-top">
-              <div class="rc-icon ri-blue">🏃</div>
-              <div class="rc-info">
-                <div class="rc-name">아침 유산소 루틴</div>
-                <div class="rc-source">직접 만든 루틴</div>
-                <div class="rc-meta">운동 4개 · 약 30분</div>
-              </div>
-              <span class="rc-more">⋮</span>
-            </div>
-            <div class="rc-bottom">
-              <div class="rc-tags">
-                <span class="rc-tag">유산소</span>
-              </div>
-              <button class="btn-start-sm" onclick="event.stopPropagation(); go('play')">시작</button>
-            </div>
-          </div>
-          <div class="btn-add-routine" onclick="go('make')">+ 새 루틴 만들기</div>
+        <div class="tab-bar" style="margin-top:0;">
+          <div class="tab-item on" id="home-tab-prx" onclick="homeTab('prx')">💊 운동처방</div>
+          <div class="tab-item" id="home-tab-my" onclick="homeTab('my')">⭐ 나만의 운동</div>
+        </div>
+        <div class="app-body" id="home-body">
+          <!-- JS로 렌더링 -->
         </div>
       </div>
 
-      <!-- ② 최근 운동 탭 -->
+      <!-- ② 루틴 상세 -->
+      <div class="screen-frame" id="screen-detail">
+        <div class="detail-hero">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+            <span class="back" style="margin-bottom:0;" onclick="switchScreen('home')">←</span>
+            <button onclick="startCurrentRoutine()" style="
+              background:rgba(255,255,255,0.22);color:#fff;border:1.5px solid rgba(255,255,255,0.5);
+              border-radius:20px;padding:7px 16px;font-size:13px;font-weight:700;cursor:pointer;
+              font-family:'Noto Sans KR',sans-serif;">▶ 운동 시작</button>
+          </div>
+          <div class="dh-source" id="detail-source">—</div>
+          <div class="dh-name" id="detail-name">—</div>
+          <div class="dh-stats">
+            <div class="dh-stat">운동 <span id="detail-cnt">—</span>개</div>
+            <div class="dh-stat">예상 <span id="detail-min">—</span>분</div>
+            <div class="dh-stat">총 수행 <span id="detail-total">0</span>회</div>
+          </div>
+        </div>
+        <div class="app-body">
+          <div class="achieve-row">
+            <div class="ach-box"><div class="ach-val" id="detail-ach-done">0</div><div class="ach-lbl">총 완료</div></div>
+            <div class="ach-box"><div class="ach-val" id="detail-ach-streak">🔥 5일</div><div class="ach-lbl">연속 달성</div></div>
+            <div class="ach-box"><div class="ach-val" id="detail-ach-last">—</div><div class="ach-lbl">최근 수행</div></div>
+          </div>
+          <div id="detail-ex-list"></div>
+
+          <!-- 알림 설정 카드 -->
+          <div style="background:#fff;border-radius:14px;padding:14px 16px;box-shadow:0 1px 6px rgba(0,0,0,0.06);">
+            <div style="font-size:12px;font-weight:900;color:#553C9A;margin-bottom:12px;display:flex;align-items:center;gap:6px;">
+              🔔 알림 설정
+            </div>
+            <!-- 알림 ON/OFF -->
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+              <div>
+                <div style="font-size:13px;font-weight:700;color:#1A202C;">운동 알림</div>
+                <div style="font-size:11px;color:#A0AEC0;margin-top:2px;" id="alarm-status-txt">알림 꺼짐</div>
+              </div>
+              <div class="toggle off" id="alarm-toggle" onclick="toggleAlarm()"></div>
+            </div>
+            <!-- 요일 선택 -->
+            <div id="alarm-day-row" style="display:none;margin-bottom:12px;">
+              <div style="font-size:11px;font-weight:800;color:#A0AEC0;margin-bottom:8px;letter-spacing:0.5px;">반복 요일</div>
+              <div style="display:flex;gap:6px;" id="alarm-days">
+                <div class="day-chip on" onclick="toggleDay(this,'월')">월</div>
+                <div class="day-chip" onclick="toggleDay(this,'화')">화</div>
+                <div class="day-chip on" onclick="toggleDay(this,'수')">수</div>
+                <div class="day-chip" onclick="toggleDay(this,'목')">목</div>
+                <div class="day-chip on" onclick="toggleDay(this,'금')">금</div>
+                <div class="day-chip" onclick="toggleDay(this,'토')">토</div>
+                <div class="day-chip" onclick="toggleDay(this,'일')">일</div>
+              </div>
+            </div>
+            <!-- 시간 설정 -->
+            <div id="alarm-time-row" style="display:none;">
+              <div style="font-size:11px;font-weight:800;color:#A0AEC0;margin-bottom:8px;letter-spacing:0.5px;">알림 시각</div>
+              <div style="display:flex;align-items:center;gap:8px;">
+                <select id="alarm-ampm" style="border:1.5px solid #E9E3FF;border-radius:10px;padding:8px 10px;font-size:13px;font-family:'Noto Sans KR',sans-serif;color:#553C9A;font-weight:700;outline:none;background:#fff;">
+                  <option>오전</option><option>오후</option>
+                </select>
+                <select id="alarm-hour" style="border:1.5px solid #E9E3FF;border-radius:10px;padding:8px 10px;font-size:13px;font-family:'Noto Sans KR',sans-serif;color:#553C9A;font-weight:700;outline:none;background:#fff;">
+                  <option>06</option><option>07</option><option selected>08</option>
+                  <option>09</option><option>10</option><option>11</option><option>12</option>
+                </select>
+                <span style="font-size:16px;font-weight:900;color:#553C9A;">:</span>
+                <select id="alarm-min" style="border:1.5px solid #E9E3FF;border-radius:10px;padding:8px 10px;font-size:13px;font-family:'Noto Sans KR',sans-serif;color:#553C9A;font-weight:700;outline:none;background:#fff;">
+                  <option selected>00</option><option>10</option><option>20</option><option>30</option><option>40</option><option>50</option>
+                </select>
+              </div>
+              <button onclick="saveAlarm()" style="
+                width:100%;margin-top:12px;background:#9B6DFF;color:#fff;border:none;
+                border-radius:10px;padding:10px;font-size:13px;font-weight:700;cursor:pointer;
+                font-family:'Noto Sans KR',sans-serif;">
+                💾 알림 저장
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ③ 운동 따라하기 -->
+      <div class="screen-frame" id="screen-play" style="background:#F5F0FF;">
+        <!-- 상단 진행 바 -->
+        <div class="play-top">
+          <span class="play-top-info" id="play-progress-txt">1 / 1</span>
+          <div class="step-dots" id="play-step-dots"></div>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <button class="btn-auto-play" id="btn-auto-toggle" onclick="toggleAutoPlay()">▶ 자동진행</button>
+            <span style="font-size:15px;color:#9B6DFF;font-weight:700;cursor:pointer;" onclick="switchScreen('detail')">✕</span>
+          </div>
+        </div>
+        <!-- 자동진행 바 -->
+        <div class="auto-bar" id="auto-bar" style="display:none;">
+          <span class="auto-label" id="auto-label">자동진행 중...</span>
+          <button class="btn-auto-stop" onclick="toggleAutoPlay()">■ 중지</button>
+        </div>
+        <!-- 운동 네비게이션 (가로 스크롤) -->
+        <div style="background:#fff;border-bottom:1px solid #EDE9FE;padding:8px 12px;flex-shrink:0;">
+          <div id="ex-nav-list" style="display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;"></div>
+        </div>
+        <div class="app-body" id="ex-body" style="gap:8px;">
+          <!-- JS로 렌더링 -->
+        </div>
+        <button class="btn-next-ex" id="ex-next-btn">다음 운동 →</button>
+      </div>
+
+      <!-- ④ 운동 완료 -->
+      <div class="screen-frame" id="screen-complete" style="background:#F5F0FF;">
+        <div class="complete-wrap">
+          <div class="complete-circle">🎉</div>
+          <div class="complete-title">운동 완료!</div>
+          <div class="complete-sub" id="complete-sub">정말 잘 하셨어요!<br>오늘도 건강한 하루였습니다.</div>
+          <div class="complete-stats">
+            <div class="cs-box"><div class="cs-val" id="stat-time">—</div><div class="cs-lbl">운동시간</div></div>
+            <div class="cs-box"><div class="cs-val" id="stat-count">—</div><div class="cs-lbl">완료 운동</div></div>
+            <div class="cs-box"><div class="cs-val" id="stat-sets">—</div><div class="cs-lbl">총 세트</div></div>
+          </div>
+          <button class="btn-home-after" onclick="switchScreen('home')">홈으로 돌아가기</button>
+          <button class="btn-outline-after" onclick="switchScreen('detail')">루틴 내용 보기</button>
+        </div>
+      </div>
+
+      <!-- ⑤ 최근 운동 -->
       <div class="screen-frame" id="screen-recent">
         <div class="home-top" style="padding-bottom:14px;">
           <div class="ht-sub">🔄 마이루틴</div>
           <div class="ht-title">최근 운동 기록</div>
         </div>
         <div class="tab-bar">
-          <div class="tab-item" onclick="go('home')">내 루틴</div>
+          <div class="tab-item" onclick="switchScreen('home')">내 루틴</div>
           <div class="tab-item on">최근 운동</div>
         </div>
-        <div class="app-body">
-          <div class="recent-item" onclick="go('play')">
-            <div class="ri-date-box">
-              <div class="rd">15</div>
-              <div class="rm">3월</div>
-            </div>
-            <div class="ri-info">
-              <div class="ri-name">어깨 스트레칭 루틴</div>
-              <div class="ri-detail">운동 3개 완료 · 3세트</div>
-            </div>
-            <div class="ri-right">
-              <div class="ri-time">17분</div>
-              <div class="ri-redo">🔁 다시하기</div>
-            </div>
-          </div>
-          <div class="recent-item" onclick="go('play')">
-            <div class="ri-date-box">
-              <div class="rd">13</div>
-              <div class="rm">3월</div>
-            </div>
-            <div class="ri-info">
-              <div class="ri-name">디스크 시술 초기 재활</div>
-              <div class="ri-detail">운동 3개 완료</div>
-            </div>
-            <div class="ri-right">
-              <div class="ri-time">22분</div>
-              <div class="ri-redo">🔁 다시하기</div>
-            </div>
-          </div>
-          <div class="recent-item" onclick="go('play')">
-            <div class="ri-date-box">
-              <div class="rd">12</div>
-              <div class="rm">3월</div>
-            </div>
-            <div class="ri-info">
-              <div class="ri-name">아침 유산소 루틴</div>
-              <div class="ri-detail">운동 4개 완료</div>
-            </div>
-            <div class="ri-right">
-              <div class="ri-time">31분</div>
-              <div class="ri-redo">🔁 다시하기</div>
-            </div>
-          </div>
-          <div class="recent-item" onclick="go('play')">
-            <div class="ri-date-box">
-              <div class="rd">10</div>
-              <div class="rm">3월</div>
-            </div>
-            <div class="ri-info">
-              <div class="ri-name">어깨 스트레칭 루틴</div>
-              <div class="ri-detail">운동 3개 완료 · 3세트</div>
-            </div>
-            <div class="ri-right">
-              <div class="ri-time">16분</div>
-              <div class="ri-redo">🔁 다시하기</div>
-            </div>
-          </div>
-        </div>
+        <div class="app-body" id="recent-body"></div>
       </div>
 
-      <!-- ③ 루틴 상세 -->
-      <div class="screen-frame" id="screen-detail">
-        <div class="detail-hero">
-          <span class="back" onclick="go('home')">←</span>
-          <div class="dh-source">재활운동에서 만든 루틴</div>
-          <div class="dh-name">디스크 시술 초기 재활</div>
-          <div class="dh-stats">
-            <div class="dh-stat">운동 <span>3개</span></div>
-            <div class="dh-stat">예상 <span>22분</span></div>
-            <div class="dh-stat">총 수행 <span>7회</span></div>
-          </div>
-        </div>
-        <div class="app-body">
-          <div class="achieve-row">
-            <div class="ach-box">
-              <div class="ach-val">7</div>
-              <div class="ach-lbl">총 완료</div>
-            </div>
-            <div class="ach-box">
-              <div class="ach-val">🔥 5일</div>
-              <div class="ach-lbl">연속 달성</div>
-            </div>
-            <div class="ach-box">
-              <div class="ach-val">03.15</div>
-              <div class="ach-lbl">최근 수행</div>
-            </div>
-          </div>
-          <div class="ex-list-item">
-            <div class="el-num">1</div>
-            <div class="el-icon">🧘</div>
-            <div class="el-info">
-              <div class="el-name">누운 자세 무릎 당기기</div>
-              <div class="el-detail">2세트 × 10회</div>
-            </div>
-            <span class="el-play">▷</span>
-          </div>
-          <div class="ex-list-item">
-            <div class="el-num">2</div>
-            <div class="el-icon">🌊</div>
-            <div class="el-info">
-              <div class="el-name">골반 기울이기 운동</div>
-              <div class="el-detail">3세트 × 15회</div>
-            </div>
-            <span class="el-play">▷</span>
-          </div>
-          <div class="ex-list-item">
-            <div class="el-num">3</div>
-            <div class="el-icon">🦵</div>
-            <div class="el-info">
-              <div class="el-name">복식 호흡 운동</div>
-              <div class="el-detail">3세트 × 20회</div>
-            </div>
-            <span class="el-play">▷</span>
-          </div>
-          <div style="display:flex; gap:10px;">
-            <button style="flex:1; background:#EDE9FE; color:#6B46C1; border:none; border-radius:12px; padding:12px; font-size:13px; font-weight:700; cursor:pointer; font-family:'Noto Sans KR',sans-serif;" onclick="go('make')">✏️ 수정</button>
-            <button style="flex:1; background:#FFF5F5; color:#E53E3E; border:none; border-radius:12px; padding:12px; font-size:13px; font-weight:700; cursor:pointer; font-family:'Noto Sans KR',sans-serif;">🗑 삭제</button>
-          </div>
-        </div>
-        <button class="btn-start-full" onclick="go('play')">▶ 운동 시작하기</button>
-      </div>
-
-      <!-- ④ 운동 따라하기 -->
-      <div class="screen-frame" id="screen-play" style="background:#F5F0FF;">
-        <div class="progress-bar-top">
-          <span style="font-size:13px; color:#718096; font-weight:700;">2 / 3</span>
-          <div class="step-dots">
-            <div class="step-dot done"></div>
-            <div class="step-dot now"></div>
-            <div class="step-dot"></div>
-          </div>
-          <span style="font-size:13px; color:#9B6DFF; font-weight:700; cursor:pointer;">일시정지</span>
-        </div>
-        <div class="app-body">
-          <div class="ex-card">
-            <div class="ex-img">🌊</div>
-            <div class="ex-body">
-              <div class="ex-title">골반 기울이기 운동</div>
-              <div class="ex-desc">허리를 바닥에 밀착하며 복부에 힘을 주세요. 천천히 골반을 앞뒤로 기울입니다.</div>
-            </div>
-          </div>
-          <div class="counter-row">
-            <div class="counter-box">
-              <div class="counter-label">현재 세트</div>
-              <div class="counter-val">2 / 3</div>
-            </div>
-            <div class="counter-box">
-              <div class="counter-label">횟수</div>
-              <div class="counter-controls">
-                <button class="cnt-btn">−</button>
-                <span style="font-size:22px; font-weight:900; color:#1A202C; min-width:28px; text-align:center;">11</span>
-                <button class="cnt-btn">+</button>
-              </div>
-              <div style="text-align:center; font-size:11px; color:#A0AEC0; margin-top:4px;">목표: 15회</div>
-            </div>
-            <div class="counter-box" style="background:#F0FFF4;">
-              <div class="counter-label" style="color:#68D391;">휴식</div>
-              <div class="counter-val" style="color:#38A169; font-size:22px;">30초</div>
-              <div style="text-align:center; font-size:10px; color:#68D391; margin-top:4px; font-weight:700;">세트 사이 휴식</div>
-            </div>
-          </div>
-        </div>
-        <button class="btn-next">다음 운동 →</button>
-      </div>
-
-      <!-- ⑤ 루틴 만들기 -->
-      <div class="screen-frame" id="screen-make">
-        <div class="app-header">
-          <span class="back" onclick="go('home')">←</span>
-          <span class="title">루틴 만들기</span>
-        </div>
-        <div class="make-sub">루틴 이름과 운동을 설정해 주세요</div>
-        <div class="app-body">
-          <div class="input-field">
-            <label>루틴 이름</label>
-            <input type="text" value="나의 맞춤 루틴" placeholder="루틴 이름을 입력하세요" />
-          </div>
-          <div class="input-field">
-            <label>반복 주기</label>
-            <div class="cycle-options">
-              <div class="cycle-chip">매일</div>
-              <div class="cycle-chip on">월·수·금</div>
-              <div class="cycle-chip">화·목</div>
-              <div class="cycle-chip">주말</div>
-              <div class="cycle-chip">직접 설정</div>
-            </div>
-          </div>
-          <div style="font-size:12px; font-weight:800; color:#718096; letter-spacing:0.5px; padding: 4px 0 0;">운동 목록</div>
-          <div class="make-ex-item">
-            <span class="drag">⠿</span>
-            <div class="make-num">1</div>
-            <div class="make-info">
-              <div class="make-name">누운 자세 무릎 당기기</div>
-              <div class="make-detail">2세트 × 10회</div>
-            </div>
-            <span class="make-del">✕</span>
-          </div>
-          <div class="make-ex-item">
-            <span class="drag">⠿</span>
-            <div class="make-num">2</div>
-            <div class="make-info">
-              <div class="make-name">골반 기울이기 운동</div>
-              <div class="make-detail">3세트 × 15회</div>
-            </div>
-            <span class="make-del">✕</span>
-          </div>
-          <div class="make-ex-item">
-            <span class="drag">⠿</span>
-            <div class="make-num">3</div>
-            <div class="make-info">
-              <div class="make-name">복식 호흡 운동</div>
-              <div class="make-detail">3세트 × 20회</div>
-            </div>
-            <span class="make-del">✕</span>
-          </div>
-          <div class="add-ex-btn">+ 운동 추가하기</div>
-          <button class="btn-save" onclick="go('home')">저장하기</button>
-        </div>
-      </div>
-
-      <!-- ⑥ 달성 이력 + 알림 설정 -->
+      <!-- ⑥ 달성 이력 -->
       <div class="screen-frame" id="screen-history">
         <div class="app-header">
-          <span class="back" onclick="go('home')">←</span>
+          <span class="back" onclick="switchScreen('home')">←</span>
           <span class="title">달성 이력 · 알림</span>
         </div>
         <div class="app-body">
           <div class="streak-card">
             <span class="sc-fire">🔥</span>
-            <div class="sc-info">
+            <div>
               <div class="sc-val">5일 연속</div>
               <div class="sc-lbl">현재 연속 달성 중</div>
               <div class="sc-best">🏆 최고 기록 12일</div>
@@ -747,57 +627,55 @@
           </div>
           <div class="history-cal">
             <div class="hc-title">이번 달 달성 현황</div>
-            <div class="hc-grid">
-              <!-- 행 1 -->
-              <div class="hc-cell done">3</div><div class="hc-cell skip">4</div>
-              <div class="hc-cell done">5</div><div class="hc-cell">6</div>
-              <div class="hc-cell done">7</div><div class="hc-cell">8</div>
-              <div class="hc-cell">9</div>
-              <!-- 행 2 -->
-              <div class="hc-cell done">10</div><div class="hc-cell">11</div>
-              <div class="hc-cell done">12</div><div class="hc-cell done">13</div>
-              <div class="hc-cell">14</div><div class="hc-cell done">15</div>
-              <div class="hc-cell today">16</div>
-            </div>
-            <div style="display:flex; gap:12px; margin-top:12px; font-size:11px; font-weight:700;">
+            <div class="hc-grid" id="history-cal-grid"></div>
+            <div style="display:flex;gap:12px;margin-top:10px;font-size:11px;font-weight:700;">
               <span style="color:#9B6DFF;">● 완료</span>
               <span style="color:#E53E3E;">● 미완료</span>
               <span style="color:#A0AEC0;">● 해당없음</span>
             </div>
           </div>
-          <div style="font-size:12px; font-weight:800; color:#718096; letter-spacing:0.5px;">최근 완료 기록</div>
-          <div class="history-row">
-            <span class="hr-icon">🤸</span>
-            <div class="hr-info">
-              <div class="hr-name">어깨 스트레칭 루틴</div>
-              <div class="hr-date">2026.03.15</div>
+          <!-- 날짜 클릭 시 운동 상세 패널 -->
+          <div id="day-detail-panel" style="display:none;background:#fff;border-radius:14px;padding:14px;box-shadow:0 2px 10px rgba(0,0,0,0.07);border-left:4px solid #9B6DFF;">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+              <div style="font-size:13px;font-weight:900;color:#553C9A;" id="day-detail-title">3월 17일 운동</div>
+              <span onclick="closeDayDetail()" style="font-size:16px;color:#B794F4;cursor:pointer;padding:2px 6px;">✕</span>
             </div>
-            <span class="hr-done">완료 ✓</span>
+            <div id="day-detail-body"></div>
+          </div>
+          <div style="font-size:12px;font-weight:800;color:#718096;letter-spacing:0.5px;">최근 완료 기록</div>
+          <div class="history-row">
+            <span style="font-size:20px;">💊</span>
+            <div style="flex:1;">
+              <div style="font-size:13px;font-weight:700;color:#1A202C;">디스크시술 5주차</div>
+              <div style="font-size:11px;color:#A0AEC0;">2026.03.17</div>
+            </div>
+            <span style="font-size:13px;font-weight:800;color:#9B6DFF;">완료 ✓</span>
           </div>
           <div class="history-row">
-            <span class="hr-icon">🧘</span>
-            <div class="hr-info">
-              <div class="hr-name">디스크 시술 초기 재활</div>
-              <div class="hr-date">2026.03.13</div>
+            <span style="font-size:20px;">🤸</span>
+            <div style="flex:1;">
+              <div style="font-size:13px;font-weight:700;color:#1A202C;">어깨 스트레칭 루틴</div>
+              <div style="font-size:11px;color:#A0AEC0;">2026.03.15</div>
             </div>
-            <span class="hr-done">완료 ✓</span>
+            <span style="font-size:13px;font-weight:800;color:#9B6DFF;">완료 ✓</span>
           </div>
-          <div style="font-size:12px; font-weight:800; color:#718096; letter-spacing:0.5px; margin-top:4px;">알림 설정</div>
-          <div class="alarm-item">
-            <span style="font-size:22px;">🤸</span>
+          <div style="font-size:12px;font-weight:800;color:#718096;letter-spacing:0.5px;margin-top:4px;">알림 설정</div>
+          <div style="font-size:11px;color:#B794F4;margin-bottom:8px;">루틴을 탭하면 알림을 설정할 수 있습니다</div>
+          <div class="alarm-item" style="cursor:pointer;" onclick="goToAlarmSetting(0,'prx')">
+            <span style="font-size:20px;">💊</span>
+            <div class="ai-info">
+              <div class="ai-name">디스크시술 5주차</div>
+              <div class="ai-time" id="alarm-summary-0">🔔 매일 오전 08:00</div>
+            </div>
+            <span style="font-size:12px;font-weight:700;color:#9B6DFF;">설정 →</span>
+          </div>
+          <div class="alarm-item" style="cursor:pointer;" onclick="goToAlarmSetting(0,'my')">
+            <span style="font-size:20px;">🤸</span>
             <div class="ai-info">
               <div class="ai-name">어깨 스트레칭 루틴</div>
-              <div class="ai-time">🔔 매일 오전 08:00</div>
+              <div class="ai-time" id="alarm-summary-1">🔕 알림 꺼짐</div>
             </div>
-            <div class="toggle"></div>
-          </div>
-          <div class="alarm-item">
-            <span style="font-size:22px;">🧘</span>
-            <div class="ai-info">
-              <div class="ai-name">디스크 시술 초기 재활</div>
-              <div class="ai-time">🔕 알림 꺼짐</div>
-            </div>
-            <div class="toggle off"></div>
+            <span style="font-size:12px;font-weight:700;color:#9B6DFF;">설정 →</span>
           </div>
         </div>
       </div>
@@ -810,7 +688,7 @@
     <h3>🔄 마이루틴 화면 메모</h3>
     <div class="memo-field">
       <label>현재 화면</label>
-      <input type="text" id="memo-screen-name" value="① 내 루틴 탭" readonly />
+      <input type="text" id="memo-screen-name" value="① 내 루틴 홈" readonly />
     </div>
     <div class="memo-divider"></div>
     <div class="memo-field">
@@ -825,63 +703,837 @@
       <label>UX 고려사항</label>
       <textarea placeholder="사용자 흐름, 예외 처리, 피드백..."></textarea>
     </div>
-    <div class="memo-field">
-      <label>개발 메모</label>
-      <textarea placeholder="API, 상태 관리, 로컬 저장 등..."></textarea>
-    </div>
     <div class="memo-divider"></div>
     <div class="memo-field">
       <label>화면 흐름</label>
-      <textarea readonly style="color:#B794F4; font-size:12px;">① 내 루틴 탭
-  · 저장된 루틴 카드 목록
-  · 카드 클릭 → ③ 루틴 상세
-  · [시작] 버튼 → ④ 따라하기
-  · [+ 새 루틴 만들기] → ⑤ 만들기
+      <textarea readonly style="color:#B794F4;font-size:12px;">① 내 루틴 홈
+  탭1 💊 운동처방
+    · 트레이너 처방 루틴 카드
+    · 카드 클릭 → ② 루틴 상세
+    · [시작] → ③ 운동 따라하기
 
-② 최근 운동 탭
-  · 수행 이력 리스트
-  · [다시하기] → ④ 따라하기
+  탭2 ⭐ 나만의 운동
+    · 운동법에서 저장한 루틴 카드
+    · 카드 클릭 → ② 루틴 상세
 
-③ 루틴 상세
+② 루틴 상세
   · 운동 목록 + 달성 통계
-  · [수정] → ⑤ 만들기(수정 모드)
-  · [시작하기] → ④ 따라하기
+  · [시작하기] → ③ 따라하기
 
-④ 운동 따라하기
-  · 진행 단계 + 세트/횟수 카운트
-  · 세트 사이 휴식 타이머
+③ 운동 따라하기
+  · 세트 타이머 (30초 카운트다운)
+  · ✓ 완료 버튼으로 다음 세트
+  · 자동진행 모드 (세트 완료 기반)
+  · 마지막 운동 → ④ 완료
 
-⑤ 루틴 만들기 / 수정
-  · 이름 · 반복 주기 · 운동 추가
-  · 순서 드래그 설정
+④ 완료
+  · 운동시간 / 완료 운동 / 총 세트
+  · 홈으로 돌아가기
 
-⑥ 달성 이력 + 알림
-  · 연속 달성 스트릭 🔥
+⑤ 최근 운동
+  · 수행 이력 리스트
+  · 다시하기 → ③
+
+⑥ 달성 이력
+  · 연속 스트릭 🔥
   · 이번 달 달성 캘린더
-  · 루틴별 알림 ON/OFF</textarea>
+  · 알림 ON/OFF</textarea>
     </div>
   </div>
-
 </div>
 
 <script>
-  const screenNames = {
-    home:    '① 내 루틴 탭',
-    recent:  '② 최근 운동 탭',
-    detail:  '③ 루틴 상세',
-    play:    '④ 운동 따라하기',
-    make:    '⑤ 루틴 만들기 / 수정',
-    history: '⑥ 달성 이력 + 알림 설정',
-  };
-  function go(id) {
-    document.querySelectorAll('.screen-frame').forEach(el => el.classList.remove('active'));
-    document.querySelectorAll('.screen-btn').forEach(el => el.classList.remove('active'));
-    document.getElementById('screen-' + id).classList.add('active');
-    document.querySelectorAll('.screen-btn').forEach(btn => {
-      if (btn.getAttribute('onclick').includes("'" + id + "'")) btn.classList.add('active');
-    });
-    document.getElementById('memo-screen-name').value = screenNames[id] || id;
+/* ═══════════════════════════════════════════
+   데이터
+═══════════════════════════════════════════ */
+// 운동처방 데이터 (data.js 에서)
+const memberData = window.APP_DATA ? window.APP_DATA.members['김도산'] : null;
+const prescriptionList = memberData ? memberData.list.filter(p => p.status === 'active') : [];
+
+// 나만의 운동 (샘플 — 운동법.html 저장 데이터 연동 예정)
+// title이 빈 문자열이면 이름 미지정 루틴으로 처리됨
+const myRoutineList = [
+  {
+    id: 'm1', title: '어깨 스트레칭 루틴', source: '나만의 운동', icon: '🤸', iconBg: 'ri-green',
+    tags: [{ label: '어깨', cls: 'green' }, { label: '초급', cls: '' }],
+    doneCount: 7, lastDate: '03.15',
+    exercises: [
+      { name: '어깨 전방 굴곡', sets: 3, reps: '10회', emoji: '🤸', desc: '어깨를 앞으로 천천히 들어올립니다.' },
+      { name: '어깨 외전 운동', sets: 3, reps: '12회', emoji: '💪', desc: '팔을 옆으로 들어올려 어깨 근육을 자극합니다.' },
+      { name: '어깨 내회전 스트레칭', sets: 2, reps: '30초 유지', emoji: '🔄', desc: '팔을 뒤로 가져가 어깨를 부드럽게 스트레칭합니다.' },
+    ]
+  },
+  {
+    id: 'm2', title: '허리 코어 강화', source: '나만의 운동', icon: '🧘', iconBg: 'ri-purple',
+    tags: [{ label: '척추', cls: '' }, { label: '중급', cls: 'orange' }],
+    doneCount: 4, lastDate: '03.12',
+    exercises: [
+      { name: '데드버그', sets: 3, reps: '8회', emoji: '🧘', desc: '허리를 바닥에 붙이고 팔다리를 교차로 뻗습니다.' },
+      { name: '버드독', sets: 3, reps: '10회', emoji: '🐦', desc: '네 발 자세에서 팔과 다리를 반대쪽으로 뻗습니다.' },
+      { name: '플랭크', sets: 3, reps: '30초 유지', emoji: '💪', desc: '몸을 일직선으로 유지하며 코어에 힘을 줍니다.' },
+    ]
+  },
+  {
+    id: 'm3', title: '', source: '나만의 운동', icon: '🏋️', iconBg: 'ri-blue',
+    tags: [{ label: '하체', cls: '' }],
+    doneCount: 2, lastDate: '03.18',
+    exercises: [
+      { name: '스쿼트', sets: 3, reps: '15회', emoji: '🦵', desc: '하체 전체를 자극하는 기본 스쿼트.' },
+      { name: '런지', sets: 3, reps: '12회', emoji: '🏃', desc: '앞으로 한 발씩 내딛으며 하체를 강화합니다.' },
+      { name: '힙 브릿지', sets: 3, reps: '15회', emoji: '🌉', desc: '엉덩이를 들어올려 힙과 햄스트링을 자극합니다.' },
+    ]
+  },
+];
+
+// 루틴 표시 제목: title 없으면 "첫 운동명 외 N개" 자동 생성
+function getRoutineTitle(r) {
+  if (r.title && r.title.trim()) return r.title;
+  if (!r.exercises || r.exercises.length === 0) return '이름 없는 루틴';
+  const first = r.exercises[0].name;
+  const rest = r.exercises.length - 1;
+  return rest > 0 ? `${first} 외 ${rest}개` : first;
+}
+
+// 이모지 매핑
+function getExEmoji(name) {
+  const map = { '맥켄지':'🧘','코어':'💪','고관절':'🦵','허리':'🌊','골반':'🌊','버드독':'🐦','데드버그':'🧘','플랭크':'💪','스트레칭':'🤸','고양이':'🐱' };
+  for (const [k, v] of Object.entries(map)) if (name.includes(k)) return v;
+  return '🏋️';
+}
+
+// 처방 → exercises 변환 (detail 파싱)
+function prxToExercises(prx) {
+  return prx.exercises.map(e => {
+    const m = e.detail.match(/(\d+)세트\s*[×x]\s*(.+?)(?:\s*·|$)/);
+    return {
+      name: e.name,
+      sets: m ? parseInt(m[1]) : 3,
+      reps: m ? m[2].trim() : e.detail,
+      emoji: getExEmoji(e.name),
+      desc: e.detail,
+    };
+  });
+}
+
+/* ═══════════════════════════════════════════
+   상태
+═══════════════════════════════════════════ */
+const screenNames = {
+  home: '① 내 루틴 홈', detail: '② 루틴 상세',
+  play: '③ 운동 따라하기', complete: '④ 운동 완료',
+  recent: '⑤ 최근 운동', history: '⑥ 달성 이력',
+};
+let homeCurrentTab = 'prx';   // 'prx' | 'my'
+let selectedRoutine = null;   // { title, source, exercises[] }
+let exercises = [];
+let currentExIdx = 0;
+let currentSetCount = [];
+let exerciseStartTime = null;
+let setTimerInterval = null;
+let autoPlayActive = false;
+const SET_TIMER_SECS = 30;
+
+/* ═══════════════════════════════════════════
+   화면 전환
+═══════════════════════════════════════════ */
+function switchScreen(id) {
+  document.querySelectorAll('.screen-frame').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.screen-btn').forEach(el => el.classList.remove('active'));
+  document.getElementById('screen-' + id).classList.add('active');
+  document.querySelectorAll('.screen-btn').forEach(btn => {
+    if (btn.getAttribute('onclick')?.includes("'" + id + "'")) btn.classList.add('active');
+  });
+  document.getElementById('memo-screen-name').value = screenNames[id] || id;
+
+  if (id === 'play') {
+    currentExIdx = 0;
+    currentSetCount = exercises.map(() => 1);
+    exerciseStartTime = Date.now();
+    autoPlayActive = false;
+    document.getElementById('auto-bar').style.display = 'none';
+    document.getElementById('btn-auto-toggle').textContent = '▶ 자동진행';
+    renderExercise();
   }
+  if (id === 'complete') renderCompleteStats();
+  if (id === 'recent') renderRecent();
+  if (id === 'history') renderHistoryCal();
+}
+
+/* ═══════════════════════════════════════════
+   홈 탭
+═══════════════════════════════════════════ */
+function homeTab(tab) {
+  homeCurrentTab = tab;
+  document.getElementById('home-tab-prx').classList.toggle('on', tab === 'prx');
+  document.getElementById('home-tab-my').classList.toggle('on', tab === 'my');
+  renderHome();
+}
+
+function renderHome() {
+  const body = document.getElementById('home-body');
+  if (homeCurrentTab === 'prx') {
+    // 운동처방 목록
+    if (prescriptionList.length === 0) {
+      body.innerHTML = '<div class="empty-card">현재 등록된 운동처방이 없습니다.<br>트레이너에게 처방을 요청해 보세요.</div>';
+      return;
+    }
+    body.innerHTML = prescriptionList.map((p, i) => {
+      const exCnt = p.exercises.length;
+      const minEst = exCnt * 7;
+      const statusCls = p.status === 'active' ? 'orange' : '';
+      const statusTxt = p.status === 'active' ? '진행중' : '완료';
+      return `<div class="routine-card" onclick="openRoutine('prx',${i})">
+        <div class="rc-top">
+          <div class="rc-icon ri-orange">💊</div>
+          <div class="rc-info">
+            <div class="rc-name">${p.name}</div>
+            <div class="rc-source">💊 트레이너 처방 · ${p.trainer}</div>
+            <div class="rc-meta">운동 ${exCnt}개 · 약 ${minEst}분 · 등급: ${p.grade}</div>
+          </div>
+        </div>
+        <div class="rc-bottom">
+          <div class="rc-tags">
+            <span class="rc-tag ${statusCls}">${statusTxt}</span>
+            <span class="rc-tag">${p.grade}</span>
+          </div>
+          <div style="display:flex;gap:6px;align-items:center;">
+            <button onclick="event.stopPropagation();openRoutineToAlarm('prx',${i})" title="알림 설정"
+              style="background:#EDE9FE;color:#9B6DFF;border:none;border-radius:8px;padding:6px 9px;font-size:14px;cursor:pointer;"
+              id="alarm-btn-prx-${i}">${alarmState[p.name]?.on ? '🔔' : '🔕'}</button>
+            <button class="btn-start-sm" onclick="event.stopPropagation();openRoutine('prx',${i});startCurrentRoutine()">시작</button>
+          </div>
+        </div>
+      </div>`;
+    }).join('');
+  } else {
+    // 나만의 운동 목록
+    const emptyBtn = `<div class="empty-card" style="cursor:pointer;" onclick="">
+      + 운동법에서 나만의 운동 추가하기<br>
+      <span style="font-size:11px;color:#B794F4;margin-top:4px;display:block;">운동법 메뉴에서 운동을 선택해 저장할 수 있습니다</span>
+    </div>`;
+    if (myRoutineList.length === 0) {
+      body.innerHTML = emptyBtn;
+      return;
+    }
+    body.innerHTML = myRoutineList.map((r, i) => {
+      const displayTitle = getRoutineTitle(r);
+      const hasTitle = !!(r.title && r.title.trim());
+      return `<div class="routine-card" onclick="openRoutine('my',${i})">
+        <div class="rc-top">
+          <div class="rc-icon ${r.iconBg}">${r.icon}</div>
+          <div class="rc-info">
+            <div class="rc-name">${displayTitle}${!hasTitle ? ' <span style="font-size:10px;font-weight:600;color:#A0AEC0;background:#F7FAFC;border-radius:6px;padding:1px 6px;margin-left:2px;">미지정</span>' : ''}</div>
+            <div class="rc-source">⭐ ${r.source}</div>
+            <div class="rc-meta">운동 ${r.exercises.length}개 · 완료 ${r.doneCount}회</div>
+          </div>
+        </div>
+        <div class="rc-bottom">
+          <div class="rc-tags">${r.tags.map(t => `<span class="rc-tag ${t.cls}">${t.label}</span>`).join('')}</div>
+          <div style="display:flex;gap:6px;align-items:center;">
+            <button onclick="event.stopPropagation();openRoutineToAlarm('my',${i})" title="알림 설정"
+              style="background:#EDE9FE;color:#9B6DFF;border:none;border-radius:8px;padding:6px 9px;font-size:14px;cursor:pointer;"
+              id="alarm-btn-my-${i}">${alarmState[displayTitle]?.on ? '🔔' : '🔕'}</button>
+            <button class="btn-start-sm" onclick="event.stopPropagation();openRoutine('my',${i});startCurrentRoutine()">시작</button>
+          </div>
+        </div>
+      </div>`;
+    }).join('') + emptyBtn;
+  }
+
+  // 저장 루틴 수
+  const total = prescriptionList.length + myRoutineList.length;
+  document.getElementById('home-stat-count').textContent = total;
+}
+
+/* ═══════════════════════════════════════════
+   루틴 선택 & 상세
+═══════════════════════════════════════════ */
+function openRoutine(type, idx) {
+  let routine;
+  if (type === 'prx') {
+    const p = prescriptionList[idx];
+    routine = {
+      title: p.name,
+      source: `💊 트레이너 처방 · ${p.trainer}`,
+      exercises: prxToExercises(p),
+      doneCount: p.hist ? p.hist.done : 0,
+      lastDate: p.hist?.sessions?.[0]?.date?.replace(' (오늘)','') || '—',
+    };
+  } else {
+    const r = myRoutineList[idx];
+    routine = {
+      title: getRoutineTitle(r),
+      source: `⭐ ${r.source}`,
+      exercises: r.exercises,
+      doneCount: r.doneCount,
+      lastDate: r.lastDate,
+    };
+  }
+  selectedRoutine = routine;
+  exercises = routine.exercises;
+  renderDetail();
+  switchScreen('detail');
+}
+
+function renderDetail() {
+  if (!selectedRoutine) return;
+  const r = selectedRoutine;
+  document.getElementById('detail-source').textContent = r.source;
+  document.getElementById('detail-name').textContent = r.title;
+  document.getElementById('detail-cnt').textContent = r.exercises.length;
+  document.getElementById('detail-min').textContent = r.exercises.reduce((s, e) => s + e.sets * 2 + 1, 0);
+  document.getElementById('detail-total').textContent = r.doneCount;
+  document.getElementById('detail-ach-done').textContent = r.doneCount;
+  document.getElementById('detail-ach-last').textContent = r.lastDate;
+
+  document.getElementById('detail-ex-list').innerHTML = r.exercises.map((e, i) =>
+    `<div class="ex-list-item">
+      <div class="el-num">${i + 1}</div>
+      <div class="el-icon">${e.emoji}</div>
+      <div class="el-info">
+        <div class="el-name">${e.name}</div>
+        <div class="el-detail">${e.sets}세트 × ${e.reps}</div>
+      </div>
+      <span onclick="startFromExercise(${i})" style="font-size:20px;color:#9B6DFF;cursor:pointer;padding:4px 6px;border-radius:8px;transition:background .15s;"
+        onmouseover="this.style.background='#EDE9FE'" onmouseout="this.style.background='transparent'">▷</span>
+    </div>`
+  ).join('');
+
+  // 이 루틴의 저장된 알림 상태 로드
+  loadAlarmForRoutine();
+}
+
+function startCurrentRoutine() {
+  if (!selectedRoutine) return;
+  exercises = selectedRoutine.exercises;
+  switchScreen('play');
+}
+
+function startFromExercise(idx) {
+  if (!selectedRoutine) return;
+  exercises = selectedRoutine.exercises;
+  // play 화면 초기화 후 idx 운동부터 시작
+  currentExIdx = idx;
+  currentSetCount = exercises.map(() => 1);
+  exerciseStartTime = Date.now();
+  autoPlayActive = false;
+  document.querySelectorAll('.screen-frame').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.screen-btn').forEach(el => el.classList.remove('active'));
+  document.getElementById('screen-play').classList.add('active');
+  document.querySelectorAll('.screen-btn').forEach(btn => {
+    if (btn.getAttribute('onclick')?.includes("'play'")) btn.classList.add('active');
+  });
+  document.getElementById('memo-screen-name').value = screenNames['play'];
+  document.getElementById('auto-bar').style.display = 'none';
+  document.getElementById('btn-auto-toggle').textContent = '▶ 자동진행';
+  renderExercise();
+}
+
+/* ═══════════════════════════════════════════
+   운동 따라하기
+═══════════════════════════════════════════ */
+function renderExercise() {
+  if (!exercises.length) return;
+  const ex = exercises[currentExIdx];
+  const total = exercises.length;
+  const cs = currentSetCount[currentExIdx];
+
+  // 진행 상태
+  document.getElementById('play-progress-txt').textContent = `${currentExIdx + 1} / ${total}`;
+  document.getElementById('play-step-dots').innerHTML = exercises.map((_, i) => {
+    const cls = i < currentExIdx ? 'done' : i === currentExIdx ? 'now' : '';
+    return `<div class="step-dot ${cls}" style="cursor:pointer;" onclick="jumpToExercise(${i})"></div>`;
+  }).join('');
+
+  // 운동 네비게이션 가로 스크롤
+  document.getElementById('ex-nav-list').innerHTML = exercises.map((e, i) => {
+    const isCurrent = i === currentExIdx;
+    const isDone = i < currentExIdx;
+    return `<div onclick="jumpToExercise(${i})" style="
+      flex-shrink:0; display:flex; align-items:center; gap:6px;
+      padding:5px 11px; border-radius:99px; cursor:pointer; transition:all .2s;
+      background:${isCurrent ? '#9B6DFF' : isDone ? '#F0FFF4' : '#F5F0FF'};
+      border:1.5px solid ${isCurrent ? '#9B6DFF' : isDone ? '#68D391' : '#E9E3FF'};
+    ">
+      <span style="
+        width:18px;height:18px;border-radius:50%;flex-shrink:0;
+        display:flex;align-items:center;justify-content:center;
+        font-size:10px;font-weight:700;
+        background:${isCurrent ? 'rgba(255,255,255,0.25)' : isDone ? '#68D391' : '#E9E3FF'};
+        color:${isCurrent ? '#fff' : isDone ? '#fff' : '#9B6DFF'};
+      ">${isDone ? '✓' : i + 1}</span>
+      <span style="font-size:12px;font-weight:700;white-space:nowrap;color:${isCurrent ? '#fff' : isDone ? '#38A169' : '#553C9A'};">${e.name}</span>
+      <span style="font-size:10px;white-space:nowrap;color:${isCurrent ? 'rgba(255,255,255,0.75)' : '#B794F4'};">${e.sets}×${e.reps}</span>
+    </div>`;
+  }).join('');
+
+  // 현재 운동 항목으로 자동 스크롤
+  requestAnimationFrame(() => {
+    const navList = document.getElementById('ex-nav-list');
+    const currentItem = navList?.children[currentExIdx];
+    if (currentItem) {
+      currentItem.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+    }
+  });
+
+  // 자동진행 레이블 업데이트
+  if (autoPlayActive) _updateAutoLabel();
+
+  // 카드
+  document.getElementById('ex-body').innerHTML = `
+    <div class="ex-play-card">
+      <div class="ex-play-img" id="ex-img-wrap">
+        <span style="font-size:60px;">${ex.emoji}</span>
+        <div class="ex-play-overlay" id="ex-play-overlay" onclick="startSetTimer()">
+          <div class="ex-play-btn"><span class="ex-play-btn-icon">▶</span></div>
+        </div>
+      </div>
+      <div class="ex-play-body">
+        <div class="ex-play-title">${ex.name}</div>
+        <div class="ex-play-desc">${ex.desc || ex.reps}</div>
+        <div class="counter-row">
+          <div class="counter-box">
+            <div class="counter-label">현재 세트</div>
+            <div class="counter-val" id="ex-set-display">${cs} / ${ex.sets}</div>
+            <div class="counter-sub">세트</div>
+          </div>
+          <div class="counter-box">
+            <div class="counter-label">목표 횟수</div>
+            <div class="counter-val">${ex.reps}</div>
+            <div class="counter-sub">
+              <button class="cnt-btn" style="width:24px;height:24px;font-size:14px;" onclick="changeRep(-1)">−</button>
+              <span id="ex-rep-count" style="font-size:16px;font-weight:900;color:#553C9A;min-width:24px;text-align:center;">0</span>
+              <button class="cnt-btn" style="width:24px;height:24px;font-size:14px;" onclick="changeRep(1)">+</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>`;
+
+  // 다음 버튼
+  const nextBtn = document.getElementById('ex-next-btn');
+  if (currentExIdx < total - 1) {
+    nextBtn.textContent = `다음 운동 → ${exercises[currentExIdx + 1].name}`;
+    nextBtn.onclick = () => { currentSetCount[currentExIdx] = ex.sets; goNextExercise(); };
+  } else {
+    nextBtn.textContent = '운동 완료 🎉';
+    nextBtn.onclick = () => { currentSetCount[currentExIdx] = ex.sets; stopAutoPlay(); switchScreen('complete'); };
+  }
+}
+
+function changeRep(delta) {
+  const el = document.getElementById('ex-rep-count');
+  if (!el) return;
+  el.textContent = Math.max(0, (parseInt(el.textContent) || 0) + delta);
+}
+
+function goNextExercise() {
+  clearInterval(setTimerInterval);
+  currentExIdx++;
+  renderExercise();
+}
+
+function jumpToExercise(idx) {
+  clearInterval(setTimerInterval);
+  stopAutoPlay();
+  currentExIdx = idx;
+  renderExercise();
+}
+
+/* ═══════════════════════════════════════════
+   세트 타이머
+═══════════════════════════════════════════ */
+function startSetTimer() {
+  const overlay = document.getElementById('ex-play-overlay');
+  if (overlay) overlay.style.display = 'none';
+
+  let remain = SET_TIMER_SECS;
+  _renderSetTimerOverlay(remain);
+
+  clearInterval(setTimerInterval);
+  setTimerInterval = setInterval(() => {
+    remain--;
+    _updateSetTimerUI(remain);
+    if (remain <= 0) {
+      clearInterval(setTimerInterval);
+      _completeSet();
+    }
+  }, 1000);
+}
+
+function _renderSetTimerOverlay(remain) {
+  const imgWrap = document.getElementById('ex-img-wrap');
+  if (!imgWrap) return;
+  imgWrap.style.position = 'relative';
+  const old = document.getElementById('set-timer-overlay');
+  if (old) old.remove();
+  const div = document.createElement('div');
+  div.id = 'set-timer-overlay';
+  div.className = 'set-timer-overlay';
+  div.innerHTML = `
+    <div class="set-timer-ring">
+      <svg width="80" height="80" viewBox="0 0 80 80">
+        <circle cx="40" cy="40" r="34" fill="none" stroke="#9B6DFF" stroke-width="5"
+          stroke-dasharray="213.63" stroke-dashoffset="0" stroke-linecap="round" id="stc"/>
+      </svg>
+      <span class="set-timer-num" id="set-timer-num">${remain}</span>
+    </div>
+    <span class="set-timer-label">세트 진행 중...</span>
+    <button class="set-timer-done-btn" onclick="completeSetEarly()">✓ 완료</button>`;
+  imgWrap.appendChild(div);
+}
+
+function _updateSetTimerUI(remain) {
+  const numEl = document.getElementById('set-timer-num');
+  const circle = document.getElementById('stc');
+  if (numEl) numEl.textContent = remain;
+  if (circle) {
+    const circumference = 213.63;
+    circle.style.strokeDashoffset = circumference * (1 - remain / SET_TIMER_SECS);
+  }
+}
+
+function completeSetEarly() {
+  clearInterval(setTimerInterval);
+  _completeSet();
+}
+
+function _completeSet() {
+  const imgWrap = document.getElementById('ex-img-wrap');
+  if (imgWrap) {
+    const old = document.getElementById('set-timer-overlay');
+    if (old) old.remove();
+    // 완료 플래시
+    const flash = document.createElement('div');
+    flash.className = 'set-timer-overlay';
+    flash.style.background = 'rgba(107,70,193,0.72)';
+    flash.innerHTML = `<span style="font-size:36px;">✓</span><span class="set-timer-label" style="color:#fff;">세트 완료!</span>`;
+    imgWrap.appendChild(flash);
+  }
+
+  const ex = exercises[currentExIdx];
+  const cur = currentSetCount[currentExIdx];
+  const isLastSet = cur >= ex.sets;
+  if (!isLastSet) {
+    currentSetCount[currentExIdx]++;
+    const setDisp = document.getElementById('ex-set-display');
+    if (setDisp) setDisp.textContent = `${currentSetCount[currentExIdx]} / ${ex.sets}`;
+  }
+
+  setTimeout(() => {
+    const overlay = document.getElementById('set-timer-overlay');
+    if (overlay) overlay.remove();
+
+    if (autoPlayActive) {
+      if (isLastSet) {
+        _updateAutoLabel();
+        if (currentExIdx < exercises.length - 1) {
+          currentExIdx++;
+          renderExercise();
+          setTimeout(() => startSetTimer(), 600);
+        } else {
+          stopAutoPlay();
+          switchScreen('complete');
+        }
+      } else {
+        _updateAutoLabel();
+        setTimeout(() => startSetTimer(), 800);
+      }
+    } else {
+      const playOverlay = document.getElementById('ex-play-overlay');
+      if (playOverlay) playOverlay.style.display = 'flex';
+    }
+  }, 1000);
+}
+
+/* ═══════════════════════════════════════════
+   자동 진행
+═══════════════════════════════════════════ */
+function toggleAutoPlay() {
+  autoPlayActive ? stopAutoPlay() : startAutoPlay();
+}
+
+function startAutoPlay() {
+  autoPlayActive = true;
+  document.getElementById('auto-bar').style.display = 'flex';
+  document.getElementById('btn-auto-toggle').textContent = '■ 자동중지';
+  _updateAutoLabel();
+  startSetTimer();
+}
+
+function stopAutoPlay() {
+  autoPlayActive = false;
+  clearInterval(setTimerInterval);
+  document.getElementById('auto-bar').style.display = 'none';
+  const btn = document.getElementById('btn-auto-toggle');
+  if (btn) btn.textContent = '▶ 자동진행';
+  const playOverlay = document.getElementById('ex-play-overlay');
+  if (playOverlay) playOverlay.style.display = 'flex';
+}
+
+function _updateAutoLabel() {
+  const lbl = document.getElementById('auto-label');
+  if (!lbl || !exercises.length) return;
+  const ex = exercises[currentExIdx];
+  const sd = currentSetCount[currentExIdx];
+  lbl.textContent = `자동진행 · ${currentExIdx + 1}/${exercises.length}번 운동 · ${sd}/${ex.sets}세트`;
+}
+
+/* ═══════════════════════════════════════════
+   완료 통계
+═══════════════════════════════════════════ */
+function renderCompleteStats() {
+  const completedCount = currentExIdx + 1;
+  let totalSets = 0;
+  for (let i = 0; i < completedCount; i++) {
+    totalSets += (i < currentExIdx) ? exercises[i].sets : currentSetCount[i];
+  }
+  let timeStr = '—';
+  if (exerciseStartTime) {
+    const mins = Math.round((Date.now() - exerciseStartTime) / 60000);
+    timeStr = mins < 1 ? '1분 미만' : mins + '분';
+  }
+  document.getElementById('stat-time').textContent = timeStr;
+  document.getElementById('stat-count').textContent = completedCount + '개';
+  document.getElementById('stat-sets').textContent = totalSets + '세트';
+  if (selectedRoutine) {
+    document.getElementById('complete-sub').innerHTML =
+      `<strong>${selectedRoutine.title}</strong> 완료!<br>오늘도 정말 잘 하셨어요 🎉`;
+  }
+}
+
+/* ═══════════════════════════════════════════
+   최근 운동
+═══════════════════════════════════════════ */
+const recentHistory = [
+  { date: '17', month: '3월', name: '디스크시술 5주차', detail: '운동 5개 완료 · 13세트', time: '34분', type: 'prx' },
+  { date: '15', month: '3월', name: '어깨 스트레칭 루틴', detail: '운동 3개 완료 · 9세트', time: '17분', type: 'my' },
+  { date: '13', month: '3월', name: '디스크시술 5주차', detail: '운동 5개 완료', time: '29분', type: 'prx' },
+  { date: '12', month: '3월', name: '허리 코어 강화', detail: '운동 3개 완료 · 9세트', time: '22분', type: 'my' },
+  { date: '10', month: '3월', name: '어깨 스트레칭 루틴', detail: '운동 3개 완료', time: '16분', type: 'my' },
+];
+function renderRecent() {
+  document.getElementById('recent-body').innerHTML = recentHistory.map(r =>
+    `<div class="recent-item">
+      <div class="ri-date-box"><div class="rd">${r.date}</div><div class="rm">${r.month}</div></div>
+      <div class="ri-info">
+        <div class="ri-name">${r.type === 'prx' ? '💊 ' : '⭐ '}${r.name}</div>
+        <div class="ri-detail">${r.detail}</div>
+      </div>
+      <div class="ri-right">
+        <div class="ri-time">${r.time}</div>
+        <div class="ri-redo">🔁 다시하기</div>
+      </div>
+    </div>`
+  ).join('');
+}
+
+/* ═══════════════════════════════════════════
+   달성 이력 캘린더
+═══════════════════════════════════════════ */
+// 날짜별 운동 기록 (일자 → 기록 배열)
+const workoutByDay = {
+  3:  [{ type:'prx', name:'디스크시술 5주차', detail:'운동 5개 완료 · 13세트', time:'31분', exercises:['맥켄지 신전 운동','코어 안정화 운동','고관절 스트레칭','허리 굴곡 운동','골반 교정 스트레칭'] }],
+  5:  [{ type:'prx', name:'디스크시술 5주차', detail:'운동 5개 완료 · 13세트', time:'33분', exercises:['맥켄지 신전 운동','코어 안정화 운동','고관절 스트레칭','허리 굴곡 운동','골반 교정 스트레칭'] }],
+  7:  [{ type:'my', name:'어깨 스트레칭 루틴', detail:'운동 3개 완료 · 9세트', time:'18분', exercises:['어깨 전방 굴곡','어깨 외전 운동','어깨 내회전 스트레칭'] }],
+  10: [{ type:'my', name:'어깨 스트레칭 루틴', detail:'운동 3개 완료', time:'16분', exercises:['어깨 전방 굴곡','어깨 외전 운동','어깨 내회전 스트레칭'] }],
+  12: [{ type:'my', name:'허리 코어 강화', detail:'운동 3개 완료 · 9세트', time:'22분', exercises:['데드버그','버드독','플랭크'] }],
+  13: [{ type:'prx', name:'디스크시술 5주차', detail:'운동 5개 완료', time:'29분', exercises:['맥켄지 신전 운동','코어 안정화 운동','고관절 스트레칭','허리 굴곡 운동','골반 교정 스트레칭'] }],
+  15: [{ type:'my', name:'어깨 스트레칭 루틴', detail:'운동 3개 완료 · 9세트', time:'17분', exercises:['어깨 전방 굴곡','어깨 외전 운동','어깨 내회전 스트레칭'] }],
+  17: [{ type:'prx', name:'디스크시술 5주차', detail:'운동 5개 완료 · 13세트', time:'34분', exercises:['맥켄지 신전 운동','코어 안정화 운동','고관절 스트레칭','허리 굴곡 운동','골반 교정 스트레칭'] }],
+  19: [{ type:'prx', name:'디스크시술 5주차', detail:'운동 진행중 · 2개 완료', time:'—', exercises:['맥켄지 신전 운동','코어 안정화 운동'] }],
+};
+
+function renderHistoryCal() {
+  const doneDays = new Set([3,5,7,10,12,13,15,17]);
+  const skipDays = new Set([4]);
+  const today = 19;
+  let html = '';
+  for (let d = 1; d <= 19; d++) {
+    const cls = d === today ? 'today' : doneDays.has(d) ? 'done' : skipDays.has(d) ? 'skip' : '';
+    const hasData = workoutByDay[d];
+    const cursor = hasData ? 'cursor:pointer;' : '';
+    const ring = hasData ? 'box-shadow:0 0 0 2px #9B6DFF;' : '';
+    html += `<div class="hc-cell ${cls}" style="${cursor}${ring}" onclick="showDayDetail(${d})">${d}</div>`;
+  }
+  const el = document.getElementById('history-cal-grid');
+  if (el) el.innerHTML = html;
+}
+
+function showDayDetail(day) {
+  const records = workoutByDay[day];
+  const panel = document.getElementById('day-detail-panel');
+  const body = document.getElementById('day-detail-body');
+  const title = document.getElementById('day-detail-title');
+
+  if (!records) { panel.style.display = 'none'; return; }
+
+  title.textContent = `3월 ${day}일 운동`;
+  body.innerHTML = records.map(r => {
+    const icon = r.type === 'prx' ? '💊' : '⭐';
+    const exRows = r.exercises.map((ex, i) =>
+      `<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid #F5F0FF;">
+        <div style="width:20px;height:20px;border-radius:6px;background:#EDE9FE;color:#9B6DFF;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;">${i+1}</div>
+        <span style="font-size:12px;font-weight:700;color:#2D3748;">${ex}</span>
+        <span style="margin-left:auto;font-size:11px;font-weight:700;color:#9B6DFF;">✓</span>
+      </div>`
+    ).join('');
+    return `<div style="margin-bottom:6px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+        <div style="display:flex;align-items:center;gap:6px;">
+          <span style="font-size:16px;">${icon}</span>
+          <div>
+            <div style="font-size:13px;font-weight:800;color:#1A202C;">${r.name}</div>
+            <div style="font-size:11px;color:#A0AEC0;">${r.detail}</div>
+          </div>
+        </div>
+        <div style="font-size:13px;font-weight:800;color:#9B6DFF;">${r.time}</div>
+      </div>
+      <div style="background:#F5F0FF;border-radius:10px;padding:6px 10px;">
+        ${exRows}
+      </div>
+    </div>`;
+  }).join('');
+
+  panel.style.display = 'block';
+  // 패널로 스크롤
+  setTimeout(() => panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 50);
+}
+
+function closeDayDetail() {
+  document.getElementById('day-detail-panel').style.display = 'none';
+}
+
+function goToAlarmSetting(idx, type) {
+  openRoutineToAlarm(type, idx);
+}
+
+function goToAlarmList() {
+  switchScreen('history');
+  setTimeout(() => {
+    const alarmSection = document.querySelector('#screen-history .app-body');
+    if (alarmSection) {
+      // 알림 설정 레이블 위치로 스크롤
+      const labels = alarmSection.querySelectorAll('div');
+      for (const el of labels) {
+        if (el.textContent.trim() === '알림 설정') {
+          el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          break;
+        }
+      }
+    }
+  }, 200);
+}
+
+function openRoutineToAlarm(type, idx) {
+  openRoutine(type, idx);
+  // 알림 설정 카드까지 스크롤
+  setTimeout(() => {
+    const appBody = document.querySelector('#screen-detail .app-body');
+    if (appBody) appBody.scrollTo({ top: appBody.scrollHeight, behavior: 'smooth' });
+  }, 250);
+}
+
+// 알림 저장 후 홈 카드 아이콘 갱신
+function refreshAlarmIcons() {
+  prescriptionList.forEach((p, i) => {
+    const btn = document.getElementById(`alarm-btn-prx-${i}`);
+    if (btn) btn.textContent = alarmState[p.name]?.on ? '🔔' : '🔕';
+  });
+  myRoutineList.forEach((r, i) => {
+    const btn = document.getElementById(`alarm-btn-my-${i}`);
+    if (btn) btn.textContent = alarmState[r.title]?.on ? '🔔' : '🔕';
+  });
+}
+
+/* ═══════════════════════════════════════════
+   알림 설정
+═══════════════════════════════════════════ */
+const alarmState = {}; // { routineTitle: { on, days, ampm, hour, min } }
+
+function toggleAlarm() {
+  const toggle = document.getElementById('alarm-toggle');
+  const dayRow = document.getElementById('alarm-day-row');
+  const timeRow = document.getElementById('alarm-time-row');
+  const statusTxt = document.getElementById('alarm-status-txt');
+  const isOn = toggle.classList.toggle('off');
+  // toggle.off 클래스 없으면 ON
+  const on = !toggle.classList.contains('off');
+  dayRow.style.display = on ? 'block' : 'none';
+  timeRow.style.display = on ? 'block' : 'none';
+  statusTxt.textContent = on ? '알림 켜짐' : '알림 꺼짐';
+  statusTxt.style.color = on ? '#9B6DFF' : '#A0AEC0';
+}
+
+function toggleDay(el, day) {
+  el.classList.toggle('on');
+}
+
+function saveAlarm() {
+  if (!selectedRoutine) return;
+  const toggle = document.getElementById('alarm-toggle');
+  const on = !toggle.classList.contains('off');
+  const days = [...document.querySelectorAll('#alarm-days .day-chip.on')].map(el => el.textContent);
+  const ampm = document.getElementById('alarm-ampm').value;
+  const hour = document.getElementById('alarm-hour').value;
+  const min  = document.getElementById('alarm-min').value;
+
+  alarmState[selectedRoutine.title] = { on, days, ampm, hour, min };
+
+  const msg = on && days.length
+    ? `${days.join('·')} ${ampm} ${hour}:${min} 알림이 설정되었습니다.`
+    : '알림이 꺼졌습니다.';
+
+  // 저장 확인 피드백
+  const saveBtn = document.querySelector('#alarm-time-row button');
+  if (saveBtn) {
+    saveBtn.textContent = '✓ 저장되었습니다';
+    saveBtn.style.background = '#68D391';
+    setTimeout(() => {
+      saveBtn.textContent = '💾 알림 저장';
+      saveBtn.style.background = '#9B6DFF';
+    }, 1800);
+  }
+  refreshAlarmIcons();
+}
+
+function loadAlarmForRoutine() {
+  if (!selectedRoutine) return;
+  const state = alarmState[selectedRoutine.title];
+  const toggle = document.getElementById('alarm-toggle');
+  const dayRow = document.getElementById('alarm-day-row');
+  const timeRow = document.getElementById('alarm-time-row');
+  const statusTxt = document.getElementById('alarm-status-txt');
+  if (!state || !state.on) {
+    toggle.classList.add('off');
+    dayRow.style.display = 'none';
+    timeRow.style.display = 'none';
+    statusTxt.textContent = '알림 꺼짐';
+    statusTxt.style.color = '#A0AEC0';
+    // 요일 기본값
+    document.querySelectorAll('#alarm-days .day-chip').forEach(el => {
+      el.classList.toggle('on', ['월','수','금'].includes(el.textContent));
+    });
+  } else {
+    toggle.classList.remove('off');
+    dayRow.style.display = 'block';
+    timeRow.style.display = 'block';
+    statusTxt.textContent = '알림 켜짐';
+    statusTxt.style.color = '#9B6DFF';
+    document.querySelectorAll('#alarm-days .day-chip').forEach(el => {
+      el.classList.toggle('on', state.days.includes(el.textContent));
+    });
+    if (state.ampm) document.getElementById('alarm-ampm').value = state.ampm;
+    if (state.hour) document.getElementById('alarm-hour').value = state.hour;
+    if (state.min)  document.getElementById('alarm-min').value = state.min;
+  }
+}
+
+/* ═══════════════════════════════════════════
+   초기화
+═══════════════════════════════════════════ */
+renderHome();
+renderHistoryCal();
 </script>
 </body>
 </html>

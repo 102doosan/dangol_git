@@ -968,6 +968,9 @@
       exercises.push([name, partKey, typeText, levelText, setsText, reps, desc]);
       updateStats();
 
+      // ── 영상 localStorage 저장 ──
+      _saveVideoForExercise(name);
+
       // 폼 초기화
       document.getElementById('exName').value = '';
       document.getElementById('exNameEn').value = '';
@@ -1468,6 +1471,22 @@
 
     /* ── 동영상 업로드/미리보기 ── */
     let currentVideoFile = null;
+    let currentVideoDataUrl = null; // FileReader로 변환된 dataURL
+
+    function _saveVideoForExercise(name) {
+      const url = (document.getElementById('videoUrlInput')?.value || '').trim();
+      const key = 'exVideo_' + name;
+      if (currentVideoDataUrl) {
+        try { localStorage.setItem(key, JSON.stringify({ type: 'data', src: currentVideoDataUrl })); } catch(e) { console.warn('영상 저장 실패(용량 초과):', e); }
+      } else if (url) {
+        const ytMatch = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([A-Za-z0-9_-]{11})/);
+        const src = ytMatch ? 'https://www.youtube.com/embed/' + ytMatch[1] : url;
+        const type = ytMatch ? 'youtube' : 'url';
+        localStorage.setItem(key, JSON.stringify({ type, src }));
+      }
+      // 초기화
+      currentVideoDataUrl = null;
+    }
 
     function handleVideoFile(input) {
       const file = input.files[0];
@@ -1476,8 +1495,17 @@
       document.getElementById('videoUrlInput').value = '';
       document.getElementById('videoFileName').style.display = 'flex';
       document.getElementById('videoFileNameText').textContent = file.name + '  (' + (file.size / 1024 / 1024).toFixed(1) + 'MB)';
-      const url = URL.createObjectURL(file);
-      showLocalVideoPreview(url);
+      const blobUrl = URL.createObjectURL(file);
+      showLocalVideoPreview(blobUrl);
+      // dataURL 변환 저장 (5MB 이하만)
+      if (file.size < 5 * 1024 * 1024) {
+        const reader = new FileReader();
+        reader.onload = e => { currentVideoDataUrl = e.target.result; };
+        reader.readAsDataURL(file);
+      } else {
+        currentVideoDataUrl = null;
+        console.warn('5MB 초과 파일: URL 입력 방식을 권장합니다.');
+      }
     }
 
     function handleVideoDrop(e) {

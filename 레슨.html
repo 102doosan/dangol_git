@@ -125,9 +125,10 @@
       width: 5px; height: 5px; border-radius: 50%;
       background: #FFF; margin-top: 2px;
     }
-    .cal-cell.today { background: rgba(255,255,255,0.25); }
-    .cal-cell.selected { background: #fff; }
-    .cal-cell.selected .cal-date { color: #C05621; }
+    .cal-cell.today { background: rgba(255,255,255,0.9); }
+    .cal-cell.today .cal-date { color: #C05621; font-weight: 900; }
+    .cal-cell.selected { background: #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.18); }
+    .cal-cell.selected .cal-date { color: #C05621; font-weight: 900; }
     .cal-cell.selected .cal-dot { background: #F6AD55; }
     .cal-cell.has-lesson .cal-dot { opacity: 1; }
     .cal-cell:not(.has-lesson) .cal-dot { opacity: 0; }
@@ -235,6 +236,39 @@
     }
     .memo-card .mc-label { font-size: 11px; font-weight: 800; color: #F6AD55; margin-bottom: 6px; }
     .memo-card .mc-text { font-size: 13px; color: #744210; line-height: 1.7; }
+
+    /* 카드 하단 알림 바 */
+    .lc-alarm-bar {
+      border-top: 1px solid #F7F3EE; padding: 8px 14px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .lc-alarm-btn {
+      display: flex; align-items: center; gap: 5px;
+      font-size: 11px; font-weight: 700; color: #A0AEC0;
+      background: none; border: none; cursor: pointer;
+      font-family: 'Noto Sans KR', sans-serif; padding: 0;
+    }
+    .lc-alarm-btn.alarm-on { color: #C05621; }
+    /* 인라인 알림 패널 */
+    .inline-alarm {
+      display: none; padding: 12px 14px 14px;
+      background: #FFFBF0; border-top: 1px solid #FEEBC8;
+    }
+    .inline-alarm.open { display: block; }
+    .ia-row { margin-bottom: 10px; }
+    .ia-label { font-size: 10px; font-weight: 800; color: #A0AEC0; letter-spacing: 0.5px; margin-bottom: 5px; }
+    .ia-chips { display: flex; gap: 5px; flex-wrap: wrap; }
+    .ia-chip {
+      font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 99px;
+      border: 1.5px solid #E2E8F0; background: #fff; color: #718096;
+      cursor: pointer; font-family: 'Noto Sans KR', sans-serif; transition: all 0.15s;
+    }
+    .ia-chip.on { background: #FEEBC8; border-color: #F6AD55; color: #C05621; }
+    .ia-save {
+      width: 100%; margin-top: 10px; background: #C05621; color: #fff; border: none;
+      border-radius: 8px; padding: 8px; font-size: 12px; font-weight: 700;
+      cursor: pointer; font-family: 'Noto Sans KR', sans-serif;
+    }
     .status-bar {
       margin: 0 16px 16px;
       background: #fff; border-radius: 14px; padding: 14px 16px;
@@ -255,6 +289,70 @@
     .sb-step-line.done { background: #F6AD55; }
     .sb-step-label { font-size: 10px; color: #A0AEC0; font-weight: 600; }
     .sb-step-label.on { color: #C05621; font-weight: 800; }
+
+    /* 회차 진행 카드 */
+    .session-card {
+      background: #fff; border-radius: 14px; padding: 16px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.07); margin: 0 0 0 0;
+    }
+    .sc-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+    .sc-label { font-size: 12px; font-weight: 900; color: #C05621; }
+    .sc-badge {
+      font-size: 13px; font-weight: 900; color: #C05621;
+      background: #FEEBC8; border-radius: 99px; padding: 3px 12px;
+    }
+    .sc-bar-wrap { background: #EDF2F7; border-radius: 99px; height: 8px; overflow: hidden; margin-bottom: 8px; }
+    .sc-bar { height: 100%; border-radius: 99px; background: linear-gradient(90deg, #F6AD55, #C05621); transition: width 0.4s; }
+    .sc-nums { display: flex; justify-content: space-between; }
+    .sc-num-left { font-size: 11px; color: #A0AEC0; font-weight: 600; }
+    .sc-num-right { font-size: 11px; color: #C05621; font-weight: 700; }
+    .sc-dots { display: flex; gap: 4px; flex-wrap: wrap; margin-top: 10px; }
+    .sc-dot { width: 14px; height: 14px; border-radius: 50%; }
+    .sc-dot.done { background: #C05621; }
+    .sc-dot.now  { background: #F6AD55; border: 2px solid #C05621; }
+    .sc-dot.left { background: #EDF2F7; }
+
+    /* 알림 설정 카드 */
+    .alarm-card {
+      background: #fff; border-radius: 14px; padding: 16px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+    }
+    .alarm-title { font-size: 12px; font-weight: 900; color: #2D3748; margin-bottom: 14px;
+      display: flex; align-items: center; gap: 6px; }
+    .alarm-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+    .alarm-row:last-child { margin-bottom: 0; }
+    .alarm-row-label { font-size: 13px; font-weight: 700; color: #2D3748; }
+    .alarm-row-sub { font-size: 11px; color: #A0AEC0; margin-top: 2px; }
+
+    /* 토글 스위치 */
+    .toggle-wrap { position: relative; width: 44px; height: 24px; flex-shrink: 0; }
+    .toggle-wrap input { opacity: 0; width: 0; height: 0; }
+    .toggle-slider {
+      position: absolute; cursor: pointer; inset: 0;
+      background: #CBD5E0; border-radius: 99px; transition: 0.3s;
+    }
+    .toggle-slider::before {
+      content: ''; position: absolute;
+      width: 18px; height: 18px; border-radius: 50%;
+      left: 3px; top: 3px; background: #fff; transition: 0.3s;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+    }
+    .toggle-wrap input:checked + .toggle-slider { background: #C05621; }
+    .toggle-wrap input:checked + .toggle-slider::before { transform: translateX(20px); }
+
+    /* 알림 시점 칩 */
+    .timing-row { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
+    .timing-chip {
+      font-size: 11px; font-weight: 700; padding: 5px 12px; border-radius: 99px;
+      border: 1.5px solid #E2E8F0; background: #fff; color: #718096;
+      cursor: pointer; transition: all 0.15s; font-family: 'Noto Sans KR', sans-serif;
+    }
+    .timing-chip.on { background: #FEEBC8; border-color: #F6AD55; color: #C05621; }
+
+    /* 알림 상태 텍스트 */
+    .alarm-status { font-size: 11px; color: #A0AEC0; margin-top: 10px; padding-top: 10px;
+      border-top: 1px solid #F0F4F8; display: flex; align-items: center; gap: 6px; }
+    .alarm-status.on { color: #C05621; }
   </style>
 </head>
 <body>
@@ -277,10 +375,10 @@
       <div class="screen-frame active" id="screen-main">
         <div class="cal-header">
           <div class="ch-top">
-            <span class="ch-month">🎓 2026년 3월</span>
+            <span class="ch-month" id="cal-month-title">🎓 2026년 3월</span>
             <div class="ch-nav">
-              <button class="ch-arrow">‹</button>
-              <button class="ch-arrow">›</button>
+              <button class="ch-arrow" onclick="changeMonth(-1)">‹</button>
+              <button class="ch-arrow" onclick="changeMonth(1)">›</button>
             </div>
           </div>
           <div class="cal-dow">
@@ -292,128 +390,17 @@
             <div class="dow-cell">금</div>
             <div class="dow-cell">토</div>
           </div>
-          <div class="cal-grid">
-            <!-- 1행 -->
-            <div class="cal-cell"><span class="cal-date other">23</span><div class="cal-dot"></div></div>
-            <div class="cal-cell"><span class="cal-date other">24</span><div class="cal-dot"></div></div>
-            <div class="cal-cell"><span class="cal-date other">25</span><div class="cal-dot"></div></div>
-            <div class="cal-cell"><span class="cal-date other">26</span><div class="cal-dot"></div></div>
-            <div class="cal-cell"><span class="cal-date other">27</span><div class="cal-dot"></div></div>
-            <div class="cal-cell"><span class="cal-date other">28</span><div class="cal-dot"></div></div>
-            <div class="cal-cell has-lesson"><span class="cal-date sat">1</span><div class="cal-dot"></div></div>
-            <!-- 2행 -->
-            <div class="cal-cell"><span class="cal-date sun">2</span><div class="cal-dot"></div></div>
-            <div class="cal-cell has-lesson"><span class="cal-date">3</span><div class="cal-dot"></div></div>
-            <div class="cal-cell"><span class="cal-date">4</span><div class="cal-dot"></div></div>
-            <div class="cal-cell has-lesson"><span class="cal-date">5</span><div class="cal-dot"></div></div>
-            <div class="cal-cell"><span class="cal-date">6</span><div class="cal-dot"></div></div>
-            <div class="cal-cell has-lesson"><span class="cal-date">7</span><div class="cal-dot"></div></div>
-            <div class="cal-cell"><span class="cal-date sat">8</span><div class="cal-dot"></div></div>
-            <!-- 3행 -->
-            <div class="cal-cell"><span class="cal-date sun">9</span><div class="cal-dot"></div></div>
-            <div class="cal-cell has-lesson"><span class="cal-date">10</span><div class="cal-dot"></div></div>
-            <div class="cal-cell"><span class="cal-date">11</span><div class="cal-dot"></div></div>
-            <div class="cal-cell has-lesson"><span class="cal-date">12</span><div class="cal-dot"></div></div>
-            <div class="cal-cell"><span class="cal-date">13</span><div class="cal-dot"></div></div>
-            <div class="cal-cell has-lesson today"><span class="cal-date">14</span><div class="cal-dot"></div></div>
-            <div class="cal-cell"><span class="cal-date sat">15</span><div class="cal-dot"></div></div>
-            <!-- 4행 -->
-            <div class="cal-cell"><span class="cal-date sun">16</span><div class="cal-dot"></div></div>
-            <div class="cal-cell has-lesson selected" onclick="go('day')"><span class="cal-date">17</span><div class="cal-dot"></div></div>
-            <div class="cal-cell"><span class="cal-date">18</span><div class="cal-dot"></div></div>
-            <div class="cal-cell has-lesson"><span class="cal-date">19</span><div class="cal-dot"></div></div>
-            <div class="cal-cell"><span class="cal-date">20</span><div class="cal-dot"></div></div>
-            <div class="cal-cell has-lesson"><span class="cal-date">21</span><div class="cal-dot"></div></div>
-            <div class="cal-cell"><span class="cal-date sat">22</span><div class="cal-dot"></div></div>
-            <!-- 5행 -->
-            <div class="cal-cell"><span class="cal-date sun">23</span><div class="cal-dot"></div></div>
-            <div class="cal-cell has-lesson"><span class="cal-date">24</span><div class="cal-dot"></div></div>
-            <div class="cal-cell"><span class="cal-date">25</span><div class="cal-dot"></div></div>
-            <div class="cal-cell has-lesson"><span class="cal-date">26</span><div class="cal-dot"></div></div>
-            <div class="cal-cell"><span class="cal-date">27</span><div class="cal-dot"></div></div>
-            <div class="cal-cell"><span class="cal-date">28</span><div class="cal-dot"></div></div>
-            <div class="cal-cell"><span class="cal-date sat">29</span><div class="cal-dot"></div></div>
+          <div class="cal-grid" id="cal-grid">
+            <!-- JS로 렌더링 -->
           </div>
         </div>
 
         <div class="list-section">
           <div class="list-section-header">
-            <span class="lsh-title">📅 예정된 레슨</span>
+            <span class="lsh-title" id="list-title">📅 예정된 레슨</span>
             <span class="lsh-count">이번 달 12회</span>
           </div>
-
-          <div class="lesson-card type-pt" onclick="go('detail')">
-            <div class="lc-body">
-              <div class="lc-date-box">
-                <div class="ldb-day">17</div>
-                <div class="ldb-dow">월</div>
-              </div>
-              <div class="lc-info">
-                <span class="lc-type-badge badge-pt">PT</span>
-                <div class="lc-name">개인 PT 레슨</div>
-                <div class="lc-meta">📍 1번 스튜디오</div>
-              </div>
-              <div class="lc-right">
-                <div class="lc-time">10:00</div>
-                <div class="lc-trainer">김트레이너</div>
-              </div>
-            </div>
-          </div>
-
-          <div class="lesson-card type-group" onclick="go('detail')">
-            <div class="lc-body">
-              <div class="lc-date-box">
-                <div class="ldb-day">19</div>
-                <div class="ldb-dow">수</div>
-              </div>
-              <div class="lc-info">
-                <span class="lc-type-badge badge-group">그룹</span>
-                <div class="lc-name">코어 그룹 수업</div>
-                <div class="lc-meta">📍 그룹 스튜디오</div>
-              </div>
-              <div class="lc-right">
-                <div class="lc-time">14:00</div>
-                <div class="lc-trainer">이트레이너</div>
-              </div>
-            </div>
-          </div>
-
-          <div class="lesson-card type-pt" onclick="go('detail')">
-            <div class="lc-body">
-              <div class="lc-date-box">
-                <div class="ldb-day">21</div>
-                <div class="ldb-dow">금</div>
-              </div>
-              <div class="lc-info">
-                <span class="lc-type-badge badge-pt">PT</span>
-                <div class="lc-name">개인 PT 레슨</div>
-                <div class="lc-meta">📍 1번 스튜디오</div>
-              </div>
-              <div class="lc-right">
-                <div class="lc-time">10:00</div>
-                <div class="lc-trainer">김트레이너</div>
-              </div>
-            </div>
-          </div>
-
-          <div class="lesson-card type-rehab" onclick="go('detail')">
-            <div class="lc-body">
-              <div class="lc-date-box">
-                <div class="ldb-day">24</div>
-                <div class="ldb-dow">월</div>
-              </div>
-              <div class="lc-info">
-                <span class="lc-type-badge badge-rehab">재활</span>
-                <div class="lc-name">재활 전문 레슨</div>
-                <div class="lc-meta">📍 재활 스튜디오</div>
-              </div>
-              <div class="lc-right">
-                <div class="lc-time">11:00</div>
-                <div class="lc-trainer">박트레이너</div>
-              </div>
-            </div>
-          </div>
-
+          <div id="main-lesson-list"><!-- JS 렌더링 --></div>
           <div style="height:16px;"></div>
         </div>
       </div>
@@ -422,46 +409,11 @@
       <div class="screen-frame" id="screen-day">
         <div class="day-header">
           <span class="back" onclick="go('main')">←</span>
-          <div class="dh-date">3월 17일 월요일</div>
-          <div class="dh-count">레슨 2개</div>
+          <div class="dh-date" id="day-header-date">3월 17일 월요일</div>
+          <div class="dh-count" id="day-header-count">레슨 2개</div>
         </div>
-        <div style="padding: 16px; display:flex; flex-direction:column; gap:12px; overflow-y:auto; flex:1;">
-
-          <div class="lesson-card type-pt" style="margin:0;" onclick="go('detail')">
-            <div class="lc-body">
-              <div style="width:44px; height:44px; border-radius:12px; background:#FEEBC8; display:flex; align-items:center; justify-content:center; font-size:20px; flex-shrink:0;">🏋️</div>
-              <div class="lc-info">
-                <span class="lc-type-badge badge-pt">PT</span>
-                <div class="lc-name">개인 PT 레슨</div>
-                <div class="lc-meta">10:00 ~ 11:00 · 📍 1번 스튜디오</div>
-              </div>
-              <div class="lc-right">
-                <div class="lc-trainer" style="font-size:12px; color:#C05621; font-weight:700;">김트레이너</div>
-                <div style="margin-top:6px; font-size:11px; background:#C6F6D5; color:#276749; padding:2px 8px; border-radius:99px; font-weight:700;">예정</div>
-              </div>
-            </div>
-          </div>
-
-          <div class="lesson-card type-group" style="margin:0;" onclick="go('detail')">
-            <div class="lc-body">
-              <div style="width:44px; height:44px; border-radius:12px; background:#C6F6D5; display:flex; align-items:center; justify-content:center; font-size:20px; flex-shrink:0;">🧘</div>
-              <div class="lc-info">
-                <span class="lc-type-badge badge-group">그룹</span>
-                <div class="lc-name">저녁 스트레칭 수업</div>
-                <div class="lc-meta">19:00 ~ 20:00 · 📍 그룹 스튜디오</div>
-              </div>
-              <div class="lc-right">
-                <div class="lc-trainer" style="font-size:12px; color:#38A169; font-weight:700;">이트레이너</div>
-                <div style="margin-top:6px; font-size:11px; background:#C6F6D5; color:#276749; padding:2px 8px; border-radius:99px; font-weight:700;">예정</div>
-              </div>
-            </div>
-          </div>
-
-          <div style="background:#fff; border-radius:16px; padding:20px; text-align:center; box-shadow:0 1px 6px rgba(0,0,0,0.06);">
-            <div style="font-size:32px; margin-bottom:8px;">📅</div>
-            <div style="font-size:14px; font-weight:700; color:#4A5568; margin-bottom:4px;">오늘 레슨이 2개 있어요</div>
-            <div style="font-size:12px; color:#A0AEC0;">열심히 운동해 보세요 💪</div>
-          </div>
+        <div id="day-lesson-list" style="padding: 16px; display:flex; flex-direction:column; gap:12px; overflow-y:auto; flex:1;">
+          <!-- JS 렌더링 -->
         </div>
       </div>
 
@@ -497,6 +449,40 @@
         </div>
 
         <div class="detail-body">
+          <!-- 회차 진행 현황 -->
+          <div class="session-card">
+            <div class="sc-top">
+              <span class="sc-label">🔢 레슨 회차</span>
+              <span class="sc-badge">9 / 24회차</span>
+            </div>
+            <div class="sc-bar-wrap">
+              <div class="sc-bar" style="width:37.5%;"></div>
+            </div>
+            <div class="sc-nums">
+              <span class="sc-num-left">완료 8회 · 오늘 9회차</span>
+              <span class="sc-num-right">잔여 15회</span>
+            </div>
+            <!-- 회차 점 시각화 -->
+            <div class="sc-dots">
+              <!-- 완료(8개) -->
+              <div class="sc-dot done"></div><div class="sc-dot done"></div>
+              <div class="sc-dot done"></div><div class="sc-dot done"></div>
+              <div class="sc-dot done"></div><div class="sc-dot done"></div>
+              <div class="sc-dot done"></div><div class="sc-dot done"></div>
+              <!-- 오늘(1개) -->
+              <div class="sc-dot now"></div>
+              <!-- 잔여(15개) -->
+              <div class="sc-dot left"></div><div class="sc-dot left"></div>
+              <div class="sc-dot left"></div><div class="sc-dot left"></div>
+              <div class="sc-dot left"></div><div class="sc-dot left"></div>
+              <div class="sc-dot left"></div><div class="sc-dot left"></div>
+              <div class="sc-dot left"></div><div class="sc-dot left"></div>
+              <div class="sc-dot left"></div><div class="sc-dot left"></div>
+              <div class="sc-dot left"></div><div class="sc-dot left"></div>
+              <div class="sc-dot left"></div>
+            </div>
+          </div>
+
           <div class="info-card">
             <div class="info-row">
               <span class="info-icon">📅</span>
@@ -533,6 +519,53 @@
             <div class="mc-label">📝 레슨 메모</div>
             <div class="mc-text">저번 레슨에서 허리 불편감 호소. 이번 레슨은 코어 안정화 위주로 진행 예정. 무릎 스쿼트는 제외.</div>
           </div>
+
+          <!-- 알림 설정 -->
+          <div class="alarm-card">
+            <div class="alarm-title">🔔 레슨 알림 설정</div>
+
+            <!-- 알림 ON/OFF -->
+            <div class="alarm-row">
+              <div>
+                <div class="alarm-row-label">레슨 알림</div>
+                <div class="alarm-row-sub" id="alarm-status-txt">알림 꺼짐</div>
+              </div>
+              <label class="toggle-wrap">
+                <input type="checkbox" id="alarm-toggle" onchange="onAlarmToggle()">
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+
+            <!-- 알림 시점 (토글 ON일 때 표시) -->
+            <div id="alarm-options" style="display:none;">
+              <div style="font-size:11px;font-weight:800;color:#A0AEC0;margin-bottom:6px;letter-spacing:0.5px;">알림 시점</div>
+              <div class="timing-row">
+                <button class="timing-chip" onclick="selectTiming(this)">1주일 전</button>
+                <button class="timing-chip" onclick="selectTiming(this)">3일 전</button>
+                <button class="timing-chip on" onclick="selectTiming(this)">2일 전</button>
+                <button class="timing-chip on" onclick="selectTiming(this)">1일 전</button>
+              </div>
+
+              <div style="font-size:11px;font-weight:800;color:#A0AEC0;margin-top:14px;margin-bottom:6px;letter-spacing:0.5px;">반복 알림</div>
+              <div class="timing-row">
+                <button class="timing-chip on" onclick="selectRepeat(this)">이 레슨만</button>
+                <button class="timing-chip" onclick="selectRepeat(this)">모든 PT 레슨</button>
+                <button class="timing-chip" onclick="selectRepeat(this)">전체 레슨</button>
+              </div>
+
+              <button onclick="saveAlarm()" style="
+                width:100%;margin-top:14px;background:#C05621;color:#fff;border:none;
+                border-radius:10px;padding:10px;font-size:13px;font-weight:700;cursor:pointer;
+                font-family:'Noto Sans KR',sans-serif;">
+                💾 알림 저장
+              </button>
+            </div>
+
+            <div class="alarm-status" id="alarm-status-bar">
+              <span>🔕</span> 알림이 꺼져 있습니다
+            </div>
+          </div>
+
         </div>
       </div>
 
@@ -603,6 +636,280 @@
 </div>
 
 <script>
+  /* ── 현재 연/월 상태 ── */
+  let curYear = 2026, curMonth = 3; // 3월 기준
+
+  /* ── 레슨 데이터 ── */
+  const DOW = ['일','월','화','수','목','금','토'];
+  const lessonData = {
+    1:  [{ type:'pt',    name:'개인 PT 레슨',       time:'10:00', end:'11:00', loc:'1번 스튜디오',  trainer:'김트레이너', trainerColor:'#C05621', icon:'🏋️', session:3,  total:24 }],
+    3:  [{ type:'pt',    name:'개인 PT 레슨',       time:'09:00', end:'10:00', loc:'1번 스튜디오',  trainer:'김트레이너', trainerColor:'#C05621', icon:'🏋️', session:4,  total:24 }],
+    5:  [{ type:'group', name:'코어 그룹 수업',     time:'14:00', end:'15:00', loc:'그룹 스튜디오', trainer:'이트레이너', trainerColor:'#38A169', icon:'🧘', session:null,total:null }],
+    7:  [{ type:'pt',    name:'개인 PT 레슨',       time:'10:00', end:'11:00', loc:'1번 스튜디오',  trainer:'김트레이너', trainerColor:'#C05621', icon:'🏋️', session:5,  total:24 }],
+    10: [{ type:'pt',    name:'개인 PT 레슨',       time:'09:00', end:'10:00', loc:'1번 스튜디오',  trainer:'김트레이너', trainerColor:'#C05621', icon:'🏋️', session:6,  total:24 }],
+    12: [{ type:'rehab', name:'재활 전문 레슨',     time:'11:00', end:'12:00', loc:'재활 스튜디오', trainer:'박트레이너', trainerColor:'#3182CE', icon:'🩺', session:2,  total:12 }],
+    14: [
+      { type:'pt',    name:'개인 PT 레슨',         time:'10:00', end:'11:00', loc:'1번 스튜디오',  trainer:'김트레이너', trainerColor:'#C05621', icon:'🏋️', session:7, total:24 },
+      { type:'group', name:'저녁 스트레칭 수업',   time:'19:00', end:'20:00', loc:'그룹 스튜디오', trainer:'이트레이너', trainerColor:'#38A169', icon:'🧘', session:null,total:null }
+    ],
+    17: [
+      { type:'pt',    name:'개인 PT 레슨',         time:'10:00', end:'11:00', loc:'1번 스튜디오',  trainer:'김트레이너', trainerColor:'#C05621', icon:'🏋️', session:8, total:24 },
+      { type:'group', name:'저녁 스트레칭 수업',   time:'19:00', end:'20:00', loc:'그룹 스튜디오', trainer:'이트레이너', trainerColor:'#38A169', icon:'🧘', session:null,total:null }
+    ],
+    19: [{ type:'group', name:'코어 그룹 수업',     time:'14:00', end:'15:00', loc:'그룹 스튜디오', trainer:'이트레이너', trainerColor:'#38A169', icon:'🧘', session:null,total:null }],
+    21: [{ type:'pt',    name:'개인 PT 레슨',       time:'10:00', end:'11:00', loc:'1번 스튜디오',  trainer:'김트레이너', trainerColor:'#C05621', icon:'🏋️', session:9,  total:24 }],
+    24: [{ type:'rehab', name:'재활 전문 레슨',     time:'11:00', end:'12:00', loc:'재활 스튜디오', trainer:'박트레이너', trainerColor:'#3182CE', icon:'🩺', session:3,  total:12 }],
+    26: [{ type:'pt',    name:'개인 PT 레슨',       time:'10:00', end:'11:00', loc:'1번 스튜디오',  trainer:'김트레이너', trainerColor:'#C05621', icon:'🏋️', session:10, total:24 }],
+  };
+
+  const typeLabel = { pt:'PT', group:'그룹', rehab:'재활' };
+  const typeBg    = { pt:'#FEEBC8', group:'#C6F6D5', rehab:'#FED7D7' };
+
+  /* ── 회차 배지 HTML ── */
+  function sessionBadge(session, total) {
+    if (!session) return '';
+    return `<span style="font-size:10px;font-weight:800;color:#C05621;background:#FEEBC8;
+      border-radius:99px;padding:1px 7px;margin-left:4px;">${session}/${total}회차</span>`;
+  }
+
+  /* ── 캘린더 렌더링 ── */
+  let selectedDay = 0;
+
+  /* ── 캘린더 셀 동적 생성 ── */
+  function buildCalDays(year, month) {
+    const TODAY_Y = 2026, TODAY_M = 3, TODAY_D = 14; // 오늘 고정
+    const firstDow = new Date(year, month - 1, 1).getDay(); // 1일의 요일
+    const daysInMonth = new Date(year, month, 0).getDate();
+    const daysInPrev  = new Date(year, month - 1, 0).getDate();
+    const cells = [];
+
+    // 이전 달 채우기
+    for (let i = firstDow - 1; i >= 0; i--) {
+      cells.push({ day: null, label: daysInPrev - i });
+    }
+    // 이번 달
+    for (let d = 1; d <= daysInMonth; d++) {
+      const dow = new Date(year, month - 1, d).getDay();
+      cells.push({
+        day: d,
+        cls: dow === 0 ? 'sun' : dow === 6 ? 'sat' : '',
+        today: (year === TODAY_Y && month === TODAY_M && d === TODAY_D),
+      });
+    }
+    // 다음 달 채우기 (6행 맞춤)
+    let next = 1;
+    while (cells.length % 7 !== 0) cells.push({ day: null, label: next++ });
+    return cells;
+  }
+
+  function renderCalendar() {
+    document.getElementById('cal-month-title').textContent =
+      `🎓 ${curYear}년 ${curMonth}월`;
+
+    const calDays = buildCalDays(curYear, curMonth);
+    const grid = document.getElementById('cal-grid');
+    grid.innerHTML = calDays.map(c => {
+      const d = c.day;
+      const isOther = d === null;
+      const label = isOther ? c.label : d;
+      const hasLesson = d && lessonData[d] && curMonth === 3 && curYear === 2026;
+      const isToday = c.today;
+      const isSel = d && d === selectedDay && curMonth === 3 && curYear === 2026;
+      const dow = d ? new Date(curYear, curMonth - 1, d).getDay() : -1;
+      const dateClass = isOther ? 'other' : (dow === 0 ? 'sun' : dow === 6 ? 'sat' : '');
+      let cellClass = 'cal-cell';
+      if (hasLesson) cellClass += ' has-lesson';
+      if (isToday && !isSel) cellClass += ' today';
+      if (isSel) cellClass += ' selected';
+      const click = d ? `onclick="selectDay(${d})"` : '';
+      const style = isOther ? 'cursor:default;opacity:0.4;' : 'cursor:pointer;';
+      return `<div class="${cellClass}" ${click} style="${style}">
+        <span class="cal-date ${dateClass}">${label}</span>
+        <div class="cal-dot"></div>
+      </div>`;
+    }).join('');
+  }
+
+  function changeMonth(dir) {
+    curMonth += dir;
+    if (curMonth > 12) { curMonth = 1; curYear++; }
+    if (curMonth < 1)  { curMonth = 12; curYear--; }
+    selectedDay = 0;
+    renderCalendar();
+    // 해당 월 레슨 데이터가 없으면 예정 목록 비우기
+    if (curMonth !== 3 || curYear !== 2026) {
+      document.getElementById('main-lesson-list').innerHTML =
+        `<div style="padding:20px;text-align:center;color:#A0AEC0;font-size:13px;">이 달은 예정된 레슨이 없습니다.</div>`;
+    } else {
+      renderMainList();
+    }
+  }
+
+  /* ── 날짜 선택 ── */
+  function selectDay(day) {
+    selectedDay = day;
+    renderCalendar();
+
+    const lessons = lessonData[day] || [];
+    // 날짜 헤더 업데이트
+    const date = new Date(2026, 2, day); // 3월
+    const dowStr = DOW[date.getDay()];
+    document.getElementById('day-header-date').textContent = `3월 ${day}일 ${dowStr}요일`;
+    document.getElementById('day-header-count').textContent =
+      lessons.length ? `레슨 ${lessons.length}개` : '레슨 없음';
+
+    // 날짜별 레슨 목록 렌더링
+    const list = document.getElementById('day-lesson-list');
+    if (lessons.length === 0) {
+      list.innerHTML = `
+        <div style="background:#fff;border-radius:16px;padding:28px;text-align:center;box-shadow:0 1px 6px rgba(0,0,0,0.06);">
+          <div style="font-size:32px;margin-bottom:8px;">📭</div>
+          <div style="font-size:14px;font-weight:700;color:#4A5568;margin-bottom:4px;">이날은 예정된 레슨이 없어요</div>
+          <div style="font-size:12px;color:#A0AEC0;">다른 날짜를 선택해 보세요</div>
+        </div>`;
+    } else {
+      list.innerHTML = lessons.map(l => {
+        const iconBg = typeBg[l.type];
+        const badge = `<span class="lc-type-badge badge-${l.type}">${typeLabel[l.type]}</span>`;
+        const sess = l.session ? `${l.session}/${l.total}회차` : '';
+        return `
+        <div class="lesson-card type-${l.type}" style="margin:0;" onclick="go('detail')">
+          <div class="lc-body">
+            <div style="width:44px;height:44px;border-radius:12px;background:${iconBg};
+              display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;">${l.icon}</div>
+            <div class="lc-info">
+              <div style="display:flex;align-items:center;gap:4px;margin-bottom:3px;">
+                ${badge}
+                ${sess ? `<span style="font-size:10px;font-weight:800;color:#C05621;background:#FEEBC8;border-radius:99px;padding:1px 7px;">${sess}</span>` : ''}
+              </div>
+              <div class="lc-name">${l.name}</div>
+              <div class="lc-meta">${l.time} ~ ${l.end} · 📍 ${l.loc}</div>
+            </div>
+            <div class="lc-right">
+              <div class="lc-trainer" style="font-size:12px;color:${l.trainerColor};font-weight:700;">${l.trainer}</div>
+              <div style="margin-top:6px;font-size:11px;background:#C6F6D5;color:#276749;padding:2px 8px;border-radius:99px;font-weight:700;">예정</div>
+            </div>
+          </div>
+        </div>`;
+      }).join('') + `
+        <div style="background:#fff;border-radius:16px;padding:18px;text-align:center;box-shadow:0 1px 6px rgba(0,0,0,0.06);">
+          <div style="font-size:28px;margin-bottom:6px;">📅</div>
+          <div style="font-size:13px;font-weight:700;color:#4A5568;margin-bottom:3px;">
+            ${day}일 레슨이 ${lessons.length}개 있어요
+          </div>
+          <div style="font-size:12px;color:#A0AEC0;">열심히 운동해 보세요 💪</div>
+        </div>`;
+    }
+    go('day');
+  }
+
+  /* ── 메인 예정 레슨 목록 렌더링 ── */
+  // 카드별 알림 상태 저장
+  const cardAlarmState = {}; // { cardId: { on, timing, repeat } }
+
+  function renderMainList() {
+    const upcoming = [
+      { day:17, dow:'월', cardId:'c17', ...lessonData[17][0] },
+      { day:19, dow:'수', cardId:'c19', ...lessonData[19][0] },
+      { day:21, dow:'금', cardId:'c21', ...lessonData[21][0] },
+      { day:24, dow:'월', cardId:'c24', ...lessonData[24][0] },
+    ];
+    const el = document.getElementById('main-lesson-list');
+    el.innerHTML = upcoming.map(l => {
+      const sess = l.session ? `<span style="font-size:10px;font-weight:800;color:#C05621;background:#FEEBC8;border-radius:99px;padding:1px 7px;">${l.session}/${l.total}회차</span>` : '';
+      const alarmOn = cardAlarmState[l.cardId]?.on;
+      const alarmIcon = alarmOn ? '🔔' : '🔕';
+      const alarmTxt  = alarmOn
+        ? `${cardAlarmState[l.cardId].timing} 알림 설정됨`
+        : '알림 설정';
+      return `
+      <div class="lesson-card type-${l.type}" id="card-${l.cardId}">
+        <div class="lc-body" onclick="selectDay(${l.day})" style="cursor:pointer;">
+          <div class="lc-date-box">
+            <div class="ldb-day">${l.day}</div>
+            <div class="ldb-dow">${l.dow}</div>
+          </div>
+          <div class="lc-info">
+            <div style="display:flex;align-items:center;gap:4px;margin-bottom:2px;">
+              <span class="lc-type-badge badge-${l.type}">${typeLabel[l.type]}</span>
+              ${sess}
+            </div>
+            <div class="lc-name">${l.name}</div>
+            <div class="lc-meta">📍 ${l.loc}</div>
+          </div>
+          <div class="lc-right">
+            <div class="lc-time">${l.time}</div>
+            <div class="lc-trainer">${l.trainer}</div>
+          </div>
+        </div>
+        <!-- 알림 바 -->
+        <div class="lc-alarm-bar" onclick="toggleInlineAlarm('${l.cardId}')" style="cursor:pointer;">
+          <button class="lc-alarm-btn ${alarmOn ? 'alarm-on' : ''}" id="alarm-btn-${l.cardId}"
+            style="pointer-events:none;">
+            <span>${alarmIcon}</span> ${alarmTxt}
+          </button>
+          <span id="alarm-arrow-${l.cardId}" style="font-size:11px;font-weight:700;color:#C05621;">${alarmOn ? '▲ 접기' : '▼ 설정'}</span>
+        </div>
+        <!-- 인라인 알림 패널 -->
+        <div class="inline-alarm" id="inline-${l.cardId}">
+          <div class="ia-row">
+            <div class="ia-label">알림 시점</div>
+            <div class="ia-chips" id="timing-${l.cardId}">
+              <button class="ia-chip" onclick="pickChip(this)">1주일 전</button>
+              <button class="ia-chip" onclick="pickChip(this)">3일 전</button>
+              <button class="ia-chip on" onclick="pickChip(this)">2일 전</button>
+              <button class="ia-chip on" onclick="pickChip(this)">1일 전</button>
+            </div>
+          </div>
+          <div class="ia-row">
+            <div class="ia-label">반복 범위</div>
+            <div class="ia-chips" id="repeat-${l.cardId}">
+              <button class="ia-chip on" onclick="pickChip(this,'repeat','${l.cardId}')">이 레슨만</button>
+              <button class="ia-chip" onclick="pickChip(this,'repeat','${l.cardId}')">전체 레슨</button>
+            </div>
+          </div>
+          <button class="ia-save" onclick="saveCardAlarm('${l.cardId}')">🔔 알림 저장</button>
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  function toggleInlineAlarm(cardId) {
+    const panel = document.getElementById('inline-' + cardId);
+    const isOpen = panel.classList.toggle('open');
+    document.getElementById('alarm-arrow-' + cardId).textContent = isOpen ? '▲ 접기' : '▼ 설정';
+  }
+
+  // 중복 선택 토글
+  function pickChip(el) {
+    el.classList.toggle('on');
+  }
+
+  function saveCardAlarm(cardId) {
+    const timings = [...document.querySelectorAll(`#timing-${cardId} .ia-chip.on`)].map(c => c.textContent);
+    const repeat  = document.querySelector(`#repeat-${cardId} .ia-chip.on`)?.textContent || '이 레슨만';
+    const timing  = timings.length ? timings.join('·') : '1일 전';
+    cardAlarmState[cardId] = { on: true, timing, repeat };
+    cardAlarmState[cardId] = { on: true, timing, repeat };
+
+    // 버튼 텍스트·색 갱신
+    const btn = document.getElementById('alarm-btn-' + cardId);
+    btn.classList.add('alarm-on');
+    btn.innerHTML = `<span>🔔</span> ${timing} 알림 설정됨`;
+
+    // 패널 닫기 + 저장 피드백
+    const saveBtn = document.querySelector(`#inline-${cardId} .ia-save`);
+    saveBtn.textContent = '✓ 저장되었습니다';
+    saveBtn.style.background = '#68D391';
+    setTimeout(() => {
+      saveBtn.textContent = '🔔 알림 저장';
+      saveBtn.style.background = '#C05621';
+      document.getElementById('inline-' + cardId).classList.remove('open');
+      document.getElementById('alarm-arrow-' + cardId).textContent = '▼ 설정';
+    }, 1400);
+  }
+
+  /* ── 화면 전환 ── */
   const screenNames = {
     main:   '① 캘린더 + 예정 목록',
     day:    '② 날짜별 레슨 목록',
@@ -617,6 +924,50 @@
     });
     document.getElementById('memo-screen-name').value = screenNames[id] || id;
   }
+
+  /* ── 알림 설정 ── */
+  function onAlarmToggle() {
+    const on = document.getElementById('alarm-toggle').checked;
+    const opts = document.getElementById('alarm-options');
+    const statusTxt = document.getElementById('alarm-status-txt');
+    const statusBar = document.getElementById('alarm-status-bar');
+    opts.style.display = on ? 'block' : 'none';
+    statusTxt.textContent = on ? '알림 켜짐' : '알림 꺼짐';
+    statusTxt.style.color = on ? '#C05621' : '#A0AEC0';
+    if (!on) {
+      statusBar.innerHTML = '<span>🔕</span> 알림이 꺼져 있습니다';
+      statusBar.className = 'alarm-status';
+    }
+  }
+
+  function selectTiming(el) {
+    el.classList.toggle('on');
+  }
+
+  function selectRepeat(el) {
+    el.closest('.timing-row').querySelectorAll('.timing-chip').forEach(c => c.classList.remove('on'));
+    el.classList.add('on');
+  }
+
+  function saveAlarm() {
+    const timings = [...document.querySelectorAll('#alarm-options .timing-row:first-of-type .timing-chip.on')].map(c => c.textContent);
+    const timing  = timings.length ? timings.join(' · ') : '1일 전';
+    const repeat  = document.querySelectorAll('#alarm-options .timing-row')[1]?.querySelector('.timing-chip.on')?.textContent || '이 레슨만';
+    const btn = document.querySelector('.alarm-card button[onclick="saveAlarm()"]');
+    const statusBar = document.getElementById('alarm-status-bar');
+    btn.textContent = '✓ 저장되었습니다';
+    btn.style.background = '#68D391';
+    statusBar.innerHTML = `<span>🔔</span> 레슨 <strong>${timing}</strong> · ${repeat}`;
+    statusBar.className = 'alarm-status on';
+    setTimeout(() => {
+      btn.textContent = '💾 알림 저장';
+      btn.style.background = '#C05621';
+    }, 1800);
+  }
+
+  /* ── 초기화 ── */
+  renderCalendar();
+  renderMainList();
 </script>
 
 </body>

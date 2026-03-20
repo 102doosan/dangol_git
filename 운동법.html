@@ -113,13 +113,17 @@
     .body-icon { font-size: 32px; margin-bottom: 8px; }
     .body-name { font-size: 13px; font-weight: 700; color: #2D3748; }
     .body-count { font-size: 11px; color: #A0AEC0; margin-top: 3px; }
-    .my-btn-wrap { padding: 0 16px 16px; flex-shrink: 0; }
+    .my-btn-wrap { padding: 0 16px 16px; flex-shrink: 0; display: flex; flex-direction: column; gap: 10px; }
     .my-btn {
       width: 100%; background: #2D3748; color: #fff;
       border: none; border-radius: 14px; padding: 14px;
       font-size: 14px; font-weight: 700; cursor: pointer;
       font-family: 'Noto Sans KR', sans-serif;
       display: flex; align-items: center; justify-content: center; gap: 8px;
+    }
+    .my-btn.outline {
+      background: #fff; color: #00B894;
+      border: 2px solid #00B894;
     }
 
     /* ────────────────────────────────────────
@@ -316,45 +320,48 @@
           <div class="desc">부위를 선택하고 나만의 운동을 만들어 보세요</div>
         </div>
         <div class="body-grid">
-          <div class="body-card" onclick="go('list')">
+          <div class="body-card" onclick="selectPart('목')">
             <div class="body-icon">🦴</div>
             <div class="body-name">목</div>
-            <div class="body-count">12개 운동</div>
+            <div class="body-count">50개 운동</div>
           </div>
-          <div class="body-card" onclick="go('list')">
-            <div class="body-icon">🦷</div>
+          <div class="body-card" onclick="selectPart('척추')">
+            <div class="body-icon">🧬</div>
             <div class="body-name">척추</div>
-            <div class="body-count">15개 운동</div>
+            <div class="body-count">50개 운동</div>
           </div>
-          <div class="body-card" onclick="go('list')">
+          <div class="body-card" onclick="selectPart('어깨')">
             <div class="body-icon">💪</div>
             <div class="body-name">어깨</div>
-            <div class="body-count">18개 운동</div>
+            <div class="body-count">50개 운동</div>
           </div>
-          <div class="body-card" onclick="go('list')">
+          <div class="body-card" onclick="selectPart('고관절')">
             <div class="body-icon">🦵</div>
             <div class="body-name">고관절</div>
-            <div class="body-count">10개 운동</div>
+            <div class="body-count">50개 운동</div>
           </div>
-          <div class="body-card" onclick="go('list')">
-            <div class="body-icon">🦶</div>
+          <div class="body-card" onclick="selectPart('무릎')">
+            <div class="body-icon">🦿</div>
             <div class="body-name">무릎</div>
-            <div class="body-count">14개 운동</div>
+            <div class="body-count">50개 운동</div>
           </div>
-          <div class="body-card" onclick="go('list')">
+          <div class="body-card" onclick="selectPart('발')">
             <div class="body-icon">👣</div>
-            <div class="body-name">발</div>
-            <div class="body-count">8개 운동</div>
+            <div class="body-name">발·발목</div>
+            <div class="body-count">50개 운동</div>
           </div>
-          <div class="body-card" style="grid-column: span 3;" onclick="go('list')">
+          <div class="body-card" style="grid-column: span 3;" onclick="selectPart('유산소')">
             <div class="body-icon">🏃</div>
             <div class="body-name">유산소</div>
-            <div class="body-count">20개 운동</div>
+            <div class="body-count">50개 운동</div>
           </div>
         </div>
         <div class="my-btn-wrap">
-          <button class="my-btn" onclick="go('make')">
+          <button class="my-btn" onclick="startNewMake()">
             <span>📋</span> 나만의 운동 만들기
+          </button>
+          <button class="my-btn outline" onclick="go('mylist')">
+            <span>⭐</span> 나만의 운동 보기
           </button>
         </div>
       </div>
@@ -363,122 +370,37 @@
       <div class="screen-frame" id="screen-list">
         <div class="app-header">
           <span class="back" onclick="go('main')">←</span>
-          <span class="title">어깨 운동</span>
-          <span class="count">1개 선택</span>
+          <span class="title" id="list-title">운동 목록</span>
+          <span class="count" id="list-sel-count">0개 선택</span>
         </div>
+        <!-- 파트 탭 -->
+        <div id="part-tab-bar" style="display:flex;gap:0;overflow-x:auto;scrollbar-width:none;border-bottom:2px solid #E2E8F0;flex-shrink:0;background:#fff;"></div>
         <div class="list-filter">
-          <button class="filter-chip on">전체</button>
-          <button class="filter-chip">초급</button>
-          <button class="filter-chip">중급</button>
-          <button class="filter-chip">고급</button>
+          <button class="filter-chip on" onclick="setFilter('전체',this)">전체</button>
+          <button class="filter-chip" onclick="setFilter('초급',this)">초급</button>
+          <button class="filter-chip" onclick="setFilter('중급',this)">중급</button>
+          <button class="filter-chip" onclick="setFilter('고급',this)">고급</button>
         </div>
-        <div class="app-body">
-          <div class="ex-item" onclick="go('detail')">
-            <div class="check-box on">✓</div>
-            <div class="ex-thumb">🤸</div>
-            <div class="ex-info">
-              <div class="ex-name">어깨 회전 스트레칭</div>
-              <div class="ex-meta">3세트 × 10회 · 약 5분</div>
-            </div>
-            <span class="lv-badge lv1">초급</span>
-          </div>
-          <div class="ex-item" onclick="go('detail')">
-            <div class="check-box"></div>
-            <div class="ex-thumb lv2">💪</div>
-            <div class="ex-info">
-              <div class="ex-name">밴드 외회전 운동</div>
-              <div class="ex-meta">3세트 × 15회 · 약 8분</div>
-            </div>
-            <span class="lv-badge lv2">중급</span>
-          </div>
-          <div class="ex-item" onclick="go('detail')">
-            <div class="check-box"></div>
-            <div class="ex-thumb">🏋️</div>
-            <div class="ex-info">
-              <div class="ex-name">펜들럼 운동</div>
-              <div class="ex-meta">2세트 × 30초 · 약 5분</div>
-            </div>
-            <span class="lv-badge lv1">초급</span>
-          </div>
-          <div class="ex-item" onclick="go('detail')">
-            <div class="check-box"></div>
-            <div class="ex-thumb lv3">🎯</div>
-            <div class="ex-info">
-              <div class="ex-name">어깨 강화 사이드레이즈</div>
-              <div class="ex-meta">4세트 × 12회 · 약 10분</div>
-            </div>
-            <span class="lv-badge lv3">고급</span>
-          </div>
-          <div class="ex-item" onclick="go('detail')">
-            <div class="check-box"></div>
-            <div class="ex-thumb">🧘</div>
-            <div class="ex-info">
-              <div class="ex-name">흉추 가동성 운동</div>
-              <div class="ex-meta">3세트 × 10회 · 약 7분</div>
-            </div>
-            <span class="lv-badge lv1">초급</span>
-          </div>
-        </div>
+        <div class="app-body" id="ex-list-body"></div>
         <div class="select-bar">
-          <span class="sel-count">1개 선택됨</span>
-          <button class="btn-add" onclick="go('make')">나만의 운동에 추가 →</button>
+          <span class="sel-count" id="sel-count-bar">0개 선택됨</span>
+          <button class="btn-add" onclick="goMake()">나만의 운동에 추가 →</button>
         </div>
       </div>
 
       <!-- ③ 운동 상세 -->
       <div class="screen-frame" id="screen-detail">
-        <div class="app-header" style="position:relative; z-index:2; background:transparent; position:absolute; top:28px; left:0; right:0; background:transparent;">
-          <span class="back" onclick="go('list')" style="background:rgba(0,0,0,0.3); border-radius:50%; width:32px; height:32px; display:flex; align-items:center; justify-content:center;">←</span>
+        <div style="position:absolute; top:28px; left:0; right:0; z-index:2; padding:14px 16px;">
+          <span class="back" onclick="go('list')" style="background:rgba(0,0,0,0.35); border-radius:50%; width:34px; height:34px; display:inline-flex; align-items:center; justify-content:center; color:#fff; font-size:18px; cursor:pointer;">←</span>
         </div>
-        <div class="detail-img">🤸</div>
-        <div class="detail-body" style="overflow-y:auto; flex:1;">
-          <div class="detail-name">어깨 회전 스트레칭</div>
-          <div class="detail-tags">
-            <span class="tag green">초급</span>
-            <span class="tag blue">어깨</span>
-            <span class="tag orange">스트레칭</span>
-          </div>
-          <div class="set-info">
-            <div class="set-box">
-              <div class="set-val">3</div>
-              <div class="set-lbl">세트</div>
-            </div>
-            <div class="set-box">
-              <div class="set-val">10</div>
-              <div class="set-lbl">회</div>
-            </div>
-            <div class="set-box">
-              <div class="set-val">5분</div>
-              <div class="set-lbl">예상시간</div>
-            </div>
-          </div>
-          <div>
-            <div class="section-title" style="margin-bottom:8px;">운동 방법</div>
-            <div class="desc-box">
-              1. 바른 자세로 앉거나 서서 시작합니다.<br>
-              2. 팔꿈치를 구부려 어깨 높이로 올립니다.<br>
-              3. 천천히 앞→위→뒤→아래 방향으로 회전합니다.<br>
-              4. 반대 방향으로도 동일하게 반복합니다.
-            </div>
-          </div>
-          <div>
-            <div class="section-title" style="margin-bottom:8px;">주의사항</div>
-            <div class="warn-box">
-              <div class="warn-title">⚠ 주의</div>
-              통증이 느껴지면 즉시 중단하세요. 동작 중 어깨에 소리가 나거나 날카로운 통증이 있을 경우 전문가에게 상담하세요.
-            </div>
-          </div>
-        </div>
-        <div style="padding: 0 16px 16px; flex-shrink:0;">
-          <button class="btn-add-my" onclick="go('make')">+ 나만의 운동에 추가</button>
-        </div>
+        <div id="detail-content" style="display:flex;flex-direction:column;height:100%;overflow-y:auto;"></div>
       </div>
 
       <!-- ④ 나만의 운동 만들기 -->
       <div class="screen-frame" id="screen-make">
         <div class="app-header">
-          <span class="back" onclick="go('list')">←</span>
-          <span class="title">나만의 운동 만들기</span>
+          <span class="back" onclick="cancelMake()">←</span>
+          <span class="title" id="make-screen-title">나만의 운동 만들기</span>
         </div>
         <div class="make-header-sub">
           ✅ 선택한 운동 순서를 조정하고 제목을 입력하세요
@@ -486,41 +408,12 @@
         <div class="app-body">
           <div class="title-input-wrap">
             <label>운동 제목</label>
-            <input type="text" placeholder="예) 어깨 회복 루틴" value="어깨 스트레칭 루틴" />
+            <input type="text" id="routine-title" placeholder="예) 목 회복 루틴" />
           </div>
-          <div class="my-ex-item">
-            <span class="drag-handle">⠿</span>
-            <div class="my-ex-num">1</div>
-            <div class="my-ex-info">
-              <div class="my-ex-name">어깨 회전 스트레칭</div>
-              <div class="my-ex-detail">3세트 × 10회</div>
-            </div>
-            <span class="my-ex-del">✕</span>
-          </div>
-          <div class="my-ex-item">
-            <span class="drag-handle">⠿</span>
-            <div class="my-ex-num">2</div>
-            <div class="my-ex-info">
-              <div class="my-ex-name">흉추 가동성 운동</div>
-              <div class="my-ex-detail">3세트 × 10회</div>
-            </div>
-            <span class="my-ex-del">✕</span>
-          </div>
-          <div class="my-ex-item">
-            <span class="drag-handle">⠿</span>
-            <div class="my-ex-num">3</div>
-            <div class="my-ex-info">
-              <div class="my-ex-name">펜들럼 운동</div>
-              <div class="my-ex-detail">2세트 × 30초</div>
-            </div>
-            <span class="my-ex-del">✕</span>
-          </div>
-          <div style="border: 2px dashed #CBD5E0; border-radius: 14px; padding: 16px; text-align:center; color:#A0AEC0; font-size:13px; font-weight:600; cursor:pointer;" onclick="go('list')">
-            + 운동 더 추가하기
-          </div>
+          <div id="make-ex-list"></div>
         </div>
         <div class="btn-save-wrap">
-          <button class="btn-save" onclick="go('done')">마이루틴에 저장</button>
+          <button class="btn-save" onclick="saveRoutine()">마이루틴에 저장</button>
         </div>
       </div>
 
@@ -532,12 +425,22 @@
           <div class="done-sub">나만의 운동이 마이루틴에 추가됐어요.<br>언제든지 꺼내서 따라 해보세요.</div>
           <div class="done-card">
             <div class="dc-label">📋 저장된 운동</div>
-            <div class="dc-name">어깨 스트레칭 루틴</div>
-            <div class="dc-count">운동 3개 · 약 17분</div>
+            <div class="dc-name" id="done-routine-name">—</div>
+            <div class="dc-count" id="done-routine-count">—</div>
           </div>
-          <button class="btn-routine">마이루틴에서 보기 →</button>
-          <button class="btn-more-guide" onclick="go('main')">다른 운동법 더 보기</button>
+          <button class="btn-routine" onclick="go('mylist')">마이루틴에서 보기 →</button>
+          <button class="btn-more-guide" onclick="goMoreGuide()">다른 운동법 더 보기</button>
         </div>
+      </div>
+
+      <!-- ⑥ 마이루틴 목록 -->
+      <div class="screen-frame" id="screen-mylist">
+        <div class="app-header">
+          <span class="back" onclick="go('main')">←</span>
+          <span class="title">📋 마이루틴</span>
+          <span class="count" id="mylist-count">0개</span>
+        </div>
+        <div class="app-body" id="mylist-body"></div>
       </div>
 
     </div>
@@ -593,24 +496,524 @@
 </div>
 
 <script>
+  // ── 운동 데이터베이스 ──
+  // [이름, 레벨(1=초급/2=중급/3=고급), 세트, 횟수/시간, 예상분, 아이콘]
+  const PARTS = ['목','척추','어깨','고관절','무릎','발','유산소'];
+  const PART_ICON = { '목':'🦴','척추':'🧬','어깨':'💪','고관절':'🦵','무릎':'🦿','발':'👣','유산소':'🏃' };
+
+  const exerciseDB = {
+    '목': [
+      ['턱 당기기 (Chin Tuck)',1,3,'10회',5],['목 측면 스트레칭',1,3,'30초',6],['목 회전 운동',1,3,'10회',5],
+      ['목 전방 굴곡',1,3,'10회',4],['목 후방 신전',1,3,'10회',4],['상부 승모근 스트레칭',1,3,'30초',6],
+      ['목 견인 스트레칭',1,3,'20초',5],['레베이터 스캐풀라 스트레칭',1,2,'30초',4],['흉추 가동성 운동',1,3,'10회',6],
+      ['어깨 으쓱 운동',1,3,'15회',4],['목 반원 운동',1,3,'8회',5],['목 맥켄지 신전',1,3,'10회',5],
+      ['경추 안정화 기초',1,3,'10회',6],['SCM 스트레칭',1,2,'30초',4],['스캘린 스트레칭',1,2,'30초',4],
+      ['두개 경추 굴곡',1,3,'10회',5],['목 프로트랙션/리트랙션',1,3,'10회',5],['목 롤링',1,3,'8회',4],
+      ['눈-목 협응 기초',1,3,'10회',5],['어깨 뒤당기기',1,3,'15회',4],
+      ['목 전방 등척성 저항',2,3,'10초',6],['목 후방 등척성 저항',2,3,'10초',6],['목 측방 등척성 저항',2,3,'10초',6],
+      ['목 회전 등척성 저항',2,3,'10초',6],['밴드 목 굴곡',2,3,'12회',7],['밴드 목 신전',2,3,'12회',7],
+      ['밴드 목 측방 굴곡',2,3,'12회',7],['밴드 목 회전',2,3,'12회',7],['벽 천사 운동',2,3,'10회',6],
+      ['상부 교차 증후군 교정',2,3,'10회',7],['흉추 폼롤러',2,2,'30초',5],['깊은 목 굴근 운동',2,3,'10회',6],
+      ['하이 소케이프',2,3,'12회',7],['경추 협응 운동',2,3,'10회',6],['경추 안정화 심화',2,3,'12회',8],
+      ['리듬적 경추 안정화',2,3,'10회',7],['목 기능적 안정화',2,3,'10회',6],['PNF 경추 기초',2,3,'30초',7],
+      ['엎드려 목 신전',2,3,'10회',6],['경부 안정화 플랭크',2,3,'15초',7],
+      ['경추 현수 훈련',3,3,'12회',10],['플랭크 목 안정화',3,3,'20초',8],['고강도 등척성 훈련',3,4,'10초',8],
+      ['밴드 고저항 회전',3,3,'15회',9],['맥켄지 고급 신전',3,3,'15회',8],['경추 파워 훈련',3,3,'12회',10],
+      ['스포츠 특이적 경추',3,3,'10회',10],['고급 PNF 경추',3,3,'30초',9],['역동적 경추 훈련',3,3,'12회',10],
+      ['경추 종합 안정화',3,4,'10회',12]
+    ],
+    '척추': [
+      ['캣-카우 스트레칭',1,3,'10회',5],['무릎 가슴 당기기',1,3,'30초',5],['골반 기울기 운동',1,3,'10회',4],
+      ['슈퍼맨 기초',1,3,'10회',5],['브리지 기초',1,3,'15회',5],['척추 회전 스트레칭',1,3,'30초',6],
+      ['누워 무릎 돌리기',1,3,'10회',5],['아동 자세',1,3,'30초',4],['흉추 신전 의자',1,3,'10회',5],
+      ['요추 신전 기초',1,3,'10회',5],['좌우 몸통 굴곡',1,3,'10회',4],['앉아 척추 회전',1,3,'10회',5],
+      ['서서 척추 회전',1,3,'10회',5],['서서 측방 굴곡',1,3,'10회',4],['맥켄지 신전 기초',1,3,'10회',5],
+      ['누워 척추 견인',1,3,'30초',5],['척추 롤다운',1,3,'8회',6],['요추 안정화 기초',1,3,'10회',6],
+      ['사자 자세',1,3,'30초',4],['앉아 전방 굴곡',1,3,'30초',5],
+      ['버드독',2,3,'12회',7],['데드버그',2,3,'10회',7],['한다리 브리지',2,3,'12회',7],
+      ['사이드 플랭크 기초',2,3,'20초',6],['수영 운동',2,3,'10회',7],['척추 안정화 볼',2,3,'10회',7],
+      ['클램쉘',2,3,'15회',6],['레그 레이즈',2,3,'12회',7],['스쿼트 자세 교정',2,3,'10회',6],
+      ['힙 힌지 운동',2,3,'12회',7],['요추 안정화 심화',2,3,'12회',8],['흉추 로테이션 심화',2,3,'10회',7],
+      ['맥켄지 신전 심화',2,3,'12회',7],['짐볼 브리지',2,3,'15회',7],['짐볼 백익스텐션',2,3,'12회',7],
+      ['요방형근 스트레칭',2,3,'30초',6],['장요근 스트레칭',2,3,'30초',6],['이상근 스트레칭',2,3,'30초',6],
+      ['척추 PNF',2,3,'30초',7],['척추 사지 협응',2,3,'10회',8],
+      ['플랭크',3,3,'30초',8],['사이드 플랭크 심화',3,3,'30초',8],['롤아웃',3,3,'12회',9],
+      ['척추 저항 운동',3,3,'12회',9],['TRX 척추 안정화',3,3,'12회',10],['데드리프트 기초',3,3,'10회',10],
+      ['고강도 버드독',3,3,'15회',9],['고급 데드버그',3,3,'12회',9],['척추 파워 운동',3,3,'10회',10],
+      ['척추 종합 안정화',3,4,'10회',12]
+    ],
+    '어깨': [
+      ['어깨 회전 스트레칭',1,3,'10회',5],['펜들럼 운동',1,2,'30초',5],['흉부 스트레칭',1,3,'30초',5],
+      ['어깨 전방 스트레칭',1,3,'30초',5],['어깨 후방 스트레칭',1,3,'30초',5],['월 슬라이드',1,3,'10회',5],
+      ['팔 원 그리기',1,3,'10회',4],['어깨 으쓱 운동',1,3,'15회',4],['내회전 스트레칭',1,3,'30초',5],
+      ['외회전 스트레칭',1,3,'30초',5],['어깨 수평 내전 스트레칭',1,3,'30초',5],['이두근 스트레칭',1,3,'30초',4],
+      ['삼두근 스트레칭',1,3,'30초',4],['어깨 이완 운동',1,3,'10회',4],['팔 스윙 운동',1,3,'15회',4],
+      ['벽 기댄 스트레칭',1,3,'30초',5],['어깨 신전 스트레칭',1,3,'30초',5],['어깨 견갑 기초',1,3,'10회',5],
+      ['상부 승모근 스트레칭',1,3,'30초',5],['어깨 전체 이완',1,3,'10회',5],
+      ['밴드 외회전',2,3,'15회',7],['밴드 내회전',2,3,'15회',7],['밴드 어깨 굴곡',2,3,'12회',7],
+      ['밴드 어깨 신전',2,3,'12회',7],['페이스 풀',2,3,'15회',7],['레터럴 레이즈',2,3,'12회',7],
+      ['프론트 레이즈',2,3,'12회',7],['리버스 플라이',2,3,'12회',7],['스캡션 운동',2,3,'12회',7],
+      ['사이드라잉 외회전',2,3,'15회',7],['견갑 안정화',2,3,'12회',7],['어깨 PNF 기초',2,3,'30초',7],
+      ['다이아몬드 푸쉬업',2,3,'10회',7],['파이크 푸쉬업',2,3,'10회',7],['월 푸쉬업 심화',2,3,'15회',6],
+      ['시티드 로우',2,3,'12회',7],['어깨 외전 강화',2,3,'12회',7],['어깨 굴곡 강화',2,3,'12회',7],
+      ['어깨 3D 안정화',2,3,'10회',8],['어깨 PNF 심화',2,3,'30초',8],
+      ['숄더 프레스',3,4,'10회',9],['아놀드 프레스',3,3,'12회',9],['밀리터리 프레스',3,4,'8회',10],
+      ['업라이트 로우',3,3,'12회',9],['슈러그',3,4,'15회',8],['케이블 외회전',3,3,'15회',9],
+      ['어깨 고급 PNF',3,3,'30초',9],['어깨 파워 운동',3,3,'10회',10],['어깨 플라이오',3,3,'10회',10],
+      ['어깨 종합 강화',3,4,'12회',12]
+    ],
+    '고관절': [
+      ['고관절 굴곡 스트레칭',1,3,'30초',5],['고관절 신전 스트레칭',1,3,'30초',5],['고관절 외회전 스트레칭',1,3,'30초',5],
+      ['고관절 내회전 스트레칭',1,3,'30초',5],['고관절 외전 스트레칭',1,3,'30초',5],['나비 자세',1,3,'30초',5],
+      ['누워 무릎 당기기',1,3,'30초',5],['비둘기 자세',1,3,'30초',6],['앉아 고관절 굴곡',1,3,'10회',5],
+      ['고관절 90/90 스트레칭',1,3,'30초',6],['장요근 스트레칭',1,3,'30초',5],['이상근 스트레칭',1,3,'30초',5],
+      ['서서 고관절 굴곡',1,3,'10회',5],['서서 다리 스윙',1,3,'15회',5],['골반 안정화 기초',1,3,'10회',5],
+      ['옆으로 누워 다리들기',1,3,'15회',5],['클램쉘 기초',1,3,'15회',5],['고관절 전방 스트레칭',1,3,'30초',5],
+      ['누워 고관절 돌리기',1,3,'10회',5],['앉아 전방 굴곡',1,3,'30초',5],
+      ['클램쉘 저항',2,3,'15회',7],['사이드라잉 외전',2,3,'15회',7],['한다리 브리지',2,3,'12회',7],
+      ['와이드 스쿼트',2,3,'12회',7],['사이드 스텝 밴드',2,3,'15회',7],['몬스터 워크',2,3,'10회',7],
+      ['고관절 회전 강화',2,3,'12회',7],['런지 고관절',2,3,'12회',7],['고관절 PNF',2,3,'30초',7],
+      ['힙 에이버덕션',2,3,'15회',7],['힙 애덕션',2,3,'15회',7],['서서 고관절 외회전',2,3,'12회',7],
+      ['케틀벨 힙 힌지',2,3,'12회',8],['고관절 딥 스쿼트',2,3,'12회',8],['고관절 안정화 중급',2,3,'12회',8],
+      ['모닝글로리',2,3,'10회',7],['고관절 기능 훈련',2,3,'10회',7],['고관절 협응 운동',2,3,'10회',7],
+      ['고관절 PNF 심화',2,3,'30초',8],['고관절 복합 운동',2,3,'10회',8],
+      ['힙 스러스트',3,4,'12회',10],['불가리안 스쿼트',3,3,'10회',10],['한다리 스쿼트',3,3,'8회',10],
+      ['데드리프트 고관절',3,4,'8회',10],['고관절 파워 운동',3,3,'10회',10],['플라이오 힙',3,3,'10회',10],
+      ['고속 고관절 운동',3,3,'12회',10],['스포츠 특이 고관절',3,3,'10회',10],['고급 PNF 고관절',3,3,'30초',10],
+      ['고관절 종합 안정화',3,4,'10회',12]
+    ],
+    '무릎': [
+      ['무릎 굴곡 스트레칭',1,3,'30초',5],['대퇴사두근 스트레칭',1,3,'30초',5],['슬굴곡근 스트레칭',1,3,'30초',5],
+      ['장경인대 스트레칭',1,3,'30초',5],['앉아 무릎 신전',1,3,'10회',5],['발목 펌프',1,3,'15회',4],
+      ['종아리 스트레칭',1,3,'30초',5],['누워 무릎 굴곡',1,3,'10회',5],['벽 스쿼트',1,3,'20초',5],
+      ['미니 스쿼트',1,3,'12회',5],['사두근 수축 운동',1,3,'15회',4],['햄스트링 기초',1,3,'12회',5],
+      ['스텝업 기초',1,3,'10회',5],['무릎 신전 기초',1,3,'12회',5],['반월상 연골 기초',1,3,'10회',5],
+      ['무릎 각도 운동',1,3,'10회',5],['무릎 빙하기 자세',1,3,'20초',5],['서서 무릎 굴곡',1,3,'12회',5],
+      ['무릎 전방 스트레칭',1,3,'30초',5],['무릎 후방 스트레칭',1,3,'30초',5],
+      ['레그 프레스',2,4,'12회',8],['레그 익스텐션',2,3,'12회',7],['레그 컬',2,3,'12회',7],
+      ['스쿼트 중급',2,4,'12회',8],['런지 중급',2,3,'12회',8],['스텝업 심화',2,3,'12회',7],
+      ['터미널 니 익스텐션',2,3,'15회',7],['무릎 안정화 밴드',2,3,'12회',7],['VMO 강화',2,3,'15회',7],
+      ['사이드 스텝',2,3,'12회',7],['고유수용감각 훈련',2,3,'10회',7],['무릎 PNF',2,3,'30초',7],
+      ['대퇴사두근 강화 중급',2,4,'12회',8],['슬굴곡근 강화 중급',2,4,'12회',8],['균형 무릎 운동',2,3,'20초',7],
+      ['단계적 스쿼트',2,4,'10회',8],['무릎 협응 운동',2,3,'10회',7],['반월상 연골 중급',2,3,'12회',7],
+      ['무릎 안정화 중급',2,3,'12회',8],['무릎 복합 운동',2,3,'10회',8],
+      ['점프 스쿼트',3,4,'10회',10],['불가리안 스쿼트',3,3,'10회',10],['피스톨 스쿼트',3,3,'8회',10],
+      ['파워 런지',3,3,'10회',10],['박스 점프',3,4,'8회',10],['무릎 파워 트레이닝',3,3,'10회',10],
+      ['고속 무릎 운동',3,3,'12회',10],['스포츠 특이 무릎',3,3,'10회',10],['고급 PNF 무릎',3,3,'30초',10],
+      ['무릎 종합 안정화',3,4,'10회',12]
+    ],
+    '발': [
+      ['발목 회전 운동',1,3,'10회',4],['발목 굴곡 신전',1,3,'15회',4],['발가락 운동',1,3,'15회',4],
+      ['발바닥 마사지',1,3,'30초',5],['발목 좌우 운동',1,3,'15회',4],['종아리 스트레칭',1,3,'30초',5],
+      ['아킬레스건 스트레칭',1,3,'30초',5],['발 아치 강화 기초',1,3,'15회',5],['수건 집기',1,3,'15회',4],
+      ['발목 펌프',1,3,'15회',4],['발가락 굴곡',1,3,'15회',4],['발가락 신전',1,3,'15회',4],
+      ['발바닥 스트레칭',1,3,'30초',5],['발목 안쪽 스트레칭',1,3,'30초',5],['발목 바깥쪽 스트레칭',1,3,'30초',5],
+      ['발뒤꿈치 들기 기초',1,3,'15회',5],['발가락 분리 운동',1,3,'10회',4],['발목 균형 기초',1,3,'20초',5],
+      ['맨발 걷기 감각',1,1,'2분',5],['족저근막 스트레칭',1,3,'30초',5],
+      ['카프 레이즈 중급',2,3,'20회',7],['한발 카프 레이즈',2,3,'15회',7],['발목 안정화 밴드',2,3,'12회',7],
+      ['발목 외전 강화',2,3,'15회',7],['발목 내전 강화',2,3,'15회',7],['발목 배굴 강화',2,3,'12회',7],
+      ['발목 저측굴 강화',2,3,'15회',7],['한발 균형 서기',2,3,'20초',6],['BOSU 발목 훈련',2,3,'20초',7],
+      ['발목 저항 운동',2,3,'12회',7],['발 아치 강화 중급',2,3,'15회',7],['인솔 강화 운동',2,3,'12회',7],
+      ['족저근막 운동',2,3,'15회',7],['발목 PNF',2,3,'30초',7],['발 고유수용감각',2,3,'20초',7],
+      ['발목 동적 안정화',2,3,'10회',7],['발목 복합 운동',2,3,'10회',8],['발 기능 훈련',2,3,'10회',7],
+      ['발목 협응 운동',2,3,'10회',7],['발목 기능 강화',2,3,'12회',8],
+      ['발목 플라이오메트릭',3,3,'10회',10],['한발 점프',3,3,'10회',10],['발목 파워 운동',3,3,'12회',10],
+      ['스포츠 특이 발목',3,3,'10회',10],['고강도 카프 레이즈',3,4,'20회',9],['발목 속도 훈련',3,3,'10회',10],
+      ['발목 방향 전환',3,3,'10회',10],['발목 균형 고급',3,3,'30초',9],['고급 PNF 발목',3,3,'30초',10],
+      ['발목 종합 훈련',3,4,'10회',12]
+    ],
+    '유산소': [
+      ['제자리 걷기',1,1,'5분',5],['발뒤꿈치 터치',1,3,'15회',4],['발앞꿈치 터치',1,3,'15회',4],
+      ['서서 무릎 들기',1,3,'15회',4],['팔 스윙 운동',1,3,'20회',4],['옆으로 걷기',1,1,'3분',4],
+      ['교차 보행',1,3,'15회',5],['의자 에어로빅',1,3,'10회',5],['느린 스텝 운동',1,3,'10회',5],
+      ['가벼운 계단 운동',1,1,'3분',5],['간단 댄스 스텝',1,3,'10회',5],['스트레칭 복합 기초',1,3,'10회',6],
+      ['저강도 바이크',1,1,'10분',10],['천천히 걷기',1,1,'15분',15],['팔꿈치 무릎 교차',1,3,'15회',5],
+      ['발목 펌프 유산소',1,3,'20회',4],['어깨 돌리기 걷기',1,1,'5분',5],['온몸 이완 걷기',1,1,'10분',10],
+      ['리듬 걷기',1,1,'10분',10],['저강도 맨손 체조',1,3,'10회',6],
+      ['파워 워킹',2,1,'20분',20],['빠른 걷기',2,1,'15분',15],['조깅 기초',2,1,'10분',10],
+      ['에어로빅 댄스',2,3,'3분',10],['줄넘기 기초',2,3,'1분',8],['스텝 에어로빅',2,3,'5분',15],
+      ['수중 운동 중급',2,1,'20분',20],['엘립티컬 훈련',2,1,'15분',15],['인터벌 워킹',2,4,'2분',20],
+      ['사이클 중급',2,1,'15분',15],['댄스 스텝 중급',2,3,'3분',10],['킥복싱 기초',2,3,'3분',12],
+      ['복합 에어로빅',2,3,'5분',15],['트레드밀 중급',2,1,'15분',15],['계단 운동 중급',2,3,'3분',10],
+      ['지속 조깅',2,1,'15분',15],['사이클 인터벌',2,4,'2분',20],['에어로빅 복합',2,3,'5분',15],
+      ['로잉 중급',2,3,'3분',12],['런닝 기초',2,1,'10분',10],
+      ['HIIT 기초',3,4,'30초',20],['버피',3,4,'10회',10],['마운틴 클라이머',3,4,'20회',10],
+      ['점핑잭',3,4,'30회',8],['고속 줄넘기',3,3,'1분',10],['인터벌 달리기',3,5,'2분',25],
+      ['스프린트 훈련',3,6,'30초',20],['써킷 트레이닝',3,3,'5분',20],['HIIT 고급',3,5,'30초',25],
+      ['유산소 종합 훈련',3,4,'5분',30]
+    ]
+  };
+
+  const LV = ['','초급','중급','고급'];
+  const LV_CLASS = ['','lv1','lv2','lv3'];
+  const LV_ICON_CLS = ['','','lv2','lv3'];
+
+  let currentPart = '어깨';
+  let currentFilter = '전체';
+  // 부위별 선택 목록 보존: { '척추': Set<idx>, '어깨': Set<idx>, ... }
+  const selectedByPart = {};
+  let viewingExIdx = -1;
+
+  function getSelected() {
+    if (!selectedByPart[currentPart]) selectedByPart[currentPart] = new Set();
+    return selectedByPart[currentPart];
+  }
+  function totalSelected() {
+    return Object.values(selectedByPart).reduce((s, set) => s + set.size, 0);
+  }
+
   const screenNames = {
-    main:   '① 메인 — 부위 선택',
-    list:   '② 부위별 운동 목록',
-    detail: '③ 운동 상세',
-    make:   '④ 나만의 운동 만들기',
-    done:   '⑤ 저장 완료',
+    main:'① 메인 — 부위 선택', list:'② 부위별 운동 목록',
+    detail:'③ 운동 상세', make:'④ 나만의 운동 만들기', done:'⑤ 저장 완료'
   };
 
   function go(id) {
     document.querySelectorAll('.screen-frame').forEach(el => el.classList.remove('active'));
     document.querySelectorAll('.screen-btn').forEach(el => el.classList.remove('active'));
-
     document.getElementById('screen-' + id).classList.add('active');
     document.querySelectorAll('.screen-btn').forEach(btn => {
-      if (btn.getAttribute('onclick').includes("'" + id + "'")) btn.classList.add('active');
+      if (btn.getAttribute('onclick') && btn.getAttribute('onclick').includes("'" + id + "'")) btn.classList.add('active');
     });
-
     document.getElementById('memo-screen-name').value = screenNames[id] || id;
+    if (id === 'mylist') renderMylist();
+  }
+
+  function selectPart(part) {
+    currentPart = part;
+    currentFilter = '전체';
+    // 선택 초기화 없이 기존 선택 유지
+    document.querySelectorAll('.filter-chip').forEach((b,i) => b.classList.toggle('on', i===0));
+    renderList();
+    go('list');
+  }
+
+  function setFilter(f, btn) {
+    currentFilter = f;
+    document.querySelectorAll('.filter-chip').forEach(b => b.classList.remove('on'));
+    btn.classList.add('on');
+    renderList();
+  }
+
+  function renderPartTabs() {
+    const bar = document.getElementById('part-tab-bar');
+    if (!bar) return;
+    // 수정 모드: editItems에서 부위별 카운트 집계
+    const editCount = {};
+    if (editingRoutineIdx >= 0) {
+      for (const item of editItems) {
+        editCount[item.part] = (editCount[item.part] || 0) + 1;
+      }
+    }
+    bar.innerHTML = PARTS.map(p => {
+      const cnt = editingRoutineIdx >= 0
+        ? (editCount[p] || 0) + (selectedByPart[p] ? selectedByPart[p].size : 0)
+        : (selectedByPart[p] || new Set()).size;
+      const isActive = p === currentPart;
+      return `<button onclick="selectPart('${p}')" style="
+        flex-shrink:0; padding:10px 14px; border:none; cursor:pointer;
+        background:${isActive ? '#fff' : '#fff'};
+        color:${isActive ? '#00B894' : '#718096'};
+        font-size:12px; font-weight:${isActive ? '800' : '600'};
+        font-family:'Noto Sans KR',sans-serif;
+        border-bottom:${isActive ? '3px solid #00B894' : '3px solid transparent'};
+        position:relative; white-space:nowrap;
+      ">${PART_ICON[p]} ${p}${cnt > 0 ? `<span style="margin-left:4px;background:#00B894;color:#fff;border-radius:99px;padding:1px 6px;font-size:10px;">${cnt}</span>` : ''}</button>`;
+    }).join('');
+    // 현재 탭으로 스크롤
+    const idx = PARTS.indexOf(currentPart);
+    if (idx > 0) bar.scrollLeft = idx * 80;
+  }
+
+  function renderList() {
+    renderPartTabs();
+    const sel = getSelected();
+    const all = exerciseDB[currentPart] || [];
+    const list = currentFilter === '전체' ? all : all.filter(e => LV[e[1]] === currentFilter);
+    document.getElementById('list-title').textContent = currentPart + ' 운동';
+    const tot = totalSelected();
+    document.getElementById('list-sel-count').textContent = tot + '개 선택';
+    document.getElementById('sel-count-bar').textContent = tot + '개 선택됨';
+    document.getElementById('ex-list-body').innerHTML = list.map((e) => {
+      const origIdx = all.indexOf(e);
+      const checked = sel.has(origIdx);
+      const lvCls = LV_CLASS[e[1]];
+      const icoCls = LV_ICON_CLS[e[1]];
+      return `<div class="ex-item" onclick="toggleItem(${origIdx})">
+        <div class="check-box${checked ? ' on' : ''}">${checked ? '✓' : ''}</div>
+        <div class="ex-thumb ${icoCls}">${PART_ICON[currentPart]}</div>
+        <div class="ex-info">
+          <div class="ex-name">${e[0]}</div>
+          <div class="ex-meta">${e[2]}세트 × ${e[3]} · 약 ${e[4]}분</div>
+        </div>
+        <span class="lv-badge ${lvCls}" onclick="event.stopPropagation();showDetail(${origIdx})">${LV[e[1]]}</span>
+      </div>`;
+    }).join('');
+  }
+
+  function toggleItem(idx) {
+    const sel = getSelected();
+    if (sel.has(idx)) sel.delete(idx); else sel.add(idx);
+    renderList();
+  }
+
+  function goMake() {
+    if (totalSelected() === 0) { alert('운동을 1개 이상 선택해주세요.'); return; }
+    if (editingRoutineIdx >= 0) {
+      // 수정 모드: 새로 선택한 운동을 editItems에 즉시 병합 후 selectedByPart 초기화
+      for (const [part, idxSet] of Object.entries(selectedByPart)) {
+        const all = exerciseDB[part] || [];
+        for (const idx of idxSet) {
+          if (all[idx]) editItems.push({ part, e: all[idx] });
+        }
+      }
+      for (const k in selectedByPart) delete selectedByPart[k];
+      document.getElementById('make-screen-title').textContent = '루틴 수정';
+    } else {
+      editItems = [];
+      document.getElementById('make-screen-title').textContent = '나만의 운동 만들기';
+    }
+    renderMake();
+    go('make');
+  }
+
+  function cancelMake() {
+    if (editingRoutineIdx >= 0) {
+      editingRoutineIdx = -1;
+      editItems = [];
+      go('mylist');
+    } else {
+      go('list');
+    }
+  }
+
+  function renderMake() {
+    // 모든 부위의 선택 운동을 합쳐서 표시
+    const items = [];
+    for (const [part, idxSet] of Object.entries(selectedByPart)) {
+      const all = exerciseDB[part] || [];
+      for (const idx of idxSet) {
+        if (all[idx]) items.push({ part, idx, e: all[idx] });
+      }
+    }
+    const partNames = [...new Set(items.map(x => x.part))];
+    document.getElementById('routine-title').value = partNames.join('+') + ' 운동 루틴';
+    document.getElementById('make-ex-list').innerHTML = items.map((item, i) => `
+      <div class="my-ex-item">
+        <span class="drag-handle">⠿</span>
+        <div class="my-ex-num">${i + 1}</div>
+        <div class="my-ex-info">
+          <div class="my-ex-name">${item.e[0]}</div>
+          <div class="my-ex-detail">${item.e[2]}세트 × ${item.e[3]} · ${item.part}</div>
+        </div>
+        <span class="my-ex-del" onclick="removeFromMake('${item.part}',${item.idx})">✕</span>
+      </div>`).join('');
+  }
+
+  function removeFromMake(part, idx) {
+    if (selectedByPart[part]) selectedByPart[part].delete(idx);
+    if (totalSelected() === 0) { go('list'); return; }
+    renderMake();
+    if (part === currentPart) renderList();
+  }
+
+  // ── 마이루틴 저장소 ──
+  const myRoutines = [];
+  let editingRoutineIdx = -1; // -1이면 신규, 0이상이면 수정 중인 루틴 인덱스
+
+
+  function startNewMake() {
+    // 수정 상태 완전 초기화 후 신규 루틴 만들기
+    editingRoutineIdx = -1;
+    editItems = [];
+    for (const k in selectedByPart) delete selectedByPart[k];
+    document.getElementById('make-screen-title').textContent = '나만의 운동 만들기';
+    document.getElementById('routine-title').value = '';
+    document.getElementById('make-ex-list').innerHTML = '';
+    go('list'); // 운동 목록에서 먼저 선택하게 유도
+  }
+
+  function goMoreGuide() {
+    for (const k in selectedByPart) delete selectedByPart[k];
+    go('main');
+  }
+
+  function editRoutine(ri) {
+    editingRoutineIdx = ri;
+    const r = myRoutines[ri];
+    for (const k in selectedByPart) delete selectedByPart[k];
+    editItems = r.items.map(x => ({ ...x }));
+    document.getElementById('make-screen-title').textContent = '루틴 수정';
+    renderEditMake(r.title);
+    go('make');
+  }
+
+  // 수정 모드 전용 아이템 배열
+  let editItems = [];
+
+  function renderEditMake(title) {
+    document.getElementById('routine-title').value = title;
+    document.getElementById('make-ex-list').innerHTML = editItems.map((item, i) => `
+      <div class="my-ex-item">
+        <span class="drag-handle">⠿</span>
+        <div class="my-ex-num">${i + 1}</div>
+        <div class="my-ex-info">
+          <div class="my-ex-name">${item.e[0]}</div>
+          <div class="my-ex-detail">${item.e[2]}세트 × ${item.e[3]} · ${item.part}</div>
+        </div>
+        <span class="my-ex-del" onclick="removeEditItem(${i})">✕</span>
+      </div>`).join('') +
+      `<div style="border:2px dashed #CBD5E0;border-radius:14px;padding:14px;text-align:center;color:#A0AEC0;font-size:13px;font-weight:600;cursor:pointer;margin-top:4px;" onclick="go('list')">
+        + 운동 더 추가하기
+      </div>`;
+  }
+
+  function removeEditItem(i) {
+    editItems.splice(i, 1);
+    if (editItems.length === 0) { go('mylist'); return; }
+    renderEditMake(document.getElementById('routine-title').value);
+  }
+
+  // saveRoutine을 수정 모드에서도 동작하도록: editItems가 있으면 우선 사용
+  const _origSaveRoutine = saveRoutine;
+
+  function renderMake() {
+    if (editingRoutineIdx >= 0) {
+      renderEditMake(myRoutines[editingRoutineIdx].title);
+      return;
+    }
+    const items = [];
+    for (const [part, idxSet] of Object.entries(selectedByPart)) {
+      const all = exerciseDB[part] || [];
+      for (const idx of idxSet) {
+        if (all[idx]) items.push({ part, idx, e: all[idx] });
+      }
+    }
+    const partNames = [...new Set(items.map(x => x.part))];
+    document.getElementById('routine-title').value = partNames.join('+') + ' 운동 루틴';
+    document.getElementById('make-ex-list').innerHTML = items.map((item, i) => `
+      <div class="my-ex-item">
+        <span class="drag-handle">⠿</span>
+        <div class="my-ex-num">${i + 1}</div>
+        <div class="my-ex-info">
+          <div class="my-ex-name">${item.e[0]}</div>
+          <div class="my-ex-detail">${item.e[2]}세트 × ${item.e[3]} · ${item.part}</div>
+        </div>
+        <span class="my-ex-del" onclick="removeFromMake('${item.part}',${item.idx})">✕</span>
+      </div>`).join('') +
+      `<div style="border:2px dashed #CBD5E0;border-radius:14px;padding:14px;text-align:center;color:#A0AEC0;font-size:13px;font-weight:600;cursor:pointer;margin-top:4px;" onclick="go('list')">
+        + 운동 더 추가하기
+      </div>`;
+  }
+
+  // saveRoutine 재정의 — editItems 우선 사용
+  function saveRoutine() {
+    const title = document.getElementById('routine-title').value.trim() || '나만의 루틴';
+    if (editingRoutineIdx >= 0) {
+      // 수정 모드: editItems에 이미 병합 완료됨 (goMake에서 처리)
+      if (editItems.length === 0) { alert('운동이 없습니다.'); return; }
+      myRoutines[editingRoutineIdx] = { title, items: [...editItems], savedAt: myRoutines[editingRoutineIdx].savedAt };
+      editingRoutineIdx = -1;
+      editItems = [];
+      renderMylist();
+      go('mylist');
+    } else {
+      const items = [];
+      for (const [part, idxSet] of Object.entries(selectedByPart)) {
+        const all = exerciseDB[part] || [];
+        for (const idx of idxSet) {
+          if (all[idx]) items.push({ part, e: all[idx] });
+        }
+      }
+      if (items.length === 0) { alert('저장할 운동이 없습니다.'); return; }
+      const totalMins = items.reduce((s, x) => s + x.e[4], 0);
+      myRoutines.unshift({ title, items, savedAt: new Date() });
+      document.getElementById('done-routine-name').textContent = title;
+      document.getElementById('done-routine-count').textContent = `운동 ${items.length}개 · 약 ${totalMins}분`;
+      for (const k in selectedByPart) delete selectedByPart[k];
+      go('done');
+    }
+  }
+
+  function renderMylist() {
+    document.getElementById('mylist-count').textContent = myRoutines.length + '개';
+    if (myRoutines.length === 0) {
+      document.getElementById('mylist-body').innerHTML = `
+        <div style="text-align:center;padding:60px 20px;color:#A0AEC0;">
+          <div style="font-size:48px;margin-bottom:12px;">📋</div>
+          <div style="font-size:15px;font-weight:700;">저장된 루틴이 없습니다</div>
+          <div style="font-size:13px;margin-top:6px;">운동을 선택하고 루틴을 만들어보세요!</div>
+        </div>`;
+      return;
+    }
+    document.getElementById('mylist-body').innerHTML = myRoutines.map((r, ri) => `
+      <div style="background:#fff;border-radius:16px;padding:16px;box-shadow:0 1px 6px rgba(0,0,0,0.06);">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+          <div style="flex:1;cursor:pointer;" onclick="toggleRoutineDetail(${ri})">
+            <div style="font-size:15px;font-weight:800;color:#1A202C;">${r.title}</div>
+            <div style="font-size:12px;color:#A0AEC0;margin-top:2px;">운동 ${r.items.length}개 · 약 ${r.items.reduce((s,x)=>s+x.e[4],0)}분</div>
+          </div>
+          <button onclick="editRoutine(${ri})" style="background:#EBF8FF;border:none;border-radius:8px;padding:6px 10px;color:#3182CE;font-size:12px;font-weight:700;cursor:pointer;">수정</button>
+          <button onclick="deleteRoutine(${ri})" style="background:#FFF5F5;border:none;border-radius:8px;padding:6px 10px;color:#FC8181;font-size:12px;font-weight:700;cursor:pointer;">삭제</button>
+        </div>
+        <div id="routine-detail-${ri}" style="display:none;border-top:1px solid #F0F4F8;padding-top:10px;flex-direction:column;gap:6px;">
+          ${r.items.map((x,i) => `
+            <div style="display:flex;align-items:center;gap:8px;">
+              <div style="width:22px;height:22px;border-radius:50%;background:#00B894;color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;">${i+1}</div>
+              <div style="flex:1;font-size:13px;font-weight:600;color:#2D3748;">${x.e[0]}</div>
+              <div style="font-size:12px;color:#A0AEC0;">${x.e[2]}×${x.e[3]}</div>
+              <span style="font-size:11px;padding:2px 8px;border-radius:99px;background:${x.e[1]===1?'#C6F6D5':x.e[1]===2?'#FEEBC8':'#FED7D7'};color:${x.e[1]===1?'#276749':x.e[1]===2?'#744210':'#742A2A'};flex-shrink:0;">${LV[x.e[1]]}</span>
+            </div>`).join('')}
+        </div>
+      </div>`).join('');
+  }
+
+  function toggleRoutineDetail(ri) {
+    const d = document.getElementById(`routine-detail-${ri}`);
+    if (!d) return;
+    const isOpen = d.style.display === 'flex';
+    myRoutines.forEach((_, i) => {
+      const el = document.getElementById(`routine-detail-${i}`);
+      if (el) el.style.display = 'none';
+    });
+    if (!isOpen) d.style.display = 'flex';
+  }
+
+  function deleteRoutine(ri) {
+    if (!confirm('이 루틴을 삭제하시겠습니까?')) return;
+    myRoutines.splice(ri, 1);
+    renderMylist();
+  }
+
+  function showDetail(idx) {
+    viewingExIdx = idx;
+    const e = (exerciseDB[currentPart] || [])[idx];
+    if (!e) return;
+    const lvCls = LV_CLASS[e[1]];
+    const gradients = ['','linear-gradient(135deg,#00B894,#00CEC9)','linear-gradient(135deg,#F6AD55,#ED8936)','linear-gradient(135deg,#FC8181,#E53E3E)'];
+    document.getElementById('detail-content').innerHTML = `
+      <div style="height:200px;background:${gradients[e[1]]};display:flex;align-items:center;justify-content:center;font-size:72px;flex-shrink:0;">${PART_ICON[currentPart]}</div>
+      <div class="detail-body" style="flex:1;">
+        <div class="detail-name">${e[0]}</div>
+        <div class="detail-tags">
+          <span class="tag ${e[1]===1?'green':e[1]===2?'orange':'red'}">${LV[e[1]]}</span>
+          <span class="tag blue">${currentPart}</span>
+        </div>
+        <div class="set-info">
+          <div class="set-box"><div class="set-val">${e[2]}</div><div class="set-lbl">세트</div></div>
+          <div class="set-box"><div class="set-val">${e[3]}</div><div class="set-lbl">횟수/시간</div></div>
+          <div class="set-box"><div class="set-val">${e[4]}분</div><div class="set-lbl">예상시간</div></div>
+        </div>
+        <div><div class="section-title" style="margin-bottom:8px;">운동 방법</div>
+          <div class="desc-box">1. 바른 자세로 시작합니다.<br>2. 설정된 세트와 횟수를 지킵니다.<br>3. 각 동작 사이 적절한 휴식을 취합니다.<br>4. 통증이 느껴지면 즉시 중단하세요.</div>
+        </div>
+        <div><div class="section-title" style="margin-bottom:8px;">주의사항</div>
+          <div class="warn-box"><div class="warn-title">⚠ 주의</div>통증이 느껴지면 즉시 중단하세요. ${e[1]===3?'고급 운동입니다. 충분한 준비 후 진행하세요.':'동작 중 이상 증상이 있으면 전문가에게 상담하세요.'}</div>
+        </div>
+      </div>
+      <div style="padding:0 16px 16px;flex-shrink:0;">
+        <button class="btn-add-my" onclick="getSelected().add(${idx});renderMake();go('make')">+ 나만의 운동에 추가</button>
+      </div>`;
+    go('detail');
   }
 </script>
 

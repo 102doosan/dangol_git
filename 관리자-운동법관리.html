@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>관리자 — 운동법 관리</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Noto Sans KR', sans-serif; background: #F0F4F8; color: #1A202C; min-height: 100vh; padding: 24px 20px 48px; }
+
+    .admin-wrap { display: flex; gap: 20px; align-items: flex-start; }
+
+    /* 사이드바 */
+    .sidebar { width: 220px; flex-shrink: 0; background: #1E2A3A; border-radius: 16px; padding: 20px 0; color: #fff; min-height: 600px; }
+    .sidebar-logo { padding: 0 20px 16px; border-bottom: 1px solid #2D3F54; margin-bottom: 12px; }
+    .sidebar-logo-title { font-size: 15px; font-weight: 900; color: #fff; }
+    .sidebar-logo-sub { font-size: 11px; color: #718096; margin-top: 2px; }
+    .sidebar-section { font-size: 10px; font-weight: 800; color: #4A6080; letter-spacing: 1.5px; padding: 8px 20px 4px; }
+    .sidebar-item { display: flex; align-items: center; gap: 10px; padding: 10px 20px; font-size: 13px; font-weight: 600; color: #A0AEC0; cursor: pointer; transition: all 0.15s; }
+    .sidebar-item:hover { background: #2D3F54; color: #fff; }
+    .sidebar-item.active { background: #00897B; color: #fff; border-right: 3px solid #4DB6AC; }
+    .sidebar-item-icon { font-size: 16px; width: 20px; text-align: center; }
+
+    /* 메인 */
+    .main { flex: 1; min-width: 0; }
+    .screen { display: none; }
+    .screen.active { display: block; }
+
+    /* 페이지 헤더 */
+    .page-header { background: #fff; border-radius: 16px; padding: 20px 24px; margin-bottom: 16px; box-shadow: 0 1px 6px rgba(0,0,0,0.06); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+    .page-title { font-size: 18px; font-weight: 900; color: #1A202C; }
+    .page-sub { font-size: 13px; color: #A0AEC0; margin-top: 2px; }
+    .page-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+    .btn-primary { background: #00897B; color: #fff; border: none; border-radius: 10px; padding: 10px 18px; font-size: 13px; font-weight: 700; cursor: pointer; font-family: 'Noto Sans KR', sans-serif; }
+    .btn-primary:hover { background: #00796B; }
+    .btn-secondary { background: #F0F4F8; color: #4A5568; border: none; border-radius: 10px; padding: 10px 18px; font-size: 13px; font-weight: 700; cursor: pointer; font-family: 'Noto Sans KR', sans-serif; }
+    .btn-danger { background: #FFF5F5; color: #E53E3E; border: none; border-radius: 8px; padding: 6px 12px; font-size: 12px; font-weight: 700; cursor: pointer; font-family: 'Noto Sans KR', sans-serif; }
+    .btn-edit { background: #EBF8FF; color: #3182CE; border: none; border-radius: 8px; padding: 6px 12px; font-size: 12px; font-weight: 700; cursor: pointer; font-family: 'Noto Sans KR', sans-serif; }
+
+    /* 통계 카드 */
+    .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 16px; }
+    .stat-card { background: #fff; border-radius: 14px; padding: 16px 18px; box-shadow: 0 1px 6px rgba(0,0,0,0.06); cursor: pointer; transition: all .18s; border: 2px solid transparent; }
+    .stat-card:hover { border-color: #00897B; box-shadow: 0 4px 16px rgba(0,137,123,0.15); }
+    .stat-card.active-filter { border-color: #00897B; background: #F0FFF9; }
+    .stat-card-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+    .stat-card-label { font-size: 12px; color: #A0AEC0; font-weight: 700; }
+    .stat-card-icon { font-size: 22px; }
+    .stat-card-val { font-size: 26px; font-weight: 900; color: #1A202C; }
+    .stat-card-sub { font-size: 12px; color: #718096; margin-top: 4px; }
+
+    /* 검색/필터 바 */
+    .filter-bar { background: #fff; border-radius: 14px; padding: 14px 20px; margin-bottom: 16px; box-shadow: 0 1px 6px rgba(0,0,0,0.06); display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+    .search-input { flex: 1; min-width: 180px; border: 1.5px solid #E2E8F0; border-radius: 10px; padding: 9px 14px; font-size: 13px; font-family: 'Noto Sans KR', sans-serif; outline: none; }
+    .search-input:focus { border-color: #00897B; }
+    .filter-select { border: 1.5px solid #E2E8F0; border-radius: 10px; padding: 9px 12px; font-size: 13px; font-family: 'Noto Sans KR', sans-serif; color: #4A5568; outline: none; background: #fff; }
+    .filter-select:focus { border-color: #00897B; }
+
+    /* 테이블 */
+    .table-wrap { background: #fff; border-radius: 14px; box-shadow: 0 1px 6px rgba(0,0,0,0.06); overflow: hidden; margin-bottom: 16px; }
+    .table-header { display: flex; align-items: center; justify-content: space-between; padding: 16px 20px 12px; border-bottom: 1px solid #F0F4F8; }
+    .table-title { font-size: 14px; font-weight: 800; color: #2D3748; }
+    .table-count { font-size: 12px; color: #A0AEC0; font-weight: 600; }
+    table { width: 100%; border-collapse: collapse; }
+    th { background: #F7FAFC; font-size: 12px; font-weight: 700; color: #718096; padding: 10px 16px; text-align: left; border-bottom: 1px solid #E2E8F0; }
+    td { padding: 12px 16px; font-size: 13px; border-bottom: 1px solid #F7FAFC; vertical-align: middle; }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: #F7FAFC; }
+
+    /* 레벨 뱃지 */
+    .lv-badge { display: inline-block; padding: 3px 10px; border-radius: 99px; font-size: 11px; font-weight: 700; }
+    .lv1 { background: #C6F6D5; color: #276749; }
+    .lv2 { background: #FEEBC8; color: #744210; }
+    .lv3 { background: #FED7D7; color: #742A2A; }
+
+    /* 폼 패널 */
+    .form-panel { background: #fff; border-radius: 16px; padding: 24px; box-shadow: 0 1px 6px rgba(0,0,0,0.06); margin-bottom: 16px; }
+    .form-panel-title { font-size: 15px; font-weight: 900; color: #1A202C; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 2px solid #F0F4F8; }
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .form-group { display: flex; flex-direction: column; gap: 6px; }
+    .form-group.full { grid-column: span 2; }
+    .form-label { font-size: 12px; font-weight: 800; color: #4A5568; }
+    .required { color: #E53E3E; }
+    .form-input, .form-select, .form-textarea { border: 1.5px solid #E2E8F0; border-radius: 10px; padding: 10px 14px; font-size: 13px; font-family: 'Noto Sans KR', sans-serif; outline: none; color: #2D3748; width: 100%; }
+    .form-input:focus, .form-select:focus, .form-textarea:focus { border-color: #00897B; }
+    .form-textarea { resize: vertical; min-height: 80px; }
+    .form-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; padding-top: 16px; border-top: 1px solid #F0F4F8; }
+
+    /* 통계 화면 */
+    .part-stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 16px; }
+    .part-stat-card { background: #fff; border-radius: 14px; padding: 20px; box-shadow: 0 1px 6px rgba(0,0,0,0.06); }
+    .part-stat-name { font-size: 16px; font-weight: 900; margin-bottom: 4px; }
+    .part-stat-total { font-size: 28px; font-weight: 900; color: #00897B; margin-bottom: 12px; }
+    .part-stat-bar { display: flex; gap: 8px; margin-top: 10px; }
+    .part-stat-lv { flex: 1; text-align: center; border-radius: 10px; padding: 8px 4px; }
+    .part-stat-lv-num { font-size: 18px; font-weight: 900; }
+    .part-stat-lv-label { font-size: 11px; font-weight: 700; margin-top: 2px; }
+
+    /* 페이지네이션 */
+    .pagination { display: flex; gap: 6px; justify-content: center; padding: 14px; }
+    .page-btn { padding: 6px 12px; border-radius: 8px; border: 1.5px solid #E2E8F0; background: #fff; font-size: 13px; font-weight: 700; cursor: pointer; font-family: 'Noto Sans KR', sans-serif; color: #4A5568; }
+    .page-btn.active { background: #00897B; border-color: #00897B; color: #fff; }
+    .page-btn:hover:not(.active) { border-color: #00897B; color: #00897B; }
+  </style>
+</head>
+<body>
+
+<div class="admin-wrap">
+
+  <!-- 사이드바 -->
+  <div class="sidebar">
+    <div class="sidebar-logo">
+      <div class="sidebar-logo-title">📚 운동법 관리</div>
+      <div class="sidebar-logo-sub">Exercise Admin</div>
+    </div>
+    <div class="sidebar-section">운동 관리</div>
+    <div class="sidebar-item active" onclick="showScreen(0,this)">
+      <span class="sidebar-item-icon">📋</span> 운동 목록
+    </div>
+    <div class="sidebar-item" onclick="showScreen(1,this)">
+      <span class="sidebar-item-icon">➕</span> 운동 등록
+    </div>
+    <div class="sidebar-section">현황</div>
+    <div class="sidebar-item" onclick="showScreen(2,this)">
+      <span class="sidebar-item-icon">📊</span> 부위별 통계
+    </div>
+  </div>
+
+  <!-- 메인 -->
+  <div class="main">
+
+    <!-- ① 운동 목록 -->
+    <div class="screen active" id="s0">
+      <div class="page-header">
+        <div>
+          <div class="page-title">운동 목록</div>
+          <div class="page-sub" id="list-page-sub">전체 350개 운동</div>
+        </div>
+        <div class="page-actions">
+          <button class="btn-primary" onclick="showScreen(1,document.querySelectorAll('.sidebar-item')[1]);openAddForm()">+ 운동 등록</button>
+        </div>
+      </div>
+
+      <!-- 통계 카드 -->
+      <div class="stats-row" id="top-stats"></div>
+
+      <!-- 필터 바 -->
+      <div class="filter-bar">
+        <input class="search-input" id="search-q" placeholder="운동명 검색..." oninput="applyFilter()">
+        <select class="filter-select" id="filter-part" onchange="applyFilter()">
+          <option value="">전체 부위</option>
+          <option>목</option><option>척추</option><option>어깨</option>
+          <option>고관절</option><option>무릎</option><option>발</option><option>유산소</option>
+        </select>
+        <select class="filter-select" id="filter-lv" onchange="applyFilter()">
+          <option value="">전체 난이도</option>
+          <option>초급</option><option>중급</option><option>고급</option>
+        </select>
+        <button class="btn-secondary" onclick="resetFilter()">초기화</button>
+      </div>
+
+      <div class="table-wrap">
+        <div class="table-header">
+          <span class="table-title">운동 목록</span>
+          <span class="table-count" id="list-count">0개</span>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th style="width:36px;">#</th>
+              <th>운동명</th>
+              <th>부위</th>
+              <th>난이도</th>
+              <th>세트</th>
+              <th>횟수/시간</th>
+              <th>예상시간</th>
+              <th style="width:120px;">관리</th>
+            </tr>
+          </thead>
+          <tbody id="ex-table-body"></tbody>
+        </table>
+        <div class="pagination" id="ex-pagination"></div>
+      </div>
+    </div>
+
+    <!-- ② 운동 등록/수정 -->
+    <div class="screen" id="s1">
+      <div class="page-header">
+        <div>
+          <div class="page-title" id="form-title">운동 등록</div>
+          <div class="page-sub" id="form-sub">새 운동을 추가합니다</div>
+        </div>
+        <div class="page-actions">
+          <button class="btn-secondary" onclick="showScreen(0,document.querySelectorAll('.sidebar-item')[0])">← 목록으로</button>
+        </div>
+      </div>
+      <div class="form-panel">
+        <div class="form-panel-title" id="form-panel-title">✏️ 운동 기본 정보</div>
+        <div class="form-grid">
+          <div class="form-group">
+            <div class="form-label">운동명 <span class="required">*</span></div>
+            <input class="form-input" id="f-name" placeholder="예) 어깨 회전 스트레칭">
+          </div>
+          <div class="form-group">
+            <div class="form-label">부위 <span class="required">*</span></div>
+            <select class="form-select" id="f-part">
+              <option value="">선택</option>
+              <option>목</option><option>척추</option><option>어깨</option>
+              <option>고관절</option><option>무릎</option><option>발</option><option>유산소</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <div class="form-label">난이도 <span class="required">*</span></div>
+            <select class="form-select" id="f-lv">
+              <option value="">선택</option>
+              <option value="1">초급</option>
+              <option value="2">중급</option>
+              <option value="3">고급</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <div class="form-label">세트 수</div>
+            <input class="form-input" id="f-sets" type="number" min="1" max="10" placeholder="3">
+          </div>
+          <div class="form-group">
+            <div class="form-label">횟수/시간</div>
+            <input class="form-input" id="f-reps" placeholder="예) 10회, 30초, 1분">
+          </div>
+          <div class="form-group">
+            <div class="form-label">예상 시간(분)</div>
+            <input class="form-input" id="f-mins" type="number" min="1" max="60" placeholder="5">
+          </div>
+          <div class="form-group full">
+            <div class="form-label">운동 설명</div>
+            <textarea class="form-textarea" id="f-desc" placeholder="운동 방법 및 설명을 입력하세요"></textarea>
+          </div>
+          <div class="form-group full">
+            <div class="form-label">주의사항</div>
+            <textarea class="form-textarea" id="f-warn" placeholder="통증, 금기 등 주의사항을 입력하세요" style="min-height:60px;"></textarea>
+          </div>
+        </div>
+        <div class="form-actions">
+          <button class="btn-secondary" onclick="resetForm()">초기화</button>
+          <button class="btn-primary" onclick="submitForm()">💾 저장</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ③ 부위별 통계 -->
+    <div class="screen" id="s2">
+      <div class="page-header">
+        <div>
+          <div class="page-title">부위별 통계</div>
+          <div class="page-sub">각 부위별 운동 수 및 난이도 분포</div>
+        </div>
+      </div>
+      <div class="stats-row" style="grid-template-columns:repeat(4,1fr);">
+        <div class="stat-card">
+          <div class="stat-card-top"><span class="stat-card-label">전체 운동</span><span class="stat-card-icon">📚</span></div>
+          <div class="stat-card-val" id="stat-total">—</div>
+          <div class="stat-card-sub">7개 부위</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-top"><span class="stat-card-label">초급</span><span class="stat-card-icon">🟢</span></div>
+          <div class="stat-card-val" id="stat-lv1">—</div>
+          <div class="stat-card-sub" id="stat-lv1-pct">—</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-top"><span class="stat-card-label">중급</span><span class="stat-card-icon">🟠</span></div>
+          <div class="stat-card-val" id="stat-lv2">—</div>
+          <div class="stat-card-sub" id="stat-lv2-pct">—</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-top"><span class="stat-card-label">고급</span><span class="stat-card-icon">🔴</span></div>
+          <div class="stat-card-val" id="stat-lv3">—</div>
+          <div class="stat-card-sub" id="stat-lv3-pct">—</div>
+        </div>
+      </div>
+      <div class="part-stat-grid" id="part-stat-grid"></div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  // ── 운동 DB (운동법.html과 동일 구조: [이름, 레벨, 세트, 횟수/시간, 예상분]) ──
+  const PARTS = ['목','척추','어깨','고관절','무릎','발','유산소'];
+  const PART_ICON = { '목':'🦴','척추':'🧬','어깨':'💪','고관절':'🦵','무릎':'🦿','발':'👣','유산소':'🏃' };
+  const LV_LABEL = ['','초급','중급','고급'];
+  const LV_CLS   = ['','lv1','lv2','lv3'];
+
+  // 운동 목록: { id, part, name, lv, sets, reps, mins, desc, warn }
+  let exList = [];
+  let nextId = 1;
+
+  const rawDB = {
+    '목': [
+      ['턱 당기기 (Chin Tuck)',1,3,'10회',5],['목 측면 스트레칭',1,3,'30초',6],['목 회전 운동',1,3,'10회',5],
+      ['목 전방 굴곡',1,3,'10회',4],['목 후방 신전',1,3,'10회',4],['상부 승모근 스트레칭',1,3,'30초',6],
+      ['목 견인 스트레칭',1,3,'20초',5],['레베이터 스캐풀라 스트레칭',1,2,'30초',4],['흉추 가동성 운동',1,3,'10회',6],
+      ['어깨 으쓱 운동',1,3,'15회',4],['목 반원 운동',1,3,'8회',5],['목 맥켄지 신전',1,3,'10회',5],
+      ['경추 안정화 기초',1,3,'10회',6],['SCM 스트레칭',1,2,'30초',4],['스캘린 스트레칭',1,2,'30초',4],
+      ['두개 경추 굴곡',1,3,'10회',5],['목 프로트랙션/리트랙션',1,3,'10회',5],['목 롤링',1,3,'8회',4],
+      ['눈-목 협응 기초',1,3,'10회',5],['어깨 뒤당기기',1,3,'15회',4],
+      ['목 전방 등척성 저항',2,3,'10초',6],['목 후방 등척성 저항',2,3,'10초',6],['목 측방 등척성 저항',2,3,'10초',6],
+      ['목 회전 등척성 저항',2,3,'10초',6],['밴드 목 굴곡',2,3,'12회',7],['밴드 목 신전',2,3,'12회',7],
+      ['밴드 목 측방 굴곡',2,3,'12회',7],['밴드 목 회전',2,3,'12회',7],['벽 천사 운동',2,3,'10회',6],
+      ['상부 교차 증후군 교정',2,3,'10회',7],['흉추 폼롤러',2,2,'30초',5],['깊은 목 굴근 운동',2,3,'10회',6],
+      ['하이 소케이프',2,3,'12회',7],['경추 협응 운동',2,3,'10회',6],['경추 안정화 심화',2,3,'12회',8],
+      ['리듬적 경추 안정화',2,3,'10회',7],['목 기능적 안정화',2,3,'10회',6],['PNF 경추 기초',2,3,'30초',7],
+      ['엎드려 목 신전',2,3,'10회',6],['경부 안정화 플랭크',2,3,'15초',7],
+      ['경추 현수 훈련',3,3,'12회',10],['플랭크 목 안정화',3,3,'20초',8],['고강도 등척성 훈련',3,4,'10초',8],
+      ['밴드 고저항 회전',3,3,'15회',9],['맥켄지 고급 신전',3,3,'15회',8],['경추 파워 훈련',3,3,'12회',10],
+      ['스포츠 특이적 경추',3,3,'10회',10],['고급 PNF 경추',3,3,'30초',9],['역동적 경추 훈련',3,3,'12회',10],
+      ['경추 종합 안정화',3,4,'10회',12]
+    ],
+    '척추': [
+      ['캣-카우 스트레칭',1,3,'10회',5],['무릎 가슴 당기기',1,3,'30초',5],['골반 기울기 운동',1,3,'10회',4],
+      ['슈퍼맨 기초',1,3,'10회',5],['브리지 기초',1,3,'15회',5],['척추 회전 스트레칭',1,3,'30초',6],
+      ['누워 무릎 돌리기',1,3,'10회',5],['아동 자세',1,3,'30초',4],['흉추 신전 의자',1,3,'10회',5],
+      ['요추 신전 기초',1,3,'10회',5],['좌우 몸통 굴곡',1,3,'10회',4],['앉아 척추 회전',1,3,'10회',5],
+      ['서서 척추 회전',1,3,'10회',5],['서서 측방 굴곡',1,3,'10회',4],['맥켄지 신전 기초',1,3,'10회',5],
+      ['누워 척추 견인',1,3,'30초',5],['척추 롤다운',1,3,'8회',6],['요추 안정화 기초',1,3,'10회',6],
+      ['사자 자세',1,3,'30초',4],['앉아 전방 굴곡',1,3,'30초',5],
+      ['버드독',2,3,'12회',7],['데드버그',2,3,'10회',7],['한다리 브리지',2,3,'12회',7],
+      ['사이드 플랭크 기초',2,3,'20초',6],['수영 운동',2,3,'10회',7],['척추 안정화 볼',2,3,'10회',7],
+      ['클램쉘',2,3,'15회',6],['레그 레이즈',2,3,'12회',7],['스쿼트 자세 교정',2,3,'10회',6],
+      ['힙 힌지 운동',2,3,'12회',7],['요추 안정화 심화',2,3,'12회',8],['흉추 로테이션 심화',2,3,'10회',7],
+      ['맥켄지 신전 심화',2,3,'12회',7],['짐볼 브리지',2,3,'15회',7],['짐볼 백익스텐션',2,3,'12회',7],
+      ['요방형근 스트레칭',2,3,'30초',6],['장요근 스트레칭',2,3,'30초',6],['이상근 스트레칭',2,3,'30초',6],
+      ['척추 PNF',2,3,'30초',7],['척추 사지 협응',2,3,'10회',8],
+      ['플랭크',3,3,'30초',8],['사이드 플랭크 심화',3,3,'30초',8],['롤아웃',3,3,'12회',9],
+      ['척추 저항 운동',3,3,'12회',9],['TRX 척추 안정화',3,3,'12회',10],['데드리프트 기초',3,3,'10회',10],
+      ['고강도 버드독',3,3,'15회',9],['고급 데드버그',3,3,'12회',9],['척추 파워 운동',3,3,'10회',10],
+      ['척추 종합 안정화',3,4,'10회',12]
+    ],
+    '어깨': [
+      ['어깨 회전 스트레칭',1,3,'10회',5],['펜들럼 운동',1,2,'30초',5],['흉부 스트레칭',1,3,'30초',5],
+      ['어깨 전방 스트레칭',1,3,'30초',5],['어깨 후방 스트레칭',1,3,'30초',5],['월 슬라이드',1,3,'10회',5],
+      ['팔 원 그리기',1,3,'10회',4],['어깨 으쓱 운동',1,3,'15회',4],['내회전 스트레칭',1,3,'30초',5],
+      ['외회전 스트레칭',1,3,'30초',5],['어깨 수평 내전 스트레칭',1,3,'30초',5],['이두근 스트레칭',1,3,'30초',4],
+      ['삼두근 스트레칭',1,3,'30초',4],['어깨 이완 운동',1,3,'10회',4],['팔 스윙 운동',1,3,'15회',4],
+      ['벽 기댄 스트레칭',1,3,'30초',5],['어깨 신전 스트레칭',1,3,'30초',5],['어깨 견갑 기초',1,3,'10회',5],
+      ['상부 승모근 스트레칭',1,3,'30초',5],['어깨 전체 이완',1,3,'10회',5],
+      ['밴드 외회전',2,3,'15회',7],['밴드 내회전',2,3,'15회',7],['밴드 어깨 굴곡',2,3,'12회',7],
+      ['밴드 어깨 신전',2,3,'12회',7],['페이스 풀',2,3,'15회',7],['레터럴 레이즈',2,3,'12회',7],
+      ['프론트 레이즈',2,3,'12회',7],['리버스 플라이',2,3,'12회',7],['스캡션 운동',2,3,'12회',7],
+      ['사이드라잉 외회전',2,3,'15회',7],['견갑 안정화',2,3,'12회',7],['어깨 PNF 기초',2,3,'30초',7],
+      ['다이아몬드 푸쉬업',2,3,'10회',7],['파이크 푸쉬업',2,3,'10회',7],['월 푸쉬업 심화',2,3,'15회',6],
+      ['시티드 로우',2,3,'12회',7],['어깨 외전 강화',2,3,'12회',7],['어깨 굴곡 강화',2,3,'12회',7],
+      ['어깨 3D 안정화',2,3,'10회',8],['어깨 PNF 심화',2,3,'30초',8],
+      ['숄더 프레스',3,4,'10회',9],['아놀드 프레스',3,3,'12회',9],['밀리터리 프레스',3,4,'8회',10],
+      ['업라이트 로우',3,3,'12회',9],['슈러그',3,4,'15회',8],['케이블 외회전',3,3,'15회',9],
+      ['어깨 고급 PNF',3,3,'30초',9],['어깨 파워 운동',3,3,'10회',10],['어깨 플라이오',3,3,'10회',10],
+      ['어깨 종합 강화',3,4,'12회',12]
+    ],
+    '고관절': [
+      ['고관절 굴곡 스트레칭',1,3,'30초',5],['고관절 신전 스트레칭',1,3,'30초',5],['고관절 외회전 스트레칭',1,3,'30초',5],
+      ['고관절 내회전 스트레칭',1,3,'30초',5],['고관절 외전 스트레칭',1,3,'30초',5],['나비 자세',1,3,'30초',5],
+      ['누워 무릎 당기기',1,3,'30초',5],['비둘기 자세',1,3,'30초',6],['앉아 고관절 굴곡',1,3,'10회',5],
+      ['고관절 90/90 스트레칭',1,3,'30초',6],['장요근 스트레칭',1,3,'30초',5],['이상근 스트레칭',1,3,'30초',5],
+      ['서서 고관절 굴곡',1,3,'10회',5],['서서 다리 스윙',1,3,'15회',5],['골반 안정화 기초',1,3,'10회',5],
+      ['옆으로 누워 다리들기',1,3,'15회',5],['클램쉘 기초',1,3,'15회',5],['고관절 전방 스트레칭',1,3,'30초',5],
+      ['누워 고관절 돌리기',1,3,'10회',5],['앉아 전방 굴곡',1,3,'30초',5],
+      ['클램쉘 저항',2,3,'15회',7],['사이드라잉 외전',2,3,'15회',7],['한다리 브리지',2,3,'12회',7],
+      ['와이드 스쿼트',2,3,'12회',7],['사이드 스텝 밴드',2,3,'15회',7],['몬스터 워크',2,3,'10회',7],
+      ['고관절 회전 강화',2,3,'12회',7],['런지 고관절',2,3,'12회',7],['고관절 PNF',2,3,'30초',7],
+      ['힙 에이버덕션',2,3,'15회',7],['힙 애덕션',2,3,'15회',7],['서서 고관절 외회전',2,3,'12회',7],
+      ['케틀벨 힙 힌지',2,3,'12회',8],['고관절 딥 스쿼트',2,3,'12회',8],['고관절 안정화 중급',2,3,'12회',8],
+      ['모닝글로리',2,3,'10회',7],['고관절 기능 훈련',2,3,'10회',7],['고관절 협응 운동',2,3,'10회',7],
+      ['고관절 PNF 심화',2,3,'30초',8],['고관절 복합 운동',2,3,'10회',8],
+      ['힙 스러스트',3,4,'12회',10],['불가리안 스쿼트',3,3,'10회',10],['한다리 스쿼트',3,3,'8회',10],
+      ['데드리프트 고관절',3,4,'8회',10],['고관절 파워 운동',3,3,'10회',10],['플라이오 힙',3,3,'10회',10],
+      ['고속 고관절 운동',3,3,'12회',10],['스포츠 특이 고관절',3,3,'10회',10],['고급 PNF 고관절',3,3,'30초',10],
+      ['고관절 종합 안정화',3,4,'10회',12]
+    ],
+    '무릎': [
+      ['무릎 굴곡 스트레칭',1,3,'30초',5],['대퇴사두근 스트레칭',1,3,'30초',5],['슬굴곡근 스트레칭',1,3,'30초',5],
+      ['장경인대 스트레칭',1,3,'30초',5],['앉아 무릎 신전',1,3,'10회',5],['발목 펌프',1,3,'15회',4],
+      ['종아리 스트레칭',1,3,'30초',5],['누워 무릎 굴곡',1,3,'10회',5],['벽 스쿼트',1,3,'20초',5],
+      ['미니 스쿼트',1,3,'12회',5],['사두근 수축 운동',1,3,'15회',4],['햄스트링 기초',1,3,'12회',5],
+      ['스텝업 기초',1,3,'10회',5],['무릎 신전 기초',1,3,'12회',5],['반월상 연골 기초',1,3,'10회',5],
+      ['무릎 각도 운동',1,3,'10회',5],['무릎 빙하기 자세',1,3,'20초',5],['서서 무릎 굴곡',1,3,'12회',5],
+      ['무릎 전방 스트레칭',1,3,'30초',5],['무릎 후방 스트레칭',1,3,'30초',5],
+      ['레그 프레스',2,4,'12회',8],['레그 익스텐션',2,3,'12회',7],['레그 컬',2,3,'12회',7],
+      ['스쿼트 중급',2,4,'12회',8],['런지 중급',2,3,'12회',8],['스텝업 심화',2,3,'12회',7],
+      ['터미널 니 익스텐션',2,3,'15회',7],['무릎 안정화 밴드',2,3,'12회',7],['VMO 강화',2,3,'15회',7],
+      ['사이드 스텝',2,3,'12회',7],['고유수용감각 훈련',2,3,'10회',7],['무릎 PNF',2,3,'30초',7],
+      ['대퇴사두근 강화 중급',2,4,'12회',8],['슬굴곡근 강화 중급',2,4,'12회',8],['균형 무릎 운동',2,3,'20초',7],
+      ['단계적 스쿼트',2,4,'10회',8],['무릎 협응 운동',2,3,'10회',7],['반월상 연골 중급',2,3,'12회',7],
+      ['무릎 안정화 중급',2,3,'12회',8],['무릎 복합 운동',2,3,'10회',8],
+      ['점프 스쿼트',3,4,'10회',10],['불가리안 스쿼트',3,3,'10회',10],['피스톨 스쿼트',3,3,'8회',10],
+      ['파워 런지',3,3,'10회',10],['박스 점프',3,4,'8회',10],['무릎 파워 트레이닝',3,3,'10회',10],
+      ['고속 무릎 운동',3,3,'12회',10],['스포츠 특이 무릎',3,3,'10회',10],['고급 PNF 무릎',3,3,'30초',10],
+      ['무릎 종합 안정화',3,4,'10회',12]
+    ],
+    '발': [
+      ['발목 회전 운동',1,3,'10회',4],['발목 굴곡 신전',1,3,'15회',4],['발가락 운동',1,3,'15회',4],
+      ['발바닥 마사지',1,3,'30초',5],['발목 좌우 운동',1,3,'15회',4],['종아리 스트레칭',1,3,'30초',5],
+      ['아킬레스건 스트레칭',1,3,'30초',5],['발 아치 강화 기초',1,3,'15회',5],['수건 집기',1,3,'15회',4],
+      ['발목 펌프',1,3,'15회',4],['발가락 굴곡',1,3,'15회',4],['발가락 신전',1,3,'15회',4],
+      ['발바닥 스트레칭',1,3,'30초',5],['발목 안쪽 스트레칭',1,3,'30초',5],['발목 바깥쪽 스트레칭',1,3,'30초',5],
+      ['발뒤꿈치 들기 기초',1,3,'15회',5],['발가락 분리 운동',1,3,'10회',4],['발목 균형 기초',1,3,'20초',5],
+      ['맨발 걷기 감각',1,1,'2분',5],['족저근막 스트레칭',1,3,'30초',5],
+      ['카프 레이즈 중급',2,3,'20회',7],['한발 카프 레이즈',2,3,'15회',7],['발목 안정화 밴드',2,3,'12회',7],
+      ['발목 외전 강화',2,3,'15회',7],['발목 내전 강화',2,3,'15회',7],['발목 배굴 강화',2,3,'12회',7],
+      ['발목 저측굴 강화',2,3,'15회',7],['한발 균형 서기',2,3,'20초',6],['BOSU 발목 훈련',2,3,'20초',7],
+      ['발목 저항 운동',2,3,'12회',7],['발 아치 강화 중급',2,3,'15회',7],['인솔 강화 운동',2,3,'12회',7],
+      ['족저근막 운동',2,3,'15회',7],['발목 PNF',2,3,'30초',7],['발 고유수용감각',2,3,'20초',7],
+      ['발목 동적 안정화',2,3,'10회',7],['발목 복합 운동',2,3,'10회',8],['발 기능 훈련',2,3,'10회',7],
+      ['발목 협응 운동',2,3,'10회',7],['발목 기능 강화',2,3,'12회',8],
+      ['발목 플라이오메트릭',3,3,'10회',10],['한발 점프',3,3,'10회',10],['발목 파워 운동',3,3,'12회',10],
+      ['스포츠 특이 발목',3,3,'10회',10],['고강도 카프 레이즈',3,4,'20회',9],['발목 속도 훈련',3,3,'10회',10],
+      ['발목 방향 전환',3,3,'10회',10],['발목 균형 고급',3,3,'30초',9],['고급 PNF 발목',3,3,'30초',10],
+      ['발목 종합 훈련',3,4,'10회',12]
+    ],
+    '유산소': [
+      ['제자리 걷기',1,1,'5분',5],['발뒤꿈치 터치',1,3,'15회',4],['발앞꿈치 터치',1,3,'15회',4],
+      ['서서 무릎 들기',1,3,'15회',4],['팔 스윙 운동',1,3,'20회',4],['옆으로 걷기',1,1,'3분',4],
+      ['교차 보행',1,3,'15회',5],['의자 에어로빅',1,3,'10회',5],['느린 스텝 운동',1,3,'10회',5],
+      ['가벼운 계단 운동',1,1,'3분',5],['간단 댄스 스텝',1,3,'10회',5],['스트레칭 복합 기초',1,3,'10회',6],
+      ['저강도 바이크',1,1,'10분',10],['천천히 걷기',1,1,'15분',15],['팔꿈치 무릎 교차',1,3,'15회',5],
+      ['발목 펌프 유산소',1,3,'20회',4],['어깨 돌리기 걷기',1,1,'5분',5],['온몸 이완 걷기',1,1,'10분',10],
+      ['리듬 걷기',1,1,'10분',10],['저강도 맨손 체조',1,3,'10회',6],
+      ['파워 워킹',2,1,'20분',20],['빠른 걷기',2,1,'15분',15],['조깅 기초',2,1,'10분',10],
+      ['에어로빅 댄스',2,3,'3분',10],['줄넘기 기초',2,3,'1분',8],['스텝 에어로빅',2,3,'5분',15],
+      ['수중 운동 중급',2,1,'20분',20],['엘립티컬 훈련',2,1,'15분',15],['인터벌 워킹',2,4,'2분',20],
+      ['사이클 중급',2,1,'15분',15],['댄스 스텝 중급',2,3,'3분',10],['킥복싱 기초',2,3,'3분',12],
+      ['복합 에어로빅',2,3,'5분',15],['트레드밀 중급',2,1,'15분',15],['계단 운동 중급',2,3,'3분',10],
+      ['지속 조깅',2,1,'15분',15],['사이클 인터벌',2,4,'2분',20],['에어로빅 복합',2,3,'5분',15],
+      ['로잉 중급',2,3,'3분',12],['런닝 기초',2,1,'10분',10],
+      ['HIIT 기초',3,4,'30초',20],['버피',3,4,'10회',10],['마운틴 클라이머',3,4,'20회',10],
+      ['점핑잭',3,4,'30회',8],['고속 줄넘기',3,3,'1분',10],['인터벌 달리기',3,5,'2분',25],
+      ['스프린트 훈련',3,6,'30초',20],['써킷 트레이닝',3,3,'5분',20],['HIIT 고급',3,5,'30초',25],
+      ['유산소 종합 훈련',3,4,'5분',30]
+    ]
+  };
+
+  // DB 초기화
+  function initDB() {
+    for (const part of PARTS) {
+      for (const row of (rawDB[part] || [])) {
+        exList.push({ id: nextId++, part, name: row[0], lv: row[1], sets: row[2], reps: row[3], mins: row[4], desc: '', warn: '' });
+      }
+    }
+  }
+
+  // ── 화면 전환 ──
+  function showScreen(idx, el) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.sidebar-item').forEach(b => b.classList.remove('active'));
+    document.getElementById('s' + idx).classList.add('active');
+    el.classList.add('active');
+    if (idx === 0) renderTable();
+    if (idx === 2) renderStats();
+  }
+
+  // ── 목록 ──
+  const PAGE_SIZE = 15;
+  let currentPage = 1;
+  let filteredList = [];
+
+  function applyFilter() {
+    const q = document.getElementById('search-q').value.trim().toLowerCase();
+    const part = document.getElementById('filter-part').value;
+    const lv = document.getElementById('filter-lv').value;
+    filteredList = exList.filter(e => {
+      if (q && !e.name.toLowerCase().includes(q)) return false;
+      if (part && e.part !== part) return false;
+      if (lv && LV_LABEL[e.lv] !== lv) return false;
+      return true;
+    });
+    currentPage = 1;
+    renderTable();
+  }
+
+  function resetFilter() {
+    document.getElementById('search-q').value = '';
+    document.getElementById('filter-part').value = '';
+    document.getElementById('filter-lv').value = '';
+    applyFilter();
+  }
+
+  function renderTable() {
+    filteredList = filteredList.length || filteredList === [] ? filteredList : [...exList];
+    if (!filteredList.length && !document.getElementById('search-q').value && !document.getElementById('filter-part').value && !document.getElementById('filter-lv').value) {
+      filteredList = [...exList];
+    }
+    const total = filteredList.length;
+    const totalPages = Math.ceil(total / PAGE_SIZE);
+    const start = (currentPage - 1) * PAGE_SIZE;
+    const page = filteredList.slice(start, start + PAGE_SIZE);
+
+    document.getElementById('list-count').textContent = total + '개';
+    document.getElementById('list-page-sub').textContent = `전체 ${exList.length}개 운동 · ${PARTS.length}개 부위`;
+
+    document.getElementById('ex-table-body').innerHTML = page.map((e, i) => `
+      <tr>
+        <td style="color:#A0AEC0;font-size:12px;">${start + i + 1}</td>
+        <td style="font-weight:700;">${e.name}</td>
+        <td><span style="font-size:13px;">${PART_ICON[e.part]}</span> ${e.part}</td>
+        <td><span class="lv-badge ${LV_CLS[e.lv]}">${LV_LABEL[e.lv]}</span></td>
+        <td>${e.sets}세트</td>
+        <td>${e.reps}</td>
+        <td>${e.mins}분</td>
+        <td>
+          <button class="btn-edit" onclick="openEditForm(${e.id})">수정</button>
+          <button class="btn-danger" onclick="deleteEx(${e.id})" style="margin-left:4px;">삭제</button>
+        </td>
+      </tr>`).join('');
+
+    renderPagination(totalPages);
+    renderTopStats();
+  }
+
+  function renderPagination(totalPages) {
+    const el = document.getElementById('ex-pagination');
+    if (totalPages <= 1) { el.innerHTML = ''; return; }
+    let html = '';
+    if (currentPage > 1) html += `<button class="page-btn" onclick="goPage(${currentPage-1})">‹</button>`;
+    const s = Math.max(1, currentPage - 2), end = Math.min(totalPages, s + 4);
+    for (let i = s; i <= end; i++) html += `<button class="page-btn${i===currentPage?' active':''}" onclick="goPage(${i})">${i}</button>`;
+    if (currentPage < totalPages) html += `<button class="page-btn" onclick="goPage(${currentPage+1})">›</button>`;
+    el.innerHTML = html;
+  }
+
+  function goPage(p) { currentPage = p; renderTable(); }
+
+  function renderTopStats() {
+    const byPart = {};
+    for (const p of PARTS) byPart[p] = exList.filter(e => e.part === p).length;
+    document.getElementById('top-stats').innerHTML = PARTS.map(p => `
+      <div class="stat-card" onclick="document.getElementById('filter-part').value='${p}';applyFilter()">
+        <div class="stat-card-top"><span class="stat-card-label">${p}</span><span class="stat-card-icon">${PART_ICON[p]}</span></div>
+        <div class="stat-card-val">${byPart[p]}</div>
+        <div class="stat-card-sub">개 운동</div>
+      </div>`).join('');
+  }
+
+  // ── 등록/수정 폼 ──
+  let editingId = null;
+
+  function openAddForm() {
+    editingId = null;
+    resetForm();
+    document.getElementById('form-title').textContent = '운동 등록';
+    document.getElementById('form-sub').textContent = '새 운동을 추가합니다';
+    document.getElementById('form-panel-title').textContent = '✏️ 운동 기본 정보';
+  }
+
+  function openEditForm(id) {
+    const e = exList.find(x => x.id === id);
+    if (!e) return;
+    editingId = id;
+    document.getElementById('f-name').value = e.name;
+    document.getElementById('f-part').value = e.part;
+    document.getElementById('f-lv').value = e.lv;
+    document.getElementById('f-sets').value = e.sets;
+    document.getElementById('f-reps').value = e.reps;
+    document.getElementById('f-mins').value = e.mins;
+    document.getElementById('f-desc').value = e.desc || '';
+    document.getElementById('f-warn').value = e.warn || '';
+    document.getElementById('form-title').textContent = '운동 수정';
+    document.getElementById('form-sub').textContent = e.name;
+    document.getElementById('form-panel-title').textContent = `✏️ 운동 수정 — ${e.name}`;
+    showScreen(1, document.querySelectorAll('.sidebar-item')[1]);
+  }
+
+  function resetForm() {
+    ['f-name','f-part','f-lv','f-sets','f-reps','f-mins','f-desc','f-warn'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el.tagName === 'SELECT') el.value = '';
+      else el.value = '';
+    });
+  }
+
+  function submitForm() {
+    const name = document.getElementById('f-name').value.trim();
+    const part = document.getElementById('f-part').value;
+    const lv   = parseInt(document.getElementById('f-lv').value);
+    const sets = parseInt(document.getElementById('f-sets').value) || 3;
+    const reps = document.getElementById('f-reps').value.trim() || '10회';
+    const mins = parseInt(document.getElementById('f-mins').value) || 5;
+    const desc = document.getElementById('f-desc').value.trim();
+    const warn = document.getElementById('f-warn').value.trim();
+
+    if (!name) { alert('운동명을 입력하세요.'); return; }
+    if (!part) { alert('부위를 선택하세요.'); return; }
+    if (!lv)   { alert('난이도를 선택하세요.'); return; }
+
+    if (editingId) {
+      const e = exList.find(x => x.id === editingId);
+      if (e) Object.assign(e, { name, part, lv, sets, reps, mins, desc, warn });
+      alert('수정되었습니다.');
+    } else {
+      exList.push({ id: nextId++, part, name, lv, sets, reps, mins, desc, warn });
+      alert('등록되었습니다.');
+    }
+    editingId = null;
+    filteredList = [...exList];
+    showScreen(0, document.querySelectorAll('.sidebar-item')[0]);
+  }
+
+  function deleteEx(id) {
+    if (!confirm('이 운동을 삭제하시겠습니까?')) return;
+    exList = exList.filter(x => x.id !== id);
+    filteredList = filteredList.filter(x => x.id !== id);
+    renderTable();
+  }
+
+  // ── 통계 ──
+  function renderStats() {
+    const total = exList.length;
+    const lv1 = exList.filter(e => e.lv === 1).length;
+    const lv2 = exList.filter(e => e.lv === 2).length;
+    const lv3 = exList.filter(e => e.lv === 3).length;
+    document.getElementById('stat-total').textContent = total;
+    document.getElementById('stat-lv1').textContent = lv1;
+    document.getElementById('stat-lv1-pct').textContent = Math.round(lv1/total*100) + '%';
+    document.getElementById('stat-lv2').textContent = lv2;
+    document.getElementById('stat-lv2-pct').textContent = Math.round(lv2/total*100) + '%';
+    document.getElementById('stat-lv3').textContent = lv3;
+    document.getElementById('stat-lv3-pct').textContent = Math.round(lv3/total*100) + '%';
+
+    document.getElementById('part-stat-grid').innerHTML = PARTS.map(p => {
+      const list = exList.filter(e => e.part === p);
+      const p1 = list.filter(e => e.lv === 1).length;
+      const p2 = list.filter(e => e.lv === 2).length;
+      const p3 = list.filter(e => e.lv === 3).length;
+      return `
+        <div class="part-stat-card">
+          <div class="part-stat-name">${PART_ICON[p]} ${p}</div>
+          <div class="part-stat-total">${list.length}개</div>
+          <div class="part-stat-bar">
+            <div class="part-stat-lv" style="background:#C6F6D5;">
+              <div class="part-stat-lv-num" style="color:#276749;">${p1}</div>
+              <div class="part-stat-lv-label" style="color:#276749;">초급</div>
+            </div>
+            <div class="part-stat-lv" style="background:#FEEBC8;">
+              <div class="part-stat-lv-num" style="color:#744210;">${p2}</div>
+              <div class="part-stat-lv-label" style="color:#744210;">중급</div>
+            </div>
+            <div class="part-stat-lv" style="background:#FED7D7;">
+              <div class="part-stat-lv-num" style="color:#742A2A;">${p3}</div>
+              <div class="part-stat-lv-label" style="color:#742A2A;">고급</div>
+            </div>
+          </div>
+        </div>`;
+    }).join('');
+  }
+
+  // ── 초기화 ──
+  initDB();
+  filteredList = [...exList];
+  renderTable();
+</script>
+
+</body>
+</html>

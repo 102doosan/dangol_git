@@ -245,7 +245,7 @@
     .step3-search-icon { color: #A0AEC0; font-size: 13px; }
     .step3-part-btns { padding: 10px 14px; border-bottom: 1px solid #E2E8F0; display: flex; flex-wrap: wrap; gap: 6px; }
     .step3-part-btn { padding: 4px 10px; border-radius: 99px; border: 1.5px solid #E2E8F0; background: #fff; font-size: 11px; font-weight: 700; cursor: pointer; font-family: 'Noto Sans KR',sans-serif; color: #718096; transition: all .15s; }
-    .step3-part-btn.active { color: #fff; border-color: transparent; }
+    .step3-part-btn.active { color: #fff; border-color: transparent; background: #718096; }
     .step3-ex-list { flex: 1; overflow-y: auto; padding: 8px 8px; }
     .step3-ex-row { display: flex; align-items: center; gap: 10px; padding: 9px 10px; border-radius: 10px; cursor: pointer; transition: background .12s; margin-bottom: 3px; }
     .step3-ex-row:hover { background: #EBF4FF; }
@@ -317,6 +317,53 @@
     .page-btn { width: 32px; height: 32px; border-radius: 8px; border: 1.5px solid #E2E8F0; background: #fff; font-size: 13px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; color: #718096; }
     .page-btn.active { background: #E67E22; border-color: #E67E22; color: #fff; }
 
+    /* ── 회원 앱 미리보기 모달 ── */
+    .preview-overlay {
+      display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.65);
+      z-index: 9999; align-items: center; justify-content: center;
+    }
+    .preview-overlay.open { display: flex; }
+    .preview-modal {
+      background: #fff; border-radius: 24px; overflow: hidden;
+      width: 400px; max-height: 90vh; display: flex; flex-direction: column;
+      box-shadow: 0 24px 80px rgba(0,0,0,0.45);
+    }
+    .preview-modal-topbar {
+      background: #1E2A3A; padding: 12px 18px;
+      display: flex; align-items: center; justify-content: space-between; flex-shrink: 0;
+    }
+    .preview-modal-topbar-title { font-size: 13px; font-weight: 800; color: #A0AEC0; }
+    .preview-modal-close {
+      background: rgba(255,255,255,0.12); border: none; border-radius: 8px;
+      color: #fff; font-size: 13px; font-weight: 700; padding: 5px 12px; cursor: pointer;
+    }
+    .preview-phone-body { overflow-y: auto; flex: 1; background: #F0F4F8; }
+
+    /* 미리보기 내부 컴포넌트 */
+    .pv-header {
+      padding: 24px 20px 20px; color: #fff;
+    }
+    .pv-back { font-size: 13px; opacity: .8; margin-bottom: 10px; }
+    .pv-name { font-size: 20px; font-weight: 900; }
+    .pv-meta { font-size: 12px; opacity: .75; margin-top: 4px; }
+    .pv-tags { display: flex; gap: 6px; margin-top: 10px; flex-wrap: wrap; }
+    .pv-tag { font-size: 10px; font-weight: 700; padding: 3px 10px; border-radius: 99px; background: rgba(255,255,255,0.22); color: #fff; }
+    .pv-body { padding: 16px; display: flex; flex-direction: column; gap: 12px; }
+    .pv-info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .pv-info-item { background: #fff; border-radius: 12px; padding: 12px 14px; box-shadow: 0 1px 4px rgba(0,0,0,0.05); }
+    .pv-info-label { font-size: 10px; font-weight: 700; color: #A0AEC0; margin-bottom: 4px; }
+    .pv-info-val { font-size: 14px; font-weight: 700; color: #2D3748; }
+    .pv-section-title { font-size: 11px; font-weight: 800; color: #A0AEC0; letter-spacing: .5px; text-transform: uppercase; padding-bottom: 4px; border-bottom: 1px solid #E2E8F0; }
+    .pv-ex-row { background: #fff; border-radius: 14px; padding: 12px 14px; display: flex; align-items: center; gap: 12px; box-shadow: 0 1px 6px rgba(0,0,0,0.06); }
+    .pv-ex-num { width: 26px; height: 26px; border-radius: 50%; background: #3B6FF0; color: #fff; font-size: 11px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .pv-ex-num.sec { background: #E2E8F0; color: #718096; }
+    .pv-ex-name { font-size: 13px; font-weight: 700; color: #1A202C; }
+    .pv-ex-detail { font-size: 11px; color: #A0AEC0; margin-top: 2px; }
+    .pv-memo-card { background: #FFF8E7; border-radius: 14px; padding: 14px 16px; border-left: 4px solid #F6AD55; }
+    .pv-memo-label { font-size: 11px; font-weight: 700; color: #F6AD55; margin-bottom: 6px; }
+    .pv-memo-text { font-size: 13px; color: #744210; line-height: 1.7; }
+    .pv-done-badge { background: #F0FFF4; border-left: 4px solid #48BB78; border-radius: 12px; padding: 12px 14px; font-size: 12px; color: #276749; font-weight: 600; }
+
     /* 메모판 */
     .memo-panel { background: #fff; border-radius: 16px; padding: 22px; box-shadow: 0 1px 6px rgba(0,0,0,0.06); min-height: 200px; }
     .memo-panel-title { font-size: 14px; font-weight: 900; color: #2D3748; margin-bottom: 4px; }
@@ -328,6 +375,19 @@
     .memo-text { font-size: 13px; color: #4A5568; line-height: 1.6; }
     .memo-tag { display: inline-block; padding: 3px 10px; border-radius: 99px; font-size: 11px; font-weight: 700; margin: 2px 2px; }
     .memo-section { margin-bottom: 18px; }
+
+    /* 세션 운동 상세 토글 */
+    .sess-ex-detail { display: none; margin-top: 10px; background: #fff; border-radius: 10px; padding: 10px 12px; border: 1.5px solid #E2E8F0; }
+    .sess-ex-detail.open { display: block; }
+    .sess-ex-row { display: flex; align-items: center; gap: 10px; padding: 7px 0; border-bottom: 1px solid #F0F4F8; }
+    .sess-ex-row:last-child { border-bottom: none; }
+    .sess-ex-check { width: 22px; height: 22px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 13px; flex-shrink: 0; }
+    .sess-ex-check.done { background: #C6F6D5; color: #276749; }
+    .sess-ex-check.skip { background: #EDF2F7; color: #A0AEC0; }
+    .sess-ex-name { font-size: 12px; font-weight: 700; color: #2D3748; flex: 1; }
+    .sess-ex-grade { font-size: 10px; font-weight: 700; color: #A0AEC0; }
+    .sess-toggle-btn { font-size: 11px; font-weight: 700; color: #E67E22; cursor: pointer; margin-top: 8px; display: inline-block; }
+    .sess-toggle-btn:hover { text-decoration: underline; }
   </style>
 </head>
 <body>
@@ -400,20 +460,20 @@
         </div>
 
         <div class="search-bar">
-          <input class="search-input" id="memberListSearch" type="text" placeholder="🔍  회원명 또는 전화번호 검색" oninput="renderMemberTable()" />
-          <select class="filter-select" id="filterBranch" onchange="renderMemberTable()">
+          <input class="search-input" id="memberListSearch" type="text" placeholder="🔍  회원명 또는 전화번호 검색" oninput="renderMemberTable(true)" />
+          <select class="filter-select" id="filterBranch" onchange="renderMemberTable(true)">
             <option value="">전체 지점</option>
             <option value="강남점">강남점</option>
             <option value="서초점">서초점</option>
             <option value="마포점">마포점</option>
           </select>
-          <select class="filter-select" id="filterGrade" onchange="renderMemberTable()">
+          <select class="filter-select" id="filterGrade" onchange="renderMemberTable(true)">
             <option value="">전체 등급</option>
             <option value="초급">초급</option>
             <option value="중급">중급</option>
             <option value="고급">고급</option>
           </select>
-          <select class="filter-select" id="filterStatus" onchange="renderMemberTable()">
+          <select class="filter-select" id="filterStatus" onchange="renderMemberTable(true)">
             <option value="">전체 상태</option>
             <option value="active">활성</option>
             <option value="done">완료</option>
@@ -441,12 +501,7 @@
             </thead>
             <tbody id="memberTableBody"></tbody>
           </table>
-          <div class="pagination">
-            <button class="page-btn active">1</button>
-            <button class="page-btn">2</button>
-            <button class="page-btn">3</button>
-            <button class="page-btn">›</button>
-          </div>
+          <div class="pagination" id="memberPagination"></div>
         </div>
       </div>
 
@@ -460,6 +515,7 @@
           <div class="page-actions">
             <button class="btn-secondary" onclick="showScreen(0,document.querySelectorAll('.nav-btn')[0])">← 목록</button>
             <button class="btn-secondary" id="btn-edit-prx" onclick="editPrx()">처방 수정</button>
+            <button class="btn-secondary" style="background:#EBF8FF;color:#3B6FF0;border-color:#BEE3F8;" onclick="showMemberPreview()">📱 회원 화면 보기</button>
             <button class="btn-primary" onclick="showScreen(2,document.querySelectorAll('.nav-btn')[2])">+ 신규 처방</button>
           </div>
         </div>
@@ -565,6 +621,7 @@
         <div class="detail-panel">
           <div class="detail-panel-title" id="rc-list-title">📨 전체 신청 목록</div>
           <div class="request-list" id="rcList"></div>
+          <div class="pagination" id="rcPagination"></div>
         </div>
       </div>
 
@@ -613,7 +670,7 @@
               <div class="form-label">회원 검색 <span class="required">*</span></div>
               <div style="display:flex;gap:8px;">
                 <input class="form-input" id="acMemberSearchInput" type="text" placeholder="회원명 또는 전화번호 입력" style="flex:1;"
-                  oninput="onMemberSearchInput()" onkeydown="if(event.key==='Enter'){event.preventDefault();onMemberSearchInput();}" />
+                  oninput="onMemberSearchInput()" onkeydown="if(event.key==='Enter'){event.preventDefault();renderAcMemberSearch(true);}" />
                 <button onclick="renderAcMemberSearch(true)" style="background:#E67E22;color:#fff;border:none;border-radius:10px;padding:10px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Noto Sans KR',sans-serif;white-space:nowrap;">검색</button>
               </div>
             </div>
@@ -803,7 +860,78 @@
       }
     ];
 
+    // ── 회원 앱 미리보기 ──
+    function showMemberPreview() {
+      if (!selectedPrxId) { alert('처방을 먼저 선택해주세요.'); return; }
+      const data = memberPrescriptions[currentMember];
+      if (!data) return;
+      const p = data.list.find(x => x.id === selectedPrxId);
+      if (!p) return;
+
+      const isDone = p.status !== 'active';
+      const gradeColor = { '초급': '#38A169', '중급': '#3B6FF0', '고급': '#E53E3E' };
+      const exGrade = { '필수': ['#EBF8FF','#3B6FF0'], '권장': ['#F0FFF4','#38A169'], '선택': ['#FFF5F5','#E53E3E'] };
+      const headerBg = isDone
+        ? 'linear-gradient(135deg,#4A5568 0%,#2D3748 100%)'
+        : 'linear-gradient(135deg,#3B6FF0 0%,#7B61FF 100%)';
+
+      const exRows = (p.exercises || []).map((e, i) => {
+        const [bg, fg] = exGrade[e.grade] || ['#F0F4F8','#718096'];
+        const numCls = e.grade === '필수' ? 'pv-ex-num' : 'pv-ex-num sec';
+        return `<div class="pv-ex-row">
+          <div class="${numCls}">${i+1}</div>
+          <div style="flex:1;">
+            <div class="pv-ex-name">${e.name}</div>
+            <div class="pv-ex-detail">${e.detail}</div>
+          </div>
+          <span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:99px;background:${bg};color:${fg};">${e.grade}</span>
+        </div>`;
+      }).join('');
+
+      const doneBlock = isDone ? `<div class="pv-done-badge">✅ 처방 완료 — ${p.count}회 수행 · 마지막 ${p.hist?.sessions?.[0]?.date || '—'}</div>` : '';
+
+      const sfmaText = p.sfmaAfter ? `${p.sfmaAfter}회 후` : '—';
+      const alertText = (p.sfmaAlertDays || []).map(d => d+'회 전').join(' · ') || '—';
+
+      document.getElementById('previewBody').innerHTML = `
+        <div class="pv-header" style="background:${headerBg};">
+          <div class="pv-back">← 처방 목록</div>
+          <div class="pv-name">${p.name}</div>
+          <div class="pv-meta">담당: ${p.trainer} · ${data.branch || '—'}</div>
+          <div class="pv-tags">
+            <span class="pv-tag">${isDone ? '✓ 완료' : '● 진행중'}</span>
+            <span class="pv-tag">${p.grade}</span>
+            <span class="pv-tag">${p.date} 처방</span>
+          </div>
+        </div>
+        <div class="pv-body">
+          ${doneBlock}
+          <div class="pv-info-grid">
+            <div class="pv-info-item"><div class="pv-info-label">총 수행 횟수</div><div class="pv-info-val">${p.count}회</div></div>
+            <div class="pv-info-item"><div class="pv-info-label">마지막 수행</div><div class="pv-info-val">${p.hist?.sessions?.[0]?.date || '—'}</div></div>
+            <div class="pv-info-item"><div class="pv-info-label">SFMA 기준</div><div class="pv-info-val">${sfmaText}</div></div>
+            <div class="pv-info-item"><div class="pv-info-label">알림 시점</div><div class="pv-info-val">${alertText}</div></div>
+          </div>
+          <div class="pv-section-title">운동 목록 (${(p.exercises||[]).length}가지)</div>
+          ${exRows}
+          <div class="pv-memo-card">
+            <div class="pv-memo-label">📝 트레이너 메모 — ${p.trainer}</div>
+            <div class="pv-memo-text">${(p.memo || '').replace(/\n/g,'<br>')}</div>
+          </div>
+        </div>
+      `;
+      document.getElementById('previewOverlay').classList.add('open');
+    }
+
+    function closeMemberPreview() {
+      document.getElementById('previewOverlay').classList.remove('open');
+    }
+
     function showScreen(idx, btn) {
+      // 편집 모드에서 다른 화면으로 이동 시 편집 폼 초기화
+      if (idx !== 1 && document.getElementById('ep-name')) {
+        document.getElementById('prx-detail').innerHTML = '';
+      }
       document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
       document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
       document.querySelectorAll('.sidebar-item').forEach(b => b.classList.remove('active'));
@@ -849,12 +977,13 @@
 
     function setStep3Part(part, btn) {
       step3Part = part;
-      document.querySelectorAll('.step3-part-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.step3-part-btn').forEach(b => {
+        b.classList.remove('active');
+        b.style.background = ''; b.style.borderColor = '';
+      });
       btn.classList.add('active');
-      if (part) {
-        const c = acPartColors[part] || '#718096';
-        btn.style.background = c; btn.style.borderColor = c;
-      }
+      const c = part ? (acPartColors[part] || '#718096') : '#718096';
+      btn.style.background = c; btn.style.borderColor = c;
       renderStep3List();
     }
 
@@ -926,6 +1055,10 @@
           <button class="step3-del-btn" onclick="removeStep3Item(${i})">×</button>
         </div>`).join('');
     }
+
+    // 전체 버튼 초기 활성 색상
+    const _initActiveBtn = document.querySelector('.step3-part-btn.active');
+    if (_initActiveBtn) { _initActiveBtn.style.background = '#718096'; _initActiveBtn.style.borderColor = '#718096'; }
 
     // 부위 버튼 색상 초기화 (active 비색상 버튼은 기본 스타일 유지)
     document.querySelectorAll('.step3-part-btn:not(.active)').forEach(b => {
@@ -1014,6 +1147,10 @@
     let currentMember = '김도산';
     let selectedPrxId = null;
     let acSelectedMember = null; // 처방 등록 시 선택된 회원
+    let memberPage = 1;
+    const MEMBER_PAGE_SIZE = 10;
+    let rcPage = 1;
+    const RC_PAGE_SIZE = 8;
 
     function selectAcGrade(el) {
       document.querySelectorAll('#acGradeOptions .grade-option').forEach(e => e.classList.remove('selected'));
@@ -1195,6 +1332,13 @@
       const p = data.list.find(x => x.id === id);
       if (!p) return;
 
+      // 편집 모드 중이면 새 처방을 편집 폼으로 바로 전환
+      if (document.getElementById('ep-name')) {
+        renderPrxTimeline();
+        editPrx();
+        return;
+      }
+
       // 편집 폼에서 돌아올 때 원본 뷰 구조 복원
       if (!document.getElementById('pd-name')) {
         document.getElementById('prx-detail').innerHTML = `
@@ -1286,6 +1430,21 @@
       document.getElementById('pd-hist-avg-sub').textContent = h.avgSub;
       document.getElementById('pd-hist-timeline').innerHTML = h.sessions.map((s, i) => {
         const isLastSess = i === h.sessions.length - 1;
+        // 완료 운동 수 파싱 (예: "5/5" → 5, "2/5" → 2)
+        const doneStatArr = s.stats.find(st => st[0] === '완료 운동');
+        let doneCount = p.exercises.length;
+        if (doneStatArr) {
+          const m = String(doneStatArr[1]).match(/^(\d+)/);
+          if (m) doneCount = parseInt(m[1], 10);
+        }
+        const exRows = p.exercises.map((e, ei) => {
+          const isDone = ei < doneCount;
+          return `<div class="sess-ex-row">
+            <div class="sess-ex-check ${isDone ? 'done' : 'skip'}">${isDone ? '✓' : '—'}</div>
+            <div class="sess-ex-name">${e.name}<div style="font-size:10px;color:#A0AEC0;margin-top:1px;">${e.detail}</div></div>
+            <div class="sess-ex-grade">${e.grade}</div>
+          </div>`;
+        }).join('');
         return `<div class="timeline-item">
           <div class="timeline-left">
             <div class="timeline-dot done"></div>
@@ -1297,6 +1456,10 @@
               <div class="timeline-title">${s.round}회차 · <span class="badge ${s.badgeClass}" style="font-size:11px;">${s.badge}</span></div>
               <div class="timeline-stats">
                 ${s.stats.map(st => `<div class="timeline-stat">${st[0]} <span>${st[1]}</span></div>`).join('')}
+              </div>
+              <span class="sess-toggle-btn" onclick="toggleSessDetail(this)">▶ 운동 상세 보기</span>
+              <div class="sess-ex-detail">
+                ${exRows}
               </div>
             </div>
           </div>
@@ -1330,6 +1493,12 @@
         </div>`;
 
       renderPrxTimeline(); // dot active 갱신
+    }
+
+    function toggleSessDetail(btn) {
+      const detail = btn.nextElementSibling;
+      const open = detail.classList.toggle('open');
+      btn.textContent = open ? '▼ 운동 상세 닫기' : '▶ 운동 상세 보기';
     }
 
     function editPrx() {
@@ -1520,7 +1689,8 @@
         b.style.background = ''; b.style.borderColor = '';
       });
       btn.classList.add('active');
-      if (part) { const c = acPartColors[part]||'#718096'; btn.style.background=c; btn.style.borderColor=c; }
+      const c = part ? (acPartColors[part]||'#718096') : '#718096';
+      btn.style.background = c; btn.style.borderColor = c;
       renderEpStep3List();
     }
 
@@ -1614,9 +1784,14 @@
         detail: item.sets ? `${item.sets}세트 × ${item.reps}` : item.reps,
         grade: item.importance
       }));
+      // 편집 폼 제거 후 상세 뷰로 복귀
+      document.getElementById('prx-detail').innerHTML = '';
+      renderPrxTimeline();
       selectPrx(selectedPrxId);
     }
     function cancelEditPrx() {
+      // 편집 폼 제거 후 상세 뷰로 복귀
+      document.getElementById('prx-detail').innerHTML = '';
       selectPrx(selectedPrxId);
     }
 
@@ -1694,7 +1869,8 @@
       if (e.key === 'Escape') closeExModal();
     });
 
-    function renderMemberTable() {
+    function renderMemberTable(resetPage) {
+      if (resetPage) memberPage = 1;
       const tbody = document.getElementById('memberTableBody');
       if (!tbody) return;
       // 필터 값 읽기
@@ -1731,10 +1907,16 @@
         tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:32px;color:#A0AEC0;">조회된 회원이 없습니다</td></tr>';
         const countEl = document.querySelector('.table-count');
         if (countEl) countEl.textContent = '총 0명';
+        document.getElementById('memberPagination').innerHTML = '';
         return;
       }
 
-      tbody.innerHTML = filtered.map(r => {
+      // 페이지네이션 슬라이싱
+      const totalPages = Math.ceil(filtered.length / MEMBER_PAGE_SIZE);
+      if (memberPage > totalPages) memberPage = totalPages;
+      const paged = filtered.slice((memberPage - 1) * MEMBER_PAGE_SIZE, memberPage * MEMBER_PAGE_SIZE);
+
+      tbody.innerHTML = paged.map(r => {
         const statusBadge = r.status === 'active'
           ? '<span class="badge badge-green">활성</span>'
           : r.status === 'none'
@@ -1754,15 +1936,38 @@
           <td>${r.trainer}</td>
           <td>${r.lastDone}</td>
           <td>${statusBadge}</td>
-          <td>${r.id !== null
-            ? `<button class="btn-secondary" style="padding:4px 10px;font-size:12px;" onclick="event.stopPropagation();currentMember='${r.name}';selectedPrxId=${r.id};showScreen(1,document.querySelectorAll('.nav-btn')[1]);renderPrxTimeline();selectPrx(${r.id});setTimeout(()=>editPrx(),50)">✏️ 수정</button>`
+          <td style="display:flex;gap:4px;align-items:center;flex-wrap:wrap;">${r.id !== null
+            ? `<button class="btn-secondary" style="padding:4px 10px;font-size:12px;" onclick="event.stopPropagation();currentMember='${r.name}';selectedPrxId=${r.id};showScreen(1,document.querySelectorAll('.nav-btn')[1]);renderPrxTimeline();selectPrx(${r.id});setTimeout(()=>editPrx(),50)">✏️ 수정</button>
+               <button class="btn-secondary" style="padding:4px 10px;font-size:12px;background:#EBF8FF;color:#3B6FF0;border-color:#BEE3F8;" onclick="event.stopPropagation();currentMember='${r.name}';selectedPrxId=${r.id};showMemberPreview()">📱</button>`
             : `<button class="btn-primary" style="padding:4px 10px;font-size:12px;" onclick="event.stopPropagation();currentMember='${r.name}';showScreen(2,document.querySelectorAll('.nav-btn')[2])">+ 처방 등록</button>`
           }</td>
         </tr>`;
       }).join('');
       const countEl = document.querySelector('.table-count');
       if (countEl) countEl.textContent = `총 ${filtered.length}명`;
+
+      // 페이지네이션 렌더링
+      _renderPagination('memberPagination', totalPages, memberPage, 'goMemberPage');
     }
+
+    function _renderPagination(containerId, totalPages, current, fnName) {
+      const el = document.getElementById(containerId);
+      if (!el || totalPages <= 1) { if (el) el.innerHTML = ''; return; }
+      const pages = [];
+      if (current > 1) pages.push({ label: '‹', p: current - 1 });
+      let start = Math.max(1, current - 2);
+      let end = Math.min(totalPages, start + 4);
+      if (end - start < 4) start = Math.max(1, end - 4);
+      for (let i = start; i <= end; i++) pages.push({ label: String(i), p: i });
+      if (current < totalPages) pages.push({ label: '›', p: current + 1 });
+      el.innerHTML = pages.map(b =>
+        `<button class="page-btn${b.p === current && b.label === String(current) ? ' active' : ''}"
+          onclick="${fnName}(${b.p})">${b.label}</button>`
+      ).join('');
+    }
+
+    function goMemberPage(p) { memberPage = p; renderMemberTable(); }
+    function goRcPage(p) { rcPage = p; _renderRcList(); }
 
     /* ── 날짜 피커 ── */
     const _dpState = {}; // { popupId: { year, month } }
@@ -1901,7 +2106,7 @@
       // 상태 필터 셀렉트 연동
       const sel = document.getElementById('filterStatus');
       if (sel) sel.value = type === 'all' ? '' : type;
-      renderMemberTable();
+      renderMemberTable(true);
     }
 
     /* ── 처방 신청 접수 관리 (4탭) ── */
@@ -1924,8 +2129,11 @@
       filterRequests('new');
     }
 
+    let _rcCurrentList = [];
+
     function filterRequests(type) {
       currentRcFilter = type;
+      rcPage = 1;
       const all = Object.entries(memberPrescriptions);
 
       // 카드 하이라이트
@@ -1934,26 +2142,37 @@
         if (card) card.style.borderColor = t === type ? '#E67E22' : 'transparent';
       });
 
-      let list, title;
+      let title;
       if (type === 'new') {
-        list = all.filter(([, m]) => !m.list || m.list.length === 0);
+        _rcCurrentList = all.filter(([, m]) => !m.list || m.list.length === 0);
         title = '📩 신청자 목록 — 처방 미등록 회원';
       } else if (type === 'process') {
-        list = all.filter(([, m]) => m.list && m.list.some(p => p.status === 'active'));
+        _rcCurrentList = all.filter(([, m]) => m.list && m.list.some(p => p.status === 'active'));
         title = '🔄 진행중 목록 — 처방 진행중 회원';
       } else {
-        list = all.filter(([, m]) => m.list && m.list.length > 0 && !m.list.some(p => p.status === 'active'));
+        _rcCurrentList = all.filter(([, m]) => m.list && m.list.length > 0 && !m.list.some(p => p.status === 'active'));
         title = '✅ 처리완료 목록 — 처방 완료 회원';
       }
 
       document.getElementById('rc-list-title').textContent = title;
+      _renderRcList();
+    }
+
+    function _renderRcList() {
+      const type = currentRcFilter;
+      const list = _rcCurrentList;
       const container = document.getElementById('rcList');
       if (!list.length) {
         container.innerHTML = '<div style="padding:32px;text-align:center;color:#A0AEC0;">해당 회원이 없습니다</div>';
+        document.getElementById('rcPagination').innerHTML = '';
         return;
       }
 
-      container.innerHTML = list.map(([name, m]) => {
+      const totalPages = Math.ceil(list.length / RC_PAGE_SIZE);
+      if (rcPage > totalPages) rcPage = totalPages;
+      const paged = list.slice((rcPage - 1) * RC_PAGE_SIZE, rcPage * RC_PAGE_SIZE);
+
+      container.innerHTML = paged.map(([name, m]) => {
         const latest = m.list && m.list[0];
         const borderColor = type === 'new' ? '#F6AD55' : type === 'process' ? '#4299E1' : '#48BB78';
         const badgeHtml = type === 'new'
@@ -1988,6 +2207,8 @@
           </div>
         </div>`;
       }).join('');
+
+      _renderPagination('rcPagination', totalPages, rcPage, 'goRcPage');
     }
 
     function initStatCards() {
@@ -2064,6 +2285,19 @@
 
       <div class="ex-modal-count" id="exModalCount"></div>
       <div class="ex-modal-grid" id="exModalGrid"></div>
+    </div>
+  </div>
+
+  <!-- 📱 회원 앱 미리보기 모달 -->
+  <div class="preview-overlay" id="previewOverlay" onclick="if(event.target===this)closeMemberPreview()">
+    <div class="preview-modal">
+      <div class="preview-modal-topbar">
+        <span class="preview-modal-topbar-title">📱 회원이 보는 화면</span>
+        <button class="preview-modal-close" onclick="closeMemberPreview()">✕ 닫기</button>
+      </div>
+      <div class="preview-phone-body" id="previewBody">
+        <!-- JS로 채워짐 -->
+      </div>
     </div>
   </div>
 </body>
