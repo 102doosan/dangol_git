@@ -890,6 +890,94 @@
       </div>
     </div>
 
+    <!-- 간편 레슨 등록 모달 -->
+    <div id="quick-modal-overlay" onclick="closeQuickModal()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:900;"></div>
+    <div id="quick-modal" style="display:none;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);
+      width:480px;max-height:90vh;overflow-y:auto;background:#fff;border-radius:16px;
+      box-shadow:0 12px 48px rgba(0,0,0,0.22);z-index:901;padding:28px;">
+
+      <div style="font-size:17px;font-weight:900;color:#1A202C;margin-bottom:20px;">📋 레슨 빠른 등록</div>
+
+      <!-- 날짜/시간 (자동) -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;">
+        <div>
+          <div style="font-size:11px;font-weight:700;color:#A0AEC0;margin-bottom:4px;">날짜</div>
+          <input id="qm-date" class="form-input" type="date" />
+        </div>
+        <div>
+          <div style="font-size:11px;font-weight:700;color:#A0AEC0;margin-bottom:4px;">시간</div>
+          <div style="display:flex;align-items:center;gap:6px;">
+            <input id="qm-start" class="form-input" type="time" style="flex:1;" />
+            <span style="color:#A0AEC0;font-size:12px;">~</span>
+            <input id="qm-end" class="form-input" type="time" style="flex:1;" />
+          </div>
+        </div>
+      </div>
+
+      <!-- 회원 검색 -->
+      <div style="margin-bottom:14px;position:relative;">
+        <div style="font-size:11px;font-weight:700;color:#A0AEC0;margin-bottom:4px;">회원 검색 *</div>
+        <input id="qm-member-input" class="form-input" type="text" placeholder="🔍 회원명 검색"
+          autocomplete="off" oninput="qmSearchMember(this.value)" onblur="qmHideDD()" />
+        <div id="qm-member-dd" style="display:none;position:absolute;top:100%;left:0;right:0;
+          background:#fff;border:1.5px solid #E2E8F0;border-radius:10px;
+          box-shadow:0 4px 16px rgba(0,0,0,0.10);z-index:100;max-height:160px;overflow-y:auto;margin-top:3px;"></div>
+      </div>
+      <div id="qm-member-card" style="display:none;margin-bottom:14px;">
+        <div class="member-mini" id="qm-member-card-inner"></div>
+      </div>
+
+      <!-- 레슨 종류 / 트레이너 -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;">
+        <div>
+          <div style="font-size:11px;font-weight:700;color:#A0AEC0;margin-bottom:4px;">레슨 종류</div>
+          <select id="qm-type" class="form-select">
+            <option>PT 레슨 (개인)</option>
+            <option>그룹 수업</option>
+            <option>재활 전문 레슨</option>
+          </select>
+        </div>
+        <div>
+          <div style="font-size:11px;font-weight:700;color:#A0AEC0;margin-bottom:4px;">담당 트레이너</div>
+          <select id="qm-trainer" class="form-select">
+            <option>김트레이너</option>
+            <option>이트레이너</option>
+            <option>박트레이너</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- 출석 처리 -->
+      <div style="margin-bottom:14px;">
+        <div style="font-size:11px;font-weight:700;color:#A0AEC0;margin-bottom:8px;">출석 처리</div>
+        <div style="display:flex;gap:8px;">
+          <button type="button" class="attend-btn" id="qm-sign" onclick="qmSetAttend('sign')">✍️ 출석(사인)</button>
+          <button type="button" class="attend-btn" id="qm-btn" onclick="qmSetAttend('btn')">👆 출석(버튼)</button>
+          <button type="button" class="attend-btn attend-absent" id="qm-absent" onclick="qmSetAttend('absent')">✕ 결석</button>
+        </div>
+        <div id="qm-sign-pad" style="display:none;margin-top:10px;">
+          <canvas id="qm-canvas" width="400" height="90"
+            style="border:1.5px solid #E2E8F0;border-radius:8px;background:#FAFAFA;cursor:crosshair;touch-action:none;display:block;"></canvas>
+          <div style="display:flex;gap:6px;margin-top:6px;">
+            <button onclick="qmClearSign()" style="font-size:11px;padding:4px 10px;border:1.5px solid #E2E8F0;border-radius:6px;background:#fff;cursor:pointer;">🗑 지우기</button>
+            <button onclick="qmSaveSign()" style="font-size:11px;padding:4px 10px;border:none;border-radius:6px;background:#38A169;color:#fff;font-weight:700;cursor:pointer;">✓ 완료</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 메모 -->
+      <div style="margin-bottom:20px;">
+        <div style="font-size:11px;font-weight:700;color:#A0AEC0;margin-bottom:4px;">메모</div>
+        <textarea class="form-textarea" id="qm-memo" placeholder="레슨 관련 메모..." style="min-height:60px;"></textarea>
+      </div>
+
+      <!-- 버튼 -->
+      <div style="display:flex;gap:10px;justify-content:flex-end;">
+        <button class="btn-secondary" onclick="closeQuickModal()">닫기</button>
+        <button class="btn-primary" onclick="saveQuickLesson()">💾 저장</button>
+      </div>
+    </div>
+
     <!-- ③ 레슨 등록 / 수정 -->
     <div class="screen" id="screen-register">
 
@@ -1290,6 +1378,7 @@ function renderWeekly() {
         const ds = dateStr(d);
         const isToday = ds === todayStr;
         const lessons = filtered.filter(l => l.date === ds && l.startH === h);
+        const clickHandler = `onclick="openQuickModal('${ds}',${h})"`;
         const cells = lessons.map(l => {
           const isDone = l.status === 'done';
           const isAbsent = l.status === 'absent';
@@ -1302,11 +1391,135 @@ function renderWeekly() {
             <div class="wk-count">${l.count}회 · ${l.ticket}${trainerFilter==='all'?' · '+tname:''}</div>
           </div>`;
         }).join('');
-        return `<td class="${isToday?'today-col':''}">${cells}</td>`;
+        const emptyClick = !lessons.length ? `onclick="openQuickModal('${ds}',${h})" style="cursor:pointer;" title="${ds} ${String(h).padStart(2,'0')}:00 레슨 등록"` : '';
+        return `<td class="${isToday?'today-col':''}" ${emptyClick}>${cells}</td>`;
       }).join('')}
     </tr>`;
   }
   document.getElementById('weekly-body').innerHTML = rows;
+}
+
+/* ── 간편 레슨 등록 모달 ── */
+let qmAttend = null, qmSigning = false, qmCtx = null, qmSelectedMember = null;
+
+function openQuickModal(dateStr, hour) {
+  qmAttend = null; qmSelectedMember = null;
+  document.getElementById('qm-date').value = dateStr;
+  document.getElementById('qm-start').value = `${String(hour).padStart(2,'0')}:00`;
+  document.getElementById('qm-end').value   = `${String(hour+1).padStart(2,'0')}:00`;
+  document.getElementById('qm-member-input').value = '';
+  document.getElementById('qm-member-card').style.display = 'none';
+  document.getElementById('qm-sign-pad').style.display = 'none';
+  document.getElementById('qm-memo').value = '';
+  document.querySelectorAll('#quick-modal .attend-btn').forEach(b => b.classList.remove('active-attend'));
+
+  // 트레이너 드롭다운 현재 선택값 반영
+  const trainerSel = document.getElementById('weekly-trainer-sel')?.value;
+  const trainerMap = { kim:'김트레이너', lee:'이트레이너', park:'박트레이너' };
+  const qmTrainer = document.getElementById('qm-trainer');
+  if (trainerSel && trainerSel !== 'all' && qmTrainer) {
+    for (const opt of qmTrainer.options) {
+      if (opt.value === trainerMap[trainerSel] || opt.text === trainerMap[trainerSel]) {
+        opt.selected = true; break;
+      }
+    }
+  }
+
+  document.getElementById('quick-modal-overlay').style.display = 'block';
+  document.getElementById('quick-modal').style.display = 'block';
+}
+
+function closeQuickModal() {
+  document.getElementById('quick-modal-overlay').style.display = 'none';
+  document.getElementById('quick-modal').style.display = 'none';
+}
+
+function qmSearchMember(q) {
+  const dd = document.getElementById('qm-member-dd');
+  if (!q.trim()) { dd.style.display = 'none'; return; }
+  const results = memberDB.filter(m => m.name.includes(q.trim()));
+  dd.innerHTML = results.length
+    ? results.map(m => `
+        <div onmousedown="qmSelectMember('${m.name}')"
+          style="padding:9px 12px;cursor:pointer;display:flex;align-items:center;gap:8px;border-bottom:1px solid #F7FAFC;"
+          onmouseover="this.style.background='#FFF5EB'" onmouseout="this.style.background=''">
+          <div style="width:28px;height:28px;border-radius:50%;background:#C05621;color:#fff;
+            display:flex;align-items:center;justify-content:center;font-weight:900;font-size:12px;flex-shrink:0;">${m.name[0]}</div>
+          <div>
+            <div style="font-size:12px;font-weight:700;">${m.name}</div>
+            <div style="font-size:10px;color:#A0AEC0;">${m.branch} · ${m.grade} · 잔여 ${m.remain}회</div>
+          </div>
+        </div>`).join('')
+    : `<div style="padding:10px;font-size:12px;color:#A0AEC0;">검색 결과 없음</div>`;
+  dd.style.display = 'block';
+}
+
+function qmSelectMember(name) {
+  const m = memberDB.find(x => x.name === name);
+  if (!m) return;
+  qmSelectedMember = m;
+  document.getElementById('qm-member-input').value = '';
+  document.getElementById('qm-member-dd').style.display = 'none';
+  const card = document.getElementById('qm-member-card');
+  card.style.display = 'block';
+  document.getElementById('qm-member-card-inner').innerHTML = `
+    <div class="member-avatar">${m.name[0]}</div>
+    <div class="member-info">
+      <div class="member-name">${m.name}</div>
+      <div class="member-meta">${m.branch} · ${m.grade} · 잔여 ${m.remain}회</div>
+    </div>
+    <button onclick="qmRemoveMember()" style="background:#FED7D7;color:#C53030;border:none;
+      border-radius:8px;padding:4px 10px;font-size:12px;font-weight:700;cursor:pointer;">✕</button>`;
+  // 레슨 종류 자동 반영
+  const sel = document.getElementById('qm-type');
+  sel.innerHTML = m.memberships.map((ms,i) =>
+    `<option value="${ms}" ${i===0?'selected':''}>${ms}</option>`).join('');
+}
+
+function qmRemoveMember() {
+  qmSelectedMember = null;
+  document.getElementById('qm-member-card').style.display = 'none';
+  document.getElementById('qm-type').innerHTML = `
+    <option>PT 레슨 (개인)</option><option>그룹 수업</option><option>재활 전문 레슨</option>`;
+}
+
+function qmHideDD() { setTimeout(() => { document.getElementById('qm-member-dd').style.display = 'none'; }, 150); }
+
+function qmSetAttend(type) {
+  if (qmAttend === type) {
+    qmAttend = null;
+    document.querySelectorAll('#quick-modal .attend-btn').forEach(b => b.classList.remove('active-attend'));
+    document.getElementById('qm-sign-pad').style.display = 'none';
+    return;
+  }
+  qmAttend = type;
+  document.querySelectorAll('#quick-modal .attend-btn').forEach(b => b.classList.remove('active-attend'));
+  document.getElementById('qm-' + type).classList.add('active-attend');
+  document.getElementById('qm-sign-pad').style.display = type === 'sign' ? 'block' : 'none';
+  if (type === 'sign') qmInitSign();
+}
+
+function qmInitSign() {
+  const canvas = document.getElementById('qm-canvas');
+  qmCtx = canvas.getContext('2d');
+  qmCtx.strokeStyle = '#1A202C'; qmCtx.lineWidth = 2; qmCtx.lineCap = 'round';
+  const pos = e => { const r = canvas.getBoundingClientRect(); const t = e.touches?e.touches[0]:e; return {x:t.clientX-r.left,y:t.clientY-r.top}; };
+  canvas.onmousedown = canvas.ontouchstart = e => { qmSigning=true; const p=pos(e); qmCtx.beginPath(); qmCtx.moveTo(p.x,p.y); e.preventDefault(); };
+  canvas.onmousemove = canvas.ontouchmove = e => { if(!qmSigning)return; const p=pos(e); qmCtx.lineTo(p.x,p.y); qmCtx.stroke(); e.preventDefault(); };
+  canvas.onmouseup = canvas.ontouchend = ()=>{ qmSigning=false; };
+}
+
+function qmClearSign() { if(qmCtx) qmCtx.clearRect(0,0,400,90); }
+function qmSaveSign() { document.getElementById('qm-sign-pad').style.display='none'; }
+
+function saveQuickLesson() {
+  const date  = document.getElementById('qm-date').value;
+  const start = document.getElementById('qm-start').value;
+  const end   = document.getElementById('qm-end').value;
+  const type  = document.getElementById('qm-type').value;
+  if (!date || !start || !end) { alert('날짜와 시간을 입력해주세요.'); return; }
+  closeQuickModal();
+  alert(`✅ 레슨 등록 완료!\n${date} ${start}~${end}\n${qmSelectedMember?.name || '(회원 미선택)'} · ${type}`);
 }
 
 function printWeekly() {
