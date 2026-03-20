@@ -237,6 +237,39 @@
       color: #2D3748; outline: none; background: #fff; transition: border-color 0.15s;
     }
     .form-input:focus, .form-select:focus, .form-textarea:focus { border-color: #C05621; }
+    /* 주간 스케줄 그리드 */
+    #weekly-table th {
+      background: #F7FAFC; border: 1px solid #E2E8F0; padding: 8px 6px;
+      font-size: 12px; font-weight: 800; color: #4A5568; text-align: center;
+    }
+    #weekly-table th.today-col { background: #FEEBC8; color: #C05621; }
+    #weekly-table td {
+      border: 1px solid #E2E8F0; vertical-align: top; padding: 4px;
+      font-size: 11px; min-height: 44px; position: relative;
+    }
+    #weekly-table td.time-cell {
+      width: 52px; text-align: center; font-weight: 700; color: #A0AEC0;
+      background: #FAFAFA; font-size: 11px; vertical-align: middle;
+    }
+    #weekly-table td.today-col { background: #FFFBF0; }
+    .wk-lesson {
+      background: #EBF4FF; border-left: 3px solid #3182CE; border-radius: 6px;
+      padding: 5px 7px; margin-bottom: 3px; cursor: pointer; transition: opacity .15s;
+    }
+    .wk-lesson:hover { opacity: .8; }
+    .wk-lesson.done { background: #E6FFED; border-left-color: #38A169; }
+    .wk-lesson.absent { background: #FFF5F5; border-left-color: #E53E3E; }
+    .wk-lesson .wk-name { font-weight: 800; color: #1A202C; font-size: 12px; }
+    .wk-lesson .wk-time { color: #718096; font-size: 10px; margin-top:2px; }
+    .wk-lesson .wk-count { color: #3182CE; font-size: 10px; margin-top:1px; font-weight:700; }
+    .wk-lesson.done .wk-count { color: #38A169; }
+    .wk-check { color: #38A169; font-weight:900; margin-right:3px; }
+    @media print {
+      .nav, .page-actions, #weekly-trainer-sel, .mini-cal-arrow,
+      button { display: none !important; }
+      #weekly-table { font-size: 10px; }
+    }
+
     /* 출석 처리 버튼 */
     .attend-btn {
       padding: 9px 18px; border-radius: 10px; border: 2px solid #E2E8F0;
@@ -358,6 +391,7 @@
   <button class="nav-btn active" onclick="goScreen('schedule')">① 레슨 일정 관리</button>
   <button class="nav-btn" onclick="goScreen('detail')">② 레슨 상세</button>
   <button class="nav-btn" onclick="goScreen('register')">③ 레슨 등록</button>
+  <button class="nav-btn" onclick="goScreen('weekly')">④ 주간 스케줄</button>
 </div>
 
 <div class="admin-wrap">
@@ -800,6 +834,45 @@
       </div>
     </div>
 
+    <!-- ④ 주간 스케줄 -->
+    <div class="screen" id="screen-weekly">
+      <div class="page-header">
+        <div>
+          <div class="page-title">📅 트레이너 주간 스케줄</div>
+          <div class="page-sub" id="weekly-range-sub"></div>
+        </div>
+        <div class="page-actions">
+          <button class="btn-secondary" onclick="window.print()">🖨️ 인쇄</button>
+        </div>
+      </div>
+
+      <!-- 툴바 -->
+      <div style="display:flex;align-items:center;gap:16px;margin-bottom:16px;flex-wrap:wrap;">
+        <label style="font-size:13px;font-weight:700;color:#4A5568;display:flex;align-items:center;gap:6px;">
+          <input type="checkbox" id="filter-by-trainer" checked onchange="renderWeekly()"> 강사별
+        </label>
+        <select id="weekly-trainer-sel" class="form-select" style="width:160px;" onchange="renderWeekly()">
+          <option value="all">전체 트레이너</option>
+          <option value="kim">김트레이너</option>
+          <option value="lee">이트레이너</option>
+          <option value="park">박트레이너</option>
+        </select>
+        <div style="display:flex;align-items:center;gap:10px;margin-left:auto;">
+          <button class="mini-cal-arrow" onclick="weekMove(-1)">‹ 이전 주</button>
+          <span id="weekly-label" style="font-size:14px;font-weight:800;color:#2D3748;min-width:180px;text-align:center;"></span>
+          <button class="mini-cal-arrow" onclick="weekMove(1)">다음 주 ›</button>
+        </div>
+      </div>
+
+      <!-- 주간 그리드 -->
+      <div style="overflow-x:auto;">
+        <table id="weekly-table" style="border-collapse:collapse;width:100%;min-width:900px;table-layout:fixed;">
+          <thead id="weekly-head"></thead>
+          <tbody id="weekly-body"></tbody>
+        </table>
+      </div>
+    </div>
+
     <!-- ③ 레슨 등록 / 수정 -->
     <div class="screen" id="screen-register">
 
@@ -1114,13 +1187,119 @@ function pickReason(btn) {
   btn.classList.add('active');
 }
 
+/* ── 주간 스케줄 ── */
+const WEEK_DOW = ['일','월','화','수','목','금','토'];
+const TRAINERS = { kim:'김트레이너', lee:'이트레이너', park:'박트레이너' };
+
+// 주간 레슨 샘플 데이터 (월=1, 화=2, 수=3, 목=4, 금=5, 토=6, 일=0 기준으로 weekDay)
+// weekDate: 2026-03-XX 절대 날짜로 매핑
+const weeklyLessons = [
+  { date:'2026-03-17', startH:9,  startM:0, endH:10, endM:0,  member:'김도산',  count:'8/20', ticket:'PT 20회', trainer:'kim', status:'done' },
+  { date:'2026-03-17', startH:10, startM:0, endH:11, endM:0,  member:'이민준',  count:'5/20', ticket:'PT 20회', trainer:'kim', status:'done' },
+  { date:'2026-03-17', startH:14, startM:0, endH:15, endM:0,  member:'최지훈',  count:'12/30',ticket:'PT 30회', trainer:'kim', status:'done' },
+  { date:'2026-03-18', startH:9,  startM:0, endH:10, endM:0,  member:'박서연',  count:'3/15', ticket:'재활 15회',trainer:'park',status:'done' },
+  { date:'2026-03-18', startH:11, startM:0, endH:12, endM:0,  member:'정하은',  count:'6/12', ticket:'그룹 12회',trainer:'lee', status:'done' },
+  { date:'2026-03-18', startH:14, startM:0, endH:15, endM:0,  member:'조은별',  count:'2/10', ticket:'PT 10회', trainer:'kim', status:'done' },
+  { date:'2026-03-19', startH:9,  startM:0, endH:10, endM:0,  member:'김도산',  count:'9/20', ticket:'PT 20회', trainer:'kim', status:'done' },
+  { date:'2026-03-19', startH:10, startM:0, endH:11, endM:0,  member:'이민준',  count:'6/20', ticket:'PT 20회', trainer:'kim', status:'done' },
+  { date:'2026-03-19', startH:11, startM:0, endH:12, endM:0,  member:'박서연',  count:'4/15', ticket:'재활 15회',trainer:'park',status:'done' },
+  { date:'2026-03-19', startH:14, startM:0, endH:15, endM:0,  member:'그룹 8명',count:'1/12', ticket:'그룹 12회',trainer:'lee', status:'scheduled' },
+  { date:'2026-03-19', startH:16, startM:0, endH:17, endM:0,  member:'최지훈',  count:'13/30',ticket:'PT 30회', trainer:'kim', status:'scheduled' },
+  { date:'2026-03-19', startH:19, startM:0, endH:20, endM:0,  member:'그룹 15명',count:'2/12',ticket:'그룹 12회',trainer:'lee', status:'scheduled' },
+  { date:'2026-03-20', startH:10, startM:0, endH:11, endM:0,  member:'강태양',  count:'4/10', ticket:'PT 10회', trainer:'kim', status:'scheduled' },
+  { date:'2026-03-20', startH:11, startM:0, endH:12, endM:0,  member:'조은별',  count:'3/10', ticket:'PT 10회', trainer:'kim', status:'scheduled' },
+  { date:'2026-03-20', startH:14, startM:0, endH:15, endM:0,  member:'최지훈',  count:'14/30',ticket:'PT 30회', trainer:'kim', status:'scheduled' },
+  { date:'2026-03-21', startH:10, startM:0, endH:11, endM:0,  member:'이민준',  count:'7/20', ticket:'PT 20회', trainer:'kim', status:'scheduled' },
+  { date:'2026-03-21', startH:14, startM:0, endH:15, endM:0,  member:'그룹 12명',count:'2/12',ticket:'그룹 12회',trainer:'lee', status:'scheduled' },
+];
+
+// 현재 주 시작일 (월요일)
+let weekBase = getMonday(new Date(2026, 2, 19));
+
+function getMonday(d) {
+  const dt = new Date(d);
+  const day = dt.getDay();
+  const diff = (day === 0) ? -6 : 1 - day;
+  dt.setDate(dt.getDate() + diff);
+  dt.setHours(0,0,0,0);
+  return dt;
+}
+
+function weekMove(dir) { weekBase.setDate(weekBase.getDate() + dir * 7); renderWeekly(); }
+
+function dateStr(d) {
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
+
+function renderWeekly() {
+  const trainerFilter = document.getElementById('weekly-trainer-sel')?.value || 'all';
+  const TIME_START = 7, TIME_END = 21;
+
+  // 7일 날짜 배열 (월~일)
+  const days = Array.from({length:7}, (_,i) => {
+    const d = new Date(weekBase); d.setDate(d.getDate() + i); return d;
+  });
+
+  const todayStr = '2026-03-19';
+  const fmt = d => `${d.getMonth()+1}/${d.getDate()} (${WEEK_DOW[d.getDay()]})`;
+
+  // 라벨 업데이트
+  const label = document.getElementById('weekly-label');
+  const sub   = document.getElementById('weekly-range-sub');
+  if (label) label.textContent = `${fmt(days[0])} ~ ${fmt(days[6])}`;
+  if (sub)   sub.textContent   = `${days[0].getFullYear()}년 ${days[0].getMonth()+1}월 ${days[0].getDate()}일 ~ ${days[6].getMonth()+1}월 ${days[6].getDate()}일`;
+
+  // 헤더
+  const thead = document.getElementById('weekly-head');
+  thead.innerHTML = `<tr>
+    <th style="width:52px;">시간</th>
+    ${days.map(d => {
+      const isToday = dateStr(d) === todayStr;
+      return `<th class="${isToday?'today-col':''}">${fmt(d)}</th>`;
+    }).join('')}
+  </tr>`;
+
+  // 레슨 필터
+  const filtered = weeklyLessons.filter(l =>
+    trainerFilter === 'all' || l.trainer === trainerFilter
+  );
+
+  // 시간별 행 생성
+  let rows = '';
+  for (let h = TIME_START; h < TIME_END; h++) {
+    rows += `<tr>
+      <td class="time-cell">${String(h).padStart(2,'0')}:00</td>
+      ${days.map(d => {
+        const ds = dateStr(d);
+        const isToday = ds === todayStr;
+        const lessons = filtered.filter(l => l.date === ds && l.startH === h);
+        const cells = lessons.map(l => {
+          const isDone = l.status === 'done';
+          const isAbsent = l.status === 'absent';
+          const cls = isDone ? 'done' : isAbsent ? 'absent' : '';
+          const check = isDone ? '<span class="wk-check">✓</span>' : '';
+          const tname = TRAINERS[l.trainer] || '';
+          return `<div class="wk-lesson ${cls}" onclick="goScreen('detail')">
+            <div class="wk-name">${check}${l.member}</div>
+            <div class="wk-time">${String(l.startH).padStart(2,'0')}:${String(l.startM).padStart(2,'0')} ~ ${String(l.endH).padStart(2,'0')}:${String(l.endM).padStart(2,'0')}</div>
+            <div class="wk-count">${l.count}회 · ${l.ticket}${trainerFilter==='all'?' · '+tname:''}</div>
+          </div>`;
+        }).join('');
+        return `<td class="${isToday?'today-col':''}">${cells}</td>`;
+      }).join('')}
+    </tr>`;
+  }
+  document.getElementById('weekly-body').innerHTML = rows;
+}
+
 function toggleDow(btn) { btn.classList.toggle('active'); }
 
 function goScreen(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById('screen-' + id).classList.add('active');
   document.querySelectorAll('.nav-btn').forEach((b, i) => {
-    b.classList.toggle('active', ['schedule','detail','register'][i] === id);
+    b.classList.toggle('active', ['schedule','detail','register','weekly'][i] === id);
+    if (id === 'weekly') renderWeekly();
   });
 }
 
