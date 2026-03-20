@@ -1514,13 +1514,42 @@ function qmClearSign() { if(qmCtx) qmCtx.clearRect(0,0,400,90); }
 function qmSaveSign() { document.getElementById('qm-sign-pad').style.display='none'; }
 
 function saveQuickLesson() {
-  const date  = document.getElementById('qm-date').value;
-  const start = document.getElementById('qm-start').value;
-  const end   = document.getElementById('qm-end').value;
-  const type  = document.getElementById('qm-type').value;
+  const date    = document.getElementById('qm-date').value;
+  const start   = document.getElementById('qm-start').value;
+  const end     = document.getElementById('qm-end').value;
+  const type    = document.getElementById('qm-type').value || 'PT 레슨 (개인)';
+  const memo    = document.getElementById('qm-memo').value;
+  const trainerTxt = document.getElementById('qm-trainer').value;
   if (!date || !start || !end) { alert('날짜와 시간을 입력해주세요.'); return; }
+
+  const trainerKeyMap = { '김트레이너':'kim', '이트레이너':'lee', '박트레이너':'park' };
+  const [sh, sm] = start.split(':').map(Number);
+  const [eh, em] = end.split(':').map(Number);
+  const typeMap = { 'PT 레슨 (개인)':'PT 20회', '그룹 수업':'그룹 12회', '재활 전문 레슨':'재활 15회' };
+
+  // 새 레슨 데이터를 weeklyLessons 배열에 추가
+  const newLesson = {
+    date,
+    startH: sh, startM: sm, endH: eh, endM: em,
+    member: qmSelectedMember?.name || '(미입력)',
+    sub:    qmSelectedMember ? `${qmSelectedMember.branch}·${qmSelectedMember.grade}` : '',
+    count:  qmSelectedMember ? `1/${qmSelectedMember.remain}` : '1/1',
+    ticket: typeMap[type] || type,
+    trainer: trainerKeyMap[trainerTxt] || 'kim',
+    status: qmAttend === 'btn' || qmAttend === 'sign' ? 'done' : qmAttend === 'absent' ? 'absent' : 'scheduled',
+    memo,
+  };
+  weeklyLessons.push(newLesson);
+
   closeQuickModal();
-  alert(`✅ 레슨 등록 완료!\n${date} ${start}~${end}\n${qmSelectedMember?.name || '(회원 미선택)'} · ${type}`);
+  renderWeekly();
+
+  // 저장 확인 토스트
+  const toast = document.createElement('div');
+  toast.textContent = `✅ ${date} ${start}~${end} · ${newLesson.member} 등록 완료`;
+  toast.style.cssText = 'position:fixed;bottom:28px;left:50%;transform:translateX(-50%);background:#2D3748;color:#fff;padding:12px 22px;border-radius:12px;font-size:13px;font-weight:700;z-index:999;box-shadow:0 4px 16px rgba(0,0,0,0.2);';
+  document.body.appendChild(toast);
+  setTimeout(() => toast.remove(), 3000);
 }
 
 function printWeekly() {
