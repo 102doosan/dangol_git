@@ -265,9 +265,25 @@
     .wk-lesson.done .wk-count { color: #38A169; }
     .wk-check { color: #38A169; font-weight:900; margin-right:3px; }
     @media print {
-      .nav, .page-actions, #weekly-trainer-sel, .mini-cal-arrow,
-      button { display: none !important; }
-      #weekly-table { font-size: 10px; }
+      @page { size: A4 landscape; margin: 8mm; }
+      body * { visibility: hidden; }
+      #print-weekly-area, #print-weekly-area * { visibility: visible; }
+      #print-weekly-area {
+        position: fixed; top: 0; left: 0; width: 100%;
+        background: #fff;
+      }
+      #weekly-table {
+        width: 100%; font-size: 9px; border-collapse: collapse;
+        table-layout: fixed;
+      }
+      #weekly-table th, #weekly-table td {
+        border: 1px solid #ccc; padding: 3px;
+      }
+      #weekly-table td.time-cell { width: 40px; }
+      .wk-lesson { padding: 2px 4px; margin-bottom: 2px; border-radius: 3px; }
+      .wk-name { font-size: 9px; }
+      .wk-time, .wk-count { font-size: 8px; }
+      #weekly-print-title { font-size: 13px; font-weight: 900; margin-bottom: 6px; }
     }
 
     /* 출석 처리 버튼 */
@@ -842,7 +858,7 @@
           <div class="page-sub" id="weekly-range-sub"></div>
         </div>
         <div class="page-actions">
-          <button class="btn-secondary" onclick="window.print()">🖨️ 인쇄</button>
+          <button class="btn-secondary" onclick="printWeekly()">🖨️ 인쇄</button>
         </div>
       </div>
 
@@ -865,7 +881,8 @@
       </div>
 
       <!-- 주간 그리드 -->
-      <div style="overflow-x:auto;">
+      <div id="print-weekly-area" style="overflow-x:auto;">
+        <div id="weekly-print-title"></div>
         <table id="weekly-table" style="border-collapse:collapse;width:100%;min-width:900px;table-layout:fixed;">
           <thead id="weekly-head"></thead>
           <tbody id="weekly-body"></tbody>
@@ -1290,6 +1307,15 @@ function renderWeekly() {
     </tr>`;
   }
   document.getElementById('weekly-body').innerHTML = rows;
+}
+
+function printWeekly() {
+  const label = document.getElementById('weekly-label')?.textContent || '';
+  const trainer = document.getElementById('weekly-trainer-sel');
+  const trainerTxt = trainer ? trainer.options[trainer.selectedIndex].text : '전체 트레이너';
+  const title = document.getElementById('weekly-print-title');
+  if (title) title.textContent = `트레이너 주간 스케줄 · ${trainerTxt} · ${label}`;
+  window.print();
 }
 
 function toggleDow(btn) { btn.classList.toggle('active'); }
