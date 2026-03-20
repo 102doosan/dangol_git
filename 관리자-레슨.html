@@ -237,6 +237,24 @@
       color: #2D3748; outline: none; background: #fff; transition: border-color 0.15s;
     }
     .form-input:focus, .form-select:focus, .form-textarea:focus { border-color: #C05621; }
+    /* 출석 처리 버튼 */
+    .attend-btn {
+      padding: 9px 18px; border-radius: 10px; border: 2px solid #E2E8F0;
+      background: #F7FAFC; font-size: 13px; font-weight: 700; cursor: pointer;
+      color: #4A5568; transition: all 0.15s;
+    }
+    .attend-btn:hover { border-color: #C05621; color: #C05621; }
+    .attend-btn.active-attend { background: #C6F6D5; border-color: #38A169; color: #276749; }
+    .attend-absent { color: #E53E3E; border-color: #FED7D7; background: #FFF5F5; }
+    .attend-absent:hover { border-color: #E53E3E; }
+    .attend-absent.active-attend { background: #FED7D7; border-color: #E53E3E; color: #C53030; }
+    .reason-chip {
+      padding: 5px 14px; border-radius: 99px; border: 1.5px solid #E2E8F0;
+      background: #F7FAFC; font-size: 12px; font-weight: 700; cursor: pointer; color: #718096;
+      transition: all 0.15s;
+    }
+    .reason-chip.active { background: #FEB2B2; border-color: #E53E3E; color: #C53030; }
+
     .dow-btn {
       width: 36px; height: 36px; border-radius: 50%; border: 1.5px solid #E2E8F0;
       background: #F7FAFC; font-size: 12px; font-weight: 700; color: #718096;
@@ -573,6 +591,52 @@
           <div class="ss-step">
             <div class="ss-dot wait">●</div>
             <div class="ss-label">완료</div>
+          </div>
+        </div>
+
+        <!-- 출석 처리 -->
+        <div style="border-top:1px solid #F0F4F8; margin-top:16px; padding-top:16px;">
+          <div style="font-size:12px;font-weight:800;color:#4A5568;margin-bottom:12px;">✅ 출석 처리</div>
+          <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+            <button class="attend-btn" id="attend-sign" onclick="setAttend('sign')">
+              ✍️ 출석 (사인)
+            </button>
+            <button class="attend-btn" id="attend-btn" onclick="setAttend('btn')">
+              👆 출석 (버튼)
+            </button>
+            <button class="attend-btn attend-absent" id="attend-absent" onclick="setAttend('absent')">
+              ✕ 결석
+            </button>
+            <span id="attend-status-label" style="font-size:12px;color:#A0AEC0;margin-left:4px;">미처리</span>
+          </div>
+
+          <!-- 사인 패드 (출석(사인) 선택 시 표시) -->
+          <div id="sign-pad-wrap" style="display:none; margin-top:14px;">
+            <div style="font-size:11px;color:#718096;font-weight:700;margin-bottom:6px;">서명란 (마우스/터치로 서명)</div>
+            <canvas id="sign-canvas" width="420" height="120"
+              style="border:1.5px solid #E2E8F0;border-radius:10px;background:#FAFAFA;cursor:crosshair;touch-action:none;"></canvas>
+            <div style="display:flex;gap:8px;margin-top:8px;">
+              <button onclick="clearSign()" style="font-size:12px;padding:5px 14px;border:1.5px solid #E2E8F0;border-radius:8px;background:#fff;cursor:pointer;color:#718096;">🗑 지우기</button>
+              <button onclick="saveSign()" style="font-size:12px;padding:5px 14px;border:none;border-radius:8px;background:#38A169;color:#fff;font-weight:700;cursor:pointer;">✓ 서명 완료</button>
+            </div>
+          </div>
+
+          <!-- 결석 사유 (결석 선택 시 표시) -->
+          <div id="absent-reason-wrap" style="display:none; margin-top:14px;">
+            <div style="font-size:11px;color:#718096;font-weight:700;margin-bottom:6px;">결석 사유</div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px;">
+              <button class="reason-chip" onclick="pickReason(this)">개인 사정</button>
+              <button class="reason-chip" onclick="pickReason(this)">건강 문제</button>
+              <button class="reason-chip" onclick="pickReason(this)">업무·학업</button>
+              <button class="reason-chip" onclick="pickReason(this)">무단 결석</button>
+              <button class="reason-chip" onclick="pickReason(this)">기타</button>
+            </div>
+            <div style="display:flex;gap:8px;align-items:center;">
+              <label style="font-size:11px;color:#A0AEC0;font-weight:700;">페널티</label>
+              <label style="font-size:12px;cursor:pointer;"><input type="radio" name="penalty" value="none" checked> 없음</label>
+              <label style="font-size:12px;cursor:pointer;"><input type="radio" name="penalty" value="deduct"> 회차 차감</label>
+              <label style="font-size:12px;cursor:pointer;"><input type="radio" name="penalty" value="warn"> 경고</label>
+            </div>
           </div>
         </div>
       </div>
@@ -988,6 +1052,66 @@ function removeMember() {
 
 function hideMemberDropdown() {
   setTimeout(() => { document.getElementById('member-dropdown').style.display = 'none'; }, 150);
+}
+
+/* ── 출석 처리 ── */
+let currentAttend = null;
+let signCanvas, signCtx, signing = false;
+
+function setAttend(type) {
+  // 같은 버튼 재클릭 → 해제
+  if (currentAttend === type) {
+    currentAttend = null;
+    document.querySelectorAll('.attend-btn').forEach(b => b.classList.remove('active-attend'));
+    document.getElementById('attend-status-label').textContent = '미처리';
+    document.getElementById('sign-pad-wrap').style.display = 'none';
+    document.getElementById('absent-reason-wrap').style.display = 'none';
+    return;
+  }
+  currentAttend = type;
+  document.querySelectorAll('.attend-btn').forEach(b => b.classList.remove('active-attend'));
+  document.getElementById('attend-' + type).classList.add('active-attend');
+
+  document.getElementById('sign-pad-wrap').style.display = type === 'sign' ? 'block' : 'none';
+  document.getElementById('absent-reason-wrap').style.display = type === 'absent' ? 'block' : 'none';
+
+  const labels = { sign:'✍️ 출석(사인) 처리 중', btn:'👆 출석 완료', absent:'✕ 결석 처리 중' };
+  document.getElementById('attend-status-label').textContent = labels[type];
+
+  if (type === 'sign') initSignCanvas();
+}
+
+function initSignCanvas() {
+  signCanvas = document.getElementById('sign-canvas');
+  signCtx = signCanvas.getContext('2d');
+  signCtx.strokeStyle = '#1A202C';
+  signCtx.lineWidth = 2.5;
+  signCtx.lineCap = 'round';
+
+  const pos = e => {
+    const r = signCanvas.getBoundingClientRect();
+    const t = e.touches ? e.touches[0] : e;
+    return { x: t.clientX - r.left, y: t.clientY - r.top };
+  };
+  signCanvas.onmousedown = signCanvas.ontouchstart = e => { signing = true; const p = pos(e); signCtx.beginPath(); signCtx.moveTo(p.x, p.y); e.preventDefault(); };
+  signCanvas.onmousemove = signCanvas.ontouchmove = e => { if (!signing) return; const p = pos(e); signCtx.lineTo(p.x, p.y); signCtx.stroke(); e.preventDefault(); };
+  signCanvas.onmouseup = signCanvas.ontouchend = () => { signing = false; };
+}
+
+function clearSign() {
+  if (!signCtx) return;
+  signCtx.clearRect(0, 0, signCanvas.width, signCanvas.height);
+}
+
+function saveSign() {
+  document.getElementById('attend-status-label').textContent = '✍️ 서명 출석 완료';
+  document.getElementById('sign-pad-wrap').style.display = 'none';
+  document.getElementById('attend-sign').classList.add('active-attend');
+}
+
+function pickReason(btn) {
+  document.querySelectorAll('.reason-chip').forEach(c => c.classList.remove('active'));
+  btn.classList.add('active');
 }
 
 function toggleDow(btn) { btn.classList.toggle('active'); }
