@@ -266,24 +266,25 @@
     .wk-check { color: #38A169; font-weight:900; margin-right:3px; }
     @media print {
       @page { size: A4 landscape; margin: 8mm; }
-      body * { visibility: hidden; }
-      #print-weekly-area, #print-weekly-area * { visibility: visible; }
-      #print-weekly-area {
-        position: fixed; top: 0; left: 0; width: 100%;
-        background: #fff;
-      }
+      /* 모든 screen 숨김 */
+      .nav, .page-header, .stats-row, .search-bar,
+      #screen-schedule, #screen-detail, #screen-register,
+      #quick-modal, #quick-modal-overlay,
+      .admin-layout > .sidebar { display: none !important; }
+      /* weekly 화면만 표시 */
+      #screen-weekly { display: block !important; overflow: visible !important; }
+      #screen-weekly > *:not(#print-weekly-area):not(#weekly-print-title) { display: none !important; }
+      #print-weekly-area { overflow: visible !important; }
+      #weekly-print-title { font-size: 13px; font-weight: 900; margin-bottom: 6px; display: block !important; }
       #weekly-table {
-        width: 100%; font-size: 9px; border-collapse: collapse;
-        table-layout: fixed;
+        width: 100%; font-size: 9px; border-collapse: collapse; table-layout: fixed;
+        page-break-inside: avoid;
       }
-      #weekly-table th, #weekly-table td {
-        border: 1px solid #ccc; padding: 3px;
-      }
+      #weekly-table th, #weekly-table td { border: 1px solid #ccc; padding: 3px; }
       #weekly-table td.time-cell { width: 40px; }
       .wk-lesson { padding: 2px 4px; margin-bottom: 2px; border-radius: 3px; }
       .wk-name { font-size: 9px; }
       .wk-time, .wk-count { font-size: 8px; }
-      #weekly-print-title { font-size: 13px; font-weight: 900; margin-bottom: 6px; }
     }
 
     /* 출석 처리 버튼 */
