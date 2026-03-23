@@ -1492,8 +1492,13 @@
         </div>
       </div>` : `<div class="timeline-item">
         <div class="timeline-left"><div class="timeline-dot" style="background:#CBD5E0;"></div></div>
-        <div class="timeline-content">
-          <div class="timeline-date" style="color:#CBD5E0;">— 전체 이력 표시됨 —</div>
+        <div class="timeline-content" style="padding:4px 0;">
+          <div style="font-size:12px;color:#A0AEC0;">
+            — 저장된 이력 ${h.sessions.length}건 전체 표시
+            ${h.total > h.sessions.length ? `<span style="color:#E67E22;font-weight:700;"> · 총 ${h.total}회차 중 최근 ${h.sessions.length}회차</span>` : ''}
+            —
+          </div>
+          ${h.total > h.sessions.length ? `<div style="font-size:11px;color:#CBD5E0;margin-top:2px;">이전 이력(${h.total - h.sessions.length}건)은 기록 시스템 도입 이전 데이터입니다.</div>` : ''}
         </div>
       </div>`);
 
