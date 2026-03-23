@@ -1479,11 +1479,16 @@
         </div>`;
       }).join('') + (hasMore ? `<div class="timeline-item">
         <div class="timeline-left"><div class="timeline-dot"></div></div>
-        <div class="timeline-content">
-          <div class="timeline-date" onclick="loadMoreHist()"
-            style="color:#E67E22;cursor:pointer;font-weight:800;padding:4px 0;">
-            ▼ 이전 이력 더보기 (${h.sessions.length - _histShowCount}건 남음)
-          </div>
+        <div class="timeline-content" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding:4px 0;">
+          <span onclick="loadMoreHist()"
+            style="color:#E67E22;cursor:pointer;font-weight:800;font-size:12px;">
+            ▼ 더보기 (${h.sessions.length - _histShowCount}건 남음)
+          </span>
+          <span style="color:#CBD5E0;font-size:11px;">|</span>
+          <span onclick="loadAllHist()"
+            style="color:#9B6DFF;cursor:pointer;font-weight:800;font-size:12px;">
+            ≡ 전체 이력 보기 (${h.sessions.length}건)
+          </span>
         </div>
       </div>` : `<div class="timeline-item">
         <div class="timeline-left"><div class="timeline-dot" style="background:#CBD5E0;"></div></div>
@@ -1518,6 +1523,11 @@
 
     function loadMoreHist() {
       _histShowCount += 4;
+      _renderHistTimeline(_currentPrxForHist);
+    }
+
+    function loadAllHist() {
+      _histShowCount = _currentPrxForHist.hist.sessions.length;
       _renderHistTimeline(_currentPrxForHist);
     }
 
