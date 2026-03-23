@@ -211,52 +211,92 @@
       color: #fff; font-size: 11px; font-weight: 700; padding: 4px 10px; cursor: pointer;
       font-family: 'Noto Sans KR', sans-serif;
     }
-    .ex-play-card {
-      background: #fff; border-radius: 18px; overflow: hidden;
-      box-shadow: 0 4px 16px rgba(155,109,255,0.15);
+    /* ── 운동 따라하기 새 레이아웃 ── */
+    .ex-new-layout {
+      display: flex; flex-direction: column; flex: 1; background: #fff; overflow: hidden;
     }
-    .ex-play-img {
-      width: 100%; height: 185px; position: relative;
-      background: linear-gradient(135deg, #553C9A 0%, #9B6DFF 100%);
-      display: flex; align-items: center; justify-content: center; font-size: 64px;
+    /* 상태 텍스트 (준비하세요 / 세트 진행 중 / 완료) */
+    .ex-status-text {
+      text-align: center; font-size: 20px; font-weight: 900;
+      padding: 10px 0 6px; color: #38A169; letter-spacing: -0.5px;
     }
-    /* 이미지 위 재생 오버레이 */
-    .ex-play-overlay {
-      position: absolute; inset: 0; background: rgba(30,10,60,0.45);
-      display: flex; align-items: center; justify-content: center; cursor: pointer;
+    .ex-status-text.running { color: #553C9A; }
+    .ex-status-text.done-set { color: #E67E22; }
+    /* 일러스트 영역 */
+    .ex-illust-area {
+      position: relative; margin: 0 16px;
+      height: 190px; border-radius: 20px; overflow: hidden;
+      background: linear-gradient(160deg, #EDE9FE 0%, #C4B5FD 50%, #9B6DFF 100%);
+      display: flex; align-items: center; justify-content: center;
     }
-    .ex-play-btn {
-      width: 60px; height: 60px; border-radius: 50%;
-      background: rgba(255,255,255,0.92); display: flex; align-items: center; justify-content: center;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
-    }
-    .ex-play-btn-icon { font-size: 24px; margin-left: 4px; color: #6B46C1; }
-    /* 세트 타이머 오버레이 */
+    .ex-illust-emoji { font-size: 100px; filter: drop-shadow(0 4px 12px rgba(85,60,154,0.3)); }
+    /* 타이머 오버레이 (일러스트 위) */
     .set-timer-overlay {
-      position: absolute; inset: 0; background: rgba(30,10,60,0.72);
-      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px;
+      position: absolute; inset: 0;
+      background: rgba(20,8,50,0.68);
+      display: none; flex-direction: column; align-items: center; justify-content: center; gap: 6px;
     }
+    .set-timer-overlay.show { display: flex; }
     .set-timer-ring { position: relative; display: flex; align-items: center; justify-content: center; }
-    .set-timer-num {
-      position: absolute; font-size: 26px; font-weight: 900; color: #fff;
-    }
-    .set-timer-label { font-size: 12px; font-weight: 700; color: #E9D8FD; }
+    .set-timer-num { position: absolute; font-size: 30px; font-weight: 900; color: #fff; }
+    .set-timer-label { font-size: 13px; font-weight: 700; color: #E9D8FD; }
     .set-timer-done-btn {
-      background: #9B6DFF; border: none; border-radius: 20px; padding: 6px 18px;
+      background: rgba(155,109,255,0.85); border: 2px solid rgba(255,255,255,0.4);
+      border-radius: 20px; padding: 7px 20px;
       color: #fff; font-size: 12px; font-weight: 700; cursor: pointer;
-      font-family: 'Noto Sans KR', sans-serif;
+      font-family: 'Noto Sans KR', sans-serif; backdrop-filter: blur(4px);
     }
-    .ex-play-body { padding: 12px 14px; }
-    .ex-play-title { font-size: 17px; font-weight: 900; color: #1A202C; }
-    .ex-play-desc  { font-size: 11px; color: #718096; margin-top: 4px; line-height: 1.5; }
-    .counter-row { display: flex; gap: 8px; margin-top: 10px; }
-    .counter-box {
-      flex: 1; background: #F5F0FF; border-radius: 12px; padding: 10px 8px;
+    /* x10 뱃지 */
+    .ex-reps-badge {
+      position: absolute; top: 10px; right: 12px;
+      background: rgba(255,255,255,0.92); border-radius: 20px; padding: 3px 10px;
+      font-size: 13px; font-weight: 900; color: #553C9A;
     }
-    .counter-label { font-size: 10px; font-weight: 700; color: #9B6DFF; margin-bottom: 4px; text-align: center; }
-    .counter-val { font-size: 20px; font-weight: 900; color: #553C9A; text-align: center; }
-    .counter-sub { font-size: 10px; color: #B794F4; text-align: center; margin-top: 2px; }
-    .counter-controls { display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 4px; }
+    /* 운동 이름/설명 */
+    .ex-info-row { padding: 10px 18px 4px; }
+    .ex-info-name { font-size: 18px; font-weight: 900; color: #1A202C; }
+    .ex-info-desc { font-size: 12px; color: #718096; margin-top: 2px; line-height: 1.5; }
+    /* 세트 목록 */
+    .ex-set-list { flex: 1; padding: 4px 16px; overflow-y: auto; }
+    .ex-set-row {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 11px 14px; border-radius: 12px; margin-bottom: 6px;
+      background: #F8F6FF; border-left: 4px solid transparent;
+      transition: all .25s;
+    }
+    .ex-set-row.active {
+      background: #EDE9FE; border-left-color: #9B6DFF;
+    }
+    .ex-set-row.done {
+      background: #F0FFF4; border-left-color: #68D391; opacity: 0.75;
+    }
+    .ex-set-num { font-size: 14px; font-weight: 800; color: #553C9A; }
+    .ex-set-row.done .ex-set-num { color: #38A169; }
+    .ex-set-rep { font-size: 13px; font-weight: 700; color: #718096; }
+    .ex-set-row.active .ex-set-rep { color: #553C9A; font-weight: 900; }
+    .ex-set-row.done .ex-set-rep { color: #38A169; }
+    /* 타이머 진행 바 */
+    .ex-timer-bar-wrap {
+      height: 4px; background: #EDE9FE; flex-shrink: 0; margin: 4px 16px 0;
+    }
+    .ex-timer-bar-fill {
+      height: 100%; background: linear-gradient(90deg, #9B6DFF, #6B46C1);
+      transition: width .9s linear; width: 0%;
+    }
+    /* 하단 컨트롤 버튼 */
+    .ex-bottom-controls {
+      display: flex; align-items: center; justify-content: center; gap: 24px;
+      padding: 10px 0 12px; flex-shrink: 0;
+    }
+    .ex-ctrl-btn {
+      width: 54px; height: 54px; border-radius: 50%; border: none; cursor: pointer;
+      display: flex; align-items: center; justify-content: center; font-size: 22px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.18); transition: transform .15s;
+    }
+    .ex-ctrl-btn:active { transform: scale(.93); }
+    .ex-ctrl-btn.pause { background: #2D3748; color: #fff; }
+    .ex-ctrl-btn.next  { background: #9B6DFF; color: #fff; font-size: 20px; }
+    /* 이전 스타일 (호환) */
     .cnt-btn {
       width: 28px; height: 28px; border-radius: 50%;
       border: 2px solid #9B6DFF; background: #fff; color: #9B6DFF;
@@ -556,7 +596,7 @@
       </div>
 
       <!-- ③ 운동 따라하기 -->
-      <div class="screen-frame" id="screen-play" style="background:#F5F0FF;">
+      <div class="screen-frame" id="screen-play" style="background:#fff;">
         <!-- 상단 진행 바 -->
         <div class="play-top">
           <span class="play-top-info" id="play-progress-txt">1 / 1</span>
@@ -578,7 +618,7 @@
         <div class="app-body" id="ex-body" style="gap:8px;">
           <!-- JS로 렌더링 -->
         </div>
-        <button class="btn-next-ex" id="ex-next-btn">다음 운동 →</button>
+        <button class="btn-next-ex" id="ex-next-btn" style="display:none;">다음 운동 →</button>
       </div>
 
       <!-- ④ 운동 완료 -->
@@ -1079,45 +1119,58 @@ function renderExercise() {
   // 자동진행 레이블 업데이트
   if (autoPlayActive) _updateAutoLabel();
 
-  // 카드
+  // 새 레이아웃 렌더링
+  const setRows = Array.from({ length: ex.sets }, (_, i) => {
+    const sn = i + 1;
+    const cls = sn < cs ? 'done' : sn === cs ? 'active' : '';
+    const repTxt = sn < cs ? '✓ 완료' : ex.reps;
+    return `<div class="ex-set-row ${cls}" id="set-row-${sn}">
+      <span class="ex-set-num">${sn}세트</span>
+      <span class="ex-set-rep">${repTxt}</span>
+    </div>`;
+  }).join('');
+
   document.getElementById('ex-body').innerHTML = `
-    <div class="ex-play-card">
-      <div class="ex-play-img" id="ex-img-wrap">
-        <span style="font-size:60px;">${ex.emoji}</span>
-        <div class="ex-play-overlay" id="ex-play-overlay" onclick="startSetTimer()">
-          <div class="ex-play-btn"><span class="ex-play-btn-icon">▶</span></div>
+    <div class="ex-new-layout">
+      <div class="ex-status-text" id="ex-status-txt">준비하세요</div>
+      <div class="ex-illust-area">
+        <span class="ex-illust-emoji">${ex.emoji}</span>
+        <div class="ex-reps-badge">× ${ex.reps}</div>
+        <div class="set-timer-overlay" id="set-timer-overlay">
+          <div class="set-timer-ring">
+            <svg width="80" height="80" viewBox="0 0 80 80">
+              <circle cx="40" cy="40" r="34" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="6"/>
+              <circle id="timer-ring-bar" cx="40" cy="40" r="34" fill="none"
+                stroke="#B794F4" stroke-width="6" stroke-linecap="round"
+                stroke-dasharray="213.6" stroke-dashoffset="0"
+                transform="rotate(-90 40 40)"/>
+            </svg>
+            <span class="set-timer-num" id="set-timer-num">0</span>
+          </div>
+          <div class="set-timer-label" id="set-timer-label">세트 진행 중...</div>
+          <button class="set-timer-done-btn" onclick="completeSetEarly()">✓ 완료</button>
         </div>
       </div>
-      <div class="ex-play-body">
-        <div class="ex-play-title">${ex.name}</div>
-        <div class="ex-play-desc">${ex.desc || ex.reps}</div>
-        <div class="counter-row">
-          <div class="counter-box">
-            <div class="counter-label">현재 세트</div>
-            <div class="counter-val" id="ex-set-display">${cs} / ${ex.sets}</div>
-            <div class="counter-sub">세트</div>
-          </div>
-          <div class="counter-box">
-            <div class="counter-label">목표 횟수</div>
-            <div class="counter-val">${ex.reps}</div>
-            <div class="counter-sub">
-              <button class="cnt-btn" style="width:24px;height:24px;font-size:14px;" onclick="changeRep(-1)">−</button>
-              <span id="ex-rep-count" style="font-size:16px;font-weight:900;color:#553C9A;min-width:24px;text-align:center;">0</span>
-              <button class="cnt-btn" style="width:24px;height:24px;font-size:14px;" onclick="changeRep(1)">+</button>
-            </div>
-          </div>
-        </div>
+      <div class="ex-timer-bar-wrap"><div class="ex-timer-bar-fill" id="ex-timer-bar"></div></div>
+      <div class="ex-info-row">
+        <div class="ex-info-name">${ex.name}</div>
+        <div class="ex-info-desc">${ex.desc || ex.reps}</div>
+      </div>
+      <div class="ex-set-list" id="ex-set-list">${setRows}</div>
+      <div class="ex-bottom-controls">
+        <button class="ex-ctrl-btn pause" id="ex-pause-btn" onclick="toggleExPause()" title="일시정지">⏸</button>
+        <button class="ex-ctrl-btn next" id="ex-next-ctrl-btn" title="다음 세트 / 완료">▶|</button>
       </div>
     </div>`;
 
-  // 다음 버튼
-  const nextBtn = document.getElementById('ex-next-btn');
-  if (currentExIdx < total - 1) {
-    nextBtn.textContent = `다음 운동 → ${exercises[currentExIdx + 1].name}`;
-    nextBtn.onclick = () => { currentSetCount[currentExIdx] = ex.sets; goNextExercise(); };
-  } else {
-    nextBtn.textContent = '운동 완료 🎉';
-    nextBtn.onclick = () => { currentSetCount[currentExIdx] = ex.sets; stopAutoPlay(); switchScreen('complete'); };
+  // 하단 ▶| 버튼 초기 바인딩 (타이머 시작 전 기본 동작)
+  const nextCtrl = document.getElementById('ex-next-ctrl-btn');
+  if (nextCtrl) {
+    if (currentExIdx < total - 1) {
+      nextCtrl.onclick = () => { currentSetCount[currentExIdx] = ex.sets; clearInterval(setTimerInterval); goNextExercise(); };
+    } else {
+      nextCtrl.onclick = () => { currentSetCount[currentExIdx] = ex.sets; clearInterval(setTimerInterval); stopAutoPlay(); switchScreen('complete'); };
+    }
   }
 }
 
@@ -1143,17 +1196,36 @@ function jumpToExercise(idx) {
 /* ═══════════════════════════════════════════
    세트 타이머
 ═══════════════════════════════════════════ */
+let _timerPaused = false;
+
 function startSetTimer() {
-  const overlay = document.getElementById('ex-play-overlay');
-  if (overlay) overlay.style.display = 'none';
+  _timerPaused = false;
+  _setStatusText('running');
+
+  const overlay = document.getElementById('set-timer-overlay');
+  if (overlay) overlay.classList.add('show');
+
+  const ex = exercises[currentExIdx];
+  // 하단 ▶| 버튼 바인딩
+  const nextCtrl = document.getElementById('ex-next-ctrl-btn');
+  if (nextCtrl) {
+    if (currentExIdx < exercises.length - 1) {
+      nextCtrl.onclick = () => { currentSetCount[currentExIdx] = ex.sets; clearInterval(setTimerInterval); goNextExercise(); };
+    } else {
+      nextCtrl.onclick = () => { currentSetCount[currentExIdx] = ex.sets; clearInterval(setTimerInterval); stopAutoPlay(); switchScreen('complete'); };
+    }
+  }
 
   let remain = SET_TIMER_SECS;
-  _renderSetTimerOverlay(remain);
+  _updateSetTimerUI(remain);
+  _setTimerBar(remain);
 
   clearInterval(setTimerInterval);
   setTimerInterval = setInterval(() => {
+    if (_timerPaused) return;
     remain--;
     _updateSetTimerUI(remain);
+    _setTimerBar(remain);
     if (remain <= 0) {
       clearInterval(setTimerInterval);
       _completeSet();
@@ -1161,36 +1233,35 @@ function startSetTimer() {
   }, 1000);
 }
 
-function _renderSetTimerOverlay(remain) {
-  const imgWrap = document.getElementById('ex-img-wrap');
-  if (!imgWrap) return;
-  imgWrap.style.position = 'relative';
-  const old = document.getElementById('set-timer-overlay');
-  if (old) old.remove();
-  const div = document.createElement('div');
-  div.id = 'set-timer-overlay';
-  div.className = 'set-timer-overlay';
-  div.innerHTML = `
-    <div class="set-timer-ring">
-      <svg width="80" height="80" viewBox="0 0 80 80">
-        <circle cx="40" cy="40" r="34" fill="none" stroke="#9B6DFF" stroke-width="5"
-          stroke-dasharray="213.63" stroke-dashoffset="0" stroke-linecap="round" id="stc"/>
-      </svg>
-      <span class="set-timer-num" id="set-timer-num">${remain}</span>
-    </div>
-    <span class="set-timer-label">세트 진행 중...</span>
-    <button class="set-timer-done-btn" onclick="completeSetEarly()">✓ 완료</button>`;
-  imgWrap.appendChild(div);
+function _setStatusText(state) {
+  const el = document.getElementById('ex-status-txt');
+  if (!el) return;
+  if (state === 'running') { el.textContent = '세트 진행 중...'; el.className = 'ex-status-text running'; }
+  else if (state === 'done') { el.textContent = '세트 완료! 다음 준비하세요'; el.className = 'ex-status-text done-set'; }
+  else { el.textContent = '준비하세요'; el.className = 'ex-status-text'; }
 }
 
 function _updateSetTimerUI(remain) {
   const numEl = document.getElementById('set-timer-num');
-  const circle = document.getElementById('stc');
+  const ring  = document.getElementById('timer-ring-bar');
   if (numEl) numEl.textContent = remain;
-  if (circle) {
-    const circumference = 213.63;
-    circle.style.strokeDashoffset = circumference * (1 - remain / SET_TIMER_SECS);
+  if (ring) {
+    const circumference = 213.6;
+    ring.style.strokeDashoffset = circumference * (1 - remain / SET_TIMER_SECS);
   }
+}
+
+function _setTimerBar(remain) {
+  const bar = document.getElementById('ex-timer-bar');
+  if (bar) bar.style.width = ((SET_TIMER_SECS - remain) / SET_TIMER_SECS * 100) + '%';
+}
+
+function toggleExPause() {
+  _timerPaused = !_timerPaused;
+  const btn = document.getElementById('ex-pause-btn');
+  if (btn) btn.textContent = _timerPaused ? '▶' : '⏸';
+  const lbl = document.getElementById('set-timer-label');
+  if (lbl) lbl.textContent = _timerPaused ? '일시정지됨' : '세트 진행 중...';
 }
 
 function completeSetEarly() {
@@ -1199,31 +1270,19 @@ function completeSetEarly() {
 }
 
 function _completeSet() {
-  const imgWrap = document.getElementById('ex-img-wrap');
-  if (imgWrap) {
-    const old = document.getElementById('set-timer-overlay');
-    if (old) old.remove();
-    // 완료 플래시
-    const flash = document.createElement('div');
-    flash.className = 'set-timer-overlay';
-    flash.style.background = 'rgba(107,70,193,0.72)';
-    flash.innerHTML = `<span style="font-size:36px;">✓</span><span class="set-timer-label" style="color:#fff;">세트 완료!</span>`;
-    imgWrap.appendChild(flash);
-  }
+  const overlay = document.getElementById('set-timer-overlay');
+  if (overlay) overlay.classList.remove('show');
+  _setTimerBar(0);
 
   const ex = exercises[currentExIdx];
   const cur = currentSetCount[currentExIdx];
   const isLastSet = cur >= ex.sets;
-  if (!isLastSet) {
-    currentSetCount[currentExIdx]++;
-    const setDisp = document.getElementById('ex-set-display');
-    if (setDisp) setDisp.textContent = `${currentSetCount[currentExIdx]} / ${ex.sets}`;
-  }
+
+  if (!isLastSet) currentSetCount[currentExIdx]++;
+  _refreshSetRows();
+  _setStatusText('done');
 
   setTimeout(() => {
-    const overlay = document.getElementById('set-timer-overlay');
-    if (overlay) overlay.remove();
-
     if (autoPlayActive) {
       if (isLastSet) {
         _updateAutoLabel();
@@ -1240,10 +1299,21 @@ function _completeSet() {
         setTimeout(() => startSetTimer(), 800);
       }
     } else {
-      const playOverlay = document.getElementById('ex-play-overlay');
-      if (playOverlay) playOverlay.style.display = 'flex';
+      _setStatusText('ready');
     }
   }, 1000);
+}
+
+function _refreshSetRows() {
+  const ex = exercises[currentExIdx];
+  const cs = currentSetCount[currentExIdx];
+  Array.from({ length: ex.sets }, (_, i) => {
+    const sn = i + 1;
+    const row = document.getElementById(`set-row-${sn}`);
+    if (!row) return;
+    row.className = 'ex-set-row ' + (sn < cs ? 'done' : sn === cs ? 'active' : '');
+    row.querySelector('.ex-set-rep').textContent = sn < cs ? '✓ 완료' : ex.reps;
+  });
 }
 
 /* ═══════════════════════════════════════════
@@ -1267,8 +1337,10 @@ function stopAutoPlay() {
   document.getElementById('auto-bar').style.display = 'none';
   const btn = document.getElementById('btn-auto-toggle');
   if (btn) btn.textContent = '▶ 자동진행';
-  const playOverlay = document.getElementById('ex-play-overlay');
-  if (playOverlay) playOverlay.style.display = 'flex';
+  // 타이머 오버레이 숨기기, 상태 초기화
+  const overlay = document.getElementById('set-timer-overlay');
+  if (overlay) overlay.classList.remove('show');
+  _setStatusText('ready');
 }
 
 function _updateAutoLabel() {
