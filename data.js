@@ -67,6 +67,11 @@
               { date:'2024.06.10', round:18, badge:'완료', badgeClass:'badge-green', stats:[['소요시간','25분'],['완료 운동','3/3'],['총 세트','7세트']] },
               { date:'2024.06.07', round:17, badge:'완료', badgeClass:'badge-green', stats:[['소요시간','22분'],['완료 운동','3/3'],['총 세트','7세트']] },
               { date:'2024.06.04', round:16, badge:'중단', badgeClass:'badge-red', stats:[['소요시간','8분'],['완료 운동','1/3'],['중단 사유','피로감']] },
+              { date:'2024.06.01', round:15, badge:'완료', badgeClass:'badge-green', stats:[['소요시간','24분'],['완료 운동','3/3'],['총 세트','7세트']] },
+              { date:'2024.05.29', round:14, badge:'완료', badgeClass:'badge-green', stats:[['소요시간','23분'],['완료 운동','3/3'],['총 세트','7세트']] },
+              { date:'2024.05.26', round:13, badge:'완료', badgeClass:'badge-green', stats:[['소요시간','22분'],['완료 운동','3/3'],['총 세트','7세트']] },
+              { date:'2024.05.23', round:12, badge:'중단', badgeClass:'badge-red', stats:[['소요시간','6분'],['완료 운동','1/3'],['중단 사유','허리 통증']] },
+              { date:'2024.05.20', round:11, badge:'완료', badgeClass:'badge-green', stats:[['소요시간','25분'],['완료 운동','3/3'],['총 세트','7세트']] },
             ]
           }
         },
@@ -82,6 +87,11 @@
             sessions:[
               { date:'2024.04.25', round:14, badge:'완료', badgeClass:'badge-green', stats:[['소요시간','20분'],['완료 운동','2/2'],['총 세트','4세트']] },
               { date:'2024.04.22', round:13, badge:'완료', badgeClass:'badge-green', stats:[['소요시간','17분'],['완료 운동','2/2'],['총 세트','4세트']] },
+              { date:'2024.04.19', round:12, badge:'완료', badgeClass:'badge-green', stats:[['소요시간','18분'],['완료 운동','2/2'],['총 세트','4세트']] },
+              { date:'2024.04.16', round:11, badge:'완료', badgeClass:'badge-green', stats:[['소요시간','16분'],['완료 운동','2/2'],['총 세트','4세트']] },
+              { date:'2024.04.13', round:10, badge:'중단', badgeClass:'badge-red', stats:[['소요시간','7분'],['완료 운동','1/2'],['중단 사유','허리 통증']] },
+              { date:'2024.04.10', round:9, badge:'완료', badgeClass:'badge-green', stats:[['소요시간','17분'],['완료 운동','2/2'],['총 세트','4세트']] },
+              { date:'2024.04.07', round:8, badge:'완료', badgeClass:'badge-green', stats:[['소요시간','15분'],['완료 운동','2/2'],['총 세트','4세트']] },
             ]
           }
         },
@@ -97,6 +107,11 @@
             sessions:[
               { date:'2024.03.20', round:10, badge:'완료', badgeClass:'badge-green', stats:[['소요시간','16분'],['완료 운동','2/2']] },
               { date:'2024.03.17', round:9, badge:'완료', badgeClass:'badge-green', stats:[['소요시간','14분'],['완료 운동','2/2']] },
+              { date:'2024.03.14', round:8, badge:'완료', badgeClass:'badge-green', stats:[['소요시간','15분'],['완료 운동','2/2']] },
+              { date:'2024.03.11', round:7, badge:'완료', badgeClass:'badge-green', stats:[['소요시간','14분'],['완료 운동','2/2']] },
+              { date:'2024.03.08', round:6, badge:'중단', badgeClass:'badge-red', stats:[['소요시간','5분'],['완료 운동','0/2'],['중단 사유','통증 악화']] },
+              { date:'2024.03.05', round:5, badge:'완료', badgeClass:'badge-green', stats:[['소요시간','13분'],['완료 운동','2/2']] },
+              { date:'2024.03.02', round:4, badge:'완료', badgeClass:'badge-green', stats:[['소요시간','12분'],['완료 운동','2/2']] },
             ]
           }
         },
@@ -106,96 +121,220 @@
       { id:1, name:'코어 강화 처방', date:'2025.09.10', grade:'초급', trainer:'박트레이너', status:'active', count:31, sfmaAfter:25, sfmaAlertDays:[7,3],
         memo:'코어 근력이 약해 요통 예방 목적. 천천히 강도 증가.',
         exercises:[{name:'플랭크',detail:'3세트 × 30초',grade:'필수'},{name:'데드버그',detail:'3세트 × 10회',grade:'필수'},{name:'버드독',detail:'3세트 × 10회',grade:'권장'},{name:'힙 브릿지',detail:'3세트 × 15회',grade:'권장'}],
-        hist:{total:31,done:29,stop:2,rate:'94%',avg:'28분',avgSub:'목표 30분 대비',sessions:[{date:'2026.03.15',round:31,badge:'완료',badgeClass:'badge-green',stats:[['소요시간','27분'],['완료 운동','4/4']]},{date:'2026.03.12',round:30,badge:'완료',badgeClass:'badge-green',stats:[['소요시간','30분'],['완료 운동','4/4']]}]}}
+        hist:{total:31,done:29,stop:2,rate:'94%',avg:'28분',avgSub:'목표 30분 대비',sessions:[
+              {date:'2026.03.15',round:31,badge:'완료',badgeClass:'badge-green',stats:[['소요시간','27분'],['완료 운동','4/4'],['총 세트','10세트']]},
+              {date:'2026.03.12',round:30,badge:'완료',badgeClass:'badge-green',stats:[['소요시간','30분'],['완료 운동','4/4'],['총 세트','10세트']]},
+              {date:'2026.03.09',round:29,badge:'완료',badgeClass:'badge-green',stats:[['소요시간','28분'],['완료 운동','4/4'],['총 세트','10세트']]},
+              {date:'2026.03.06',round:28,badge:'중단',badgeClass:'badge-red',stats:[['소요시간','10분'],['완료 운동','1/4'],['중단 사유','피로감']]},
+              {date:'2026.03.03',round:27,badge:'완료',badgeClass:'badge-green',stats:[['소요시간','29분'],['완료 운동','4/4'],['총 세트','10세트']]},
+              {date:'2026.02.28',round:26,badge:'완료',badgeClass:'badge-green',stats:[['소요시간','27분'],['완료 운동','4/4'],['총 세트','10세트']]},
+              {date:'2026.02.25',round:25,badge:'완료',badgeClass:'badge-green',stats:[['소요시간','26분'],['완료 운동','4/4'],['총 세트','10세트']]},
+            ]}}
     ]},
     '정유나': { branch:'서초점', joinDate:'2022.05.17', phone:'010-5678-9012', list:[
       { id:1, name:'경추 재활 2단계', date:'2025.11.20', grade:'중급', trainer:'김트레이너', status:'active', count:18, sfmaAfter:20, sfmaAlertDays:[5,2],
         memo:'경추 추간판 탈출 보존 치료 중. 목 과신전 주의.',
         exercises:[{name:'경추 측면 스트레칭',detail:'3세트 × 30초',grade:'필수'},{name:'넥 리트렉션',detail:'3세트 × 10회',grade:'필수'},{name:'어깨 회전 운동',detail:'2세트 × 15회',grade:'권장'},{name:'승모근 스트레칭',detail:'2세트 × 30초',grade:'선택'}],
-        hist:{total:18,done:17,stop:1,rate:'94%',avg:'22분',avgSub:'',sessions:[{date:'2026.03.16',round:18,badge:'완료',badgeClass:'badge-green',stats:[['소요시간','23분'],['완료 운동','4/4']]}]}},
+        hist:{total:18,done:17,stop:1,rate:'94%',avg:'22분',avgSub:'',sessions:[
+              {date:'2026.03.16',round:18,badge:'완료',badgeClass:'badge-green',stats:[['소요시간','23분'],['완료 운동','4/4']]},
+              {date:'2026.03.13',round:17,badge:'완료',badgeClass:'badge-green',stats:[['소요시간','21분'],['완료 운동','4/4']]},
+              {date:'2026.03.10',round:16,badge:'완료',badgeClass:'badge-green',stats:[['소요시간','22분'],['완료 운동','4/4']]},
+              {date:'2026.03.07',round:15,badge:'중단',badgeClass:'badge-red',stats:[['소요시간','8분'],['완료 운동','1/4'],['중단 사유','목 통증']]},
+              {date:'2026.03.04',round:14,badge:'완료',badgeClass:'badge-green',stats:[['소요시간','20분'],['완료 운동','4/4']]},
+              {date:'2026.03.01',round:13,badge:'완료',badgeClass:'badge-green',stats:[['소요시간','23분'],['완료 운동','4/4']]},
+              {date:'2026.02.26',round:12,badge:'완료',badgeClass:'badge-green',stats:[['소요시간','22분'],['완료 운동','4/4']]},
+            ]}},
       { id:2, name:'경추 재활 1단계', date:'2025.09.01', grade:'초급', trainer:'김트레이너', status:'done', count:12, sfmaAfter:10, sfmaAlertDays:[3],
         memo:'급성기 이후 안정화 단계.',
         exercises:[{name:'경추 전굴/후굴 운동',detail:'2세트 × 10회',grade:'필수'},{name:'흉쇄유돌근 스트레칭',detail:'2세트 × 30초',grade:'권장'}],
-        hist:{total:12,done:11,stop:1,rate:'92%',avg:'18분',avgSub:'',sessions:[{date:'2025.10.14',round:12,badge:'완료',badgeClass:'badge-green',stats:[['소요시간','19분'],['완료 운동','2/2']]}]}}
+        hist:{total:12,done:11,stop:1,rate:'92%',avg:'18분',avgSub:'',sessions:[
+              {date:'2025.10.14',round:12,badge:'완료',badgeClass:'badge-green',stats:[['소요시간','19분'],['완료 운동','2/2']]},
+              {date:'2025.10.11',round:11,badge:'완료',badgeClass:'badge-green',stats:[['소요시간','18분'],['완료 운동','2/2']]},
+              {date:'2025.10.08',round:10,badge:'완료',badgeClass:'badge-green',stats:[['소요시간','17분'],['완료 운동','2/2']]},
+              {date:'2025.10.05',round:9,badge:'중단',badgeClass:'badge-red',stats:[['소요시간','6분'],['완료 운동','0/2'],['중단 사유','목 통증']]},
+              {date:'2025.10.02',round:8,badge:'완료',badgeClass:'badge-green',stats:[['소요시간','16분'],['완료 운동','2/2']]},
+              {date:'2025.09.29',round:7,badge:'완료',badgeClass:'badge-green',stats:[['소요시간','17분'],['완료 운동','2/2']]},
+            ]}}
     ]},
     '최수진': { branch:'강남점', joinDate:'2021.02.28', phone:'010-3456-7890', list:[
       { id:1, name:'다이어트 근력 3단계', date:'2025.10.05', grade:'고급', trainer:'이트레이너', status:'done', count:40, sfmaAfter:30, sfmaAlertDays:[10,5],
         memo:'체중 감량 목표 8kg. 고강도 인터벌 병행.',
         exercises:[{name:'스쿼트',detail:'4세트 × 15회',grade:'필수'},{name:'런지',detail:'3세트 × 12회',grade:'필수'},{name:'레그 프레스',detail:'4세트 × 12회',grade:'필수'},{name:'케틀벨 스윙',detail:'3세트 × 20회',grade:'권장'},{name:'플랭크',detail:'3세트 × 45초',grade:'권장'}],
-        hist:{total:40,done:38,stop:2,rate:'95%',avg:'45분',avgSub:'목표 45분 대비',sessions:[{date:'2026.03.10',round:40,badge:'완료',badgeClass:'badge-green',stats:[['소요시간','47분'],['완료 운동','5/5']]}]}}
+        hist:{total:40,done:38,stop:2,rate:'95%',avg:'45분',avgSub:'목표 45분 대비',sessions:[
+              {date:'2026.03.10',round:40,badge:'완료',badgeClass:'badge-green',stats:[['소요시간','47분'],['완료 운동','5/5'],['총 세트','14세트']]},
+              {date:'2026.03.07',round:39,badge:'완료',badgeClass:'badge-green',stats:[['소요시간','44분'],['완료 운동','5/5'],['총 세트','14세트']]},
+              {date:'2026.03.04',round:38,badge:'완료',badgeClass:'badge-green',stats:[['소요시간','46분'],['완료 운동','5/5'],['총 세트','14세트']]},
+              {date:'2026.03.01',round:37,badge:'중단',badgeClass:'badge-red',stats:[['소요시간','15분'],['완료 운동','2/5'],['중단 사유','컨디션 저하']]},
+              {date:'2026.02.26',round:36,badge:'완료',badgeClass:'badge-green',stats:[['소요시간','45분'],['완료 운동','5/5'],['총 세트','14세트']]},
+              {date:'2026.02.23',round:35,badge:'완료',badgeClass:'badge-green',stats:[['소요시간','43분'],['완료 운동','5/5'],['총 세트','14세트']]},
+              {date:'2026.02.20',round:34,badge:'중단',badgeClass:'badge-red',stats:[['소요시간','12분'],['완료 운동','1/5'],['중단 사유','개인 사정']]},
+            ]}}
     ]},
     '박현우': { branch:'강남점', joinDate:'2024.01.15', phone:'010-4567-8901', list:[] },
     '홍길동': { branch:'서초점', joinDate:'2023.03.22', phone:'010-6789-0123', list:[
       { id:1, name:'무릎 반월상연골 재활', date:'2025.12.01', grade:'초급', trainer:'박트레이너', status:'active', count:15, sfmaAfter:20, sfmaAlertDays:[7,3],
         memo:'반월상연골 부분 파열 보존치료. 계단 오르내리기 금지.',
         exercises:[{name:'쿼드리셉스 세팅',detail:'3세트 × 15회',grade:'필수'},{name:'스트레이트 레그 레이즈',detail:'3세트 × 12회',grade:'필수'},{name:'힙 어브덕션',detail:'2세트 × 15회',grade:'권장'},{name:'발목 펌프 운동',detail:'3세트 × 20회',grade:'권장'}],
-        hist:{total:15,done:14,stop:1,rate:'93%',avg:'25분',avgSub:'',sessions:[{date:'2026.03.17',round:15,badge:'완료',badgeClass:'badge-green',stats:[['소요시간','26분'],['완료 운동','4/4']]}]}}
+        hist:{total:15,done:14,stop:1,rate:'93%',avg:'25분',avgSub:'',sessions:[
+              {date:'2026.03.17',round:15,badge:'완료',badgeClass:'badge-green',stats:[['소요시간','26분'],['완료 운동','4/4']]},
+              {date:'2026.03.14',round:14,badge:'완료',badgeClass:'badge-green',stats:[['소요시간','24분'],['완료 운동','4/4']]},
+              {date:'2026.03.11',round:13,badge:'완료',badgeClass:'badge-green',stats:[['소요시간','25분'],['완료 운동','4/4']]},
+              {date:'2026.03.08',round:12,badge:'중단',badgeClass:'badge-red',stats:[['소요시간','9분'],['완료 운동','1/4'],['중단 사유','무릎 통증']]},
+              {date:'2026.03.05',round:11,badge:'완료',badgeClass:'badge-green',stats:[['소요시간','23분'],['완료 운동','4/4']]},
+              {date:'2026.03.02',round:10,badge:'완료',badgeClass:'badge-green',stats:[['소요시간','24분'],['완료 운동','4/4']]},
+              {date:'2026.02.27',round:9,badge:'완료',badgeClass:'badge-green',stats:[['소요시간','22분'],['완료 운동','4/4']]},
+            ]}}
     ]},
     '강지훈': { branch:'마포점', joinDate:'2023.07.14', phone:'010-7890-1234', list:[
       { id:1, name:'어깨 충돌증후군 재활', date:'2025.08.15', grade:'초급', trainer:'김트레이너', status:'active', count:22, sfmaAfter:20, sfmaAlertDays:[5],
         memo:'우측 어깨 충돌증후군. 머리 위 동작 제한.',
         exercises:[{name:'어깨 으쓱하기',detail:'3세트 × 15회',grade:'필수'},{name:'밴드 외회전',detail:'3세트 × 12회',grade:'필수'},{name:'월 슬라이드',detail:'2세트 × 10회',grade:'권장'},{name:'어깨 회전 운동',detail:'2세트 × 15회',grade:'권장'},{name:'승모근 스트레칭',detail:'2세트 × 30초',grade:'선택'}],
-        hist:{total:22,done:20,stop:2,rate:'91%',avg:'30분',avgSub:'',sessions:[{date:'2026.03.14',round:22,badge:'완료',badgeClass:'badge-green',stats:[['소요시간','29분'],['완료 운동','5/5']]}]}}
+        hist:{total:22,done:20,stop:2,rate:'91%',avg:'30분',avgSub:'',sessions:[
+              {date:'2026.03.14',round:22,badge:'완료',badgeClass:'badge-green',stats:[['소요시간','29분'],['완료 운동','5/5']]},
+              {date:'2026.03.11',round:21,badge:'완료',badgeClass:'badge-green',stats:[['소요시간','31분'],['완료 운동','5/5']]},
+              {date:'2026.03.08',round:20,badge:'중단',badgeClass:'badge-red',stats:[['소요시간','11분'],['완료 운동','2/5'],['중단 사유','어깨 통증']]},
+              {date:'2026.03.05',round:19,badge:'완료',badgeClass:'badge-green',stats:[['소요시간','28분'],['완료 운동','5/5']]},
+              {date:'2026.03.02',round:18,badge:'완료',badgeClass:'badge-green',stats:[['소요시간','30분'],['완료 운동','5/5']]},
+              {date:'2026.02.27',round:17,badge:'완료',badgeClass:'badge-green',stats:[['소요시간','29분'],['완료 운동','5/5']]},
+              {date:'2026.02.24',round:16,badge:'중단',badgeClass:'badge-red',stats:[['소요시간','8분'],['완료 운동','1/5'],['중단 사유','개인 사정']]},
+            ]}}
     ]},
     '박소연': { branch:'강남점', joinDate:'2024.04.01', phone:'010-8901-2345', list:[
       { id:1, name:'산후 체형 교정 처방', date:'2025.10.20', grade:'초급', trainer:'이트레이너', status:'active', count:20, sfmaAfter:24, sfmaAlertDays:[7,3],
         memo:'출산 후 6개월. 골반 불안정, 코어 약화 상태. 무리 금지.',
         exercises:[{name:'힙 브릿지',detail:'3세트 × 12회',grade:'필수'},{name:'골반 교정 스트레칭',detail:'2세트 × 60초',grade:'필수'},{name:'버드독',detail:'2세트 × 8회',grade:'권장'},{name:'고양이-낙타 스트레칭',detail:'3세트 × 10회',grade:'권장'}],
-        hist:{total:20,done:19,stop:1,rate:'95%',avg:'26분',avgSub:'',sessions:[{date:'2026.03.16',round:20,badge:'완료',badgeClass:'badge-green',stats:[['소요시간','25분'],['완료 운동','4/4']]}]}}
+        hist:{total:20,done:19,stop:1,rate:'95%',avg:'26분',avgSub:'',sessions:[
+              {date:'2026.03.16',round:20,badge:'완료',badgeClass:'badge-green',stats:[['소요시간','25분'],['완료 운동','4/4']]},
+              {date:'2026.03.13',round:19,badge:'완료',badgeClass:'badge-green',stats:[['소요시간','27분'],['완료 운동','4/4']]},
+              {date:'2026.03.10',round:18,badge:'완료',badgeClass:'badge-green',stats:[['소요시간','26분'],['완료 운동','4/4']]},
+              {date:'2026.03.07',round:17,badge:'중단',badgeClass:'badge-red',stats:[['소요시간','7분'],['완료 운동','1/4'],['중단 사유','피로감']]},
+              {date:'2026.03.04',round:16,badge:'완료',badgeClass:'badge-green',stats:[['소요시간','25분'],['완료 운동','4/4']]},
+              {date:'2026.03.01',round:15,badge:'완료',badgeClass:'badge-green',stats:[['소요시간','28분'],['완료 운동','4/4']]},
+              {date:'2026.02.26',round:14,badge:'완료',badgeClass:'badge-green',stats:[['소요시간','26분'],['완료 운동','4/4']]},
+            ]}}
     ]},
     '윤서준': { branch:'서초점', joinDate:'2022.09.05', phone:'010-9012-3456', list:[
       { id:1, name:'척추측만 재활 3개월차', date:'2025.07.01', grade:'중급', trainer:'박트레이너', status:'active', count:35, sfmaAfter:30, sfmaAlertDays:[10,5,3],
         memo:'흉추 20도 좌측만. 코르셋 착용 중. 비대칭 운동 주의.',
         exercises:[{name:'사이드 플랭크',detail:'3세트 × 20초',grade:'필수'},{name:'코어 안정화 운동',detail:'3세트 × 15회',grade:'필수'},{name:'흉추 회전 운동',detail:'2세트 × 10회',grade:'권장'},{name:'척추 회전 스트레칭',detail:'2세트 × 30초',grade:'권장'},{name:'어깨 스트레칭',detail:'2세트 × 30초',grade:'선택'}],
-        hist:{total:35,done:33,stop:2,rate:'94%',avg:'35분',avgSub:'목표 35분 대비',sessions:[{date:'2026.03.17',round:35,badge:'완료',badgeClass:'badge-green',stats:[['소요시간','36분'],['완료 운동','5/5']]}]}}
+        hist:{total:35,done:33,stop:2,rate:'94%',avg:'35분',avgSub:'목표 35분 대비',sessions:[
+              {date:'2026.03.17',round:35,badge:'완료',badgeClass:'badge-green',stats:[['소요시간','36분'],['완료 운동','5/5']]},
+              {date:'2026.03.14',round:34,badge:'완료',badgeClass:'badge-green',stats:[['소요시간','34분'],['완료 운동','5/5']]},
+              {date:'2026.03.11',round:33,badge:'완료',badgeClass:'badge-green',stats:[['소요시간','35분'],['완료 운동','5/5']]},
+              {date:'2026.03.08',round:32,badge:'중단',badgeClass:'badge-red',stats:[['소요시간','12분'],['완료 운동','2/5'],['중단 사유','허리 통증']]},
+              {date:'2026.03.05',round:31,badge:'완료',badgeClass:'badge-green',stats:[['소요시간','36분'],['완료 운동','5/5']]},
+              {date:'2026.03.02',round:30,badge:'완료',badgeClass:'badge-green',stats:[['소요시간','33분'],['완료 운동','5/5']]},
+              {date:'2026.02.27',round:29,badge:'중단',badgeClass:'badge-red',stats:[['소요시간','10분'],['완료 운동','2/5'],['중단 사유','컨디션 저하']]},
+            ]}}
     ]},
     '임채원': { branch:'마포점', joinDate:'2023.12.10', phone:'010-0123-4567', list:[
       { id:1, name:'고관절 재활 2단계', date:'2025.11.05', grade:'중급', trainer:'이트레이너', status:'active', count:16, sfmaAfter:20, sfmaAlertDays:[5,2],
         memo:'고관절 라브룸 파열 수술 후 재활 2단계.',
         exercises:[{name:'고관절 스트레칭',detail:'3세트 × 30초',grade:'필수'},{name:'힙 어브덕션',detail:'3세트 × 15회',grade:'필수'},{name:'클램쉘',detail:'3세트 × 15회',grade:'권장'},{name:'SLR 운동',detail:'2세트 × 12회',grade:'권장'}],
-        hist:{total:16,done:15,stop:1,rate:'94%',avg:'28분',avgSub:'',sessions:[{date:'2026.03.15',round:16,badge:'완료',badgeClass:'badge-green',stats:[['소요시간','29분'],['완료 운동','4/4']]}]}}
+        hist:{total:16,done:15,stop:1,rate:'94%',avg:'28분',avgSub:'',sessions:[
+              {date:'2026.03.15',round:16,badge:'완료',badgeClass:'badge-green',stats:[['소요시간','29분'],['완료 운동','4/4']]},
+              {date:'2026.03.12',round:15,badge:'완료',badgeClass:'badge-green',stats:[['소요시간','27분'],['완료 운동','4/4']]},
+              {date:'2026.03.09',round:14,badge:'완료',badgeClass:'badge-green',stats:[['소요시간','28분'],['완료 운동','4/4']]},
+              {date:'2026.03.06',round:13,badge:'중단',badgeClass:'badge-red',stats:[['소요시간','9분'],['완료 운동','1/4'],['중단 사유','고관절 통증']]},
+              {date:'2026.03.03',round:12,badge:'완료',badgeClass:'badge-green',stats:[['소요시간','26분'],['완료 운동','4/4']]},
+              {date:'2026.02.28',round:11,badge:'완료',badgeClass:'badge-green',stats:[['소요시간','29분'],['완료 운동','4/4']]},
+              {date:'2026.02.25',round:10,badge:'완료',badgeClass:'badge-green',stats:[['소요시간','27분'],['완료 운동','4/4']]},
+            ]}}
     ]},
     '조민서': { branch:'강남점', joinDate:'2023.05.20', phone:'010-1111-2222', list:[
       { id:1, name:'오십견 운동 치료', date:'2025.09.25', grade:'초급', trainer:'김트레이너', status:'active', count:24, sfmaAfter:20, sfmaAlertDays:[7,3],
         memo:'좌측 오십견 구축기. 통증 범위 내에서만 운동.',
         exercises:[{name:'코드만 진자 운동',detail:'3세트 × 2분',grade:'필수'},{name:'밴드 외회전',detail:'2세트 × 10회',grade:'필수'},{name:'손가락 벽 타기',detail:'3세트 × 10회',grade:'권장'},{name:'어깨 전방 스트레칭',detail:'2세트 × 30초',grade:'선택'}],
-        hist:{total:24,done:22,stop:2,rate:'92%',avg:'24분',avgSub:'',sessions:[{date:'2026.03.13',round:24,badge:'완료',badgeClass:'badge-green',stats:[['소요시간','25분'],['완료 운동','4/4']]}]}}
+        hist:{total:24,done:22,stop:2,rate:'92%',avg:'24분',avgSub:'',sessions:[
+              {date:'2026.03.13',round:24,badge:'완료',badgeClass:'badge-green',stats:[['소요시간','25분'],['완료 운동','4/4']]},
+              {date:'2026.03.10',round:23,badge:'완료',badgeClass:'badge-green',stats:[['소요시간','23분'],['완료 운동','4/4']]},
+              {date:'2026.03.07',round:22,badge:'중단',badgeClass:'badge-red',stats:[['소요시간','8분'],['완료 운동','1/4'],['중단 사유','어깨 통증']]},
+              {date:'2026.03.04',round:21,badge:'완료',badgeClass:'badge-green',stats:[['소요시간','24분'],['완료 운동','4/4']]},
+              {date:'2026.03.01',round:20,badge:'완료',badgeClass:'badge-green',stats:[['소요시간','22분'],['완료 운동','4/4']]},
+              {date:'2026.02.26',round:19,badge:'완료',badgeClass:'badge-green',stats:[['소요시간','25분'],['완료 운동','4/4']]},
+              {date:'2026.02.23',round:18,badge:'중단',badgeClass:'badge-red',stats:[['소요시간','7분'],['완료 운동','1/4'],['중단 사유','개인 사정']]},
+            ]}}
     ]},
     '한지훈': { branch:'서초점', joinDate:'2024.02.14', phone:'010-2222-3333', list:[
       { id:1, name:'상체 근력 강화 처방', date:'2025.12.10', grade:'중급', trainer:'박트레이너', status:'active', count:14, sfmaAfter:20, sfmaAlertDays:[5],
         memo:'직장인 상체 근력 부족. 데스크워크로 인한 자세 불량 개선.',
         exercises:[{name:'풀업 보조 운동',detail:'3세트 × 8회',grade:'필수'},{name:'벤트오버 로우',detail:'3세트 × 10회',grade:'필수'},{name:'페이스풀',detail:'3세트 × 12회',grade:'권장'},{name:'넥 리트렉션',detail:'2세트 × 15회',grade:'권장'},{name:'흉추 신전 운동',detail:'2세트 × 10회',grade:'선택'}],
-        hist:{total:14,done:13,stop:1,rate:'93%',avg:'38분',avgSub:'',sessions:[{date:'2026.03.16',round:14,badge:'완료',badgeClass:'badge-green',stats:[['소요시간','40분'],['완료 운동','5/5']]}]}}
+        hist:{total:14,done:13,stop:1,rate:'93%',avg:'38분',avgSub:'',sessions:[
+              {date:'2026.03.16',round:14,badge:'완료',badgeClass:'badge-green',stats:[['소요시간','40분'],['완료 운동','5/5']]},
+              {date:'2026.03.13',round:13,badge:'완료',badgeClass:'badge-green',stats:[['소요시간','37분'],['완료 운동','5/5']]},
+              {date:'2026.03.10',round:12,badge:'완료',badgeClass:'badge-green',stats:[['소요시간','39분'],['완료 운동','5/5']]},
+              {date:'2026.03.07',round:11,badge:'중단',badgeClass:'badge-red',stats:[['소요시간','12분'],['완료 운동','2/5'],['중단 사유','어깨 결림']]},
+              {date:'2026.03.04',round:10,badge:'완료',badgeClass:'badge-green',stats:[['소요시간','38분'],['완료 운동','5/5']]},
+              {date:'2026.03.01',round:9,badge:'완료',badgeClass:'badge-green',stats:[['소요시간','36분'],['완료 운동','5/5']]},
+            ]}}
     ]},
     '신예린': { branch:'마포점', joinDate:'2024.03.08', phone:'010-3333-4444', list:[
       { id:1, name:'골반 교정 집중 처방', date:'2026.01.05', grade:'초급', trainer:'이트레이너', status:'active', count:10, sfmaAfter:15, sfmaAlertDays:[5,2],
         memo:'전방 골반경사 심함. 장요근 단축으로 요통 유발.',
         exercises:[{name:'골반 교정 스트레칭',detail:'3세트 × 60초',grade:'필수'},{name:'힙 플렉서 스트레칭',detail:'3세트 × 45초',grade:'필수'},{name:'힙 브릿지',detail:'3세트 × 15회',grade:'권장'},{name:'코어 안정화 운동',detail:'2세트 × 12회',grade:'권장'}],
-        hist:{total:10,done:10,stop:0,rate:'100%',avg:'29분',avgSub:'',sessions:[{date:'2026.03.14',round:10,badge:'완료',badgeClass:'badge-green',stats:[['소요시간','28분'],['완료 운동','4/4']]}]}}
+        hist:{total:10,done:10,stop:0,rate:'100%',avg:'29분',avgSub:'',sessions:[
+              {date:'2026.03.14',round:10,badge:'완료',badgeClass:'badge-green',stats:[['소요시간','28분'],['완료 운동','4/4']]},
+              {date:'2026.03.11',round:9,badge:'완료',badgeClass:'badge-green',stats:[['소요시간','30분'],['완료 운동','4/4']]},
+              {date:'2026.03.08',round:8,badge:'완료',badgeClass:'badge-green',stats:[['소요시간','29분'],['완료 운동','4/4']]},
+              {date:'2026.03.05',round:7,badge:'완료',badgeClass:'badge-green',stats:[['소요시간','28분'],['완료 운동','4/4']]},
+              {date:'2026.03.02',round:6,badge:'완료',badgeClass:'badge-green',stats:[['소요시간','31분'],['완료 운동','4/4']]},
+              {date:'2026.02.27',round:5,badge:'완료',badgeClass:'badge-green',stats:[['소요시간','29분'],['완료 운동','4/4']]},
+            ]}}
     ]},
     '문준혁': { branch:'강남점', joinDate:'2023.10.18', phone:'010-4444-5555', list:[
       { id:1, name:'발목 인대 재활', date:'2025.10.30', grade:'초급', trainer:'김트레이너', status:'done', count:18, sfmaAfter:15, sfmaAlertDays:[5,3],
         memo:'외측 인대 3도 파열 수술 후 재활. 점프 동작 금지.',
         exercises:[{name:'발목 펌프 운동',detail:'3세트 × 20회',grade:'필수'},{name:'밸런스 보드 훈련',detail:'3세트 × 30초',grade:'필수'},{name:'카프 레이즈',detail:'3세트 × 15회',grade:'권장'}],
-        hist:{total:18,done:17,stop:1,rate:'94%',avg:'22분',avgSub:'',sessions:[{date:'2026.02.28',round:18,badge:'완료',badgeClass:'badge-green',stats:[['소요시간','23분'],['완료 운동','3/3']]}]}}
+        hist:{total:18,done:17,stop:1,rate:'94%',avg:'22분',avgSub:'',sessions:[
+              {date:'2026.02.28',round:18,badge:'완료',badgeClass:'badge-green',stats:[['소요시간','23분'],['완료 운동','3/3']]},
+              {date:'2026.02.25',round:17,badge:'완료',badgeClass:'badge-green',stats:[['소요시간','22분'],['완료 운동','3/3']]},
+              {date:'2026.02.22',round:16,badge:'완료',badgeClass:'badge-green',stats:[['소요시간','21분'],['완료 운동','3/3']]},
+              {date:'2026.02.19',round:15,badge:'중단',badgeClass:'badge-red',stats:[['소요시간','7분'],['완료 운동','1/3'],['중단 사유','발목 통증']]},
+              {date:'2026.02.16',round:14,badge:'완료',badgeClass:'badge-green',stats:[['소요시간','22분'],['완료 운동','3/3']]},
+              {date:'2026.02.13',round:13,badge:'완료',badgeClass:'badge-green',stats:[['소요시간','20분'],['완료 운동','3/3']]},
+              {date:'2026.02.10',round:12,badge:'완료',badgeClass:'badge-green',stats:[['소요시간','21분'],['완료 운동','3/3']]},
+            ]}}
     ]},
     '오지현': { branch:'서초점', joinDate:'2024.06.30', phone:'010-5555-6666', list:[
       { id:1, name:'체형 교정 처방', date:'2026.01.20', grade:'초급', trainer:'박트레이너', status:'active', count:8, sfmaAfter:16, sfmaAlertDays:[5],
         memo:'라운드숄더 + 거북목 복합. 흉추 이동성 증가 목표.',
         exercises:[{name:'흉추 신전 운동',detail:'3세트 × 10회',grade:'필수'},{name:'페이스풀',detail:'3세트 × 15회',grade:'필수'},{name:'넥 리트렉션',detail:'3세트 × 12회',grade:'권장'},{name:'가슴 스트레칭',detail:'2세트 × 30초',grade:'선택'}],
-        hist:{total:8,done:8,stop:0,rate:'100%',avg:'26분',avgSub:'',sessions:[{date:'2026.03.10',round:8,badge:'완료',badgeClass:'badge-green',stats:[['소요시간','25분'],['완료 운동','4/4']]}]}}
+        hist:{total:8,done:8,stop:0,rate:'100%',avg:'26분',avgSub:'',sessions:[
+              {date:'2026.03.10',round:8,badge:'완료',badgeClass:'badge-green',stats:[['소요시간','25분'],['완료 운동','4/4']]},
+              {date:'2026.03.07',round:7,badge:'완료',badgeClass:'badge-green',stats:[['소요시간','27분'],['완료 운동','4/4']]},
+              {date:'2026.03.04',round:6,badge:'완료',badgeClass:'badge-green',stats:[['소요시간','26분'],['완료 운동','4/4']]},
+              {date:'2026.03.01',round:5,badge:'완료',badgeClass:'badge-green',stats:[['소요시간','25분'],['완료 운동','4/4']]},
+              {date:'2026.02.26',round:4,badge:'완료',badgeClass:'badge-green',stats:[['소요시간','28분'],['완료 운동','4/4']]},
+              {date:'2026.02.23',round:3,badge:'완료',badgeClass:'badge-green',stats:[['소요시간','26분'],['완료 운동','4/4']]},
+            ]}}
     ]},
     '배성민': { branch:'마포점', joinDate:'2023.01.07', phone:'010-6666-7777', list:[
       { id:1, name:'전방십자인대 재활 6개월', date:'2025.06.01', grade:'중급', trainer:'이트레이너', status:'active', count:42, sfmaAfter:40, sfmaAlertDays:[10,5,3],
         memo:'ACL 재건술 후 재활 6개월차. 컷팅 동작 아직 금지.',
         exercises:[{name:'레그 프레스',detail:'4세트 × 12회',grade:'필수'},{name:'레그 컬',detail:'3세트 × 12회',grade:'필수'},{name:'스텝업',detail:'3세트 × 10회',grade:'필수'},{name:'밸런스 훈련',detail:'3세트 × 30초',grade:'권장'},{name:'카프 레이즈',detail:'3세트 × 20회',grade:'권장'}],
-        hist:{total:42,done:40,stop:2,rate:'95%',avg:'42분',avgSub:'목표 40분 대비',sessions:[{date:'2026.03.17',round:42,badge:'완료',badgeClass:'badge-green',stats:[['소요시간','44분'],['완료 운동','5/5']]}]}}
+        hist:{total:42,done:40,stop:2,rate:'95%',avg:'42분',avgSub:'목표 40분 대비',sessions:[
+              {date:'2026.03.17',round:42,badge:'완료',badgeClass:'badge-green',stats:[['소요시간','44분'],['완료 운동','5/5']]},
+              {date:'2026.03.14',round:41,badge:'완료',badgeClass:'badge-green',stats:[['소요시간','43분'],['완료 운동','5/5']]},
+              {date:'2026.03.11',round:40,badge:'완료',badgeClass:'badge-green',stats:[['소요시간','42분'],['완료 운동','5/5']]},
+              {date:'2026.03.08',round:39,badge:'중단',badgeClass:'badge-red',stats:[['소요시간','14분'],['완료 운동','2/5'],['중단 사유','무릎 부기']]},
+              {date:'2026.03.05',round:38,badge:'완료',badgeClass:'badge-green',stats:[['소요시간','44분'],['완료 운동','5/5']]},
+              {date:'2026.03.02',round:37,badge:'완료',badgeClass:'badge-green',stats:[['소요시간','41분'],['완료 운동','5/5']]},
+              {date:'2026.02.27',round:36,badge:'중단',badgeClass:'badge-red',stats:[['소요시간','10분'],['완료 운동','1/5'],['중단 사유','개인 사정']]},
+            ]}}
     ]},
     '황지수': { branch:'강남점', joinDate:'2024.08.22', phone:'010-7777-8888', list:[
       { id:1, name:'목 디스크 보존 처방', date:'2025.11.10', grade:'초급', trainer:'김트레이너', status:'active', count:17, sfmaAfter:20, sfmaAlertDays:[7,3],
         memo:'C5-C6 추간판 탈출. 우측 팔 저림 있음. 목 회전 제한.',
         exercises:[{name:'경추 측면 스트레칭',detail:'3세트 × 30초',grade:'필수'},{name:'넥 리트렉션',detail:'3세트 × 15회',grade:'필수'},{name:'어깨 으쓱하기',detail:'2세트 × 15회',grade:'권장'},{name:'흉쇄유돌근 스트레칭',detail:'2세트 × 30초',grade:'선택'}],
-        hist:{total:17,done:16,stop:1,rate:'94%',avg:'21분',avgSub:'',sessions:[{date:'2026.03.15',round:17,badge:'완료',badgeClass:'badge-green',stats:[['소요시간','22분'],['완료 운동','4/4']]}]}}
+        hist:{total:17,done:16,stop:1,rate:'94%',avg:'21분',avgSub:'',sessions:[
+              {date:'2026.03.15',round:17,badge:'완료',badgeClass:'badge-green',stats:[['소요시간','22분'],['완료 운동','4/4']]},
+              {date:'2026.03.12',round:16,badge:'완료',badgeClass:'badge-green',stats:[['소요시간','21분'],['완료 운동','4/4']]},
+              {date:'2026.03.09',round:15,badge:'완료',badgeClass:'badge-green',stats:[['소요시간','20분'],['완료 운동','4/4']]},
+              {date:'2026.03.06',round:14,badge:'중단',badgeClass:'badge-red',stats:[['소요시간','8분'],['완료 운동','1/4'],['중단 사유','목 저림']]},
+              {date:'2026.03.03',round:13,badge:'완료',badgeClass:'badge-green',stats:[['소요시간','21분'],['완료 운동','4/4']]},
+              {date:'2026.02.28',round:12,badge:'완료',badgeClass:'badge-green',stats:[['소요시간','22분'],['완료 운동','4/4']]},
+              {date:'2026.02.25',round:11,badge:'완료',badgeClass:'badge-green',stats:[['소요시간','20분'],['완료 운동','4/4']]},
+            ]}}
     ]},
     '류민준': { branch:'서초점', joinDate:'2023.06.11', phone:'010-8888-9999', list:[
       { id:1, name:'심폐 기능 강화', date:'2025.10.15', grade:'고급', trainer:'박트레이너', status:'done', count:30, sfmaAfter:25, sfmaAlertDays:[7,3],
