@@ -230,21 +230,21 @@
       display: flex; align-items: center; justify-content: center;
     }
     .ex-illust-emoji { font-size: 100px; filter: drop-shadow(0 4px 12px rgba(85,60,154,0.3)); }
-    /* 타이머 오버레이 (일러스트 위) */
-    .set-timer-overlay {
-      position: absolute; inset: 0;
-      background: rgba(20,8,50,0.68);
-      display: none; flex-direction: column; align-items: center; justify-content: center; gap: 6px;
+    /* 상단 타이머 링 (일러스트 위가 아닌 상태 영역에 표시) */
+    .ex-timer-top {
+      display: none; align-items: center; justify-content: center; gap: 12px;
+      padding: 6px 16px 2px;
     }
-    .set-timer-overlay.show { display: flex; }
+    .ex-timer-top.show { display: flex; }
     .set-timer-ring { position: relative; display: flex; align-items: center; justify-content: center; }
-    .set-timer-num { position: absolute; font-size: 30px; font-weight: 900; color: #fff; }
-    .set-timer-label { font-size: 13px; font-weight: 700; color: #E9D8FD; }
+    .set-timer-num { position: absolute; font-size: 18px; font-weight: 900; color: #553C9A; }
+    /* 오버레이는 완전히 투명하게 (구조 유지용) */
+    .set-timer-overlay { display: none; }
+    .set-timer-overlay.show { display: none; }
     .set-timer-done-btn {
-      background: rgba(155,109,255,0.85); border: 2px solid rgba(255,255,255,0.4);
-      border-radius: 20px; padding: 7px 20px;
+      background: #9B6DFF; border: none; border-radius: 20px; padding: 7px 18px;
       color: #fff; font-size: 12px; font-weight: 700; cursor: pointer;
-      font-family: 'Noto Sans KR', sans-serif; backdrop-filter: blur(4px);
+      font-family: 'Noto Sans KR', sans-serif;
     }
     /* x10 뱃지 */
     .ex-reps-badge {
@@ -1132,24 +1132,26 @@ function renderExercise() {
 
   document.getElementById('ex-body').innerHTML = `
     <div class="ex-new-layout">
+      <!-- 상단: 상태 텍스트 + 타이머 링 (일러스트 밖) -->
       <div class="ex-status-text" id="ex-status-txt">준비하세요</div>
+      <div class="ex-timer-top" id="ex-timer-top">
+        <div class="set-timer-ring">
+          <svg width="52" height="52" viewBox="0 0 52 52">
+            <circle cx="26" cy="26" r="22" fill="none" stroke="#EDE9FE" stroke-width="4"/>
+            <circle id="timer-ring-bar" cx="26" cy="26" r="22" fill="none"
+              stroke="#9B6DFF" stroke-width="4" stroke-linecap="round"
+              stroke-dasharray="138.2" stroke-dashoffset="0"
+              transform="rotate(-90 26 26)"/>
+          </svg>
+          <span class="set-timer-num" id="set-timer-num">0</span>
+        </div>
+        <button class="set-timer-done-btn" onclick="completeSetEarly()">✓ 완료</button>
+      </div>
+      <!-- 일러스트 (항상 보임) -->
       <div class="ex-illust-area">
         <span class="ex-illust-emoji">${ex.emoji}</span>
         <div class="ex-reps-badge">× ${ex.reps}</div>
-        <div class="set-timer-overlay" id="set-timer-overlay">
-          <div class="set-timer-ring">
-            <svg width="80" height="80" viewBox="0 0 80 80">
-              <circle cx="40" cy="40" r="34" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="6"/>
-              <circle id="timer-ring-bar" cx="40" cy="40" r="34" fill="none"
-                stroke="#B794F4" stroke-width="6" stroke-linecap="round"
-                stroke-dasharray="213.6" stroke-dashoffset="0"
-                transform="rotate(-90 40 40)"/>
-            </svg>
-            <span class="set-timer-num" id="set-timer-num">0</span>
-          </div>
-          <div class="set-timer-label" id="set-timer-label">세트 진행 중...</div>
-          <button class="set-timer-done-btn" onclick="completeSetEarly()">✓ 완료</button>
-        </div>
+        <div class="set-timer-overlay" id="set-timer-overlay"></div>
       </div>
       <div class="ex-timer-bar-wrap"><div class="ex-timer-bar-fill" id="ex-timer-bar"></div></div>
       <div class="ex-info-row">
@@ -1212,8 +1214,8 @@ function startSetTimer() {
   _timerPaused = false;
   _setStatusText('running');
 
-  const overlay = document.getElementById('set-timer-overlay');
-  if (overlay) overlay.classList.add('show');
+  const timerTop = document.getElementById('ex-timer-top');
+  if (timerTop) timerTop.classList.add('show');
 
   const ex = exercises[currentExIdx];
   // 하단 ▶| 버튼 바인딩
@@ -1256,7 +1258,7 @@ function _updateSetTimerUI(remain) {
   const ring  = document.getElementById('timer-ring-bar');
   if (numEl) numEl.textContent = remain;
   if (ring) {
-    const circumference = 213.6;
+    const circumference = 138.2;
     ring.style.strokeDashoffset = circumference * (1 - remain / SET_TIMER_SECS);
   }
 }
@@ -1280,8 +1282,8 @@ function completeSetEarly() {
 }
 
 function _completeSet() {
-  const overlay = document.getElementById('set-timer-overlay');
-  if (overlay) overlay.classList.remove('show');
+  const timerTop = document.getElementById('ex-timer-top');
+  if (timerTop) timerTop.classList.remove('show');
   _setTimerBar(0);
 
   const ex = exercises[currentExIdx];
@@ -1347,9 +1349,9 @@ function stopAutoPlay() {
   document.getElementById('auto-bar').style.display = 'none';
   const btn = document.getElementById('btn-auto-toggle');
   if (btn) btn.textContent = '▶ 자동진행';
-  // 타이머 오버레이 숨기기, 상태 초기화
-  const overlay = document.getElementById('set-timer-overlay');
-  if (overlay) overlay.classList.remove('show');
+  // 타이머 링 숨기기, 상태 초기화
+  const timerTop = document.getElementById('ex-timer-top');
+  if (timerTop) timerTop.classList.remove('show');
   _setStatusText('ready');
 }
 
