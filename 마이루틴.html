@@ -1158,8 +1158,18 @@ function renderExercise() {
       </div>
       <div class="ex-set-list" id="ex-set-list">${setRows}</div>
       <div class="ex-bottom-controls">
-        <button class="ex-ctrl-btn pause" id="ex-pause-btn" onclick="toggleExPause()" title="일시정지">⏸</button>
-        <button class="ex-ctrl-btn next" id="ex-next-ctrl-btn" title="다음 세트 / 완료">▶|</button>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:4px;">
+          <button class="ex-ctrl-btn" onclick="startSetTimer()" style="background:#38A169;color:#fff;" title="운동 시작">▶</button>
+          <span style="font-size:10px;color:#38A169;font-weight:700;">시작</span>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:4px;">
+          <button class="ex-ctrl-btn pause" id="ex-pause-btn" onclick="toggleExPause()" title="일시정지">⏸</button>
+          <span style="font-size:10px;color:#718096;font-weight:700;">정지</span>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:4px;">
+          <button class="ex-ctrl-btn next" id="ex-next-ctrl-btn" title="다음">▶|</button>
+          <span style="font-size:10px;color:#9B6DFF;font-weight:700;">다음</span>
+        </div>
       </div>
     </div>`;
 
