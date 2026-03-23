@@ -1428,8 +1428,21 @@
       document.getElementById('pd-hist-rate-sub').textContent = `▲ 완료 ${h.done}회 / 중단 ${h.stop}회`;
       document.getElementById('pd-hist-avg').textContent = h.avg;
       document.getElementById('pd-hist-avg-sub').textContent = h.avgSub;
-      document.getElementById('pd-hist-timeline').innerHTML = h.sessions.map((s, i) => {
-        const isLastSess = i === h.sessions.length - 1;
+      _histShowCount = 4;
+      _renderHistTimeline(p);
+    }
+
+    let _histShowCount = 4;
+    let _currentPrxForHist = null;
+
+    function _renderHistTimeline(p) {
+      _currentPrxForHist = p;
+      const h = p.hist;
+      const visibleSessions = h.sessions.slice(0, _histShowCount);
+      const hasMore = h.sessions.length > _histShowCount;
+
+      document.getElementById('pd-hist-timeline').innerHTML = visibleSessions.map((s, i) => {
+        const isLastSess = i === visibleSessions.length - 1 && !hasMore;
         // 완료 운동 수 파싱 (예: "5/5" → 5, "2/5" → 2)
         const doneStatArr = s.stats.find(st => st[0] === '완료 운동');
         let doneCount = p.exercises.length;
@@ -1464,12 +1477,20 @@
             </div>
           </div>
         </div>`;
-      }).join('') + `<div class="timeline-item">
+      }).join('') + (hasMore ? `<div class="timeline-item">
         <div class="timeline-left"><div class="timeline-dot"></div></div>
         <div class="timeline-content">
-          <div class="timeline-date" style="color:#A0AEC0;cursor:pointer;">이전 이력 더보기 →</div>
+          <div class="timeline-date" onclick="loadMoreHist()"
+            style="color:#E67E22;cursor:pointer;font-weight:800;padding:4px 0;">
+            ▼ 이전 이력 더보기 (${h.sessions.length - _histShowCount}건 남음)
+          </div>
         </div>
-      </div>`;
+      </div>` : `<div class="timeline-item">
+        <div class="timeline-left"><div class="timeline-dot" style="background:#CBD5E0;"></div></div>
+        <div class="timeline-content">
+          <div class="timeline-date" style="color:#CBD5E0;">— 전체 이력 표시됨 —</div>
+        </div>
+      </div>`);
 
       // SFMA 카드
       const sfmaNext = p.sfmaAfter > p.count
@@ -1493,6 +1514,11 @@
         </div>`;
 
       renderPrxTimeline(); // dot active 갱신
+    }
+
+    function loadMoreHist() {
+      _histShowCount += 4;
+      _renderHistTimeline(_currentPrxForHist);
     }
 
     function toggleSessDetail(btn) {

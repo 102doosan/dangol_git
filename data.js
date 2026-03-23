@@ -31,6 +31,14 @@
               { date:'2026.03.14', round:22, badge:'완료', badgeClass:'badge-green', stats:[['소요시간','29분'],['완료 운동','5/5'],['총 세트','13세트']] },
               { date:'2026.03.11', round:21, badge:'중단', badgeClass:'badge-red', stats:[['소요시간','12분'],['완료 운동','2/5'],['중단 사유','허리 통증']] },
               { date:'2026.03.08', round:20, badge:'완료', badgeClass:'badge-green', stats:[['소요시간','38분'],['완료 운동','5/5'],['총 세트','13세트']] },
+              { date:'2026.03.05', round:19, badge:'완료', badgeClass:'badge-green', stats:[['소요시간','31분'],['완료 운동','5/5'],['총 세트','13세트']] },
+              { date:'2026.03.02', round:18, badge:'완료', badgeClass:'badge-green', stats:[['소요시간','35분'],['완료 운동','5/5'],['총 세트','13세트']] },
+              { date:'2026.02.27', round:17, badge:'중단', badgeClass:'badge-red', stats:[['소요시간','8분'],['완료 운동','1/5'],['중단 사유','개인 사정']] },
+              { date:'2026.02.24', round:16, badge:'완료', badgeClass:'badge-green', stats:[['소요시간','33분'],['완료 운동','5/5'],['총 세트','13세트']] },
+              { date:'2026.02.21', round:15, badge:'완료', badgeClass:'badge-green', stats:[['소요시간','30분'],['완료 운동','5/5'],['총 세트','13세트']] },
+              { date:'2026.02.18', round:14, badge:'완료', badgeClass:'badge-green', stats:[['소요시간','28분'],['완료 운동','4/5'],['총 세트','11세트']] },
+              { date:'2026.02.15', round:13, badge:'중단', badgeClass:'badge-red', stats:[['소요시간','15분'],['완료 운동','2/5'],['중단 사유','허리 통증']] },
+              { date:'2026.02.12', round:12, badge:'완료', badgeClass:'badge-green', stats:[['소요시간','36분'],['완료 운동','5/5'],['총 세트','13세트']] },
             ]
           }
         },
