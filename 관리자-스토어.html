@@ -291,14 +291,54 @@
     .status-tab.active { background: #48BB78; border-color: #48BB78; color: #fff; }
     .status-tab.inactive-tab.active { background: #718096; border-color: #718096; color: #fff; }
 
-    /* 매출 통계 카테고리 탭 */
-    .stats-cat-tabs { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
-    .stats-cat-tab {
-      padding: 7px 16px; border-radius: 99px; border: 1.5px solid #E2E8F0;
-      font-size: 13px; font-weight: 700; cursor: pointer; background: #fff; color: #718096;
-      font-family: 'Noto Sans KR', sans-serif; transition: all 0.2s;
+    /* 매출 통계 서브탭 */
+    .stats-sub-tabs { display:flex; gap:0; border-bottom:2px solid #E2E8F0; margin-bottom:16px; background:#fff; border-radius:14px 14px 0 0; overflow:hidden; box-shadow:0 1px 6px rgba(0,0,0,0.06); }
+    .stats-sub-tab {
+      padding:12px 20px; border:none; background:transparent; font-size:13px; font-weight:700;
+      cursor:pointer; color:#718096; font-family:'Noto Sans KR',sans-serif;
+      border-bottom:3px solid transparent; margin-bottom:-2px; transition:all 0.2s; white-space:nowrap;
     }
-    .stats-cat-tab.active { background: #2B6CB0; border-color: #2B6CB0; color: #fff; }
+    .stats-sub-tab:hover { color:#2B6CB0; background:#F7FAFC; }
+    .stats-sub-tab.active { color:#2B6CB0; border-bottom-color:#2B6CB0; background:#fff; }
+
+    /* 일별 매출 캘린더 */
+    .cal-filter-bar { display:flex; align-items:center; gap:16px; margin-bottom:12px; font-size:13px; }
+    .cal-filter-bar label { display:flex; align-items:center; gap:6px; cursor:pointer; font-weight:600; color:#4A5568; }
+    .cal-filter-bar input[type=checkbox] { width:15px; height:15px; accent-color:#2B6CB0; cursor:pointer; }
+    .cal-grid { width:100%; border-collapse:collapse; background:#fff; border-radius:14px; overflow:hidden; box-shadow:0 1px 6px rgba(0,0,0,0.06); }
+    .cal-grid th { background:#F7FAFC; font-size:12px; font-weight:700; color:#718096; padding:10px 8px; text-align:center; border:1px solid #EDF2F7; }
+    .cal-grid th:first-child { color:#E53E3E; }
+    .cal-grid th:last-child { color:#2B6CB0; }
+    .cal-grid td { border:1px solid #EDF2F7; vertical-align:top; padding:6px 8px; min-height:90px; height:90px; width:14.28%; font-size:12px; }
+    .cal-grid td.other-month { background:#FAFAFA; }
+    .cal-grid td.today { background:#EBF8FF; }
+    .cal-day-num { font-size:12px; font-weight:700; color:#718096; margin-bottom:4px; }
+    .cal-sale-row { display:flex; justify-content:space-between; font-size:11px; line-height:1.6; }
+    .cal-sale-cat { font-weight:600; }
+    .cal-sale-amt { color:#1A202C; font-weight:700; text-align:right; }
+    .cal-total-row { display:flex; justify-content:space-between; font-size:12px; font-weight:800; color:#2B6CB0; border-top:1px solid #BEE3F8; margin-top:3px; padding-top:3px; }
+
+    /* 상세 매출 */
+    .detail-filter-bar { display:flex; align-items:center; gap:16px; margin-bottom:14px; font-size:13px; }
+    .detail-filter-bar label { display:flex;align-items:center;gap:6px;cursor:pointer;font-weight:600;color:#4A5568; }
+    .detail-filter-bar input[type=checkbox] { width:15px;height:15px;accent-color:#2B6CB0;cursor:pointer; }
+    .detail-layout { display:flex; gap:20px; align-items:flex-start; }
+    .pie-section { width:200px; flex-shrink:0; }
+    .pie-circle { width:180px; height:180px; border-radius:50%; margin:0 auto 16px; position:relative; }
+    .pie-legend { display:flex; flex-direction:column; gap:6px; font-size:12px; }
+    .pie-legend-item { display:flex; align-items:center; gap:8px; font-weight:600; }
+    .pie-dot { width:12px; height:12px; border-radius:3px; flex-shrink:0; }
+    .detail-cols { flex:1; overflow-x:auto; }
+    .detail-table { border-collapse:collapse; font-size:12px; }
+    .detail-table th { background:#F7FAFC; padding:8px 12px; font-weight:700; font-size:11px; color:#4A5568; border:1px solid #E2E8F0; white-space:nowrap; text-align:center; }
+    .detail-table th.cat-header { font-size:12px; color:#fff; padding:10px 12px; }
+    .detail-table td { padding:7px 12px; border:1px solid #EDF2F7; color:#1A202C; text-align:right; white-space:nowrap; }
+    .detail-table td.prod-name { text-align:left; color:#4A5568; font-weight:600; padding-left:14px; }
+    .detail-table td.total-row { background:#F7FAFC; font-weight:800; }
+    .detail-table tr.no-sales td { color:#CBD5E0; }
+
+    /* 매출 통계 구 카테고리 탭 (숨김처리) */
+    .stats-cat-tabs { display:none; }
 
     /* 리뷰 */
     .review-item { padding: 14px 0; border-bottom: 1px solid #F0F4F8; }
@@ -597,29 +637,28 @@
     <!-- ③ 매출 통계 -->
     <div class="screen" id="screen-stats">
       <div class="page-header">
-        <div>
-          <div class="page-title">📊 매출 통계</div>
-          <div class="page-sub">2026년 3월 기준</div>
+        <div style="display:flex;align-items:center;gap:16px;">
+          <div>
+            <div class="page-title">📊 매출 통계</div>
+            <div class="page-sub" id="stats-period-sub">2026년 3월 기준</div>
+          </div>
         </div>
-        <div class="page-actions" id="stats-page-actions">
-          <select style="padding:8px 12px;border-radius:8px;border:1.5px solid #E2E8F0;font-size:13px;font-family:'Noto Sans KR',sans-serif;outline:none;">
-            <option>2026년 3월</option>
-            <option>2026년 2월</option>
-            <option>2026년 1월</option>
-          </select>
+        <div class="page-actions" id="stats-page-actions" style="display:flex;align-items:center;gap:8px;">
+          <button class="btn-sm" style="background:#F0F4F8;color:#4A5568;padding:8px 12px;border-radius:8px;font-size:16px;" onclick="statsChangeMonth(-1)">◀</button>
+          <span id="stats-month-label" style="font-size:15px;font-weight:800;color:#1A202C;min-width:80px;text-align:center;">2026-03</span>
+          <button class="btn-sm" style="background:#F0F4F8;color:#4A5568;padding:8px 12px;border-radius:8px;font-size:16px;" onclick="statsChangeMonth(1)">▶</button>
           <button class="btn-outline" onclick="window.print()">🖨 인쇄</button>
           <button class="btn-secondary" onclick="downloadStatsExcel()">⬇ 엑셀 다운로드</button>
         </div>
       </div>
 
-      <!-- 카테고리 탭 -->
-      <div class="stats-cat-tabs">
-        <button class="stats-cat-tab active" onclick="switchStatsCat(this,'all')">📊 전체</button>
-        <button class="stats-cat-tab" onclick="switchStatsCat(this,'health')">🏋️ 헬스</button>
-        <button class="stats-cat-tab" onclick="switchStatsCat(this,'golf')">⛳ 골프</button>
-        <button class="stats-cat-tab" onclick="switchStatsCat(this,'home')">🏠 홈트</button>
-        <button class="stats-cat-tab" onclick="switchStatsCat(this,'pilates')">🧘 필라테스</button>
-        <button class="stats-cat-tab" onclick="switchStatsCat(this,'combo')">🏆 골프+헬스</button>
+      <!-- 서브 탭 -->
+      <div class="stats-sub-tabs">
+        <button class="stats-sub-tab active" onclick="switchStatsTab(this,'daily')">일별 매출</button>
+        <button class="stats-sub-tab" onclick="switchStatsTab(this,'detail')">상세 매출</button>
+        <button class="stats-sub-tab" onclick="switchStatsTab(this,'refund')">환불 기록</button>
+        <button class="stats-sub-tab" onclick="switchStatsTab(this,'mobile')">모바일 결제 내역</button>
+        <button class="stats-sub-tab" onclick="switchStatsTab(this,'settlement')">모바일 매출 정산</button>
       </div>
 
       <!-- 동적 통계 영역 -->
@@ -816,7 +855,7 @@
     document.querySelectorAll('.sidebar-item').forEach(i => i.classList.remove('active'));
     if (idx >= 0) document.querySelectorAll('.sidebar-item')[idx].classList.add('active');
     if (name === 'categories') renderCatCards();
-    if (name === 'stats') renderStats(_currentStatsCat);
+    if (name === 'stats') renderStatsTab(_statsTab);
   }
 
   // ── 카테고리 데이터 ──────────────────────────────────────────
@@ -1211,170 +1250,361 @@
     showToast(chk.checked ? `✅ ${name} 판매 재개` : `⏸ ${name} 판매 일시중단`);
   }
 
-  // ── 매출 통계 데이터 ──────────────────────────────────────────
-  const statsDb = {
-    all:     { total:'8,234만원', sales:847, avg:'97,200원', cumul:'1.2억원', tg:12.3, sg:8.0, ag:4.1,
-      months:[5820,6130,7340,6850,7340,8234], mlabels:['10월','11월','12월','1월','2월','3월'],
-      bars:[{l:'🏋️ 헬스',pct:42,c:'#2B6CB0',v:'3,458만원'},{l:'⛳ 골프',pct:36,c:'#48BB78',v:'2,964만원'},{l:'🏠 홈트',pct:22,c:'#9F7AEA',v:'1,812만원'},{l:'🧘 필라테스',pct:8,c:'#319795',v:'658만원'},{l:'🏆 골프+헬스',pct:4,c:'#C05621',v:'329만원'}],
-      pie:[{pct:'42%',bg:'#EBF8FF',c:'#2B6CB0',l:'헬스'},{pct:'36%',bg:'#F0FFF4',c:'#276749',l:'골프'},{pct:'22%',bg:'#FAF5FF',c:'#553C9A',l:'홈트'}],
-      tops:[{r:'🥇',n:'홈트 프리미엄 1개월',b:'badge-purple',cat:'홈트',cnt:203,s:'994만원',g:'+18%',up:true,star:'4.8'},{r:'🥈',n:'홈트 베이직 1개월',b:'badge-purple',cat:'홈트',cnt:156,s:'452만원',g:'+12%',up:true,star:'4.6'},{r:'🥉',n:'골프 월정액 이용권',b:'badge-green',cat:'골프',cnt:112,s:'1,444만원',g:'+9%',up:true,star:'4.9'},{r:'4',n:'헬스 1개월 이용권',b:'badge-blue',cat:'헬스',cnt:124,s:'979만원',g:'-3%',up:false,star:'4.5'},{r:'5',n:'골프 10회 이용권',b:'badge-green',cat:'골프',cnt:95,s:'1,425만원',g:'+6%',up:true,star:'4.7'}] },
-    health:  { total:'3,458만원', sales:267, avg:'129,500원', cumul:'9,200만원', tg:5.2, sg:3.1, ag:2.0,
-      months:[2400,2800,3100,2900,3280,3458], mlabels:['10월','11월','12월','1월','2월','3월'],
-      bars:[{l:'헬스 1개월',pct:28,c:'#2B6CB0',v:'979만원'},{l:'헬스 3개월',pct:47,c:'#90CDF4',v:'1,638만원'},{l:'헬스 6개월',pct:24,c:'#BEE3F8',v:'841만원'}],
-      pie:[{pct:'28%',bg:'#EBF8FF',c:'#2B6CB0',l:'1개월'},{pct:'47%',bg:'#BEE3F8',c:'#2C5282',l:'3개월'},{pct:'24%',bg:'#EBF8FF',c:'#1A365D',l:'6개월'}],
-      tops:[{r:'🥇',n:'헬스 3개월 이용권',b:'badge-blue',cat:'헬스',cnt:87,s:'1,638만원',g:'+8%',up:true,star:'4.7'},{r:'🥈',n:'헬스 1개월 이용권',b:'badge-blue',cat:'헬스',cnt:124,s:'979만원',g:'-3%',up:false,star:'4.5'},{r:'🥉',n:'헬스 6개월 이용권',b:'badge-blue',cat:'헬스',cnt:56,s:'841만원',g:'+2%',up:true,star:'4.6'}] },
-    golf:    { total:'2,964만원', sales:287, avg:'103,300원', cumul:'7,800만원', tg:9.2, sg:7.5, ag:1.6,
-      months:[1800,2100,2400,2200,2710,2964], mlabels:['10월','11월','12월','1월','2월','3월'],
-      bars:[{l:'10회',pct:48,c:'#48BB78',v:'1,425만원'},{l:'30회',pct:36,c:'#9AE6B4',v:'1,080만원'},{l:'월정액',pct:49,c:'#276749',v:'1,444만원'},{l:'패밀리',pct:5,c:'#C6F6D5',v:'15만원'}],
-      pie:[{pct:'48%',bg:'#F0FFF4',c:'#276749',l:'10회'},{pct:'36%',bg:'#C6F6D5',c:'#22543D',l:'30회'},{pct:'49%',bg:'#9AE6B4',c:'#1C4532',l:'월정액'}],
-      tops:[{r:'🥇',n:'골프 월정액 이용권',b:'badge-green',cat:'골프',cnt:112,s:'1,444만원',g:'+9%',up:true,star:'4.9'},{r:'🥈',n:'골프 10회 이용권',b:'badge-green',cat:'골프',cnt:95,s:'1,425만원',g:'+6%',up:true,star:'4.7'},{r:'🥉',n:'골프 30회 이용권',b:'badge-green',cat:'골프',cnt:48,s:'1,080만원',g:'+4%',up:true,star:'4.6'},{r:'4',n:'골프 패밀리 이용권',b:'badge-green',cat:'골프',cnt:32,s:'15만원',g:'+12%',up:true,star:'4.5'}] },
-    home:    { total:'1,812만원', sales:493, avg:'36,800원', cumul:'4,900만원', tg:18.5, sg:15.2, ag:2.8,
-      months:[900,1200,1500,1320,1530,1812], mlabels:['10월','11월','12월','1월','2월','3월'],
-      bars:[{l:'베이직 1개월',pct:25,c:'#9F7AEA',v:'452만원'},{l:'프리미엄 1개월',pct:55,c:'#6B46C1',v:'994만원'},{l:'프리미엄 3개월',pct:20,c:'#D6BCFA',v:'366만원'}],
-      pie:[{pct:'25%',bg:'#FAF5FF',c:'#553C9A',l:'베이직'},{pct:'55%',bg:'#E9D8FD',c:'#44337A',l:'프리미엄1'},{pct:'20%',bg:'#D6BCFA',c:'#322659',l:'프리미엄3'}],
-      tops:[{r:'🥇',n:'홈트 프리미엄 1개월',b:'badge-purple',cat:'홈트',cnt:203,s:'994만원',g:'+18%',up:true,star:'4.8'},{r:'🥈',n:'홈트 베이직 1개월',b:'badge-purple',cat:'홈트',cnt:156,s:'452만원',g:'+12%',up:true,star:'4.6'},{r:'🥉',n:'홈트 프리미엄 3개월',b:'badge-purple',cat:'홈트',cnt:88,s:'366만원',g:'+9%',up:true,star:'4.7'},{r:'4',n:'홈트 패밀리',b:'badge-purple',cat:'홈트',cnt:46,s:'0만원',g:'+22%',up:true,star:'4.4'}] },
-    pilates: { total:'658만원', sales:34, avg:'193,500원', cumul:'1,800만원', tg:3.5, sg:2.0, ag:1.5,
-      months:[500,540,580,610,635,658], mlabels:['10월','11월','12월','1월','2월','3월'],
-      bars:[{l:'1개월',pct:60,c:'#319795',v:'395만원'},{l:'3개월',pct:40,c:'#81E6D9',v:'263만원'}],
-      pie:[{pct:'60%',bg:'#E6FFFA',c:'#234E52',l:'1개월'},{pct:'40%',bg:'#B2F5EA',c:'#1D4044',l:'3개월'}],
-      tops:[{r:'🥇',n:'필라테스 월정액 1개월',b:'badge-teal',cat:'필라테스',cnt:22,s:'395만원',g:'+5%',up:true,star:'4.9'},{r:'🥈',n:'필라테스 3개월',b:'badge-teal',cat:'필라테스',cnt:12,s:'263만원',g:'+2%',up:true,star:'4.8'}] },
-    combo:   { total:'329만원', sales:67, avg:'169,000원', cumul:'850만원', tg:22.1, sg:19.4, ag:2.3,
-      months:[80,120,180,210,270,329], mlabels:['10월','11월','12월','1월','2월','3월'],
-      bars:[{l:'골프+헬스 콤보',pct:100,c:'#C05621',v:'329만원'}],
-      pie:[{pct:'100%',bg:'#FFFAF0',c:'#C05621',l:'콤보'}],
-      tops:[{r:'🥇',n:'골프+헬스 콤보 이용권',b:'badge-orange',cat:'골프+헬스',cnt:67,s:'329만원',g:'+22%',up:true,star:'4.9'}] },
+  // ── 매출 통계 (신규 구조) ──────────────────────────────────────────
+  let _statsYear = 2026, _statsMonth = 3, _statsTab = 'daily';
+
+  // 상세 매출 데이터 (월별)
+  const detailSalesDb = {
+    '2026-3': [
+      { name:'헬스 이용권', color:'#2B6CB0', bg:'#2B6CB0', newM:8, renew:18,
+        products:[
+          {name:'헬스 1개월 이용권', cnt:7,  amt:553000},
+          {name:'헬스 3개월 이용권', cnt:4,  amt:756000},
+          {name:'헬스 6개월 이용권', cnt:1,  amt:329000},
+          {name:'헬스 1년 이용권',   cnt:0,  amt:0},
+        ]},
+      { name:'골프', color:'#38A169', bg:'#38A169', newM:3, renew:9,
+        products:[
+          {name:'골프 10회 이용권',   cnt:5, amt:750000},
+          {name:'골프 30회 이용권',   cnt:2, amt:780000},
+          {name:'골프 월정액 이용권', cnt:7, amt:903000},
+          {name:'골프 패밀리 이용권', cnt:0, amt:0},
+        ]},
+      { name:'홈트', color:'#9F7AEA', bg:'#9F7AEA', newM:4, renew:12,
+        products:[
+          {name:'홈트 베이직 1개월',    cnt:7, amt:203000},
+          {name:'홈트 프리미엄 1개월',  cnt:4, amt:196000},
+          {name:'홈트 프리미엄 3개월',  cnt:3, amt:387000},
+          {name:'홈트 패밀리',          cnt:2, amt:138000},
+        ]},
+      { name:'필라테스', color:'#319795', bg:'#319795', newM:1, renew:0,
+        products:[
+          {name:'필라테스 월정액', cnt:1, amt:99000},
+          {name:'필라테스 3개월', cnt:0, amt:0},
+        ]},
+      { name:'골프+헬스', color:'#C05621', bg:'#C05621', newM:2, renew:0,
+        products:[
+          {name:'골프+헬스 콤보 이용권', cnt:2, amt:338000},
+        ]},
+    ],
+    '2026-2': [
+      { name:'헬스 이용권', color:'#2B6CB0', bg:'#2B6CB0', newM:6, renew:15,
+        products:[
+          {name:'헬스 1개월 이용권', cnt:5, amt:395000},
+          {name:'헬스 3개월 이용권', cnt:3, amt:567000},
+          {name:'헬스 6개월 이용권', cnt:1, amt:329000},
+          {name:'헬스 1년 이용권',   cnt:0, amt:0},
+        ]},
+      { name:'골프', color:'#38A169', bg:'#38A169', newM:2, renew:7,
+        products:[
+          {name:'골프 10회 이용권',   cnt:4, amt:600000},
+          {name:'골프 30회 이용권',   cnt:1, amt:390000},
+          {name:'골프 월정액 이용권', cnt:5, amt:645000},
+          {name:'골프 패밀리 이용권', cnt:0, amt:0},
+        ]},
+      { name:'홈트', color:'#9F7AEA', bg:'#9F7AEA', newM:3, renew:10,
+        products:[
+          {name:'홈트 베이직 1개월',    cnt:6, amt:174000},
+          {name:'홈트 프리미엄 1개월',  cnt:3, amt:147000},
+          {name:'홈트 프리미엄 3개월',  cnt:2, amt:258000},
+          {name:'홈트 패밀리',          cnt:1, amt:69000},
+        ]},
+      { name:'필라테스', color:'#319795', bg:'#319795', newM:0, renew:1,
+        products:[
+          {name:'필라테스 월정액', cnt:1, amt:99000},
+          {name:'필라테스 3개월', cnt:0, amt:0},
+        ]},
+      { name:'골프+헬스', color:'#C05621', bg:'#C05621', newM:1, renew:0,
+        products:[
+          {name:'골프+헬스 콤보 이용권', cnt:1, amt:169000},
+        ]},
+    ],
   };
 
-  let _currentStatsCat = 'all';
+  // 일별 매출 데이터 (월별, 일 → {카테고리: 금액})
+  const dailySalesDb = {
+    '2026-3': {
+      3:  {헬스이용권:1160000, 홈트:350000, 기타:30000},
+      4:  {헬스이용권:550000, 기타:5000},
+      5:  {헬스이용권:550000},
+      6:  {헬스이용권:550000},
+      7:  {골프:20000},
+      9:  {골프:1580000, 기타:65000},
+      10: {기타:50000},
+      11: {헬스이용권:1394000, 골프:350000, 홈트:2945000, 기타:55000},
+      12: {헬스이용권:550000, 기타:50000},
+      14: {골프:20000},
+      16: {헬스이용권:1400000, 골프:600000, 홈트:2900000, 기타:95000},
+      17: {골프:1700000, 기타:30000},
+      18: {헬스이용권:1180000, 홈트:1350000},
+      19: {골프:550000},
+      20: {헬스이용권:300000, 골프:20000, 기타:80000},
+      24: {헬스이용권:180000, 골프:700000, 기타:135000},
+    },
+    '2026-2': {
+      3:  {헬스이용권:880000, 골프:450000},
+      5:  {헬스이용권:395000},
+      7:  {골프:600000, 기타:45000},
+      10: {헬스이용권:567000, 홈트:174000},
+      12: {골프:390000},
+      14: {홈트:147000, 기타:30000},
+      17: {헬스이용권:329000, 골프:645000},
+      19: {홈트:258000, 기타:20000},
+      21: {헬스이용권:395000},
+      24: {골프:600000},
+      26: {홈트:69000, 기타:55000},
+      28: {헬스이용권:395000, 골프:480000},
+    },
+  };
 
-  function switchStatsCat(btn, cat) {
-    document.querySelectorAll('.stats-cat-tab').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    _currentStatsCat = cat;
-    renderStats(cat);
+  const catColors = {헬스이용권:'#2B6CB0', 골프:'#38A169', 홈트:'#9F7AEA', 필라테스:'#319795', '골프+헬스':'#C05621', 기타:'#A0AEC0'};
+
+  function statsKey() { return `${_statsYear}-${_statsMonth}`; }
+
+  function statsChangeMonth(dir) {
+    _statsMonth += dir;
+    if (_statsMonth < 1) { _statsMonth = 12; _statsYear--; }
+    if (_statsMonth > 12) { _statsMonth = 1; _statsYear++; }
+    document.getElementById('stats-month-label').textContent = `${_statsYear}-${String(_statsMonth).padStart(2,'0')}`;
+    document.getElementById('stats-period-sub').textContent = `${_statsYear}년 ${_statsMonth}월 기준`;
+    renderStatsTab(_statsTab);
   }
 
-  function renderStats(cat) {
-    const d = statsDb[cat] || statsDb.all;
-    const maxM = Math.max(...d.months);
-    const monthBars = d.months.map((v, i) => {
-      const isLast = i === d.months.length - 1;
-      const pct = Math.round((v / maxM) * 100);
-      return `<div class="month-bar-wrap">
-        <div class="month-bar" style="height:${pct}%;background:${isLast ? '#2B6CB0' : (i >= d.months.length - 3 ? '#90CDF4' : '#BEE3F8')};" data-tip="${v.toLocaleString()}만원"></div>
-        <div class="month-label" style="${isLast ? 'font-weight:700;color:#2B6CB0;' : ''}">${d.mlabels[i]}</div>
+  function switchStatsTab(btn, tab) {
+    document.querySelectorAll('.stats-sub-tab').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    _statsTab = tab;
+    renderStatsTab(tab);
+  }
+
+  function renderStatsTab(tab) {
+    if (tab === 'daily')  renderStatsDaily();
+    else if (tab === 'detail') renderStatsDetail();
+    else if (tab === 'refund') renderStatsRefund();
+    else document.getElementById('stats-body').innerHTML = `<div class="card" style="text-align:center;padding:40px;color:#A0AEC0;">준비 중입니다.</div>`;
+  }
+
+  // ── 일별 매출 캘린더 ──
+  function renderStatsDaily() {
+    const key = statsKey();
+    const dayData = dailySalesDb[key] || {};
+    const firstDay = new Date(_statsYear, _statsMonth-1, 1).getDay(); // 0=일
+    const lastDate = new Date(_statsYear, _statsMonth, 0).getDate();
+    const today = new Date();
+
+    let calRows = '';
+    let dayCount = 1;
+    const totalCells = Math.ceil((firstDay + lastDate) / 7) * 7;
+
+    // 주 단위로 행 생성
+    for (let row = 0; row < Math.ceil((firstDay + lastDate) / 7); row++) {
+      calRows += '<tr>';
+      for (let col = 0; col < 7; col++) {
+        const cellIdx = row * 7 + col;
+        if (cellIdx < firstDay || dayCount > lastDate) {
+          // 이전/다음달 날짜
+          const otherDay = cellIdx < firstDay ? (new Date(_statsYear, _statsMonth-1, 0).getDate() - firstDay + cellIdx + 1) : (dayCount - lastDate);
+          calRows += `<td class="other-month"><div class="cal-day-num" style="color:#CBD5E0;">${cellIdx < firstDay ? otherDay : dayCount++ - lastDate}</div></td>`;
+          if (cellIdx >= firstDay) dayCount++;
+        } else {
+          const d = dayCount;
+          const isToday = today.getFullYear()===_statsYear && today.getMonth()+1===_statsMonth && today.getDate()===d;
+          const sales = dayData[d] || {};
+          const catEntries = Object.entries(sales);
+          const total = catEntries.reduce((s,[,v])=>s+v, 0);
+          let rowsHtml = catEntries.map(([cat, amt]) =>
+            `<div class="cal-sale-row">
+              <span class="cal-sale-cat" style="color:${catColors[cat]||'#4A5568'};">${cat}</span>
+              <span class="cal-sale-amt">${amt.toLocaleString()}원</span>
+            </div>`
+          ).join('');
+          if (total > 0) rowsHtml += `<div class="cal-total-row"><span>합</span><span>${total.toLocaleString()}원</span></div>`;
+          calRows += `<td class="${isToday?'today':''}">
+            <div class="cal-day-num" style="color:${col===0?'#E53E3E':col===6?'#2B6CB0':'#718096'};">${d}일</div>
+            ${rowsHtml}
+          </td>`;
+          dayCount++;
+        }
+      }
+      calRows += '</tr>';
+    }
+
+    document.getElementById('stats-body').innerHTML = `
+      <div class="cal-filter-bar">
+        <label><input type="checkbox" checked> 현장 판매</label>
+        <label><input type="checkbox" checked> 모바일 판매</label>
+      </div>
+      <table class="cal-grid">
+        <thead><tr><th>일</th><th>월</th><th>화</th><th>수</th><th>목</th><th>금</th><th>토</th></tr></thead>
+        <tbody>${calRows}</tbody>
+      </table>`;
+  }
+
+  // ── 상세 매출 ──
+  function renderStatsDetail() {
+    const key = statsKey();
+    const cats = detailSalesDb[key];
+    if (!cats) {
+      document.getElementById('stats-body').innerHTML = `<div class="card" style="text-align:center;padding:40px;color:#A0AEC0;">${_statsYear}년 ${_statsMonth}월 데이터가 없습니다.</div>`;
+      return;
+    }
+
+    // 파이차트 계산
+    const catTotals = cats.map(c => ({ name:c.name, color:c.color, amt: c.products.reduce((s,p)=>s+p.amt,0) }));
+    const grandTotal = catTotals.reduce((s,c)=>s+c.amt,0);
+    let conic = '';
+    let cumPct = 0;
+    catTotals.forEach(c => {
+      const pct = grandTotal > 0 ? (c.amt/grandTotal*100) : 0;
+      conic += `${c.color} ${cumPct.toFixed(1)}% ${(cumPct+pct).toFixed(1)}%, `;
+      cumPct += pct;
+    });
+    conic = conic.replace(/, $/, '');
+
+    const legendHtml = catTotals.map(c => {
+      const pct = grandTotal > 0 ? Math.round(c.amt/grandTotal*100) : 0;
+      return `<div class="pie-legend-item">
+        <div class="pie-dot" style="background:${c.color};"></div>
+        <span>${c.name}</span>
+        <span style="margin-left:auto;font-weight:800;color:${c.color};">${c.amt.toLocaleString()}원</span>
       </div>`;
     }).join('');
 
-    const barItems = d.bars.map(b => `
-      <div class="bar-item">
-        <div class="bar-label" style="width:90px;">${b.l}</div>
-        <div class="bar-track"><div class="bar-fill" style="width:${b.pct}%;background:${b.c};"></div></div>
-        <div class="bar-val">${b.v}</div>
-      </div>`).join('');
+    // 컬럼 헤더 & 상품 행 구성
+    const maxRows = Math.max(...cats.map(c=>c.products.length));
+    let theadCats = cats.map(c =>
+      `<th class="cat-header" colspan="2" style="background:${c.color};">
+        ${c.name} <span style="font-size:10px;font-weight:600;">(신규:${c.newM}명/재등록:${c.renew}명)</span>
+      </th>`
+    ).join('');
 
-    const pieHtml = d.pie.map(p => `
-      <div style="background:${p.bg};border-radius:10px;padding:10px;text-align:center;">
-        <div style="font-size:18px;font-weight:900;color:${p.c};">${p.pct}</div>
-        <div style="font-size:11px;color:#718096;">${p.l}</div>
-      </div>`).join('');
+    let theadSub = cats.map(() => `<th>명수</th><th>금액</th>`).join('');
 
-    const topRows = d.tops.map(t => `
-      <tr>
-        <td><span style="font-size:${t.r.length <= 2 ? '20' : '14'}px;font-weight:700;color:#718096;">${t.r}</span></td>
-        <td><strong>${t.n}</strong></td>
-        <td><span class="badge ${t.b}">${t.cat}</span></td>
-        <td><strong>${t.cnt}</strong>건</td>
-        <td>${t.s}</td>
-        <td style="color:${t.up ? '#48BB78' : '#E53E3E'};font-weight:700;">${t.up ? '▲' : '▼'} ${t.g.replace(/[+-]/,'')}</td>
-        <td>⭐ ${t.star}</td>
-      </tr>`).join('');
+    let tbodyRows = '';
+    for (let i = 0; i < maxRows; i++) {
+      let row = '';
+      cats.forEach(c => {
+        const p = c.products[i];
+        if (!p) { row += '<td>-</td><td>-</td>'; return; }
+        const noSale = p.cnt === 0;
+        row += `<td class="prod-name" style="${noSale?'color:#CBD5E0;':''}">${p.name}</td>`;
+        row += `<td style="${noSale?'color:#CBD5E0;':''}">${p.cnt > 0 ? p.cnt+'명' : '-'}</td>`;
+        // Note: only show amt column after name and cnt
+      });
+      tbodyRows += `<tr>${row}</tr>`;
+    }
 
-    const colCount = Math.min(d.pie.length, 4);
+    // 더 직관적인 레이아웃으로: 각 카테고리별 상품명/명수/금액 3열
+    let theadCats2 = cats.map(c =>
+      `<th class="cat-header" colspan="3" style="background:${c.color};">
+        ${c.name}<br><span style="font-size:10px;font-weight:600;">신규:${c.newM}명 / 재등록:${c.renew}명</span>
+      </th>`
+    ).join('');
+    let theadSub2 = cats.map(() => `<th style="font-size:11px;">이용권명</th><th style="font-size:11px;">명수</th><th style="font-size:11px;">금액</th>`).join('');
+    let tbodyRows2 = '';
+    for (let i = 0; i < maxRows; i++) {
+      let row = '';
+      cats.forEach(c => {
+        const p = c.products[i];
+        if (!p) { row += '<td>-</td><td>-</td><td>-</td>'; return; }
+        const noSale = p.cnt === 0;
+        row += `<td class="prod-name" style="${noSale?'color:#CBD5E0;':''}">${p.name}</td>`;
+        row += `<td style="text-align:center;${noSale?'color:#CBD5E0;':''}">${p.cnt > 0 ? p.cnt+'명' : '-'}</td>`;
+        row += `<td style="${noSale?'color:#CBD5E0;':''}">${p.amt > 0 ? p.amt.toLocaleString()+'원' : '-'}</td>`;
+      });
+      tbodyRows2 += `<tr>${row}</tr>`;
+    }
+
+    // 합계 행
+    let totalRow = cats.map(c => {
+      const totCnt = c.products.reduce((s,p)=>s+p.cnt,0);
+      const totAmt = c.products.reduce((s,p)=>s+p.amt,0);
+      return `<td class="total-row">합</td><td class="total-row" style="text-align:center;">${totCnt}명</td><td class="total-row">${totAmt.toLocaleString()}원</td>`;
+    }).join('');
 
     document.getElementById('stats-body').innerHTML = `
-      <div class="stats-row">
-        <div class="stat-card">
-          <div class="stat-label">이번 달 총 매출 <span class="stat-icon">💰</span></div>
-          <div class="stat-value" style="font-size:22px;">${d.total}</div>
-          <div class="stat-sub">▲ ${d.tg}% 지난달 대비</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-label">이번 달 판매건수 <span class="stat-icon">📦</span></div>
-          <div class="stat-value">${d.sales}건</div>
-          <div class="stat-sub">▲ ${d.sg}% 지난달 대비</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-label">평균 구매단가 <span class="stat-icon">💳</span></div>
-          <div class="stat-value" style="font-size:22px;">${d.avg}</div>
-          <div class="stat-sub">▲ ${d.ag}% 지난달 대비</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-label">누적 매출 <span class="stat-icon">📈</span></div>
-          <div class="stat-value" style="font-size:22px;">${d.cumul}</div>
-          <div class="stat-sub" style="color:#718096;">올해 1~3월</div>
-        </div>
+      <div class="detail-filter-bar">
+        <label><input type="checkbox" checked> 현장 판매</label>
+        <label><input type="checkbox" checked> 모바일 판매</label>
+        <label style="margin-left:auto;"><input type="checkbox"> 판매 기록 없는 상품 숨기기</label>
       </div>
-
-      <div class="chart-row">
-        <div class="card" style="margin-bottom:0;">
-          <div class="card-title">월별 매출 추이 <span style="font-size:11px;color:#A0AEC0;font-weight:400;">단위: 만원</span></div>
-          <div class="month-chart">${monthBars}</div>
+      <div class="detail-layout">
+        <div class="pie-section">
+          <div class="pie-circle" style="background:conic-gradient(${conic});"></div>
+          <div class="pie-legend">${legendHtml}</div>
+          <div style="margin-top:12px;padding:10px;background:#F7FAFC;border-radius:10px;text-align:center;">
+            <div style="font-size:11px;color:#718096;">이번 달 총 매출</div>
+            <div style="font-size:18px;font-weight:900;color:#2B6CB0;">${grandTotal.toLocaleString()}원</div>
+          </div>
         </div>
-        <div class="card" style="margin-bottom:0;">
-          <div class="card-title">${cat === 'all' ? '카테고리별 매출 비중' : '이용권별 매출 비중'}</div>
-          <div class="bar-chart">${barItems}</div>
-          <div style="margin-top:16px;display:grid;grid-template-columns:repeat(${colCount},1fr);gap:8px;">${pieHtml}</div>
-        </div>
-      </div>
-
-      <div class="card" style="margin-top:16px;">
-        <div class="card-title">🏆 인기 이용권 TOP ${d.tops.length} <span style="font-size:11px;color:#A0AEC0;font-weight:400;">이번 달 판매량 기준</span></div>
-        <div class="tbl-wrap">
-          <table>
+        <div class="detail-cols">
+          <table class="detail-table">
             <thead>
-              <tr><th>순위</th><th>이용권명</th><th>카테고리</th><th>판매량</th><th>매출</th><th>전월 대비</th><th>평균 별점</th></tr>
+              <tr>${theadCats2}</tr>
+              <tr>${theadSub2}</tr>
             </thead>
-            <tbody>${topRows}</tbody>
+            <tbody>
+              ${tbodyRows2}
+              <tr>${totalRow}</tr>
+            </tbody>
           </table>
         </div>
-      </div>
+      </div>`;
+  }
 
+  // ── 환불 기록 ──
+  function renderStatsRefund() {
+    document.getElementById('stats-body').innerHTML = `
       <div class="card">
-        <div class="card-title">💬 최근 리뷰 <button class="btn-sm" style="background:#F0F4F8;color:#4A5568;font-size:11px;" onclick="showAllReviews()">전체 보기</button></div>
-        <div class="review-item">
-          <div class="review-top"><div class="review-name">김도산</div><div class="review-ticket">헬스 3개월 이용권</div><div class="review-stars">★★★★★</div><div class="review-date">2026.03.19</div></div>
-          <div class="review-text">시설이 깔끔하고 직원분들도 친절해요. 3개월 이용권 가성비 최고입니다!</div>
-          <div class="review-reply">관리자 답변: 감사합니다! 더 좋은 서비스로 보답하겠습니다. 🙏</div>
-        </div>
-        <div class="review-item">
-          <div class="review-top"><div class="review-name">이민준</div><div class="review-ticket">골프 월정액 이용권</div><div class="review-stars">★★★★☆</div><div class="review-date">2026.03.18</div></div>
-          <div class="review-text">주말 예약이 조금 어렵지만 전반적으로 만족합니다. 시뮬레이터 품질이 좋아요.</div>
-        </div>
-        <div class="review-item">
-          <div class="review-top"><div class="review-name">박서연</div><div class="review-ticket">홈트 프리미엄 1개월</div><div class="review-stars">★★★★★</div><div class="review-date">2026.03.17</div></div>
-          <div class="review-text">AI 코칭 기능이 정말 유용해요. 자세 교정도 되고 운동 효과가 눈에 띄게 좋아졌어요!</div>
-        </div>
+        <div class="card-title">↩️ 환불 기록 <span style="font-size:11px;color:#A0AEC0;font-weight:400;">${_statsYear}년 ${_statsMonth}월</span></div>
+        <div class="tbl-wrap"><table>
+          <thead><tr><th>환불일</th><th>회원명</th><th>이용권</th><th>결제금액</th><th>환불금액</th><th>환불 사유</th><th>처리자</th></tr></thead>
+          <tbody>
+            <tr>
+              <td>2026.03.17</td><td><strong>최지훈</strong></td><td>헬스 1개월 이용권</td>
+              <td>79,000원</td><td style="color:#E53E3E;font-weight:700;">79,000원</td>
+              <td>개인 사정</td><td>관리자</td>
+            </tr>
+            <tr>
+              <td>2026.03.12</td><td><strong>강태양</strong></td><td>골프 10회 이용권</td>
+              <td>150,000원</td><td style="color:#E53E3E;font-weight:700;">120,000원</td>
+              <td>부분 사용 후 환불</td><td>관리자</td>
+            </tr>
+          </tbody>
+        </table></div>
       </div>`;
   }
 
   function downloadStatsExcel() {
-    const d = statsDb[_currentStatsCat] || statsDb.all;
-    const catLabels = {all:'전체',health:'헬스',golf:'골프',home:'홈트',pilates:'필라테스',combo:'골프+헬스'};
-    let csv = '\uFEFF순위,이용권명,카테고리,판매량(건),매출,전월대비,평균별점\n';
-    d.tops.forEach(t => {
-      csv += `${t.r},"${t.n}",${t.cat},${t.cnt},${t.s},${t.g},${t.star}\n`;
-    });
+    const key = statsKey();
+    const cats = detailSalesDb[key];
+    let csv = '\uFEFF카테고리,이용권명,판매명수,매출금액\n';
+    if (cats) {
+      cats.forEach(c => {
+        c.products.forEach(p => {
+          csv += `"${c.name}","${p.name}",${p.cnt},${p.amt}\n`;
+        });
+      });
+    }
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `매출통계_${catLabels[_currentStatsCat]}_2026년3월.csv`;
+    a.download = `매출통계_${_statsYear}년${_statsMonth}월.csv`;
     a.click();
     URL.revokeObjectURL(url);
     showToast('⬇ 엑셀(CSV) 파일이 다운로드됩니다.');
   }
 
+  // ── (구) statsDb — 더 이상 사용 안 함. 하위 호환성 유지용 더미 ──
+  const statsDb = {
+    all: { total:'', sales:0, avg:'', cumul:'', tg:0, sg:0, ag:0,
+      months:[0,0,0,0,0,0], mlabels:[], bars:[], pie:[], tops:[] },
+    health:  { total:'3,458만원', sales:267, avg:'129,500원', cumul:'9,200만원', tg:5.2, sg:3.1, ag:2.0,
+      months:[2400,2800,3100,2900,3280,3458], mlabels:['10월','11월','12월','1월','2월','3월'],
+      bars:[{l:'헬스 1개월',pct:28,c:'#2B6CB0',v:'979만원'},{l:'헬스 3개월',pct:47,c:'#90CDF4',v:'1,638만원'},{l:'헬스 6개월',pct:24,c:'#BEE3F8',v:'841만원'}],
+      pie:[{pct:'28%',bg:'#EBF8FF',c:'#2B6CB0',l:'1개월'},{pct:'47%',bg:'#BEE3F8',c:'#2C5282',l:'3개월'},{pct:'24%',bg:'#EBF8FF',c:'#1A365D',l:'6개월'}],
+      tops:[{r:'🥇',n:'헬스 3개월 이용권',b:'badge-blue',cat:'헬스',cnt:87,s:'1,638만원',g:'+8%',up:true,star:'4.7'},{r:'🥈',n:'헬스 1개월 이용권',b:'badge-blue',cat:'헬스',cnt:124,s:'979만원',g:'-3%',up:false,star:'4.5'},{r:'🥉',n:'헬스 6개월 이용권',b:'badge-blue',cat:'헬스',cnt:56,s:'841만원',g:'+2%',up:true,star:'4.6'}] },
   // ── 주문 검색 ──────────────────────────────────────────
   function filterOrders() {
     const keyword = document.getElementById('order-search').value.trim().toLowerCase();
@@ -1455,7 +1685,6 @@
   document.addEventListener('DOMContentLoaded', function() {
     renderTicketGrid();
     updateStatusTabCounts();
-    renderStats('all');
   });
 </script>
 </body>
