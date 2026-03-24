@@ -167,13 +167,24 @@
 
     @media print {
       body { background: #fff; padding: 0; }
-      .nav, .sidebar, #stats-page-actions { display: none !important; }
+      .nav, .sidebar, #stats-page-actions, .stats-sub-tabs, .cal-filter-bar { display: none !important; }
       .admin-wrap { display: block; }
       .main { width: 100%; }
       .screen { display: none !important; }
       #screen-stats { display: block !important; }
       .stats-cat-tabs { display: none !important; }
-      @page { size: A4 landscape; margin: 1cm; }
+      .page-header { box-shadow: none !important; border: none !important; padding: 6px 0 8px !important; }
+
+      /* 한 페이지 압축 */
+      @page { size: A4 landscape; margin: 0.6cm; }
+      #stats-body { margin: 0 !important; }
+      .cal-grid { box-shadow: none !important; }
+      .cal-grid th { padding: 4px 4px !important; font-size: 10px !important; }
+      .cal-grid td { padding: 3px 4px !important; min-height: 0 !important; height: auto !important; font-size: 10px !important; }
+      .cal-day-num { font-size: 10px !important; margin-bottom: 2px !important; }
+      .cal-sale-row { font-size: 9px !important; line-height: 1.4 !important; }
+      .cal-sale-amt { font-size: 9px !important; }
+      .cal-total-row { font-size: 10px !important; margin-top: 2px !important; padding-top: 2px !important; }
     }
 
     /* 카테고리 탭 */
