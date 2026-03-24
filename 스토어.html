@@ -907,7 +907,11 @@
   function renderHome() {
     // 카테고리 칩
     const catEl = document.getElementById('home-cats');
-    catEl.innerHTML = catData.filter(c => c.visible).map(c =>
+    const allChip = `<div class="cat-chip" onclick="goList('all')">
+      <div class="cat-chip-icon" style="background:#EDF2F7;font-size:24px;">🗂️</div>
+      <span class="cat-chip-label">전체</span>
+    </div>`;
+    catEl.innerHTML = allChip + catData.filter(c => c.visible).map(c =>
       `<div class="cat-chip" onclick="goList('${c.key}')">
         <div class="cat-chip-icon" style="background:${c.bg};">${c.icon}</div>
         <span class="cat-chip-label">${c.name}</span>
