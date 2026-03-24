@@ -244,6 +244,7 @@
   <button class="nav-btn active" onclick="showScreen('tickets')">① 이용권 관리</button>
   <button class="nav-btn" onclick="showScreen('orders')">② 주문/결제 관리</button>
   <button class="nav-btn" onclick="showScreen('stats')">③ 매출 통계</button>
+  <button class="nav-btn" onclick="showScreen('categories')">④ 카테고리 관리</button>
 </div>
 
 <div class="admin-wrap">
@@ -262,6 +263,9 @@
     </div>
     <div class="sidebar-item" onclick="showScreen('stats')">
       <span class="sidebar-item-icon">📊</span> 매출 통계
+    </div>
+    <div class="sidebar-item" onclick="showScreen('categories')">
+      <span class="sidebar-item-icon">🏷️</span> 카테고리 관리
     </div>
     <div class="sidebar-section">운영</div>
     <div class="sidebar-item">
@@ -316,10 +320,12 @@
 
       <!-- 카테고리 탭 -->
       <div class="cat-tabs">
-        <button class="cat-tab active" onclick="filterCat(this,'all')">전체 (12)</button>
+        <button class="cat-tab active" onclick="filterCat(this,'all')">전체 (14)</button>
         <button class="cat-tab" onclick="filterCat(this,'health')">🏋️ 헬스 (4)</button>
         <button class="cat-tab" onclick="filterCat(this,'golf')">⛳ 골프 (4)</button>
         <button class="cat-tab" onclick="filterCat(this,'home')">🏠 홈트 (4)</button>
+        <button class="cat-tab" onclick="filterCat(this,'pilates')">🧘 필라테스 (1)</button>
+        <button class="cat-tab" onclick="filterCat(this,'combo')">🏋️⛳ 골프+헬스 (1)</button>
       </div>
 
       <!-- 이용권 카드 그리드 -->
@@ -639,6 +645,60 @@
           </div>
         </div>
 
+        <!-- 필라테스 -->
+        <div class="ticket-card" data-cat="pilates">
+          <div class="tc-header">
+            <span class="tc-icon">🧘</span>
+            <div class="tc-actions">
+              <label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label>
+            </div>
+          </div>
+          <div class="tc-body">
+            <div class="tc-name">필라테스 월정액 이용권</div>
+            <div class="tc-cat"><span class="badge badge-teal">필라테스</span> <span class="badge badge-purple" style="margin-left:4px;">NEW</span></div>
+            <div class="tc-price">99,000원/월</div>
+            <div class="tc-info">
+              <div class="tc-info-row">🧘 그룹 수업 무제한</div>
+              <div class="tc-info-row">📅 30일 자동 갱신</div>
+              <div class="tc-info-row">👩‍🏫 전문 강사 지도</div>
+            </div>
+          </div>
+          <div class="tc-footer">
+            <div class="tc-sales">이번 달 <strong>34</strong>건</div>
+            <div>
+              <button class="btn-sm" style="background:#EBF8FF;color:#2B6CB0;">수정</button>
+              <button class="btn-sm" style="background:#FFF5F5;color:#C53030;margin-left:4px;">삭제</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 골프+헬스 콤보 -->
+        <div class="ticket-card" data-cat="combo">
+          <div class="tc-header">
+            <span class="tc-icon">🏆</span>
+            <div class="tc-actions">
+              <label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label>
+            </div>
+          </div>
+          <div class="tc-body">
+            <div class="tc-name">골프+헬스 콤보 이용권</div>
+            <div class="tc-cat"><span class="badge badge-green">골프</span> <span class="badge badge-blue" style="margin-left:4px;">헬스</span> <span class="badge badge-orange" style="margin-left:4px;">인기</span></div>
+            <div class="tc-price">169,000원/월</div>
+            <div class="tc-info">
+              <div class="tc-info-row">⛳ 골프 무제한</div>
+              <div class="tc-info-row">🏋️ 헬스장 무제한</div>
+              <div class="tc-info-row">💸 개별 대비 39,000원 절약</div>
+            </div>
+          </div>
+          <div class="tc-footer">
+            <div class="tc-sales">이번 달 <strong>67</strong>건</div>
+            <div>
+              <button class="btn-sm" style="background:#EBF8FF;color:#2B6CB0;">수정</button>
+              <button class="btn-sm" style="background:#FFF5F5;color:#C53030;margin-left:4px;">삭제</button>
+            </div>
+          </div>
+        </div>
+
       </div>
     </div><!-- /screen-tickets -->
 
@@ -685,6 +745,8 @@
           <option>헬스 이용권</option>
           <option>골프 이용권</option>
           <option>홈트 이용권</option>
+          <option>필라테스 이용권</option>
+          <option>골프+헬스 콤보</option>
         </select>
         <select>
           <option>전체 상태</option>
@@ -1034,6 +1096,147 @@
   </div><!-- /main -->
 </div><!-- /admin-wrap -->
 
+    <!-- ④ 카테고리 관리 -->
+    <div class="screen" id="screen-categories">
+      <div class="page-header">
+        <div>
+          <div class="page-title">🏷️ 카테고리 관리</div>
+          <div class="page-sub">이용권 카테고리 추가·수정·삭제 및 노출 순서 관리</div>
+        </div>
+        <div class="page-actions">
+          <button class="btn-outline" onclick="openModal('modal-cat-add')">+ 카테고리 추가</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">카테고리 목록 <span style="font-size:12px;color:#A0AEC0;font-weight:400;">드래그로 순서 변경 가능</span></div>
+        <div class="tbl-wrap">
+          <table id="cat-table">
+            <thead>
+              <tr>
+                <th>순서</th>
+                <th>아이콘</th>
+                <th>카테고리명</th>
+                <th>배지 색상</th>
+                <th>등록 이용권</th>
+                <th>이번 달 판매</th>
+                <th>노출</th>
+                <th>관리</th>
+              </tr>
+            </thead>
+            <tbody id="cat-tbody">
+              <tr draggable="true">
+                <td style="color:#A0AEC0;font-size:16px;cursor:grab;">⠿ 1</td>
+                <td style="font-size:22px;">🏋️</td>
+                <td><strong>헬스</strong></td>
+                <td><span class="badge badge-blue">파랑</span></td>
+                <td>4개</td>
+                <td>391건</td>
+                <td><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label></td>
+                <td>
+                  <button class="btn-sm" style="background:#EBF8FF;color:#2B6CB0;" onclick="openCatEdit('헬스','🏋️','blue')">수정</button>
+                  <button class="btn-sm" style="background:#FFF5F5;color:#C53030;margin-left:4px;">삭제</button>
+                </td>
+              </tr>
+              <tr draggable="true">
+                <td style="color:#A0AEC0;font-size:16px;cursor:grab;">⠿ 2</td>
+                <td style="font-size:22px;">⛳</td>
+                <td><strong>골프</strong></td>
+                <td><span class="badge badge-green">초록</span></td>
+                <td>4개</td>
+                <td>287건</td>
+                <td><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label></td>
+                <td>
+                  <button class="btn-sm" style="background:#EBF8FF;color:#2B6CB0;" onclick="openCatEdit('골프','⛳','green')">수정</button>
+                  <button class="btn-sm" style="background:#FFF5F5;color:#C53030;margin-left:4px;">삭제</button>
+                </td>
+              </tr>
+              <tr draggable="true">
+                <td style="color:#A0AEC0;font-size:16px;cursor:grab;">⠿ 3</td>
+                <td style="font-size:22px;">🏠</td>
+                <td><strong>홈트</strong></td>
+                <td><span class="badge badge-purple">보라</span></td>
+                <td>4개</td>
+                <td>493건</td>
+                <td><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label></td>
+                <td>
+                  <button class="btn-sm" style="background:#EBF8FF;color:#2B6CB0;" onclick="openCatEdit('홈트','🏠','purple')">수정</button>
+                  <button class="btn-sm" style="background:#FFF5F5;color:#C53030;margin-left:4px;">삭제</button>
+                </td>
+              </tr>
+              <tr draggable="true">
+                <td style="color:#A0AEC0;font-size:16px;cursor:grab;">⠿ 4</td>
+                <td style="font-size:22px;">🧘</td>
+                <td><strong>필라테스</strong></td>
+                <td><span class="badge badge-teal">청록</span></td>
+                <td>1개</td>
+                <td>34건</td>
+                <td><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label></td>
+                <td>
+                  <button class="btn-sm" style="background:#EBF8FF;color:#2B6CB0;" onclick="openCatEdit('필라테스','🧘','teal')">수정</button>
+                  <button class="btn-sm" style="background:#FFF5F5;color:#C53030;margin-left:4px;">삭제</button>
+                </td>
+              </tr>
+              <tr draggable="true">
+                <td style="color:#A0AEC0;font-size:16px;cursor:grab;">⠿ 5</td>
+                <td style="font-size:22px;">🏆</td>
+                <td><strong>골프+헬스</strong></td>
+                <td><span class="badge badge-orange">주황</span></td>
+                <td>1개</td>
+                <td>67건</td>
+                <td><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label></td>
+                <td>
+                  <button class="btn-sm" style="background:#EBF8FF;color:#2B6CB0;" onclick="openCatEdit('골프+헬스','🏆','orange')">수정</button>
+                  <button class="btn-sm" style="background:#FFF5F5;color:#C53030;margin-left:4px;">삭제</button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">카테고리별 현황</div>
+        <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:12px;">
+          <div style="background:#EBF8FF;border-radius:12px;padding:16px;text-align:center;">
+            <div style="font-size:28px;margin-bottom:6px;">🏋️</div>
+            <div style="font-weight:800;font-size:14px;color:#2B6CB0;">헬스</div>
+            <div style="font-size:12px;color:#718096;margin-top:4px;">이용권 4개</div>
+            <div style="font-size:18px;font-weight:900;color:#1A202C;margin-top:6px;">391건</div>
+            <div style="font-size:11px;color:#48BB78;">▲ 8%</div>
+          </div>
+          <div style="background:#F0FFF4;border-radius:12px;padding:16px;text-align:center;">
+            <div style="font-size:28px;margin-bottom:6px;">⛳</div>
+            <div style="font-weight:800;font-size:14px;color:#276749;">골프</div>
+            <div style="font-size:12px;color:#718096;margin-top:4px;">이용권 4개</div>
+            <div style="font-size:18px;font-weight:900;color:#1A202C;margin-top:6px;">287건</div>
+            <div style="font-size:11px;color:#48BB78;">▲ 5%</div>
+          </div>
+          <div style="background:#FAF5FF;border-radius:12px;padding:16px;text-align:center;">
+            <div style="font-size:28px;margin-bottom:6px;">🏠</div>
+            <div style="font-weight:800;font-size:14px;color:#553C9A;">홈트</div>
+            <div style="font-size:12px;color:#718096;margin-top:4px;">이용권 4개</div>
+            <div style="font-size:18px;font-weight:900;color:#1A202C;margin-top:6px;">493건</div>
+            <div style="font-size:11px;color:#48BB78;">▲ 18%</div>
+          </div>
+          <div style="background:#E6FFFA;border-radius:12px;padding:16px;text-align:center;">
+            <div style="font-size:28px;margin-bottom:6px;">🧘</div>
+            <div style="font-weight:800;font-size:14px;color:#234E52;">필라테스</div>
+            <div style="font-size:12px;color:#718096;margin-top:4px;">이용권 1개</div>
+            <div style="font-size:18px;font-weight:900;color:#1A202C;margin-top:6px;">34건</div>
+            <div style="font-size:11px;color:#48BB78;">신규</div>
+          </div>
+          <div style="background:#FFFAF0;border-radius:12px;padding:16px;text-align:center;">
+            <div style="font-size:28px;margin-bottom:6px;">🏆</div>
+            <div style="font-weight:800;font-size:14px;color:#C05621;">골프+헬스</div>
+            <div style="font-size:12px;color:#718096;margin-top:4px;">이용권 1개</div>
+            <div style="font-size:18px;font-weight:900;color:#1A202C;margin-top:6px;">67건</div>
+            <div style="font-size:11px;color:#48BB78;">신규</div>
+          </div>
+        </div>
+      </div>
+    </div><!-- /screen-categories -->
+
 <!-- 이용권 등록/수정 모달 -->
 <div class="modal-overlay" id="modal-ticket-add">
   <div class="modal">
@@ -1044,10 +1247,12 @@
     <div class="form-row">
       <div class="form-group">
         <label class="form-label">카테고리 <span class="req">*</span></label>
-        <select class="form-select">
+        <select class="form-select" id="ticket-cat-select">
           <option>헬스</option>
           <option>골프</option>
           <option>홈트</option>
+          <option>필라테스</option>
+          <option>골프+헬스</option>
         </select>
       </div>
       <div class="form-group">
@@ -1112,6 +1317,50 @@
   </div>
 </div>
 
+<!-- 카테고리 추가/수정 모달 -->
+<div class="modal-overlay" id="modal-cat-add">
+  <div class="modal" style="width:400px;">
+    <div class="modal-header">
+      <div class="modal-title" id="cat-modal-title">🏷️ 카테고리 추가</div>
+      <button class="modal-close" onclick="closeModal('modal-cat-add')">✕</button>
+    </div>
+    <div class="form-group">
+      <label class="form-label">카테고리명 <span class="req">*</span></label>
+      <input class="form-input" id="cat-name-input" type="text" placeholder="예) 필라테스" />
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">아이콘 이모지 <span class="req">*</span></label>
+        <input class="form-input" id="cat-icon-input" type="text" placeholder="예) 🧘" maxlength="2" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">배지 색상</label>
+        <select class="form-select" id="cat-color-select">
+          <option value="blue">파랑 (헬스)</option>
+          <option value="green">초록 (골프)</option>
+          <option value="purple">보라 (홈트)</option>
+          <option value="teal">청록 (필라테스)</option>
+          <option value="orange">주황 (콤보)</option>
+          <option value="red">빨강</option>
+          <option value="gray">회색</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">설명</label>
+      <input class="form-input" type="text" placeholder="카테고리 간단 설명" />
+    </div>
+    <div class="form-group" style="display:flex;align-items:center;gap:12px;">
+      <label class="form-label" style="margin:0;">노출 여부</label>
+      <label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="closeModal('modal-cat-add')">취소</button>
+      <button class="btn-primary" onclick="saveCat()">저장</button>
+    </div>
+  </div>
+</div>
+
 <!-- 주문 상세 모달 -->
 <div class="modal-overlay" id="modal-order-detail">
   <div class="modal">
@@ -1147,15 +1396,38 @@
 </div>
 
 <script>
+  const SCREENS = ['tickets','orders','stats','categories'];
+
   function showScreen(name) {
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
     document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
     document.getElementById('screen-' + name).classList.add('active');
-    document.querySelectorAll('.nav-btn')[['tickets','orders','stats'].indexOf(name)].classList.add('active');
-
+    const idx = SCREENS.indexOf(name);
+    if (idx >= 0) document.querySelectorAll('.nav-btn')[idx].classList.add('active');
     document.querySelectorAll('.sidebar-item').forEach(i => i.classList.remove('active'));
-    const sidebarIdx = ['tickets','orders','stats'].indexOf(name);
-    if (sidebarIdx >= 0) document.querySelectorAll('.sidebar-item')[sidebarIdx].classList.add('active');
+    if (idx >= 0) document.querySelectorAll('.sidebar-item')[idx].classList.add('active');
+  }
+
+  function openCatEdit(name, icon, color) {
+    document.getElementById('cat-modal-title').textContent = '🏷️ 카테고리 수정';
+    document.getElementById('cat-name-input').value = name;
+    document.getElementById('cat-icon-input').value = icon;
+    document.getElementById('cat-color-select').value = color;
+    openModal('modal-cat-add');
+  }
+
+  function saveCat() {
+    const name = document.getElementById('cat-name-input').value.trim();
+    if (!name) { alert('카테고리명을 입력해주세요.'); return; }
+    closeModal('modal-cat-add');
+    // 이용권 등록 모달 select에도 옵션 동적 추가
+    const sel = document.getElementById('ticket-cat-select');
+    const exists = Array.from(sel.options).some(o => o.text === name);
+    if (!exists) {
+      const opt = document.createElement('option');
+      opt.text = name; sel.add(opt);
+    }
+    showToast(`✅ 카테고리 "${name}" 저장 완료`);
   }
 
   function filterCat(btn, cat) {
