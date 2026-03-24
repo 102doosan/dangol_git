@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>관리자 스토어 관리</title>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet" />
+  <script src="storeData.js"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: 'Noto Sans KR', sans-serif; background: #F0F4F8; color: #1A202C; min-height: 100vh; padding: 24px 20px 48px; }
@@ -666,9 +667,6 @@
 
     </div><!-- /screen-stats -->
 
-  </div><!-- /main -->
-</div><!-- /admin-wrap -->
-
     <!-- ④ 카테고리 관리 -->
     <div class="screen" id="screen-categories">
       <div class="page-header">
@@ -684,6 +682,9 @@
 
       <div id="cat-cards-wrap" style="display:flex;flex-direction:column;gap:16px;"></div>
     </div><!-- /screen-categories -->
+
+  </div><!-- /main -->
+</div><!-- /admin-wrap -->
 
 <!-- 이용권 등록/수정 모달 -->
 <div class="modal-overlay" id="modal-ticket-add">
@@ -858,24 +859,8 @@
     if (name === 'stats') renderStatsTab(_statsTab);
   }
 
-  // ── 카테고리 데이터 ──────────────────────────────────────────
-  const catData = [
-    { icon:'🏋️', name:'헬스',    color:'badge-blue',   tickets:4, sales:391,  visible:true,
-      durations:['1개월','3개월','6개월','1년'],
-      defaultDur:'1개월', maxPersons:1, minAge:14, desc:'헬스장 기구 및 시설 이용권' },
-    { icon:'⛳', name:'골프',    color:'badge-green',  tickets:4, sales:287,  visible:true,
-      durations:['10회','30회','월정액','패밀리'],
-      defaultDur:'10회', maxPersons:4, minAge:10, desc:'스크린골프 및 골프 연습장 이용권' },
-    { icon:'🏠', name:'홈트',    color:'badge-purple', tickets:4, sales:493,  visible:true,
-      durations:['1개월','3개월','패밀리'],
-      defaultDur:'1개월', maxPersons:4, minAge:0, desc:'앱 기반 홈트레이닝 이용권' },
-    { icon:'🧘', name:'필라테스', color:'badge-teal',   tickets:1, sales:34,   visible:true,
-      durations:['1개월','3개월'],
-      defaultDur:'1개월', maxPersons:1, minAge:12, desc:'필라테스 그룹/개인 수업 이용권' },
-    { icon:'🏆', name:'골프+헬스', color:'badge-orange', tickets:1, sales:67, visible:true,
-      durations:['월정액'],
-      defaultDur:'월정액', maxPersons:4, minAge:14, desc:'골프+헬스 통합 이용권' },
-  ];
+  // ── 카테고리 데이터 — storeData.js에서 로드됨 ──────────────────────────────────────────
+  // catData는 storeData.js에 정의되어 있습니다. (공유 데이터)
 
   const COLOR_OPTIONS = [
     { val:'badge-blue',   label:'파랑' },
@@ -1053,23 +1038,8 @@
     showToast(`✅ 카테고리 "${name}" 저장 완료`);
   }
 
-  // ── 이용권 데이터 ──────────────────────────────────────────
-  const ticketData = [
-    { cat:'health', icon:'🏋️', name:'헬스 1개월 이용권', badge:'badge-blue', catLabel:'헬스', price:'79,000원', type:'기간', duration:'30일', features:['입장 제한 없음','첫 구매 20% 할인'], sales:124, active:true },
-    { cat:'health', icon:'🏋️', name:'헬스 3개월 이용권', badge:'badge-blue', catLabel:'헬스', price:'189,000원', type:'기간', duration:'90일', features:['입장 제한 없음','월 63,000원 절약'], sales:87, active:true },
-    { cat:'health', icon:'🏋️', name:'헬스 6개월 이용권', badge:'badge-blue', catLabel:'헬스', price:'329,000원', type:'기간', duration:'180일', features:['입장 제한 없음','월 54,833원 절약'], sales:56, active:true },
-    { cat:'health', icon:'🏋️', name:'헬스 1년 이용권', badge:'badge-blue', catLabel:'헬스', price:'599,000원', type:'기간', duration:'365일', features:['입장 제한 없음'], sales:0, active:false },
-    { cat:'golf', icon:'⛳', name:'골프 10회 이용권', badge:'badge-green', catLabel:'골프', price:'150,000원', type:'횟수', duration:'90일 유효', features:['오전 6시~오후 10시'], sales:95, active:true },
-    { cat:'golf', icon:'⛳', name:'골프 30회 이용권', badge:'badge-green', catLabel:'골프', price:'390,000원', type:'횟수', duration:'180일 유효', features:['회당 13,000원'], sales:48, active:true },
-    { cat:'golf', icon:'⛳', name:'골프 월정액 이용권', badge:'badge-green', catLabel:'골프', price:'129,000원/월', type:'월정액', duration:'30일 자동갱신', features:['횟수 무제한','인기 상품'], sales:112, active:true },
-    { cat:'golf', icon:'⛳', name:'골프 패밀리 이용권', badge:'badge-green', catLabel:'골프', price:'199,000원/월', type:'월정액', duration:'30일 자동갱신', features:['최대 4인 이용','인당 무제한'], sales:32, active:true },
-    { cat:'home', icon:'🏠', name:'홈트 베이직 1개월', badge:'badge-purple', catLabel:'홈트', price:'29,000원', type:'기간', duration:'30일', features:['기본 콘텐츠 제공'], sales:156, active:true },
-    { cat:'home', icon:'🏠', name:'홈트 프리미엄 1개월', badge:'badge-purple', catLabel:'홈트', price:'49,000원', type:'기간', duration:'30일', features:['전체 콘텐츠+AI코칭','트레이너 1:1 채팅'], sales:203, active:true },
-    { cat:'home', icon:'🏠', name:'홈트 프리미엄 3개월', badge:'badge-purple', catLabel:'홈트', price:'129,000원', type:'기간', duration:'90일', features:['전체 콘텐츠+AI코칭','월 43,000원 절약'], sales:88, active:true },
-    { cat:'home', icon:'🏠', name:'홈트 패밀리 이용권', badge:'badge-purple', catLabel:'홈트', price:'69,000원/월', type:'월정액', duration:'30일 자동갱신', features:['최대 4인 이용'], sales:46, active:true },
-    { cat:'pilates', icon:'🧘', name:'필라테스 월정액 이용권', badge:'badge-teal', catLabel:'필라테스', price:'99,000원/월', type:'월정액', duration:'30일 자동갱신', features:['그룹 수업 무제한','전문 강사 지도'], sales:34, active:true },
-    { cat:'combo', icon:'🏆', name:'골프+헬스 콤보 이용권', badge:'badge-orange', catLabel:'골프+헬스', price:'169,000원/월', type:'월정액', duration:'30일 자동갱신', features:['골프 무제한','헬스장 무제한','개별 대비 39,000원 절약'], sales:67, active:true },
-  ];
+  // ── 이용권 데이터 — storeData.js에서 로드됨 ──────────────────────────────────────────
+  // ticketData는 storeData.js에 정의되어 있습니다. (공유 데이터)
 
   let _currentCatFilter = 'all';
   let _currentStatusFilter = 'active'; // 'active' | 'inactive' | 'all'
@@ -1682,10 +1652,8 @@
   });
 
   // ── 초기화 ──────────────────────────────────────────
-  document.addEventListener('DOMContentLoaded', function() {
-    renderTicketGrid();
-    updateStatusTabCounts();
-  });
+  renderTicketGrid();
+  updateStatusTabCounts();
 </script>
 </body>
 </html>
