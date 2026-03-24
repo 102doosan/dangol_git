@@ -1125,14 +1125,19 @@
   function toggleTicketActive(idx, checked) {
     ticketData[idx].active = checked;
     const name = ticketData[idx].name;
-    showToast(checked ? `✅ ${name} 판매 재개` : `⏸ ${name} 판매 일시중단`);
-    // 상태 변화를 볼 수 있도록 '전체' 뷰로 전환 후 재렌더
-    _currentStatusFilter = 'all';
-    document.querySelectorAll('.status-tab').forEach(b => b.classList.remove('active'));
-    const allTab = document.querySelectorAll('.status-tab')[2];
-    if (allTab) { allTab.classList.add('active'); allTab.style.background = '#A0AEC0'; allTab.style.borderColor = '#A0AEC0'; allTab.style.color = '#fff'; }
-    renderTicketGrid();
+    showToast(checked ? `✅ ${name} 판매 재개 — 판매중 탭으로 이동` : `⏸ ${name} 일시중단 — 휴면 탭으로 이동`);
     updateStatusTabCounts();
+    // 켜면 → 판매중 탭, 끄면 → 휴면 탭으로 전환
+    const tabs = document.querySelectorAll('.status-tab');
+    tabs.forEach(b => { b.classList.remove('active'); b.style.background=''; b.style.borderColor=''; b.style.color=''; });
+    if (checked) {
+      _currentStatusFilter = 'active';
+      tabs[0].classList.add('active');
+    } else {
+      _currentStatusFilter = 'inactive';
+      tabs[1].classList.add('active');
+    }
+    renderTicketGrid();
   }
 
   function updateStatusTabCounts() {
