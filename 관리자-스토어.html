@@ -1036,8 +1036,19 @@
   let _currentStatusFilter = 'active'; // 'active' | 'inactive' | 'all'
 
   function filterStatus(btn, status) {
-    document.querySelectorAll('.status-tab').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.status-tab').forEach(b => {
+      b.classList.remove('active');
+      b.style.background = '';
+      b.style.borderColor = '';
+      b.style.color = '';
+    });
     btn.classList.add('active');
+    // 전체 탭은 별도 스타일
+    if (status === 'all') {
+      btn.style.background = '#A0AEC0';
+      btn.style.borderColor = '#A0AEC0';
+      btn.style.color = '#fff';
+    }
     _currentStatusFilter = status;
     renderTicketGrid();
   }
@@ -1063,7 +1074,7 @@
           <div class="tc-header">
             <span class="tc-icon">${t.icon}</span>
             <div class="tc-actions">
-              <label class="toggle"><input type="checkbox" ${t.active ? 'checked' : ''} onchange="ticketData[${idx}].active=this.checked; showToast(this.checked ? '✅ ${t.name} 판매 재개' : '⏸ ${t.name} 판매 일시중단'); renderTicketGrid()"><span class="toggle-slider"></span></label>
+              <label class="toggle"><input type="checkbox" ${t.active ? 'checked' : ''} onchange="toggleTicketActive(${idx}, this.checked)"><span class="toggle-slider"></span></label>
             </div>
           </div>
           <div class="tc-body">
@@ -1109,6 +1120,27 @@
     ticketData.splice(idx, 1);
     renderTicketGrid();
     showToast('🗑 이용권이 삭제되었습니다.');
+  }
+
+  function toggleTicketActive(idx, checked) {
+    ticketData[idx].active = checked;
+    const name = ticketData[idx].name;
+    showToast(checked ? `✅ ${name} 판매 재개` : `⏸ ${name} 판매 일시중단`);
+    // 상태 변화를 볼 수 있도록 '전체' 뷰로 전환 후 재렌더
+    _currentStatusFilter = 'all';
+    document.querySelectorAll('.status-tab').forEach(b => b.classList.remove('active'));
+    const allTab = document.querySelectorAll('.status-tab')[2];
+    if (allTab) { allTab.classList.add('active'); allTab.style.background = '#A0AEC0'; allTab.style.borderColor = '#A0AEC0'; allTab.style.color = '#fff'; }
+    renderTicketGrid();
+    updateStatusTabCounts();
+  }
+
+  function updateStatusTabCounts() {
+    const activeCount = ticketData.filter(t => t.active).length;
+    const inactiveCount = ticketData.filter(t => !t.active).length;
+    const tabs = document.querySelectorAll('.status-tab');
+    if (tabs[0]) tabs[0].textContent = `🟢 판매중 (${activeCount})`;
+    if (tabs[1]) tabs[1].textContent = `💤 휴면 상품 (${inactiveCount})`;
   }
 
   function filterCat(btn, cat) {
@@ -1417,6 +1449,7 @@
   // ── 초기화 ──────────────────────────────────────────
   document.addEventListener('DOMContentLoaded', function() {
     renderTicketGrid();
+    updateStatusTabCounts();
     renderStats('all');
   });
 </script>
