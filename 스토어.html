@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>스토어 — 이용권 판매</title>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet" />
+  <script src="storeData.js"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     body {
@@ -418,7 +419,7 @@
 <div class="toolbar">
   <span class="toolbar-title">🎟️ 이용권 스토어</span>
   <button class="screen-btn active" onclick="go('home')">① 스토어 홈</button>
-  <button class="screen-btn" onclick="go('list')">② 이용권 목록</button>
+  <button class="screen-btn" onclick="goList('all')">② 이용권 목록</button>
   <button class="screen-btn" onclick="go('detail')">③ 이용권 상세</button>
   <button class="screen-btn" onclick="go('cart')">④ 장바구니</button>
   <button class="screen-btn" onclick="go('order')">⑤ 결제</button>
@@ -441,215 +442,50 @@
               🛒<span class="cart-badge" style="position:relative;top:auto;right:auto;display:inline-flex;margin-left:-8px;vertical-align:top;">2</span>
             </span>
           </div>
-          <div class="hero-banner">
-            <span class="hero-emoji">⛳</span>
-            <div class="hero-text">
-              <div class="hero-tag">🔥 이달의 베스트</div>
-              <div class="hero-name">골프 스크린 20회<br>이용권 패키지</div>
-              <div class="hero-price">280,000원</div>
-            </div>
-          </div>
+          <div class="hero-banner" id="home-hero" style="cursor:pointer;"></div>
           <div class="search-bar">
             <span style="font-size:18px;color:#A0AEC0;">🔍</span>
-            <input type="text" placeholder="이용권 검색" />
+            <input type="text" placeholder="이용권 검색" id="search-input" oninput="onSearch(this.value)" />
           </div>
         </div>
 
         <!-- 카테고리 -->
-        <div class="cat-scroll">
-          <div class="cat-chip">
-            <div class="cat-chip-icon" style="background:#EBF8FF;">🏋️</div>
-            <span class="cat-chip-label">헬스</span>
-          </div>
-          <div class="cat-chip">
-            <div class="cat-chip-icon" style="background:#F0FFF4;">⛳</div>
-            <span class="cat-chip-label">골프</span>
-          </div>
-          <div class="cat-chip">
-            <div class="cat-chip-icon" style="background:#FFF5F0;">🏠</div>
-            <span class="cat-chip-label">홈트</span>
-          </div>
-          <div class="cat-chip">
-            <div class="cat-chip-icon" style="background:#FFF0F5;">🧘</div>
-            <span class="cat-chip-label">필라테스</span>
-          </div>
-          <div class="cat-chip">
-            <div class="cat-chip-icon" style="background:#FFFBF0;">🎁</div>
-            <span class="cat-chip-label">패키지</span>
-          </div>
-        </div>
+        <div class="cat-scroll" id="home-cats"></div>
 
         <!-- 인기 이용권 -->
         <div class="section-head">
           <span class="sh">🔥 인기 이용권</span>
-          <span class="more" onclick="go('list')">더보기 ›</span>
+          <span class="more" onclick="goList('all')">더보기 ›</span>
         </div>
-        <div class="pass-row">
-          <div class="pass-card" onclick="go('detail')">
-            <div class="pc-img" style="background:#EBF8FF;">🏋️</div>
-            <div class="pc-body">
-              <span class="pc-badge badge-hot">HOT</span>
-              <div class="pc-name">헬스 3개월 정기권</div>
-              <div class="pc-sub">무제한 이용</div>
-              <div class="pc-original">240,000원</div>
-              <div class="pc-price">180,000원</div>
-            </div>
-          </div>
-          <div class="pass-card" onclick="go('detail')">
-            <div class="pc-img" style="background:#F0FFF4;">⛳</div>
-            <div class="pc-body">
-              <span class="pc-badge badge-best">BEST</span>
-              <div class="pc-name">골프 스크린 20회권</div>
-              <div class="pc-sub">9홀 1회 = 1회 차감</div>
-              <div class="pc-price">280,000원</div>
-            </div>
-          </div>
-          <div class="pass-card" onclick="go('detail')">
-            <div class="pc-img" style="background:#FFF5F0;">🏠</div>
-            <div class="pc-body">
-              <span class="pc-badge badge-new">NEW</span>
-              <div class="pc-name">홈트 PRO 3개월</div>
-              <div class="pc-sub">AI 맞춤 루틴 제공</div>
-              <div class="pc-original">120,000원</div>
-              <div class="pc-price">79,000원</div>
-            </div>
-          </div>
-        </div>
+        <div class="pass-row" id="home-popular"></div>
 
         <!-- 추천 패키지 -->
         <div class="section-head" style="margin-top:4px;">
           <span class="sh">✨ 추천 패키지</span>
-          <span class="more" onclick="go('list')">더보기 ›</span>
+          <span class="more" onclick="goList('all')">더보기 ›</span>
         </div>
-        <div class="pass-row" style="padding-bottom:16px;">
-          <div class="pass-card" onclick="go('detail')">
-            <div class="pc-img" style="background:linear-gradient(135deg,#EBF8FF,#F0FFF4);">🏋️⛳</div>
-            <div class="pc-body">
-              <span class="pc-badge badge-sale">SAVE 20%</span>
-              <div class="pc-name">헬스+골프 콤보</div>
-              <div class="pc-sub">3개월 + 10회</div>
-              <div class="pc-original">570,000원</div>
-              <div class="pc-price">450,000원</div>
-            </div>
-          </div>
-          <div class="pass-card" onclick="go('detail')">
-            <div class="pc-img" style="background:#FFF0F5;">🧘</div>
-            <div class="pc-body">
-              <span class="pc-badge badge-hot">HOT</span>
-              <div class="pc-name">필라테스 10회권</div>
-              <div class="pc-sub">소도구 포함</div>
-              <div class="pc-price">280,000원</div>
-            </div>
-          </div>
-        </div>
+        <div class="pass-row" id="home-combo" style="padding-bottom:16px;"></div>
       </div>
 
       <!-- ② 이용권 목록 -->
       <div class="screen-frame" id="screen-list">
         <div class="app-header">
           <span class="back" onclick="go('home')">←</span>
-          <span class="title">헬스 이용권</span>
+          <span class="title" id="list-title">이용권 목록</span>
           <span class="icon-btn" onclick="go('cart')">🛒<span class="cart-badge">2</span></span>
         </div>
-        <div class="filter-bar">
-          <button class="f-chip on">전체</button>
-          <button class="f-chip">정기권</button>
-          <button class="f-chip">횟수권</button>
-          <button class="f-chip">원데이</button>
-          <button class="f-chip">패키지</button>
-        </div>
-        <div class="app-body">
-          <div class="list-pass-card" onclick="go('detail')">
-            <div class="lpc-img" style="background:#EBF8FF;">🏋️</div>
-            <div class="lpc-info">
-              <div class="lpc-tags"><span class="pc-badge badge-hot">HOT</span></div>
-              <div class="lpc-name">헬스 3개월 정기권</div>
-              <div class="lpc-sub">무제한 · 탈의실 포함</div>
-              <div class="lpc-price">180,000원</div>
-              <div class="lpc-original">240,000원</div>
-            </div>
-          </div>
-          <div class="list-pass-card" onclick="go('detail')">
-            <div class="lpc-img" style="background:#EBF8FF;">🏋️</div>
-            <div class="lpc-info">
-              <div class="lpc-tags"><span class="pc-badge badge-best">BEST</span></div>
-              <div class="lpc-name">헬스 6개월 정기권</div>
-              <div class="lpc-sub">무제한 · 탈의실·GX 포함</div>
-              <div class="lpc-price">320,000원</div>
-              <div class="lpc-original">480,000원</div>
-            </div>
-          </div>
-          <div class="list-pass-card" onclick="go('detail')">
-            <div class="lpc-img" style="background:#EBF8FF;">💪</div>
-            <div class="lpc-info">
-              <div class="lpc-tags"></div>
-              <div class="lpc-name">헬스 1개월 정기권</div>
-              <div class="lpc-sub">무제한 · 탈의실 포함</div>
-              <div class="lpc-price">79,000원</div>
-            </div>
-          </div>
-          <div class="list-pass-card" onclick="go('detail')">
-            <div class="lpc-img" style="background:#F0FFF4;">🕐</div>
-            <div class="lpc-info">
-              <div class="lpc-tags"><span class="pc-badge badge-new">NEW</span></div>
-              <div class="lpc-name">헬스 원데이 이용권</div>
-              <div class="lpc-sub">당일 1회 자유 이용</div>
-              <div class="lpc-price">10,000원</div>
-            </div>
-          </div>
-          <div class="list-pass-card" onclick="go('detail')">
-            <div class="lpc-img" style="background:linear-gradient(135deg,#EBF8FF,#F0FFF4);">🏋️⛳</div>
-            <div class="lpc-info">
-              <div class="lpc-tags"><span class="pc-badge badge-sale">SAVE 20%</span></div>
-              <div class="lpc-name">헬스+골프 콤보 패키지</div>
-              <div class="lpc-sub">헬스 3개월 + 골프 스크린 10회</div>
-              <div class="lpc-price">450,000원</div>
-              <div class="lpc-original">570,000원</div>
-            </div>
-          </div>
-        </div>
+        <div class="filter-bar" id="list-filter"></div>
+        <div class="app-body" id="list-body"></div>
       </div>
 
       <!-- ③ 이용권 상세 -->
       <div class="screen-frame" id="screen-detail">
-        <div class="detail-img">
+        <div class="detail-img" id="detail-img" style="background:linear-gradient(135deg,#1A365D,#2B6CB0);">
           <div class="detail-back" onclick="go('list')">←</div>
-          🏋️
+          <span id="detail-icon" style="font-size:80px;">🏋️</span>
         </div>
         <div style="overflow-y:auto; flex:1;">
-          <div class="detail-body">
-            <div>
-              <div class="info-tag-row">
-                <span class="info-tag">헬스 정기권</span>
-                <span class="info-tag">무제한</span>
-                <span class="info-tag">탈의실 포함</span>
-              </div>
-              <div class="product-title" style="margin-top:8px;">헬스 3개월 정기권</div>
-              <div class="product-sub">구매 즉시 이용 시작 · 90일 유효</div>
-            </div>
-            <div class="price-row">
-              <span class="price-main">180,000원</span>
-              <span class="price-orig">240,000원</span>
-              <span class="discount-badge">25% OFF</span>
-            </div>
-            <div class="option-box">
-              <div class="option-label">🗓 이용 기간 선택</div>
-              <div class="option-chips">
-                <div class="option-chip">1개월 · 79,000원</div>
-                <div class="option-chip on">3개월 · 180,000원</div>
-                <div class="option-chip">6개월 · 320,000원</div>
-                <div class="option-chip">1년 · 580,000원</div>
-              </div>
-            </div>
-            <div class="benefit-box">
-              <div class="benefit-title">✅ 이용 혜택</div>
-              <div class="benefit-row"><span class="benefit-icon">🏋️</span>웨이트·유산소 기구 무제한 이용</div>
-              <div class="benefit-row"><span class="benefit-icon">🚿</span>탈의실·샤워실 이용 가능</div>
-              <div class="benefit-row"><span class="benefit-icon">📱</span>출석 체크 앱 연동</div>
-              <div class="benefit-row"><span class="benefit-icon">⏰</span>운영시간: 06:00 ~ 23:00</div>
-              <div class="benefit-row"><span class="benefit-icon">📍</span>강남점 · 서초점 · 잠실점 3개 지점 공용</div>
-            </div>
-          </div>
+          <div class="detail-body" id="detail-body"></div>
         </div>
         <div class="btn-row" style="flex-shrink:0;">
           <button class="btn-cart" onclick="go('cart')">🛒 담기</button>
@@ -1049,6 +885,202 @@
     });
     document.getElementById('memo-screen-name').value = screenNames[id] || id;
   }
+
+  // ── 태그 배지 색상 매핑 ──
+  const tagClass = { 'NEW':'badge-new', 'HOT':'badge-hot', 'BEST':'badge-best', '인기':'badge-best', '추천':'badge-sale' };
+  function tagBadge(tag) {
+    if (!tag) return '';
+    const cls = tagClass[tag] || 'badge-new';
+    return `<span class="pc-badge ${cls}">${tag}</span>`;
+  }
+
+  // ── 홈 렌더 ──
+  function renderHome() {
+    // 카테고리 칩
+    const catEl = document.getElementById('home-cats');
+    catEl.innerHTML = catData.filter(c => c.visible).map(c =>
+      `<div class="cat-chip" onclick="goList('${c.key}')">
+        <div class="cat-chip-icon" style="background:${c.bg};">${c.icon}</div>
+        <span class="cat-chip-label">${c.name}</span>
+      </div>`
+    ).join('');
+
+    // 히어로 배너 — 판매량 1위 이용권
+    const best = ticketData.filter(t => t.active).sort((a,b) => b.sales - a.sales)[0];
+    if (best) {
+      const bestIdx = ticketData.indexOf(best);
+      document.getElementById('home-hero').innerHTML =
+        `<span class="hero-emoji">${best.icon}</span>
+         <div class="hero-text">
+           <div class="hero-tag">🔥 이달의 베스트</div>
+           <div class="hero-name">${best.name}</div>
+           <div class="hero-price">${best.price}</div>
+         </div>`;
+      document.getElementById('home-hero').onclick = () => showDetail(bestIdx);
+    }
+
+    // 인기 이용권 — 판매량 상위 4개 (active:true)
+    const popular = ticketData.filter(t => t.active).sort((a,b) => b.sales - a.sales).slice(0,4);
+    document.getElementById('home-popular').innerHTML = popular.map(t => {
+      const idx = ticketData.indexOf(t);
+      return `<div class="pass-card" onclick="showDetail(${idx})">
+        <div class="pc-img" style="background:${getCatBg(t.cat)};">${t.icon}</div>
+        <div class="pc-body">
+          ${tagBadge(t.tag)}
+          <div class="pc-name">${t.name}</div>
+          <div class="pc-sub">${t.type} · ${t.duration}</div>
+          <div class="pc-price">${t.price}</div>
+        </div>
+      </div>`;
+    }).join('');
+
+    // 추천 패키지 — tag에 '추천' 또는 combo 카테고리
+    const combo = ticketData.filter(t => t.active && (t.cat === 'combo' || t.tag === '추천' || t.tag === 'HOT')).slice(0,3);
+    document.getElementById('home-combo').innerHTML = combo.map(t => {
+      const idx = ticketData.indexOf(t);
+      return `<div class="pass-card" onclick="showDetail(${idx})">
+        <div class="pc-img" style="background:${getCatBg(t.cat)};">${t.icon}</div>
+        <div class="pc-body">
+          ${tagBadge(t.tag)}
+          <div class="pc-name">${t.name}</div>
+          <div class="pc-sub">${t.type} · ${t.duration}</div>
+          <div class="pc-price">${t.price}</div>
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  function getCatBg(catKey) {
+    const c = catData.find(c => c.key === catKey);
+    return c ? c.bg : '#EDF2F7';
+  }
+
+  // ── 목록 화면 ──
+  let _listCat = 'all';
+
+  function goList(catKey) {
+    _listCat = catKey || 'all';
+    renderList();
+    go('list');
+  }
+
+  function renderList(search) {
+    // 카테고리 필터 칩
+    const filterEl = document.getElementById('list-filter');
+    const chips = [{ key:'all', name:'전체' }, ...catData.filter(c => c.visible)];
+    filterEl.innerHTML = chips.map(c =>
+      `<button class="f-chip ${_listCat === c.key ? 'on' : ''}"
+        onclick="filterList('${c.key}')">${c.icon ? c.icon + ' ' : ''}${c.name}</button>`
+    ).join('');
+
+    // 제목 업데이트
+    const titleEl = document.getElementById('list-title');
+    if (_listCat === 'all') { titleEl.textContent = '이용권 전체'; }
+    else {
+      const cat = catData.find(c => c.key === _listCat);
+      titleEl.textContent = cat ? cat.name + ' 이용권' : '이용권';
+    }
+
+    // 이용권 목록
+    let list = ticketData.filter(t => t.active);
+    if (_listCat !== 'all') list = list.filter(t => t.cat === _listCat);
+    if (search) {
+      const q = search.toLowerCase();
+      list = list.filter(t => t.name.toLowerCase().includes(q) || t.catLabel.toLowerCase().includes(q));
+    }
+
+    const bodyEl = document.getElementById('list-body');
+    if (list.length === 0) {
+      bodyEl.innerHTML = '<div style="text-align:center;padding:40px 0;color:#A0AEC0;font-size:14px;">검색 결과가 없습니다</div>';
+      return;
+    }
+    bodyEl.innerHTML = list.map(t => {
+      const idx = ticketData.indexOf(t);
+      return `<div class="list-pass-card" onclick="showDetail(${idx})">
+        <div class="lpc-img" style="background:${getCatBg(t.cat)};">${t.icon}</div>
+        <div class="lpc-info">
+          <div class="lpc-tags">${tagBadge(t.tag)}</div>
+          <div class="lpc-name">${t.name}</div>
+          <div class="lpc-sub">${t.type} · ${t.duration}</div>
+          <div class="lpc-price">${t.price}</div>
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  function filterList(catKey) {
+    _listCat = catKey;
+    renderList(document.getElementById('search-input').value);
+  }
+
+  function onSearch(val) {
+    if (val.trim()) {
+      _listCat = 'all';
+      renderList(val.trim());
+      go('list');
+    } else {
+      renderList();
+    }
+  }
+
+  // ── 상세 화면 ──
+  function showDetail(idx) {
+    const t = ticketData[idx];
+    if (!t) return;
+    const cat = catData.find(c => c.key === t.cat);
+    const bg = cat ? cat.bg : '#EBF8FF';
+    const hex = cat ? cat.hex : '#2B6CB0';
+
+    // 이미지 배경
+    document.getElementById('detail-img').style.background = `linear-gradient(135deg, ${hex}44, ${hex})`;
+    document.getElementById('detail-icon').textContent = t.icon;
+
+    // 상세 본문
+    const features = t.features.map(f =>
+      `<div class="benefit-row"><span class="benefit-icon">✅</span>${f}</div>`
+    ).join('');
+
+    // 같은 카테고리의 다른 이용권으로 기간 옵션 구성
+    const samecat = ticketData.filter(x => x.cat === t.cat && x.active);
+    let optionHtml = '';
+    if (samecat.length > 1) {
+      optionHtml = `<div class="option-box">
+        <div class="option-label">🗓 이용 기간 / 옵션 선택</div>
+        <div class="option-chips">
+          ${samecat.map(x => {
+            const xIdx = ticketData.indexOf(x);
+            return `<div class="option-chip ${xIdx === idx ? 'on' : ''}" onclick="showDetail(${xIdx})">${x.duration}</div>`;
+          }).join('')}
+        </div>
+      </div>`;
+    }
+
+    document.getElementById('detail-body').innerHTML = `
+      <div>
+        <div class="info-tag-row">
+          <span class="info-tag">${t.catLabel}</span>
+          <span class="info-tag">${t.type}</span>
+          <span class="info-tag">${t.duration}</span>
+        </div>
+        <div class="product-title" style="margin-top:8px;">${t.name}</div>
+        <div class="product-sub">${cat ? cat.desc : ''}</div>
+      </div>
+      <div class="price-row">
+        <span class="price-main">${t.price}</span>
+        ${tagBadge(t.tag)}
+      </div>
+      ${optionHtml}
+      <div class="benefit-box">
+        <div class="benefit-title">✅ 이용 혜택</div>
+        ${features}
+      </div>
+    `;
+    go('detail');
+  }
+
+  // ── 초기화 ──
+  renderHome();
+  renderList();
 </script>
 </body>
 </html>
