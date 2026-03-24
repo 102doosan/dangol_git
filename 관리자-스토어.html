@@ -1250,6 +1250,37 @@
   // ── 매출 통계 (신규 구조) ──────────────────────────────────────────
   let _statsYear = 2026, _statsMonth = 3, _statsTab = 'daily';
 
+  // ── 상세 매출 행 데이터 (날짜순 개별 거래 내역) ──────────────────
+  // {date, channel, type, product, member, card, cash, point, pay, unpaid, qty, total}
+  const salesRowsDb = {
+    '2026-3': [
+      {date:'2026-03-24', channel:'현장',  type:'회원권', product:'퍼블릭 3개월',          member:'장권현',        card:180000,   cash:0,        point:0, pay:0, unpaid:0, qty:'-', total:180000},
+      {date:'2026-03-24', channel:'현장',  type:'골프',   product:'타석+헬스 6개월(오전)',  member:'박옥남',        card:700000,   cash:0,        point:0, pay:0, unpaid:0, qty:'-', total:700000},
+      {date:'2026-03-24', channel:'현장',  type:'락커',   product:'',                       member:'장권현',        card:15000,    cash:0,        point:0, pay:0, unpaid:0, qty:'-', total:15000},
+      {date:'2026-03-24', channel:'현장',  type:'락커',   product:'',                       member:'박옥남',        card:30000,    cash:0,        point:0, pay:0, unpaid:0, qty:'-', total:30000},
+      {date:'2026-03-24', channel:'현장',  type:'락커',   product:'',                       member:'박옥남',        card:90000,    cash:0,        point:0, pay:0, unpaid:0, qty:'-', total:90000},
+      {date:'2026-03-20', channel:'현장',  type:'회원권', product:'퍼블릭 6개월',           member:'김세라',        card:300000,   cash:0,        point:0, pay:0, unpaid:0, qty:'-', total:300000},
+      {date:'2026-03-20', channel:'모바일',type:'골프',   product:'타석/헬스 일일이용권',   member:'임현호',        card:20000,    cash:0,        point:0, pay:0, unpaid:0, qty:'-', total:20000},
+      {date:'2026-03-20', channel:'현장',  type:'골프',   product:'멤버십A',                member:'이정아',        card:0,        cash:0,        point:0, pay:0, unpaid:0, qty:'-', total:0},
+      {date:'2026-03-20', channel:'현장',  type:'락커',   product:'',                       member:'김세라',        card:30000,    cash:0,        point:0, pay:0, unpaid:0, qty:'-', total:30000},
+      {date:'2026-03-20', channel:'현장',  type:'락커',   product:'',                       member:'이정원',        card:50000,    cash:0,        point:0, pay:0, unpaid:0, qty:'-', total:50000},
+      {date:'2026-03-19', channel:'현장',  type:'골프',   product:'타석종일권 2개월',        member:'김성원',        card:200000,   cash:0,        point:0, pay:0, unpaid:0, qty:'-', total:200000},
+      {date:'2026-03-19', channel:'현장',  type:'골프',   product:'멤버십A',                member:'최상현',        card:0,        cash:0,        point:0, pay:0, unpaid:0, qty:'-', total:0},
+      {date:'2026-03-19', channel:'현장',  type:'골프',   product:'쿠폰레슨30분(8회)',      member:'김성원',        card:350000,   cash:0,        point:0, pay:0, unpaid:0, qty:'-', total:350000},
+      {date:'2026-03-18', channel:'현장',  type:'회원권', product:'퍼블릭 3개월',           member:'이영서',        card:180000,   cash:0,        point:0, pay:0, unpaid:0, qty:'-', total:180000},
+      {date:'2026-03-18', channel:'현장',  type:'회원권', product:'이음트레이닝',           member:'이영미',        card:1000000,  cash:0,        point:0, pay:0, unpaid:0, qty:'-', total:1000000},
+      {date:'2026-03-18', channel:'현장',  type:'PT',     product:'PT 30회',                member:'김은경',        card:1350000,  cash:0,        point:0, pay:0, unpaid:0, qty:'-', total:1350000},
+      {date:'2026-03-17', channel:'현장',  type:'골프',   product:'쿠폰레슨30분(28회)',     member:'유이주',        card:0,        cash:1000000,  point:0, pay:0, unpaid:0, qty:'-', total:1000000},
+      {date:'2026-03-17', channel:'현장',  type:'골프',   product:'타석+헬스 6개월(오전)',  member:'김진범',        card:700000,   cash:0,        point:0, pay:0, unpaid:0, qty:'-', total:700000},
+      {date:'2026-03-17', channel:'현장',  type:'락커',   product:'',                       member:'김진범',        card:30000,    cash:0,        point:0, pay:0, unpaid:0, qty:'-', total:30000},
+      {date:'2026-03-16', channel:'현장',  type:'회원권', product:'PT 50회',                member:'노금화(성공스님)',card:0,       cash:4400000,  point:0, pay:0, unpaid:0, qty:'-', total:4400000},
+      {date:'2026-03-16', channel:'현장',  type:'기타',   product:'직원이용',               member:'백두산',        card:0,        cash:0,        point:0, pay:0, unpaid:0, qty:'-', total:0},
+      {date:'2026-03-16', channel:'현장',  type:'골프',   product:'타석+헬스 6개월(오전)',  member:'이상묵★',       card:600000,   cash:0,        point:0, pay:0, unpaid:0, qty:'-', total:600000},
+      {date:'2026-03-16', channel:'현장',  type:'락커',   product:'',                       member:'박윤정',        card:5000,     cash:0,        point:0, pay:0, unpaid:0, qty:'-', total:5000},
+      {date:'2026-03-16', channel:'현장',  type:'락커',   product:'',                       member:'이상묵★',       card:90000,    cash:0,        point:0, pay:0, unpaid:0, qty:'-', total:90000},
+    ],
+  };
+
   // 상세 매출 데이터 (월별)
   const detailSalesDb = {
     '2026-3': [
@@ -1440,110 +1471,85 @@
   // ── 상세 매출 ──
   function renderStatsDetail() {
     const key = statsKey();
-    const cats = detailSalesDb[key];
-    if (!cats) {
+    const rows = (salesRowsDb[key] || []).slice().sort((a,b) => b.date.localeCompare(a.date));
+
+    const fmt = n => n === 0 ? '0' : n.toLocaleString();
+
+    // 날짜별 그룹화 (첫 행에만 날짜 표시)
+    let prevDate = '';
+    let tbodyHtml = '';
+    rows.forEach(r => {
+      const isNewDate = r.date !== prevDate;
+      const dateCell = isNewDate
+        ? `<td rowspan="1" style="font-weight:700;color:#1A202C;text-align:center;background:${isNewDate?'#F7FAFC':'#fff'};border-top:${isNewDate?'2px solid #E2E8F0':'1px solid #EDF2F7'};">${r.date}</td>`
+        : `<td style="background:#fff;border-top:1px solid #EDF2F7;"></td>`;
+      tbodyHtml += `<tr style="border-top:${isNewDate?'2px solid #CBD5E0':'1px solid #EDF2F7'};">
+        ${dateCell}
+        <td style="text-align:center;">${r.channel}</td>
+        <td style="text-align:center;">${r.type}</td>
+        <td style="text-align:left;padding-left:10px;">${r.product}</td>
+        <td style="text-align:center;">${r.member}</td>
+        <td>${fmt(r.card)}</td>
+        <td>${fmt(r.cash)}</td>
+        <td>${fmt(r.point)}</td>
+        <td>${fmt(r.pay)}</td>
+        <td>${fmt(r.unpaid)}</td>
+        <td style="text-align:center;">${r.qty}</td>
+        <td style="font-weight:700;color:${r.total>0?'#1A202C':'#A0AEC0'};">${fmt(r.total)}</td>
+      </tr>`;
+      prevDate = r.date;
+    });
+
+    // 합계
+    const sumCard   = rows.reduce((s,r)=>s+r.card,0);
+    const sumCash   = rows.reduce((s,r)=>s+r.cash,0);
+    const sumPoint  = rows.reduce((s,r)=>s+r.point,0);
+    const sumPay    = rows.reduce((s,r)=>s+r.pay,0);
+    const sumUnpaid = rows.reduce((s,r)=>s+r.unpaid,0);
+    const sumTotal  = rows.reduce((s,r)=>s+r.total,0);
+
+    if (rows.length === 0) {
       document.getElementById('stats-body').innerHTML = `<div class="card" style="text-align:center;padding:40px;color:#A0AEC0;">${_statsYear}년 ${_statsMonth}월 데이터가 없습니다.</div>`;
       return;
     }
 
-    // 파이차트 계산
-    const catTotals = cats.map(c => ({ name:c.name, color:c.color, amt: c.products.reduce((s,p)=>s+p.amt,0) }));
-    const grandTotal = catTotals.reduce((s,c)=>s+c.amt,0);
-    let conic = '';
-    let cumPct = 0;
-    catTotals.forEach(c => {
-      const pct = grandTotal > 0 ? (c.amt/grandTotal*100) : 0;
-      conic += `${c.color} ${cumPct.toFixed(1)}% ${(cumPct+pct).toFixed(1)}%, `;
-      cumPct += pct;
-    });
-    conic = conic.replace(/, $/, '');
-
-    const legendHtml = catTotals.map(c => {
-      const pct = grandTotal > 0 ? Math.round(c.amt/grandTotal*100) : 0;
-      return `<div class="pie-legend-item">
-        <div class="pie-dot" style="background:${c.color};"></div>
-        <span>${c.name}</span>
-        <span style="margin-left:auto;font-weight:800;color:${c.color};">${c.amt.toLocaleString()}원</span>
-      </div>`;
-    }).join('');
-
-    // 컬럼 헤더 & 상품 행 구성
-    const maxRows = Math.max(...cats.map(c=>c.products.length));
-    let theadCats = cats.map(c =>
-      `<th class="cat-header" colspan="2" style="background:${c.color};">
-        ${c.name} <span style="font-size:10px;font-weight:600;">(신규:${c.newM}명/재등록:${c.renew}명)</span>
-      </th>`
-    ).join('');
-
-    let theadSub = cats.map(() => `<th>명수</th><th>금액</th>`).join('');
-
-    let tbodyRows = '';
-    for (let i = 0; i < maxRows; i++) {
-      let row = '';
-      cats.forEach(c => {
-        const p = c.products[i];
-        if (!p) { row += '<td>-</td><td>-</td>'; return; }
-        const noSale = p.cnt === 0;
-        row += `<td class="prod-name" style="${noSale?'color:#CBD5E0;':''}">${p.name}</td>`;
-        row += `<td style="${noSale?'color:#CBD5E0;':''}">${p.cnt > 0 ? p.cnt+'명' : '-'}</td>`;
-        // Note: only show amt column after name and cnt
-      });
-      tbodyRows += `<tr>${row}</tr>`;
-    }
-
-    // 더 직관적인 레이아웃으로: 각 카테고리별 상품명/명수/금액 3열
-    let theadCats2 = cats.map(c =>
-      `<th class="cat-header" colspan="3" style="background:${c.color};">
-        ${c.name}<br><span style="font-size:10px;font-weight:600;">신규:${c.newM}명 / 재등록:${c.renew}명</span>
-      </th>`
-    ).join('');
-    let theadSub2 = cats.map(() => `<th style="font-size:11px;">이용권명</th><th style="font-size:11px;">명수</th><th style="font-size:11px;">금액</th>`).join('');
-    let tbodyRows2 = '';
-    for (let i = 0; i < maxRows; i++) {
-      let row = '';
-      cats.forEach(c => {
-        const p = c.products[i];
-        if (!p) { row += '<td>-</td><td>-</td><td>-</td>'; return; }
-        const noSale = p.cnt === 0;
-        row += `<td class="prod-name" style="${noSale?'color:#CBD5E0;':''}">${p.name}</td>`;
-        row += `<td style="text-align:center;${noSale?'color:#CBD5E0;':''}">${p.cnt > 0 ? p.cnt+'명' : '-'}</td>`;
-        row += `<td style="${noSale?'color:#CBD5E0;':''}">${p.amt > 0 ? p.amt.toLocaleString()+'원' : '-'}</td>`;
-      });
-      tbodyRows2 += `<tr>${row}</tr>`;
-    }
-
-    // 합계 행
-    let totalRow = cats.map(c => {
-      const totCnt = c.products.reduce((s,p)=>s+p.cnt,0);
-      const totAmt = c.products.reduce((s,p)=>s+p.amt,0);
-      return `<td class="total-row">합</td><td class="total-row" style="text-align:center;">${totCnt}명</td><td class="total-row">${totAmt.toLocaleString()}원</td>`;
-    }).join('');
-
     document.getElementById('stats-body').innerHTML = `
-      <div class="detail-filter-bar">
-        <label><input type="checkbox" checked> 현장 판매</label>
-        <label><input type="checkbox" checked> 모바일 판매</label>
-        <label style="margin-left:auto;"><input type="checkbox"> 판매 기록 없는 상품 숨기기</label>
-      </div>
-      <div class="detail-layout">
-        <div class="pie-section">
-          <div class="pie-circle" style="background:conic-gradient(${conic});"></div>
-          <div class="pie-legend">${legendHtml}</div>
-          <div style="margin-top:12px;padding:10px;background:#F7FAFC;border-radius:10px;text-align:center;">
-            <div style="font-size:11px;color:#718096;">이번 달 총 매출</div>
-            <div style="font-size:18px;font-weight:900;color:#2B6CB0;">${grandTotal.toLocaleString()}원</div>
-          </div>
+      <div class="card" style="padding:0;overflow:hidden;">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid #EDF2F7;">
+          <div style="font-size:14px;font-weight:800;color:#1A202C;">상세 매출 — ${_statsYear}년 ${_statsMonth}월 (${rows.length}건)</div>
+          <div style="font-size:15px;font-weight:900;color:#2B6CB0;">${sumTotal.toLocaleString()}원</div>
         </div>
-        <div class="detail-cols">
-          <table class="detail-table">
+        <div style="overflow-x:auto;">
+          <table class="detail-table" style="width:100%;min-width:860px;">
             <thead>
-              <tr>${theadCats2}</tr>
-              <tr>${theadSub2}</tr>
+              <tr>
+                <th style="text-align:center;">판매일</th>
+                <th style="text-align:center;">판매처</th>
+                <th style="text-align:center;">종류</th>
+                <th style="text-align:left;padding-left:10px;">상품이름(옵션)</th>
+                <th style="text-align:center;">회원명</th>
+                <th>카드</th>
+                <th>현금</th>
+                <th>포인트</th>
+                <th>페이</th>
+                <th>미수금</th>
+                <th style="text-align:center;">개수</th>
+                <th>판매금액</th>
+              </tr>
             </thead>
-            <tbody>
-              ${tbodyRows2}
-              <tr>${totalRow}</tr>
-            </tbody>
+            <tbody>${tbodyHtml}</tbody>
+            <tfoot>
+              <tr style="background:#F0F4F8;font-weight:800;border-top:2px solid #CBD5E0;">
+                <td colspan="5" style="text-align:center;font-size:12px;color:#4A5568;">합 계 (${rows.length}건)</td>
+                <td>${sumCard.toLocaleString()}</td>
+                <td>${sumCash.toLocaleString()}</td>
+                <td>${sumPoint.toLocaleString()}</td>
+                <td>${sumPay.toLocaleString()}</td>
+                <td>${sumUnpaid.toLocaleString()}</td>
+                <td></td>
+                <td style="color:#2B6CB0;">${sumTotal.toLocaleString()}</td>
+              </tr>
+            </tfoot>
           </table>
         </div>
       </div>`;
