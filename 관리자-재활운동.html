@@ -882,7 +882,7 @@
     <div style="font-size:13px;font-weight:800;margin-bottom:12px;">☰ 회차별 수행 이력</div>
     <div style="max-height:360px;overflow-y:auto;padding-right:4px;" id="mlog-timeline"></div>
     <!-- 더보기 / 전체보기 -->
-    <div id="mlog-footer" style="display:none;padding:14px 0 0;border-top:1px solid #F0F4F8;margin-top:4px;display:flex;gap:12px;align-items:center;">
+    <div id="mlog-footer" style="padding:14px 0 0;border-top:1px solid #F0F4F8;margin-top:4px;gap:12px;align-items:center;">
       <span id="mlog-more-btn" onclick="mlogShowMore()" style="color:#ED8936;font-size:13px;font-weight:700;cursor:pointer;" ></span>
       <span style="color:#E2E8F0;">|</span>
       <span id="mlog-all-btn" onclick="mlogShowAll()" style="color:#2F855A;font-size:13px;font-weight:700;cursor:pointer;"></span>
@@ -1199,6 +1199,14 @@ const memberLogData = {
       { name:'어깨 외회전',     sets:'3',reps:'15회',done:true },
       { name:'월 슬라이드',     sets:'2',reps:'10회',done:true },
     ]},
+    { date:'2026-03-11', seq:2, status:'done', minutes:30, stopReason:'', exercises:[
+      { name:'펜들럼 스트레칭', sets:'3',reps:'10회',done:true },
+      { name:'어깨 외회전',     sets:'3',reps:'15회',done:true },
+    ]},
+    { date:'2026-03-08', seq:1, status:'done', minutes:28, stopReason:'', exercises:[
+      { name:'펜들럼 스트레칭', sets:'3',reps:'10회',done:true },
+      { name:'월 슬라이드',     sets:'2',reps:'10회',done:true },
+    ]},
   ]},
   '박도현': { total:10, done:8, sessions:[
     { date:'2026-03-24', seq:8, status:'done', minutes:38, stopReason:'', exercises:[
@@ -1333,11 +1341,13 @@ function renderMlogTimeline() {
   // 더보기 / 전체보기 footer
   const footer = document.getElementById('mlog-footer');
   const remain  = sessions.length - _mlogShowing;
-  if (sessions.length > MLOG_PAGE) {
+  if (sessions.length > 0) {
     footer.style.display = 'flex';
-    document.getElementById('mlog-more-btn').style.display = remain > 0 ? '' : 'none';
-    document.getElementById('mlog-more-btn').textContent = `▼ 더보기 (${remain}건 남음)`;
-    document.getElementById('mlog-all-btn').textContent  = `≡ 전체 이력 보기 (${sessions.length}건)`;
+    const moreBtn = document.getElementById('mlog-more-btn');
+    const allBtn  = document.getElementById('mlog-all-btn');
+    moreBtn.style.display = remain > 0 ? 'inline' : 'none';
+    moreBtn.textContent   = `▼ 더보기 (${remain}건 남음)`;
+    allBtn.textContent    = `≡ 전체 이력 보기 (${sessions.length}건)`;
   } else {
     footer.style.display = 'none';
   }
