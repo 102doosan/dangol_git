@@ -1,0 +1,1013 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>골프검진 프로토타입</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Noto Sans KR', sans-serif;
+      background: #0D1F14;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 28px 16px 60px;
+      gap: 20px;
+    }
+
+    /* ── 툴바 ── */
+    .toolbar {
+      width: 100%;
+      max-width: 520px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .toolbar-title {
+      font-size: 16px;
+      font-weight: 900;
+      color: #fff;
+      margin-right: auto;
+      letter-spacing: -0.3px;
+    }
+    .screen-btn {
+      padding: 6px 14px;
+      border-radius: 99px;
+      border: none;
+      cursor: pointer;
+      font-size: 11px;
+      font-weight: 700;
+      font-family: 'Noto Sans KR', sans-serif;
+      background: #1A3326;
+      color: #6EBD8A;
+      transition: all 0.18s;
+      white-space: nowrap;
+    }
+    .screen-btn.active { background: #2F855A; color: #fff; box-shadow: 0 2px 8px rgba(47,133,90,0.4); }
+    .screen-btn:hover:not(.active) { background: #2D4A38; color: #fff; }
+
+    /* ── 폰 프레임 ── */
+    .phone {
+      width: 375px;
+      height: 780px;
+      background: #f5f5f5;
+      border-radius: 44px;
+      box-shadow: 0 0 0 10px #111, 0 32px 80px rgba(0,0,0,0.65);
+      overflow: hidden;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+    }
+    .phone-notch {
+      position: absolute;
+      top: 0; left: 50%;
+      transform: translateX(-50%);
+      width: 120px; height: 28px;
+      background: #111;
+      border-radius: 0 0 18px 18px;
+      z-index: 20;
+    }
+    .phone-inner {
+      flex: 1;
+      margin-top: 28px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* ── 화면 공통 ── */
+    .screen {
+      position: absolute;
+      inset: 0;
+      display: none;
+      flex-direction: column;
+      background: #f5f7f5;
+    }
+    .screen.active { display: flex; }
+
+    /* ── 스크롤 본문 ── */
+    .scroll-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .scroll-body::-webkit-scrollbar { width: 3px; }
+    .scroll-body::-webkit-scrollbar-thumb { background: #c8e6c9; border-radius: 99px; }
+
+    /* ── 앱 헤더 ── */
+    .app-header {
+      background: linear-gradient(135deg, #1B4332, #2D6A4F);
+      color: #fff;
+      padding: 14px 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-shrink: 0;
+    }
+    .header-title { font-size: 17px; font-weight: 900; flex: 1; letter-spacing: -0.5px; }
+    .back-btn {
+      background: rgba(255,255,255,0.18);
+      border: none;
+      color: #fff;
+      width: 32px; height: 32px;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 15px;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .back-btn:hover { background: rgba(255,255,255,0.3); }
+
+    /* ── 배지 ── */
+    .badge { font-size: 10px; font-weight: 800; padding: 2px 8px; border-radius: 99px; }
+    .badge-A { background: #C6F6D5; color: #1A4731; }
+    .badge-B { background: #BEE3F8; color: #1A365D; }
+    .badge-C { background: #FEFCBF; color: #744210; }
+    .badge-D { background: #FED7D7; color: #742A2A; }
+
+    /* ── 점수 원 ── */
+    .score-circle {
+      width: 88px; height: 88px;
+      border-radius: 50%;
+      background: conic-gradient(var(--c) var(--pct), #E2E8F0 0);
+      display: flex; align-items: center; justify-content: center;
+      position: relative;
+      flex-shrink: 0;
+    }
+    .score-circle::before {
+      content: '';
+      position: absolute;
+      inset: 10px;
+      border-radius: 50%;
+      background: #fff;
+    }
+    .score-circle-inner {
+      position: relative; z-index: 1;
+      text-align: center;
+    }
+    .score-num { font-size: 20px; font-weight: 900; line-height: 1; }
+    .score-label { font-size: 9px; color: #888; margin-top: 1px; }
+
+    /* ── 항목 카드 (메인) ── */
+    .item-card {
+      background: #fff;
+      border-radius: 14px;
+      padding: 14px 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      cursor: pointer;
+      box-shadow: 0 1px 5px rgba(0,0,0,0.07);
+      border: 1.5px solid transparent;
+      transition: all 0.15s;
+    }
+    .item-card:hover { border-color: #2F855A; box-shadow: 0 2px 12px rgba(47,133,90,0.15); transform: translateY(-1px); }
+    .item-icon-box {
+      width: 46px; height: 46px;
+      border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px;
+      flex-shrink: 0;
+    }
+    .item-info { flex: 1; min-width: 0; }
+    .item-name { font-size: 14px; font-weight: 700; color: #1A202C; margin-bottom: 3px; }
+    .item-desc { font-size: 11px; color: #888; line-height: 1.4; }
+    .item-score-box { text-align: right; flex-shrink: 0; }
+    .item-score { font-size: 20px; font-weight: 900; }
+    .item-grade { font-size: 10px; font-weight: 700; margin-top: 1px; }
+
+    /* ── 진행 바 ── */
+    .prog-bar-wrap { margin: 6px 0 0; }
+    .prog-bar-bg { background: #F0F4F8; border-radius: 99px; height: 6px; overflow: hidden; }
+    .prog-bar-fill { height: 100%; border-radius: 99px; transition: width 0.8s ease; }
+
+    /* ── 비교 세션 칩 ── */
+    .sess-chip {
+      padding: 6px 14px; border-radius: 99px;
+      border: 1.5px solid #E2E8F0; background: #fff;
+      font-size: 12px; font-weight: 700; cursor: pointer;
+      font-family: 'Noto Sans KR', sans-serif; color: #718096;
+      transition: all .15s; white-space: nowrap;
+    }
+    .sess-chip.active { background: #2F855A; border-color: #2F855A; color: #fff; }
+
+    /* ── 이력 아이템 ── */
+    .hist-item {
+      background: #fff;
+      border-radius: 12px;
+      padding: 13px 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+      cursor: pointer;
+      transition: all .15s;
+    }
+    .hist-item:hover { box-shadow: 0 2px 10px rgba(47,133,90,0.12); transform: translateY(-1px); }
+    .hist-date-box { text-align: center; flex-shrink: 0; }
+    .hist-month { font-size: 10px; font-weight: 700; color: #888; }
+    .hist-day { font-size: 22px; font-weight: 900; color: #1A202C; line-height: 1; }
+    .hist-info { flex: 1; }
+    .hist-title { font-size: 13px; font-weight: 700; color: #1A202C; margin-bottom: 3px; }
+    .hist-trainer { font-size: 11px; color: #A0AEC0; }
+    .hist-score { font-size: 22px; font-weight: 900; color: #2F855A; flex-shrink: 0; }
+
+    /* ── 운동 추천 카드 ── */
+    .ex-rec-card {
+      background: #fff;
+      border-radius: 12px;
+      padding: 13px 14px;
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+      border-left: 3px solid;
+    }
+    .rec-icon { font-size: 20px; flex-shrink: 0; margin-top: 1px; }
+    .rec-info { flex: 1; }
+    .rec-name { font-size: 13px; font-weight: 700; color: #1A202C; margin-bottom: 2px; }
+    .rec-meta { font-size: 11px; color: #888; }
+    .rec-reason { font-size: 11px; color: #2F855A; margin-top: 4px; font-weight: 600; }
+
+    /* ── 탭 바 ── */
+    .tab-bar {
+      display: flex;
+      background: #fff;
+      border-bottom: 1px solid #e9ecef;
+      flex-shrink: 0;
+    }
+    .tab-btn {
+      flex: 1; padding: 11px 0;
+      border: none; background: transparent;
+      font-size: 12px; font-weight: 700;
+      font-family: 'Noto Sans KR', sans-serif;
+      color: #A0AEC0; cursor: pointer;
+      border-bottom: 3px solid transparent;
+      transition: all 0.15s;
+    }
+    .tab-btn.active { color: #2F855A; border-bottom-color: #2F855A; }
+
+    /* ── 섹션 레이블 ── */
+    .sec-label {
+      font-size: 11px; font-weight: 800; color: #A0AEC0;
+      letter-spacing: 1px; margin-bottom: 8px; margin-top: 4px;
+    }
+
+    /* ── 종합 점수 카드 (결과 요약) ── */
+    .total-card {
+      background: linear-gradient(135deg, #1B4332, #2D6A4F);
+      border-radius: 16px;
+      padding: 20px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      color: #fff;
+    }
+    .total-score-big { font-size: 52px; font-weight: 900; line-height: 1; }
+    .total-score-unit { font-size: 16px; font-weight: 600; opacity: 0.7; }
+    .total-grade { font-size: 13px; font-weight: 800; background: rgba(255,255,255,0.2); border-radius: 8px; padding: 4px 12px; margin-top: 6px; display: inline-block; }
+
+    /* ── 레이더 차트 (SVG) ── */
+    .radar-wrap {
+      background: #fff;
+      border-radius: 16px;
+      padding: 16px;
+      box-shadow: 0 1px 5px rgba(0,0,0,0.07);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    /* ── 상세 항목 탭 ── */
+    .detail-tab-row {
+      display: flex;
+      gap: 6px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+      flex-shrink: 0;
+    }
+    .detail-tab-row::-webkit-scrollbar { height: 0; }
+    .detail-chip {
+      padding: 6px 12px; border-radius: 99px;
+      border: 1.5px solid #E2E8F0; background: #fff;
+      font-size: 11px; font-weight: 700; cursor: pointer;
+      font-family: 'Noto Sans KR', sans-serif; color: #718096;
+      white-space: nowrap; transition: all .15s; flex-shrink: 0;
+    }
+    .detail-chip.active { background: #2F855A; border-color: #2F855A; color: #fff; }
+
+    /* ── 상세 내용 카드 ── */
+    .detail-content-card {
+      background: #fff;
+      border-radius: 16px;
+      padding: 18px 16px;
+      box-shadow: 0 1px 5px rgba(0,0,0,0.07);
+    }
+
+    /* ── 비교 바 ── */
+    .cmp-bar-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+    .cmp-label { font-size: 11px; font-weight: 700; color: #4A5568; width: 64px; flex-shrink: 0; }
+    .cmp-bars { flex: 1; display: flex; flex-direction: column; gap: 3px; }
+    .cmp-bar {
+      height: 10px; border-radius: 5px;
+      transition: width 0.6s ease;
+      position: relative;
+    }
+    .cmp-score-txt { font-size: 10px; font-weight: 700; color: #718096; width: 26px; text-align: right; flex-shrink: 0; }
+
+    /* ── 빈 상태 ── */
+    .empty-state { text-align: center; padding: 40px 20px; color: #ccc; font-size: 13px; }
+    .empty-state .empty-icon { font-size: 36px; margin-bottom: 10px; }
+
+    /* ── 하단 CTA 버튼 ── */
+    .bottom-cta {
+      padding: 12px 14px 16px;
+      background: #fff;
+      border-top: 1px solid #F0F4F8;
+      flex-shrink: 0;
+    }
+    .cta-btn {
+      width: 100%;
+      background: linear-gradient(135deg, #2F855A, #38A169);
+      color: #fff;
+      border: none;
+      border-radius: 14px;
+      padding: 14px;
+      font-size: 15px;
+      font-weight: 800;
+      cursor: pointer;
+      font-family: 'Noto Sans KR', sans-serif;
+      box-shadow: 0 4px 14px rgba(47,133,90,0.35);
+    }
+    .cta-btn:active { transform: scale(0.98); }
+    .cta-btn-outline {
+      width: 100%;
+      background: #fff;
+      color: #2F855A;
+      border: 2px solid #2F855A;
+      border-radius: 14px;
+      padding: 13px;
+      font-size: 14px;
+      font-weight: 800;
+      cursor: pointer;
+      font-family: 'Noto Sans KR', sans-serif;
+      margin-top: 8px;
+    }
+  </style>
+</head>
+<body>
+
+<!-- 툴바 -->
+<div class="toolbar">
+  <span class="toolbar-title">⛳ 골프검진 프로토타입</span>
+  <button class="screen-btn active" onclick="go('main')">① 메인</button>
+  <button class="screen-btn" onclick="go('result')">② 결과 요약</button>
+  <button class="screen-btn" onclick="go('detail')">③ 결과 상세</button>
+  <button class="screen-btn" onclick="go('compare')">④ 결과 비교</button>
+  <button class="screen-btn" onclick="go('history')">⑤ 검진 이력</button>
+  <button class="screen-btn" onclick="go('recommend')">⑥ 맞춤 운동</button>
+</div>
+
+<!-- 폰 프레임 -->
+<div class="phone">
+  <div class="phone-notch"></div>
+  <div class="phone-inner">
+
+    <!-- ① 골프검진 메인 -->
+    <div class="screen active" id="screen-main">
+      <div class="app-header">
+        <span style="font-size:22px;">⛳</span>
+        <span class="header-title">골프검진</span>
+        <button onclick="go('history')" style="background:rgba(255,255,255,0.18);border:none;color:#fff;border-radius:8px;padding:5px 11px;font-size:11px;font-weight:700;cursor:pointer;font-family:'Noto Sans KR',sans-serif;">이력 보기</button>
+      </div>
+      <div class="scroll-body" id="main-scroll">
+
+        <!-- 최근 검진 배너 -->
+        <div style="background:linear-gradient(135deg,#1B4332,#2D6A4F);border-radius:16px;padding:16px;color:#fff;cursor:pointer;" onclick="go('result')">
+          <div style="font-size:11px;color:rgba(255,255,255,0.65);margin-bottom:4px;">최근 검진 · 2026.03.10</div>
+          <div style="display:flex;align-items:flex-end;gap:12px;margin-bottom:12px;">
+            <div>
+              <div style="font-size:13px;font-weight:700;opacity:.8;margin-bottom:2px;">종합 점수</div>
+              <div style="font-size:42px;font-weight:900;line-height:1;">76<span style="font-size:18px;font-weight:600;opacity:.7;"> / 100</span></div>
+            </div>
+            <div style="flex:1;text-align:right;">
+              <div style="display:inline-block;background:rgba(255,255,255,0.18);border-radius:10px;padding:6px 14px;">
+                <div style="font-size:24px;font-weight:900;">B+</div>
+                <div style="font-size:10px;opacity:.8;margin-top:1px;">양호</div>
+              </div>
+            </div>
+          </div>
+          <!-- 미니 바 차트 -->
+          <div style="display:flex;flex-direction:column;gap:5px;">
+            <div id="main-mini-bars"></div>
+          </div>
+          <div style="margin-top:10px;font-size:11px;color:rgba(255,255,255,0.6);">결과 상세 보기 →</div>
+        </div>
+
+        <!-- 검진 항목 -->
+        <div class="sec-label" style="margin-top:4px;">검진 항목</div>
+        <div id="main-item-list"></div>
+
+        <!-- 다음 검진 안내 -->
+        <div style="background:#fff;border-radius:12px;padding:13px 16px;box-shadow:0 1px 4px rgba(0,0,0,0.06);display:flex;align-items:center;gap:10px;">
+          <div style="font-size:22px;">📅</div>
+          <div style="flex:1;">
+            <div style="font-size:13px;font-weight:700;color:#1A202C;">다음 검진 권장일</div>
+            <div style="font-size:11px;color:#A0AEC0;margin-top:2px;">2026.06.10 (약 3개월 후)</div>
+          </div>
+          <div style="font-size:11px;font-weight:700;color:#2F855A;background:#F0FFF4;border-radius:8px;padding:4px 10px;">D-77</div>
+        </div>
+
+      </div>
+      <div class="bottom-cta">
+        <button class="cta-btn" onclick="alert('검진 신청이 접수되었습니다.\n담당 트레이너가 일정을 확인 후 연락드립니다.')">⛳ 검진 신청하기</button>
+      </div>
+    </div>
+
+    <!-- ② 결과 요약 -->
+    <div class="screen" id="screen-result">
+      <div class="app-header">
+        <button class="back-btn" onclick="go('main')">←</button>
+        <span class="header-title">검진 결과 요약</span>
+        <button onclick="go('compare')" style="background:rgba(255,255,255,0.18);border:none;color:#fff;border-radius:8px;padding:5px 11px;font-size:11px;font-weight:700;cursor:pointer;font-family:'Noto Sans KR',sans-serif;">비교</button>
+      </div>
+      <div class="scroll-body" id="result-scroll">
+
+        <!-- 종합 점수 -->
+        <div class="total-card">
+          <div>
+            <div style="font-size:11px;opacity:.7;margin-bottom:4px;">2026.03.10 검진 결과</div>
+            <div style="font-size:50px;font-weight:900;line-height:1;">76</div>
+            <div style="font-size:14px;opacity:.7;margin-bottom:8px;">/ 100점</div>
+            <div class="total-grade">B+ 양호</div>
+          </div>
+          <div style="flex:1;">
+            <div id="result-radar"></div>
+          </div>
+        </div>
+
+        <!-- 항목별 점수 바 -->
+        <div class="sec-label">항목별 점수</div>
+        <div style="background:#fff;border-radius:16px;padding:16px;box-shadow:0 1px 5px rgba(0,0,0,0.07);" id="result-score-bars"></div>
+
+        <!-- 트레이너 소견 -->
+        <div style="background:#fff;border-radius:14px;padding:14px 16px;box-shadow:0 1px 5px rgba(0,0,0,0.07);">
+          <div class="sec-label">트레이너 종합 소견</div>
+          <div style="font-size:13px;color:#2D3748;line-height:1.7;">
+            전반적으로 양호한 수준입니다. <strong>체형 분석</strong> 항목에서 골반 좌우 불균형이 관찰되며, 스윙 시 우측 어깨 드롭이 반복됩니다. 코어 안정화 운동과 고관절 유연성 강화 프로그램을 병행하면 효과적입니다.
+          </div>
+          <div style="margin-top:10px;font-size:11px;color:#A0AEC0;">담당 트레이너 · 박지훈 · 2026.03.10</div>
+        </div>
+
+        <div style="display:flex;gap:8px;">
+          <button onclick="go('detail')" style="flex:1;background:#F0FFF4;color:#2F855A;border:1.5px solid #C6F6D5;border-radius:12px;padding:11px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Noto Sans KR',sans-serif;">📋 상세 보기</button>
+          <button onclick="go('recommend')" style="flex:1;background:#2F855A;color:#fff;border:none;border-radius:12px;padding:11px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Noto Sans KR',sans-serif;">💪 맞춤 운동</button>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ③ 결과 상세 -->
+    <div class="screen" id="screen-detail">
+      <div class="app-header">
+        <button class="back-btn" onclick="go('result')">←</button>
+        <span class="header-title">결과 상세</span>
+      </div>
+      <!-- 항목 탭 스크롤 -->
+      <div style="background:#fff;padding:10px 14px 8px;border-bottom:1px solid #F0F4F8;flex-shrink:0;">
+        <div class="detail-tab-row" id="detail-tab-row"></div>
+      </div>
+      <div class="scroll-body" id="detail-scroll">
+        <div id="detail-content"></div>
+      </div>
+    </div>
+
+    <!-- ④ 결과 비교 -->
+    <div class="screen" id="screen-compare">
+      <div class="app-header">
+        <button class="back-btn" onclick="go('result')">←</button>
+        <span class="header-title">결과 비교</span>
+      </div>
+      <div class="scroll-body" id="compare-scroll">
+        <div class="sec-label">비교할 검진 선택 (최대 3회)</div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;" id="cmp-sess-chips"></div>
+        <div id="cmp-chart" style="margin-top:4px;"></div>
+      </div>
+    </div>
+
+    <!-- ⑤ 검진 이력 -->
+    <div class="screen" id="screen-history">
+      <div class="app-header">
+        <button class="back-btn" onclick="go('main')">←</button>
+        <span class="header-title">검진 이력</span>
+      </div>
+      <div class="scroll-body" id="history-scroll">
+        <div class="sec-label">전체 3회 검진</div>
+        <div id="history-list"></div>
+      </div>
+      <div class="bottom-cta">
+        <button class="cta-btn" onclick="alert('검진 신청이 접수되었습니다.')">⛳ 새 검진 신청</button>
+      </div>
+    </div>
+
+    <!-- ⑥ 맞춤 운동 추천 -->
+    <div class="screen" id="screen-recommend">
+      <div class="app-header">
+        <button class="back-btn" onclick="go('result')">←</button>
+        <span class="header-title">골프 맞춤 운동 추천</span>
+      </div>
+      <div style="background:linear-gradient(135deg,#1B4332,#2D6A4F);padding:12px 16px;flex-shrink:0;">
+        <div style="font-size:12px;color:rgba(255,255,255,0.7);margin-bottom:2px;">검진 결과 기반 맞춤 프로그램</div>
+        <div style="font-size:15px;font-weight:800;color:#fff;">취약 항목 강화 운동 8개 추천</div>
+      </div>
+      <div style="background:#fff;padding:8px 14px;border-bottom:1px solid #F0F4F8;flex-shrink:0;">
+        <div style="display:flex;gap:6px;overflow-x:auto;" id="rec-filter-chips"></div>
+      </div>
+      <div class="scroll-body" id="recommend-scroll">
+        <div id="rec-ex-list"></div>
+      </div>
+      <div class="bottom-cta">
+        <button class="cta-btn" onclick="alert('선택한 운동이 마이루틴에 저장됐습니다!')">📌 마이루틴에 저장</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+/* ══════════════════════════════════════
+   데이터
+══════════════════════════════════════ */
+const ITEMS = [
+  {
+    id:'swing', icon:'🏌️', name:'스윙 분석', bg:'#F0FFF4', color:'#2F855A',
+    desc:'스윙 궤도·템포·체중이동·릴리즈 패턴 분석',
+    points:[
+      { label:'스윙 궤도',  score:78, comment:'인사이드-아웃 경향 있음. 클럽 패스 약 +4°로 드로우 구질에 유리하나 과도 시 훅 발생 가능.' },
+      { label:'체중 이동',  score:72, comment:'백스윙 시 우측 이동 양호. 다운스윙 이동 타이밍이 0.1초 늦어 임팩트 에너지 손실 발생.' },
+      { label:'릴리즈 패턴', score:80, comment:'손목 릴리즈 타이밍 적절. 팔꿈치 플라잉이 경미하게 관찰됨.' },
+      { label:'스윙 템포',  score:74, comment:'백스윙:다운스윙 비율 2.8:1로 이상적 범위(3:1) 대비 약간 빠름.' },
+    ]
+  },
+  {
+    id:'mobility', icon:'🦾', name:'관절 이동성', bg:'#EBF8FF', color:'#2B6CB0',
+    desc:'어깨·고관절·척추 회전 범위 측정 및 좌우 균형',
+    points:[
+      { label:'어깨 내회전',  score:82, comment:'우측 90°, 좌측 86°. 좌우 차이 4° 이내로 양호.' },
+      { label:'고관절 회전',  score:85, comment:'우측 외회전 45°, 좌측 43°. 골프 스윙에 충분한 범위 확보.' },
+      { label:'척추 회전',   score:77, comment:'흉추 회전 우측 40°, 좌측 36°. 좌측 제한으로 팔로우스루 제약 가능.' },
+      { label:'발목 이동성', score:88, comment:'좌우 균형적. 체중 이동 시 안정적 지지 확인.' },
+    ]
+  },
+  {
+    id:'posture', icon:'🧍', name:'체형 분석', bg:'#FFFAF0', color:'#C05621',
+    desc:'정적·동적 자세 분석, 골반·척추 정렬 평가',
+    points:[
+      { label:'골반 수평',   score:62, comment:'우측 골반 약 0.8cm 높음. 장요근 불균형 의심. 교정 스트레칭 권장.' },
+      { label:'어깨 수평',   score:68, comment:'우측 어깨 드롭 경향(1.2cm). 백스윙 시 어깨 과회전으로 이어질 수 있음.' },
+      { label:'척추 측만',   score:70, comment:'경미한 요추 우측 만곡(5°). 임상적 주의 범위는 아님.' },
+      { label:'머리 위치',   score:75, comment:'전방 두부 자세 관찰. 경추 스트레칭 및 심부 굴곡근 강화 필요.' },
+    ]
+  },
+  {
+    id:'muscle', icon:'💪', name:'근력 불균형', bg:'#FAF5FF', color:'#6B46C1',
+    desc:'주요 근육군 좌우·전후 불균형 및 취약 근육 파악',
+    points:[
+      { label:'코어 안정성',   score:70, comment:'플랭크 유지 55초. 요추 안정화 근군 강화가 스윙 파워 향상에 직결.' },
+      { label:'글루트 근력',   score:74, comment:'우측 글루트 맥스 우세. 좌측 강화로 체중 이동 개선 가능.' },
+      { label:'회전근개 균형', score:75, comment:'외회전 근군 상대적 약화. 밴드 외회전 운동 권장.' },
+      { label:'전완 근력',    score:68, comment:'좌측 그립 강도 우측 대비 82%. 골프 피로 누적 시 부상 위험 주의.' },
+    ]
+  },
+  {
+    id:'flex', icon:'🤸', name:'유연성 평가', bg:'#FFF5F5', color:'#C53030',
+    desc:'근육·인대 유연성, 스트레칭 범위, 동작 제한 여부',
+    points:[
+      { label:'햄스트링',     score:90, comment:'하지 직거상 좌 84°·우 86°. 양호.' },
+      { label:'흉추 가동성',  score:85, comment:'폼롤러 흉추 신전 범위 충분. 스윙 회전에 유리.' },
+      { label:'고관절 굴곡근', score:88, comment:'토마스 테스트 정상. 골반 전방경사 없음.' },
+      { label:'어깨 유연성',  score:86, comment:'어깨 후방 타이트니스 경미. 크로스 바디 스트레칭 유지 권장.' },
+    ]
+  },
+];
+
+const ITEM_SCORE = { swing:77, mobility:83, posture:69, muscle:72, flex:87 };
+
+const SESSIONS = [
+  { date:'2026.03.10', label:'1차', scores:{ swing:77, mobility:83, posture:69, muscle:72, flex:87 }, trainer:'박지훈', total:76 },
+  { date:'2025.12.05', label:'2차', scores:{ swing:70, mobility:78, posture:62, muscle:65, flex:82 }, trainer:'김민수', total:71 },
+  { date:'2025.08.20', label:'3차', scores:{ swing:63, mobility:74, posture:58, muscle:60, flex:79 }, trainer:'박지훈', total:67 },
+];
+
+const GRADE = score =>
+  score >= 90 ? { g:'A', label:'우수' } :
+  score >= 80 ? { g:'B+', label:'양호' } :
+  score >= 70 ? { g:'B', label:'보통' } :
+  score >= 60 ? { g:'C+', label:'주의' } : { g:'C', label:'미흡' };
+
+const GRADE_COLOR = g =>
+  g === 'A' ? '#2F855A' :
+  g === 'B+' ? '#2B6CB0' :
+  g === 'B' ? '#744210' :
+  g === 'C+' ? '#9B2C2C' : '#742A2A';
+
+const REC_EXERCISES = [
+  { name:'코어 안정화 플랭크', icon:'🏋️', cat:'근력 불균형', sets:'3세트', reps:'45초', reason:'코어 안정성 강화 → 스윙 파워 향상', color:'#6B46C1' },
+  { name:'골반 교정 스트레칭', icon:'🧘', cat:'체형 분석', sets:'2세트', reps:'30초×좌우', reason:'골반 수평 불균형 교정', color:'#C05621' },
+  { name:'글루트 브릿지', icon:'🍑', cat:'근력 불균형', sets:'3세트', reps:'15회', reason:'좌측 글루트 강화 → 체중이동 개선', color:'#6B46C1' },
+  { name:'어깨 외회전 밴드', icon:'💪', cat:'근력 불균형', sets:'3세트', reps:'12회×좌우', reason:'회전근개 균형 → 부상 예방', color:'#6B46C1' },
+  { name:'흉추 회전 스트레칭', icon:'🔄', cat:'관절 이동성', sets:'2세트', reps:'10회×좌우', reason:'좌측 흉추 회전 제한 개선', color:'#2B6CB0' },
+  { name:'전완 그립 강화',     icon:'✊', cat:'근력 불균형', sets:'3세트', reps:'20회', reason:'좌측 그립 강도 향상 → 피로 예방', color:'#6B46C1' },
+  { name:'경추 심부 굴곡근 운동', icon:'🦒', cat:'체형 분석', sets:'3세트', reps:'10회·5초유지', reason:'전방 두부 자세 교정', color:'#C05621' },
+  { name:'크로스 바디 어깨 스트레칭', icon:'🤗', cat:'유연성 평가', sets:'2세트', reps:'30초×좌우', reason:'어깨 후방 타이트니스 완화', color:'#C53030' },
+];
+
+/* ══════════════════════════════════════
+   상태
+══════════════════════════════════════ */
+let _screen = 'main';
+let _detailIdx = 0;
+let _cmpSelected = [0, 1];
+let _recFilter = 'all';
+
+/* ══════════════════════════════════════
+   화면 전환
+══════════════════════════════════════ */
+function go(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-' + id).classList.add('active');
+  document.querySelectorAll('.screen-btn').forEach((b, i) => {
+    const ids = ['main','result','detail','compare','history','recommend'];
+    b.classList.toggle('active', ids[i] === id);
+  });
+  _screen = id;
+
+  const scrollMap = { main:'main-scroll', result:'result-scroll', detail:'detail-scroll',
+    compare:'compare-scroll', history:'history-scroll', recommend:'recommend-scroll' };
+  const el = document.getElementById(scrollMap[id]);
+  if (el) el.scrollTop = 0;
+
+  if (id === 'main')      renderMain();
+  if (id === 'result')    renderResult();
+  if (id === 'detail')    renderDetail(_detailIdx);
+  if (id === 'compare')   renderCompare();
+  if (id === 'history')   renderHistory();
+  if (id === 'recommend') renderRecommend();
+}
+
+/* ══════════════════════════════════════
+   ① 메인
+══════════════════════════════════════ */
+function renderMain() {
+  // 미니 바 차트 (배너 내)
+  document.getElementById('main-mini-bars').innerHTML = ITEMS.map(it => {
+    const sc = ITEM_SCORE[it.id];
+    const pct = sc + '%';
+    return `<div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+      <div style="font-size:10px;color:rgba(255,255,255,0.7);width:60px;flex-shrink:0;">${it.name}</div>
+      <div style="flex:1;background:rgba(255,255,255,0.15);border-radius:99px;height:5px;overflow:hidden;">
+        <div style="width:${pct};height:100%;background:#68D391;border-radius:99px;"></div>
+      </div>
+      <div style="font-size:10px;font-weight:800;color:#fff;width:22px;text-align:right;">${sc}</div>
+    </div>`;
+  }).join('');
+
+  // 항목 카드
+  document.getElementById('main-item-list').innerHTML = ITEMS.map((it, i) => {
+    const sc = ITEM_SCORE[it.id];
+    const gd = GRADE(sc);
+    return `<div class="item-card" onclick="openDetail(${i})" style="margin-bottom:8px;">
+      <div class="item-icon-box" style="background:${it.bg};">${it.icon}</div>
+      <div class="item-info">
+        <div class="item-name">${it.name}</div>
+        <div class="item-desc">${it.desc}</div>
+        <div class="prog-bar-wrap">
+          <div class="prog-bar-bg">
+            <div class="prog-bar-fill" style="width:${sc}%;background:${it.color};"></div>
+          </div>
+        </div>
+      </div>
+      <div class="item-score-box">
+        <div class="item-score" style="color:${it.color};">${sc}</div>
+        <div class="item-grade" style="color:${it.color};">${gd.g}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+/* ══════════════════════════════════════
+   ② 결과 요약
+══════════════════════════════════════ */
+function renderResult() {
+  // 레이더 차트 (SVG 오각형)
+  document.getElementById('result-radar').innerHTML = buildRadar(SESSIONS[0].scores, 80, true);
+
+  // 항목별 점수 바
+  document.getElementById('result-score-bars').innerHTML = ITEMS.map((it, i) => {
+    const sc = ITEM_SCORE[it.id];
+    const gd = GRADE(sc);
+    return `<div style="margin-bottom:${i < ITEMS.length-1 ? '14px' : '0'};">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;">
+        <div style="display:flex;align-items:center;gap:7px;">
+          <span style="font-size:15px;">${it.icon}</span>
+          <span style="font-size:13px;font-weight:700;color:#2D3748;">${it.name}</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:6px;">
+          <span style="font-size:12px;font-weight:800;color:${it.color};">${sc}점</span>
+          <span style="font-size:10px;font-weight:700;padding:2px 7px;border-radius:99px;background:${it.bg};color:${it.color};">${gd.g}</span>
+        </div>
+      </div>
+      <div class="prog-bar-bg">
+        <div class="prog-bar-fill" style="width:${sc}%;background:${it.color};"></div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+/* ══════════════════════════════════════
+   ③ 결과 상세
+══════════════════════════════════════ */
+function renderDetail(idx) {
+  _detailIdx = idx;
+  const it = ITEMS[idx];
+
+  // 탭
+  document.getElementById('detail-tab-row').innerHTML = ITEMS.map((item, i) =>
+    `<div class="detail-chip${i === idx ? ' active' : ''}" onclick="renderDetail(${i})">${item.icon} ${item.name}</div>`
+  ).join('');
+
+  const sc = ITEM_SCORE[it.id];
+  const gd = GRADE(sc);
+
+  document.getElementById('detail-content').innerHTML = `
+    <!-- 점수 카드 -->
+    <div class="detail-content-card">
+      <div style="display:flex;align-items:center;gap:14px;margin-bottom:16px;">
+        <div style="width:70px;height:70px;border-radius:16px;background:${it.bg};display:flex;align-items:center;justify-content:center;font-size:32px;flex-shrink:0;">${it.icon}</div>
+        <div style="flex:1;">
+          <div style="font-size:16px;font-weight:900;color:#1A202C;margin-bottom:4px;">${it.name}</div>
+          <div style="font-size:11px;color:#888;margin-bottom:8px;">${it.desc}</div>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <span style="font-size:28px;font-weight:900;color:${it.color};">${sc}</span>
+            <span style="font-size:14px;color:#A0AEC0;margin-top:4px;">/ 100</span>
+            <span style="font-size:12px;font-weight:800;padding:3px 10px;border-radius:99px;background:${it.bg};color:${it.color};">${gd.g} ${gd.label}</span>
+          </div>
+        </div>
+      </div>
+      <div class="prog-bar-bg" style="height:8px;">
+        <div class="prog-bar-fill" style="width:${sc}%;background:${it.color};height:8px;"></div>
+      </div>
+    </div>
+
+    <!-- 세부 항목 -->
+    <div class="sec-label">세부 측정 결과</div>
+    ${it.points.map(p => {
+      const pGd = GRADE(p.score);
+      return `<div class="detail-content-card" style="margin-bottom:8px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+          <div style="font-size:14px;font-weight:700;color:#1A202C;">${p.label}</div>
+          <div style="display:flex;align-items:center;gap:6px;">
+            <span style="font-size:16px;font-weight:900;color:${it.color};">${p.score}</span>
+            <span style="font-size:10px;font-weight:700;padding:2px 7px;border-radius:99px;background:${it.bg};color:${it.color};">${pGd.g}</span>
+          </div>
+        </div>
+        <div class="prog-bar-bg" style="margin-bottom:8px;">
+          <div class="prog-bar-fill" style="width:${p.score}%;background:${it.color};"></div>
+        </div>
+        <div style="font-size:12px;color:#4A5568;line-height:1.6;background:#F7FAFC;border-radius:8px;padding:9px 11px;">${p.comment}</div>
+      </div>`;
+    }).join('')}
+
+    <!-- 이전 회차와 비교 -->
+    <div class="sec-label">이전 검진 대비</div>
+    <div class="detail-content-card">
+      <div style="display:flex;align-items:center;justify-content:center;gap:20px;">
+        ${SESSIONS.map((s, i) => {
+          const prev = s.scores[it.id];
+          const diff = i === 0 ? 0 : SESSIONS[i-1].scores[it.id] - prev;
+          return `<div style="text-align:center;">
+            <div style="font-size:10px;color:#A0AEC0;margin-bottom:4px;">${s.label} · ${s.date}</div>
+            <div style="font-size:24px;font-weight:900;color:${i===0?it.color:'#A0AEC0'};">${prev}</div>
+            ${i > 0 && diff !== 0 ? `<div style="font-size:11px;font-weight:700;color:${diff>0?'#E53E3E':'#38A169'};">${diff>0?'▼':'▲'}${Math.abs(diff)}</div>` : ''}
+          </div>`;
+        }).join('<div style="width:1px;height:40px;background:#E2E8F0;"></div>')}
+      </div>
+    </div>
+
+    <div style="display:flex;gap:8px;margin-top:4px;">
+      ${_detailIdx > 0 ? `<button onclick="renderDetail(${_detailIdx-1})" style="flex:1;background:#F0FFF4;color:#2F855A;border:1.5px solid #C6F6D5;border-radius:12px;padding:11px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Noto Sans KR',sans-serif;">← 이전 항목</button>` : '<div style="flex:1;"></div>'}
+      ${_detailIdx < ITEMS.length-1 ? `<button onclick="renderDetail(${_detailIdx+1})" style="flex:1;background:#2F855A;color:#fff;border:none;border-radius:12px;padding:11px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Noto Sans KR',sans-serif;">다음 항목 →</button>` : '<div style="flex:1;"></div>'}
+    </div>
+  `;
+
+  document.getElementById('detail-scroll').scrollTop = 0;
+}
+
+function openDetail(idx) {
+  _detailIdx = idx;
+  go('detail');
+}
+
+/* ══════════════════════════════════════
+   ④ 결과 비교
+══════════════════════════════════════ */
+function renderCompare() {
+  // 세션 칩
+  document.getElementById('cmp-sess-chips').innerHTML = SESSIONS.map((s, i) =>
+    `<div class="sess-chip${_cmpSelected.includes(i)?' active':''}" onclick="toggleCmpSess(${i})">${s.label} (${s.date})</div>`
+  ).join('');
+
+  const sel = _cmpSelected.slice().sort((a,b) => b-a); // 최신순
+  const colors = ['#2F855A', '#2B6CB0', '#C05621'];
+
+  let html = '';
+
+  // 종합 점수 비교 카드
+  html += `<div style="background:#fff;border-radius:16px;padding:16px;box-shadow:0 1px 5px rgba(0,0,0,0.07);margin-bottom:10px;">
+    <div class="sec-label">종합 점수</div>
+    <div style="display:flex;gap:10px;align-items:flex-end;margin-bottom:10px;">
+      ${sel.map((si, ci) => {
+        const s = SESSIONS[si];
+        return `<div style="flex:1;text-align:center;background:${colors[ci]}18;border-radius:12px;padding:10px 6px;">
+          <div style="font-size:10px;color:#888;margin-bottom:3px;">${s.label} · ${s.date}</div>
+          <div style="font-size:28px;font-weight:900;color:${colors[ci]};">${s.total}</div>
+          <div style="font-size:11px;font-weight:700;color:${colors[ci]};">${GRADE(s.total).g}</div>
+        </div>`;
+      }).join('')}
+    </div>
+    ${sel.length > 1 ? `<div style="font-size:12px;color:#A0AEC0;text-align:center;">
+      ${SESSIONS[sel[0]].total > SESSIONS[sel[sel.length-1]].total
+        ? `📈 <b style="color:#38A169;">+${SESSIONS[sel[0]].total - SESSIONS[sel[sel.length-1]].total}점</b> 향상`
+        : `📉 <b style="color:#E53E3E;">${SESSIONS[sel[0]].total - SESSIONS[sel[sel.length-1]].total}점</b> 변화`}
+    </div>` : ''}
+  </div>`;
+
+  // 항목별 비교 바
+  html += `<div style="background:#fff;border-radius:16px;padding:16px;box-shadow:0 1px 5px rgba(0,0,0,0.07);">
+    <div class="sec-label">항목별 비교</div>
+    ${ITEMS.map(it => {
+      return `<div class="cmp-bar-row">
+        <div class="cmp-label">${it.icon} ${it.name.replace(' ','<br/>')}</div>
+        <div class="cmp-bars">
+          ${sel.map((si, ci) => {
+            const sc = SESSIONS[si].scores[it.id];
+            return `<div style="display:flex;align-items:center;gap:5px;">
+              <div style="flex:1;background:#F0F4F8;border-radius:5px;height:10px;overflow:hidden;">
+                <div style="width:${sc}%;height:100%;background:${colors[ci]};border-radius:5px;"></div>
+              </div>
+              <div style="font-size:10px;font-weight:700;color:${colors[ci]};width:22px;text-align:right;">${sc}</div>
+            </div>`;
+          }).join('')}
+        </div>
+      </div>`;
+    }).join('')}
+    <!-- 범례 -->
+    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:4px;padding-top:10px;border-top:1px solid #F0F4F8;">
+      ${sel.map((si, ci) =>
+        `<div style="display:flex;align-items:center;gap:5px;font-size:11px;color:#718096;">
+          <div style="width:12px;height:12px;border-radius:3px;background:${colors[ci]};"></div>
+          ${SESSIONS[si].label} · ${SESSIONS[si].date}
+        </div>`
+      ).join('')}
+    </div>
+  </div>`;
+
+  document.getElementById('cmp-chart').innerHTML = html;
+}
+
+function toggleCmpSess(idx) {
+  if (_cmpSelected.includes(idx)) {
+    if (_cmpSelected.length <= 1) return;
+    _cmpSelected = _cmpSelected.filter(i => i !== idx);
+  } else {
+    if (_cmpSelected.length >= 3) return;
+    _cmpSelected.push(idx);
+  }
+  renderCompare();
+}
+
+/* ══════════════════════════════════════
+   ⑤ 검진 이력
+══════════════════════════════════════ */
+function renderHistory() {
+  document.getElementById('history-list').innerHTML = SESSIONS.map((s, i) => {
+    const gd = GRADE(s.total);
+    const [y, m, d] = s.date.split('.');
+    return `<div class="hist-item" onclick="go('result')" style="margin-bottom:8px;">
+      <div class="hist-date-box">
+        <div class="hist-month">${m}월</div>
+        <div class="hist-day">${d}</div>
+        <div style="font-size:9px;color:#A0AEC0;">${y}</div>
+      </div>
+      <div style="width:1px;height:44px;background:#E2E8F0;flex-shrink:0;"></div>
+      <div class="hist-info">
+        <div class="hist-title">${i === 0 ? '최근 ' : ''}검진 ${s.label}</div>
+        <div class="hist-trainer">담당 · ${s.trainer}</div>
+        <div style="display:flex;gap:5px;margin-top:5px;">
+          ${ITEMS.map(it => {
+            const sc = SESSIONS[i].scores[it.id];
+            return `<div style="font-size:9px;font-weight:700;padding:2px 6px;border-radius:99px;background:${it.bg};color:${it.color};">${it.icon}${sc}</div>`;
+          }).join('')}
+        </div>
+      </div>
+      <div style="text-align:center;flex-shrink:0;">
+        <div class="hist-score">${s.total}</div>
+        <div style="font-size:11px;font-weight:700;color:${GRADE_COLOR(gd.g)};">${gd.g}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+/* ══════════════════════════════════════
+   ⑥ 맞춤 운동 추천
+══════════════════════════════════════ */
+const REC_FILTERS = [
+  { id:'all', label:'전체' },
+  { id:'근력 불균형', label:'💪 근력' },
+  { id:'체형 분석', label:'🧍 체형' },
+  { id:'관절 이동성', label:'🦾 관절' },
+  { id:'유연성 평가', label:'🤸 유연성' },
+];
+
+function renderRecommend() {
+  document.getElementById('rec-filter-chips').innerHTML = REC_FILTERS.map(f =>
+    `<div onclick="setRecFilter('${f.id}')" style="padding:5px 12px;border-radius:99px;border:1.5px solid ${_recFilter===f.id?'#2F855A':'#E2E8F0'};background:${_recFilter===f.id?'#2F855A':'#fff'};color:${_recFilter===f.id?'#fff':'#718096'};font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap;flex-shrink:0;font-family:'Noto Sans KR',sans-serif;margin-right:4px;">${f.label}</div>`
+  ).join('');
+
+  const filtered = _recFilter === 'all' ? REC_EXERCISES : REC_EXERCISES.filter(e => e.cat === _recFilter);
+  document.getElementById('rec-ex-list').innerHTML = filtered.map(ex =>
+    `<div class="ex-rec-card" style="border-color:${ex.color};margin-bottom:8px;">
+      <div class="rec-icon">${ex.icon}</div>
+      <div class="rec-info">
+        <div class="rec-name">${ex.name}</div>
+        <div class="rec-meta">${ex.sets} × ${ex.reps}</div>
+        <div style="margin-top:3px;">
+          <span style="font-size:10px;font-weight:700;padding:2px 7px;border-radius:99px;background:${ex.color}18;color:${ex.color};">${ex.cat}</span>
+        </div>
+        <div class="rec-reason">▷ ${ex.reason}</div>
+      </div>
+      <div onclick="alert('${ex.name} 루틴에 추가됐습니다!')" style="width:30px;height:30px;border-radius:50%;background:${ex.color}18;border:1.5px solid ${ex.color};display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;font-size:14px;color:${ex.color};">+</div>
+    </div>`
+  ).join('');
+}
+
+function setRecFilter(id) {
+  _recFilter = id;
+  renderRecommend();
+}
+
+/* ══════════════════════════════════════
+   레이더 차트 (SVG)
+══════════════════════════════════════ */
+function buildRadar(scores, size, mini) {
+  const cx = size / 2, cy = size / 2, r = size * 0.38;
+  const keys = ['swing','mobility','posture','muscle','flex'];
+  const labels = ['스윙','관절','체형','근력','유연성'];
+  const n = keys.length;
+  const pts = keys.map((k, i) => {
+    const angle = (Math.PI * 2 * i / n) - Math.PI / 2;
+    const val = (scores[k] / 100);
+    return { x: cx + r * val * Math.cos(angle), y: cy + r * val * Math.sin(angle),
+             gx: cx + (r + 16) * Math.cos(angle), gy: cy + (r + 16) * Math.sin(angle) };
+  });
+  const gridPts = [0.25, 0.5, 0.75, 1].map(pct =>
+    keys.map((k, i) => {
+      const angle = (Math.PI * 2 * i / n) - Math.PI / 2;
+      return `${cx + r * pct * Math.cos(angle)},${cy + r * pct * Math.sin(angle)}`;
+    }).join(' ')
+  );
+  const polyPts = pts.map(p => `${p.x},${p.y}`).join(' ');
+
+  return `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" xmlns="http://www.w3.org/2000/svg">
+    ${gridPts.map(gp => `<polygon points="${gp}" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="1"/>`).join('')}
+    ${keys.map((k, i) => {
+      const angle = (Math.PI * 2 * i / n) - Math.PI / 2;
+      return `<line x1="${cx}" y1="${cy}" x2="${cx + r * Math.cos(angle)}" y2="${cy + r * Math.sin(angle)}" stroke="rgba(255,255,255,0.15)" stroke-width="1"/>`;
+    }).join('')}
+    <polygon points="${polyPts}" fill="rgba(104,211,145,0.25)" stroke="#68D391" stroke-width="2"/>
+    ${pts.map(p => `<circle cx="${p.x}" cy="${p.y}" r="3" fill="#68D391"/>`).join('')}
+    ${mini ? '' : pts.map((p, i) =>
+      `<text x="${p.gx}" y="${p.gy + 4}" text-anchor="middle" font-size="9" fill="rgba(255,255,255,0.75)" font-family="Noto Sans KR,sans-serif">${labels[i]}</text>`
+    ).join('')}
+  </svg>`;
+}
+
+/* ══════════════════════════════════════
+   초기화
+══════════════════════════════════════ */
+renderMain();
+</script>
+</body>
+</html>
