@@ -193,6 +193,61 @@
     .empty-state { text-align: center; padding: 60px 20px; color: #A0AEC0; }
     .empty-state .icon { font-size: 48px; margin-bottom: 12px; }
     .empty-state p { font-size: 14px; font-weight: 600; }
+
+    /* ── 회복 루틴 프로토콜 ── */
+    .proto-wrap { display: flex; gap: 20px; align-items: flex-start; }
+    .proto-list { width: 280px; flex-shrink: 0; display: flex; flex-direction: column; gap: 10px; }
+    .proto-card {
+      background: #fff; border-radius: 14px; padding: 16px;
+      box-shadow: 0 1px 6px rgba(0,0,0,0.06); cursor: pointer;
+      border: 2px solid transparent; transition: all 0.15s;
+    }
+    .proto-card.selected { border-color: #2F855A; box-shadow: 0 4px 16px rgba(47,133,90,0.18); }
+    .proto-card:hover:not(.selected) { border-color: #C6F6D5; }
+    .proto-card-name { font-size: 14px; font-weight: 800; color: #1A202C; margin-bottom: 4px; }
+    .proto-card-cond { font-size: 11px; color: #718096; margin-bottom: 8px; line-height: 1.5; }
+    .proto-card-meta { display: flex; gap: 6px; flex-wrap: wrap; }
+
+    .proto-detail { flex: 1; min-width: 0; }
+    .proto-detail-header {
+      background: #fff; border-radius: 16px; padding: 18px 22px;
+      box-shadow: 0 1px 6px rgba(0,0,0,0.06); margin-bottom: 14px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .proto-detail-name { font-size: 17px; font-weight: 900; color: #1A202C; }
+    .proto-detail-cond { font-size: 12px; color: #718096; margin-top: 3px; }
+
+    /* 주차 타임라인 탭 */
+    .phase-tabs { display: flex; gap: 0; margin-bottom: 14px; overflow-x: auto; }
+    .phase-tab {
+      padding: 10px 18px; font-size: 13px; font-weight: 700; cursor: pointer;
+      border: none; background: #fff; color: #718096; border-bottom: 3px solid #E2E8F0;
+      font-family: 'Noto Sans KR', sans-serif; white-space: nowrap; transition: all 0.15s;
+    }
+    .phase-tab.active { color: #2F855A; border-bottom-color: #2F855A; }
+    .phase-tab:hover:not(.active) { color: #1A202C; background: #F7FAFC; }
+    .phase-tab-add { padding: 10px 14px; border: none; background: transparent; color: #A0AEC0; font-size: 20px; cursor: pointer; }
+    .phase-tab-add:hover { color: #2F855A; }
+
+    /* 페이즈 콘텐츠 */
+    .phase-content { background: #fff; border-radius: 16px; padding: 22px; box-shadow: 0 1px 6px rgba(0,0,0,0.06); }
+    .phase-info-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 18px; }
+    .phase-info-box { background: #F7FAFC; border-radius: 12px; padding: 14px 16px; }
+    .phase-info-label { font-size: 11px; font-weight: 800; color: #718096; margin-bottom: 5px; letter-spacing: 0.5px; }
+    .phase-info-val { font-size: 13px; color: #1A202C; font-weight: 600; line-height: 1.5; }
+    .phase-caution-box { background: #FFF5F5; border-radius: 12px; padding: 12px 16px; margin-bottom: 18px; font-size: 12px; color: #C53030; font-weight: 600; }
+
+    /* 운동 테이블 */
+    .ex-table-wrap { border: 1.5px solid #E2E8F0; border-radius: 12px; overflow: hidden; }
+    .ex-table-wrap table { margin: 0; }
+    .ex-table-wrap th { background: #F0FFF4; color: #276749; }
+    .ex-table-wrap tr:hover td { background: #F0FFF4; }
+
+    /* 주차 타임라인 (세로) */
+    .phase-timeline { position: relative; padding-left: 24px; }
+    .phase-timeline::before { content:''; position:absolute; left:8px; top:0; bottom:0; width:2px; background:#C6F6D5; }
+    .phase-tl-item { position: relative; margin-bottom: 6px; }
+    .phase-tl-item::before { content:''; position:absolute; left:-20px; top:50%; transform:translateY(-50%); width:12px; height:12px; border-radius:50%; background:#2F855A; border:2px solid #fff; box-shadow:0 0 0 2px #2F855A; }
   </style>
 </head>
 <body>
@@ -219,6 +274,9 @@
       <span class="sidebar-item-icon">📊</span> 대시보드
     </div>
     <div class="sidebar-section">프로그램</div>
+    <div class="sidebar-item" onclick="showScreen('protocols',this)">
+      <span class="sidebar-item-icon">🗓</span> 회복 루틴
+    </div>
     <div class="sidebar-item" onclick="showScreen('programs',this)">
       <span class="sidebar-item-icon">📋</span> 재활 프로그램
     </div>
@@ -449,6 +507,30 @@
           <thead><tr><th>트레이너</th><th>진행 중</th><th>이달 완료</th><th>누적 완료</th><th>평균 만족도</th><th>완료율</th></tr></thead>
           <tbody id="trainer-stats-tbody"></tbody>
         </table>
+      </div>
+    </div>
+
+    <!-- ⑦ 회복 루틴 프로토콜 -->
+    <div class="screen" id="screen-protocols">
+      <div class="page-header">
+        <div>
+          <div class="page-title">🗓 회복 루틴 프로토콜</div>
+          <div class="page-sub">시술·수술별 주차 단계 운동 루틴 설정</div>
+        </div>
+        <div class="page-actions">
+          <button class="btn-primary" onclick="openProtoModal()">+ 프로토콜 추가</button>
+        </div>
+      </div>
+      <div class="proto-wrap">
+        <!-- 왼쪽: 프로토콜 목록 -->
+        <div class="proto-list" id="proto-list"></div>
+        <!-- 오른쪽: 선택된 프로토콜 상세 -->
+        <div class="proto-detail" id="proto-detail">
+          <div class="empty-state" style="margin-top:60px;">
+            <div class="icon">🗓</div>
+            <p>왼쪽에서 프로토콜을 선택하세요</p>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -717,6 +799,119 @@
   </div>
 </div>
 
+<!-- 모달: 프로토콜 등록/수정 -->
+<div class="modal-overlay" id="modal-protocol">
+  <div class="modal" style="width:500px;">
+    <div class="modal-header">
+      <div class="modal-title" id="proto-modal-title">🗓 프로토콜 등록</div>
+      <button class="modal-close" onclick="closeModal('modal-protocol')">✕</button>
+    </div>
+    <input type="hidden" id="proto-edit-idx" value="-1" />
+    <div class="form-group">
+      <label class="form-label">프로토콜명 <span class="req">*</span></label>
+      <input class="form-input" id="proto-name-input" type="text" placeholder="예) 디스크 시술 후 재활" />
+    </div>
+    <div class="form-group">
+      <label class="form-label">시술/수술명</label>
+      <input class="form-input" id="proto-cond-input" type="text" placeholder="예) 경막외 스테로이드 주사 / 신경차단술" />
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">부위</label>
+        <select class="form-select" id="proto-part-select">
+          <option value="back">허리</option>
+          <option value="knee">무릎</option>
+          <option value="shoulder">어깨</option>
+          <option value="ankle">발목</option>
+          <option value="neck">목</option>
+          <option value="hip">고관절</option>
+          <option value="etc">기타</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">총 기간 (주)</label>
+        <input class="form-input" id="proto-weeks-input" type="number" min="1" max="52" placeholder="예) 12" />
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="closeModal('modal-protocol')">취소</button>
+      <button class="btn-primary" id="proto-save-btn" onclick="saveProtocol()">등록</button>
+    </div>
+  </div>
+</div>
+
+<!-- 모달: 단계(Phase) 등록/수정 -->
+<div class="modal-overlay" id="modal-phase">
+  <div class="modal" style="width:480px;">
+    <div class="modal-header">
+      <div class="modal-title" id="phase-modal-title">단계 추가</div>
+      <button class="modal-close" onclick="closeModal('modal-phase')">✕</button>
+    </div>
+    <input type="hidden" id="phase-edit-idx" value="-1" />
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">시작 주차 <span class="req">*</span></label>
+        <input class="form-input" id="phase-start-input" type="number" min="1" placeholder="예) 5" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">종료 주차 <span class="req">*</span></label>
+        <input class="form-input" id="phase-end-input" type="number" min="1" placeholder="예) 8" />
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">단계 목표</label>
+      <input class="form-input" id="phase-goal-input" type="text" placeholder="예) 근력 강화 및 기능 회복" />
+    </div>
+    <div class="form-group">
+      <label class="form-label">주의사항</label>
+      <input class="form-input" id="phase-caution-input" type="text" placeholder="예) 고강도 굴곡 동작 주의" />
+    </div>
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="closeModal('modal-phase')">취소</button>
+      <button class="btn-primary" id="phase-save-btn" onclick="savePhase()">추가</button>
+    </div>
+  </div>
+</div>
+
+<!-- 모달: 운동 추가/수정 -->
+<div class="modal-overlay" id="modal-ex">
+  <div class="modal" style="width:480px;">
+    <div class="modal-header">
+      <div class="modal-title" id="ex-modal-title">운동 추가</div>
+      <button class="modal-close" onclick="closeModal('modal-ex')">✕</button>
+    </div>
+    <input type="hidden" id="ex-edit-idx" value="-1" />
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">동작명 <span class="req">*</span></label>
+        <input class="form-input" id="ex-name-input" type="text" placeholder="예) 브릿지" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">도구</label>
+        <input class="form-input" id="ex-tool-input" type="text" placeholder="예) 요가매트, 없음" />
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">횟수</label>
+        <input class="form-input" id="ex-reps-input" type="text" placeholder="예) 10회 / 30초" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">세트</label>
+        <input class="form-input" id="ex-sets-input" type="text" placeholder="예) 3" />
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">메모</label>
+      <input class="form-input" id="ex-note-input" type="text" placeholder="예) 통증 없는 범위 내" />
+    </div>
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="closeModal('modal-ex')">취소</button>
+      <button class="btn-primary" id="ex-save-btn" onclick="saveExercise()">추가</button>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
@@ -797,6 +992,7 @@ function showScreen(id, el) {
   document.getElementById('screen-' + id).classList.add('active');
   if (el) el.classList.add('active');
   if (id === 'dashboard') renderDashboard();
+  if (id === 'protocols') { renderProtoList(); if (_selectedProtoIdx >= 0) renderProtoDetail(); }
   if (id === 'programs') renderProgGrid();
   if (id === 'motions') renderMotionGrid('all');
   if (id === 'prescriptions') renderRxTable('all');
@@ -1354,6 +1550,400 @@ function showToast(msg) {
   const t = document.getElementById('toast');
   t.textContent = msg; t.classList.add('show');
   setTimeout(() => t.classList.remove('show'), 2800);
+}
+
+// ── 회복 루틴 프로토콜 데이터 ────────────────────────
+let protocolData = [
+  {
+    name: '디스크 시술 후 재활',
+    condition: '경막외 스테로이드 주사 / 신경차단술',
+    part: 'back', totalWeeks: 12,
+    phases: [
+      { weekStart:1, weekEnd:2, goal:'안정화 및 급성 통증 조절', caution:'앞으로 굽히는 동작 금지, 무거운 물건 들기 금지', exercises:[
+        { name:'복식 호흡', reps:'5분', sets:'1', tool:'없음', note:'' },
+        { name:'맥킨지 신전', reps:'10회', sets:'3', tool:'없음', note:'통증 없는 범위 내' },
+        { name:'발목 펌핑', reps:'20회', sets:'2', tool:'없음', note:'누운 자세' },
+      ]},
+      { weekStart:3, weekEnd:4, goal:'유연성 회복 및 코어 안정화 시작', caution:'앞 굴곡 30도 이하 유지', exercises:[
+        { name:'맥킨지 신전', reps:'10회', sets:'3', tool:'없음', note:'' },
+        { name:'브릿지', reps:'10회', sets:'3', tool:'요가매트', note:'천천히' },
+        { name:'캣-카우', reps:'10회', sets:'2', tool:'요가매트', note:'' },
+      ]},
+      { weekStart:5, weekEnd:8, goal:'근력 강화 및 기능 회복', caution:'고강도 굴곡 동작 주의', exercises:[
+        { name:'브릿지', reps:'15회', sets:'3', tool:'요가매트', note:'' },
+        { name:'버드독', reps:'10회', sets:'3', tool:'요가매트', note:'좌우 교대' },
+        { name:'플랭크', reps:'30초', sets:'3', tool:'요가매트', note:'허리 꺼지지 않게' },
+        { name:'스쿼트', reps:'12회', sets:'3', tool:'없음', note:'낮은 범위' },
+      ]},
+      { weekStart:9, weekEnd:12, goal:'일상 복귀 및 재발 방지', caution:'', exercises:[
+        { name:'버드독', reps:'15회', sets:'3', tool:'요가매트', note:'' },
+        { name:'데드버그', reps:'10회', sets:'3', tool:'요가매트', note:'' },
+        { name:'케이블 로우', reps:'12회', sets:'3', tool:'탄력밴드', note:'' },
+        { name:'런지', reps:'10회', sets:'3', tool:'없음', note:'좌우 교대' },
+      ]},
+    ]
+  },
+  {
+    name: '무릎 인공관절 수술 후 재활',
+    condition: '전슬관절치환술 (TKA)',
+    part: 'knee', totalWeeks: 16,
+    phases: [
+      { weekStart:1, weekEnd:2, goal:'부종 감소, 기본 가동범위 회복', caution:'전체 체중 부하 금지', exercises:[
+        { name:'발목 펌핑', reps:'20회', sets:'3', tool:'없음', note:'시간당 1회' },
+        { name:'쿼드셋', reps:'10회', sets:'3', tool:'수건', note:'유지 5초' },
+        { name:'SLR 운동', reps:'10회', sets:'2', tool:'없음', note:'통증 시 중단' },
+      ]},
+      { weekStart:3, weekEnd:4, goal:'보행 정상화, 굴곡 90도 목표', caution:'무릎 과신전 주의', exercises:[
+        { name:'미니 스쿼트', reps:'10회', sets:'3', tool:'없음', note:'0~30도' },
+        { name:'레그 프레스', reps:'10회', sets:'3', tool:'레그프레스', note:'낮은 저항' },
+        { name:'스텝업', reps:'10회', sets:'2', tool:'계단', note:'낮은 계단' },
+      ]},
+      { weekStart:5, weekEnd:8, goal:'근력 강화, 굴곡 120도 목표', caution:'', exercises:[
+        { name:'레그 익스텐션', reps:'12회', sets:'3', tool:'기구', note:'' },
+        { name:'레그 컬', reps:'12회', sets:'3', tool:'기구', note:'' },
+        { name:'계단 오르기', reps:'5분', sets:'2', tool:'없음', note:'' },
+      ]},
+      { weekStart:9, weekEnd:16, goal:'완전 기능 회복, 스포츠 복귀', caution:'', exercises:[
+        { name:'스쿼트', reps:'15회', sets:'3', tool:'없음', note:'' },
+        { name:'런지', reps:'10회', sets:'3', tool:'없음', note:'좌우' },
+        { name:'실내 자전거', reps:'20분', sets:'1', tool:'실내자전거', note:'' },
+      ]},
+    ]
+  },
+  {
+    name: '어깨 회전근개 수술 후 재활',
+    condition: '회전근개 봉합술 (Rotator Cuff Repair)',
+    part: 'shoulder', totalWeeks: 24,
+    phases: [
+      { weekStart:1, weekEnd:4, goal:'보호기 — 수동 운동만', caution:'능동 거상 금지, 슬링 착용', exercises:[
+        { name:'펜들럼 스트레칭', reps:'10회', sets:'3', tool:'없음', note:'중력 이용' },
+        { name:'손목·손가락 운동', reps:'10회', sets:'3', tool:'없음', note:'' },
+      ]},
+      { weekStart:5, weekEnd:8, goal:'수동→능동 보조 운동', caution:'능동 거상 90도 이하', exercises:[
+        { name:'도르래 운동', reps:'10회', sets:'3', tool:'도르래', note:'' },
+        { name:'테이블 슬라이드', reps:'10회', sets:'3', tool:'테이블', note:'' },
+        { name:'어깨 외회전', reps:'10회', sets:'3', tool:'탄력밴드', note:'저저항' },
+      ]},
+      { weekStart:9, weekEnd:16, goal:'근력 강화', caution:'', exercises:[
+        { name:'밴드 내회전', reps:'15회', sets:'3', tool:'탄력밴드', note:'' },
+        { name:'밴드 외회전', reps:'15회', sets:'3', tool:'탄력밴드', note:'' },
+        { name:'월 슬라이드', reps:'10회', sets:'3', tool:'없음', note:'' },
+        { name:'사이드 레이즈', reps:'12회', sets:'3', tool:'덤벨', note:'경량' },
+      ]},
+      { weekStart:17, weekEnd:24, goal:'스포츠 복귀', caution:'', exercises:[
+        { name:'케이블 풀다운', reps:'12회', sets:'3', tool:'케이블', note:'' },
+        { name:'케이블 로우', reps:'12회', sets:'3', tool:'케이블', note:'' },
+        { name:'오버헤드 프레스', reps:'10회', sets:'3', tool:'덤벨', note:'가벼운 무게' },
+      ]},
+    ]
+  },
+  {
+    name: '발목 인대 재건술 후 재활',
+    condition: '전거비인대 재건술 (ATFL Reconstruction)',
+    part: 'ankle', totalWeeks: 12,
+    phases: [
+      { weekStart:1, weekEnd:2, goal:'부종 조절, 발목 안정화', caution:'체중 부하 금지, 부목 착용', exercises:[
+        { name:'발가락 운동', reps:'10회', sets:'3', tool:'없음', note:'' },
+        { name:'발목 알파벳', reps:'1세트', sets:'2', tool:'없음', note:'통증 없는 범위' },
+      ]},
+      { weekStart:3, weekEnd:6, goal:'가동범위 회복, 부분 체중 부하', caution:'외번 동작 주의', exercises:[
+        { name:'발목 배굴 스트레칭', reps:'10회', sets:'3', tool:'수건', note:'유지 30초' },
+        { name:'카프 레이즈', reps:'15회', sets:'3', tool:'없음', note:'양발 → 한 발' },
+        { name:'밸런스 훈련', reps:'30초', sets:'3', tool:'밸런스보드', note:'' },
+      ]},
+      { weekStart:7, weekEnd:12, goal:'근력 강화 및 고유감각 훈련', caution:'', exercises:[
+        { name:'싱글 레그 스쿼트', reps:'10회', sets:'3', tool:'없음', note:'' },
+        { name:'밸런스 보드', reps:'1분', sets:'3', tool:'밸런스보드', note:'' },
+        { name:'측방 보행', reps:'10m', sets:'3', tool:'탄력밴드', note:'밴드 저항' },
+      ]},
+    ]
+  },
+];
+
+let _selectedProtoIdx = -1;
+let _selectedPhaseIdx = 0;
+
+// ── 프로토콜 렌더 ─────────────────────────────────────
+function renderProtoList() {
+  const list = document.getElementById('proto-list');
+  list.innerHTML = protocolData.map((p, i) => `
+    <div class="proto-card ${i === _selectedProtoIdx ? 'selected' : ''}" onclick="selectProto(${i})">
+      <div class="proto-card-name">${partIcon[p.part] || '💪'} ${p.name}</div>
+      <div class="proto-card-cond">${p.condition}</div>
+      <div class="proto-card-meta">
+        <span class="badge ${partBadge[p.part]}">${partMap[p.part]}</span>
+        <span class="badge badge-gray">총 ${p.totalWeeks}주</span>
+        <span class="badge badge-teal">${p.phases.length}단계</span>
+      </div>
+      <div style="display:flex;gap:6px;margin-top:10px;">
+        <button class="btn-sm" style="background:#C6F6D5;color:#276749;flex:1;" onclick="event.stopPropagation();editProtocol(${i})">수정</button>
+        <button class="btn-sm" style="background:#FED7D7;color:#C53030;flex:1;" onclick="event.stopPropagation();deleteProtocol(${i})">삭제</button>
+      </div>
+    </div>`).join('');
+}
+
+function selectProto(idx) {
+  _selectedProtoIdx = idx;
+  _selectedPhaseIdx = 0;
+  renderProtoList();
+  renderProtoDetail();
+}
+
+function renderProtoDetail() {
+  const detail = document.getElementById('proto-detail');
+  if (_selectedProtoIdx < 0) return;
+  const p = protocolData[_selectedProtoIdx];
+
+  detail.innerHTML = `
+    <div class="proto-detail-header">
+      <div>
+        <div class="proto-detail-name">${partIcon[p.part]} ${p.name}</div>
+        <div class="proto-detail-cond">${p.condition} · 총 ${p.totalWeeks}주 프로그램 · ${p.phases.length}단계</div>
+      </div>
+      <div style="display:flex;gap:8px;">
+        <button class="btn-secondary" onclick="editProtocol(${_selectedProtoIdx})">✏ 기본 정보 수정</button>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:0;margin-bottom:2px;background:#fff;border-radius:12px 12px 0 0;overflow:hidden;box-shadow:0 1px 6px rgba(0,0,0,0.06);">
+      <div class="phase-tabs" id="phase-tab-bar" style="flex:1;margin-bottom:0;"></div>
+      <button class="phase-tab-add" onclick="openPhaseModal(-1)" title="단계 추가">＋</button>
+    </div>
+    <div id="phase-content-area"></div>`;
+
+  renderPhaseTabs();
+}
+
+function renderPhaseTabs() {
+  if (_selectedProtoIdx < 0) return;
+  const p = protocolData[_selectedProtoIdx];
+  const bar = document.getElementById('phase-tab-bar');
+  if (!bar) return;
+  bar.innerHTML = p.phases.map((ph, i) => `
+    <button class="phase-tab ${i === _selectedPhaseIdx ? 'active' : ''}" onclick="selectPhase(${i})">
+      ${ph.weekStart}~${ph.weekEnd}주차
+    </button>`).join('');
+  renderPhaseContent();
+}
+
+function selectPhase(idx) {
+  _selectedPhaseIdx = idx;
+  renderPhaseTabs();
+}
+
+function renderPhaseContent() {
+  if (_selectedProtoIdx < 0) return;
+  const p = protocolData[_selectedProtoIdx];
+  const ph = p.phases[_selectedPhaseIdx];
+  if (!ph) return;
+  const area = document.getElementById('phase-content-area');
+  if (!area) return;
+
+  const exRows = ph.exercises.map((ex, ei) => `
+    <tr>
+      <td style="text-align:center;font-weight:700;color:#2F855A;">${ei+1}</td>
+      <td><strong>${ex.name}</strong></td>
+      <td style="text-align:center;">${ex.reps}</td>
+      <td style="text-align:center;">${ex.sets}세트</td>
+      <td style="text-align:center;">${ex.tool !== '없음' && ex.tool ? `<span class="badge badge-teal">${ex.tool}</span>` : '-'}</td>
+      <td style="color:#718096;">${ex.note || '-'}</td>
+      <td>
+        <button class="btn-sm" style="background:#EBF8FF;color:#2B6CB0;" onclick="editExercise(${ei})">수정</button>
+        <button class="btn-sm" style="background:#FED7D7;color:#C53030;margin-left:4px;" onclick="deleteExercise(${ei})">삭제</button>
+      </td>
+    </tr>`).join('');
+
+  area.innerHTML = `
+    <div class="phase-content">
+      <div class="phase-info-row">
+        <div class="phase-info-box">
+          <div class="phase-info-label">🎯 단계 목표</div>
+          <div class="phase-info-val">${ph.goal || '—'}</div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          ${ph.caution ? `<div class="phase-caution-box">⚠ ${ph.caution}</div>` : '<div class="phase-info-box"><div class="phase-info-label">⚠ 주의사항</div><div class="phase-info-val" style="color:#A0AEC0;">없음</div></div>'}
+          <div style="display:flex;gap:6px;">
+            <button class="btn-sm" style="background:#EBF8FF;color:#2B6CB0;" onclick="openPhaseModal(${_selectedPhaseIdx})">✏ 단계 수정</button>
+            <button class="btn-sm" style="background:#FED7D7;color:#C53030;" onclick="deletePhase(${_selectedPhaseIdx})">🗑 단계 삭제</button>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+        <div style="font-size:14px;font-weight:800;color:#1A202C;">운동 목록 <span style="font-size:12px;color:#718096;font-weight:600;">${ph.exercises.length}개</span></div>
+        <button class="btn-sm" style="background:#2F855A;color:#fff;padding:7px 14px;" onclick="openExModal(-1)">+ 운동 추가</button>
+      </div>
+
+      <div class="ex-table-wrap">
+        <table>
+          <thead><tr>
+            <th style="width:36px;text-align:center;">#</th>
+            <th>동작명</th>
+            <th style="text-align:center;">횟수</th>
+            <th style="text-align:center;">세트</th>
+            <th style="text-align:center;">도구</th>
+            <th>메모</th>
+            <th style="width:110px;">관리</th>
+          </tr></thead>
+          <tbody>${exRows || '<tr><td colspan="7" style="text-align:center;padding:30px;color:#A0AEC0;">운동을 추가하세요</td></tr>'}</tbody>
+        </table>
+      </div>
+    </div>`;
+}
+
+// ── 프로토콜 CRUD ─────────────────────────────────────
+function openProtoModal() {
+  document.getElementById('proto-modal-title').textContent = '🗓 프로토콜 등록';
+  document.getElementById('proto-edit-idx').value = '-1';
+  document.getElementById('proto-name-input').value = '';
+  document.getElementById('proto-cond-input').value = '';
+  document.getElementById('proto-weeks-input').value = '';
+  document.getElementById('proto-save-btn').textContent = '등록';
+  openModal('modal-protocol');
+}
+
+function editProtocol(idx) {
+  const p = protocolData[idx];
+  document.getElementById('proto-modal-title').textContent = '🗓 프로토콜 수정';
+  document.getElementById('proto-edit-idx').value = idx;
+  document.getElementById('proto-name-input').value = p.name;
+  document.getElementById('proto-cond-input').value = p.condition;
+  document.getElementById('proto-part-select').value = p.part;
+  document.getElementById('proto-weeks-input').value = p.totalWeeks;
+  document.getElementById('proto-save-btn').textContent = '저장';
+  openModal('modal-protocol');
+}
+
+function saveProtocol() {
+  const idx  = parseInt(document.getElementById('proto-edit-idx').value);
+  const name = document.getElementById('proto-name-input').value.trim();
+  if (!name) { alert('프로토콜명을 입력하세요.'); return; }
+  const obj = {
+    name,
+    condition:  document.getElementById('proto-cond-input').value.trim(),
+    part:       document.getElementById('proto-part-select').value,
+    totalWeeks: parseInt(document.getElementById('proto-weeks-input').value) || 12,
+    phases:     idx >= 0 ? protocolData[idx].phases : [],
+  };
+  if (idx >= 0) { protocolData[idx] = obj; showToast('✅ 프로토콜이 수정되었습니다.'); }
+  else {
+    protocolData.push(obj);
+    _selectedProtoIdx = protocolData.length - 1;
+    _selectedPhaseIdx = 0;
+    showToast('✅ 프로토콜이 등록되었습니다.');
+  }
+  closeModal('modal-protocol');
+  renderProtoList();
+  if (_selectedProtoIdx >= 0) renderProtoDetail();
+}
+
+function deleteProtocol(idx) {
+  if (!confirm(`"${protocolData[idx].name}"을 삭제하시겠습니까?`)) return;
+  protocolData.splice(idx, 1);
+  if (_selectedProtoIdx >= protocolData.length) _selectedProtoIdx = protocolData.length - 1;
+  renderProtoList();
+  if (_selectedProtoIdx >= 0) renderProtoDetail();
+  else document.getElementById('proto-detail').innerHTML = '<div class="empty-state" style="margin-top:60px;"><div class="icon">🗓</div><p>왼쪽에서 프로토콜을 선택하세요</p></div>';
+  showToast('🗑 프로토콜이 삭제되었습니다.');
+}
+
+// ── 단계(Phase) CRUD ─────────────────────────────────
+function openPhaseModal(phIdx) {
+  const isNew = phIdx < 0;
+  document.getElementById('phase-modal-title').textContent = isNew ? '단계 추가' : '단계 수정';
+  document.getElementById('phase-edit-idx').value = phIdx;
+  if (!isNew) {
+    const ph = protocolData[_selectedProtoIdx].phases[phIdx];
+    document.getElementById('phase-start-input').value = ph.weekStart;
+    document.getElementById('phase-end-input').value   = ph.weekEnd;
+    document.getElementById('phase-goal-input').value   = ph.goal;
+    document.getElementById('phase-caution-input').value = ph.caution;
+    document.getElementById('phase-save-btn').textContent = '저장';
+  } else {
+    document.getElementById('phase-start-input').value = '';
+    document.getElementById('phase-end-input').value   = '';
+    document.getElementById('phase-goal-input').value   = '';
+    document.getElementById('phase-caution-input').value = '';
+    document.getElementById('phase-save-btn').textContent = '추가';
+  }
+  openModal('modal-phase');
+}
+
+function savePhase() {
+  const phIdx = parseInt(document.getElementById('phase-edit-idx').value);
+  const ws = parseInt(document.getElementById('phase-start-input').value);
+  const we = parseInt(document.getElementById('phase-end-input').value);
+  if (!ws || !we || ws > we) { alert('주차를 올바르게 입력하세요.'); return; }
+  const obj = {
+    weekStart: ws, weekEnd: we,
+    goal:    document.getElementById('phase-goal-input').value.trim(),
+    caution: document.getElementById('phase-caution-input').value.trim(),
+    exercises: phIdx >= 0 ? protocolData[_selectedProtoIdx].phases[phIdx].exercises : [],
+  };
+  const phases = protocolData[_selectedProtoIdx].phases;
+  if (phIdx >= 0) { phases[phIdx] = obj; showToast('✅ 단계가 수정되었습니다.'); }
+  else {
+    phases.push(obj);
+    phases.sort((a,b) => a.weekStart - b.weekStart);
+    _selectedPhaseIdx = phases.findIndex(p => p.weekStart === ws);
+    showToast('✅ 단계가 추가되었습니다.');
+  }
+  closeModal('modal-phase');
+  renderPhaseTabs();
+}
+
+function deletePhase(phIdx) {
+  if (!confirm('이 단계를 삭제하시겠습니까?')) return;
+  protocolData[_selectedProtoIdx].phases.splice(phIdx, 1);
+  if (_selectedPhaseIdx >= protocolData[_selectedProtoIdx].phases.length) _selectedPhaseIdx = 0;
+  renderPhaseTabs();
+  showToast('🗑 단계가 삭제되었습니다.');
+}
+
+// ── 운동 CRUD ──────────────────────────────────────────
+function openExModal(exIdx) {
+  const isNew = exIdx < 0;
+  document.getElementById('ex-modal-title').textContent = isNew ? '운동 추가' : '운동 수정';
+  document.getElementById('ex-edit-idx').value = exIdx;
+  if (!isNew) {
+    const ex = protocolData[_selectedProtoIdx].phases[_selectedPhaseIdx].exercises[exIdx];
+    document.getElementById('ex-name-input').value = ex.name;
+    document.getElementById('ex-tool-input').value = ex.tool;
+    document.getElementById('ex-reps-input').value = ex.reps;
+    document.getElementById('ex-sets-input').value = ex.sets;
+    document.getElementById('ex-note-input').value = ex.note;
+    document.getElementById('ex-save-btn').textContent = '저장';
+  } else {
+    ['ex-name-input','ex-tool-input','ex-reps-input','ex-sets-input','ex-note-input'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('ex-save-btn').textContent = '추가';
+  }
+  openModal('modal-ex');
+}
+
+function saveExercise() {
+  const exIdx = parseInt(document.getElementById('ex-edit-idx').value);
+  const name  = document.getElementById('ex-name-input').value.trim();
+  if (!name) { alert('동작명을 입력하세요.'); return; }
+  const obj = {
+    name,
+    tool: document.getElementById('ex-tool-input').value.trim() || '없음',
+    reps: document.getElementById('ex-reps-input').value.trim(),
+    sets: document.getElementById('ex-sets-input').value.trim(),
+    note: document.getElementById('ex-note-input').value.trim(),
+  };
+  const exs = protocolData[_selectedProtoIdx].phases[_selectedPhaseIdx].exercises;
+  if (exIdx >= 0) { exs[exIdx] = obj; showToast('✅ 운동이 수정되었습니다.'); }
+  else            { exs.push(obj);   showToast('✅ 운동이 추가되었습니다.'); }
+  closeModal('modal-ex');
+  renderPhaseContent();
+}
+
+function editExercise(exIdx) { openExModal(exIdx); }
+
+function deleteExercise(exIdx) {
+  if (!confirm('이 운동을 삭제하시겠습니까?')) return;
+  protocolData[_selectedProtoIdx].phases[_selectedPhaseIdx].exercises.splice(exIdx, 1);
+  renderPhaseContent();
+  showToast('🗑 운동이 삭제되었습니다.');
 }
 
 // ── 초기화 ──────────────────────────────────────────
