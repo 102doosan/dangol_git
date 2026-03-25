@@ -420,17 +420,17 @@
         </div>
       </div>
 
-      <!-- 최근 처방 -->
+      <!-- 최근 운동 회원 -->
       <div class="card-wrap">
-        <div style="padding:16px 20px 0; display:flex; align-items:center; justify-content:space-between;">
-          <div style="font-size:15px;font-weight:800;">최근 처방 현황</div>
-          <button class="btn-sm" style="background:#C6F6D5;color:#276749;" onclick="showScreen('prescriptions', document.querySelectorAll('.sidebar-item')[4])">전체 보기</button>
+        <div style="padding:16px 20px 12px; display:flex; align-items:center; justify-content:space-between;">
+          <div style="font-size:15px;font-weight:800;">최근 운동 회원</div>
+          <input id="dash-member-search" class="search-input" style="margin-left:0;width:180px;" placeholder="🔍 회원명 검색" oninput="filterRecentMembers(this.value)" />
         </div>
         <table>
           <thead><tr>
-            <th>처방일</th><th>회원명</th><th>부위</th><th>프로그램</th><th>담당자</th><th>진행률</th><th>상태</th>
+            <th>최근 운동일</th><th>회원명</th><th>부위</th><th>프로그램</th><th>담당자</th><th>진행률</th><th>상태</th>
           </tr></thead>
-          <tbody id="recent-rx-tbody"></tbody>
+          <tbody id="recent-member-tbody"></tbody>
         </table>
       </div>
 
@@ -1163,28 +1163,50 @@ function showScreen(id, el) {
 }
 
 // ── 대시보드 ──────────────────────────────────────────
+// 최근 운동 회원 샘플 데이터 (실 서비스에서는 운동 세션 로그에서 생성)
+const recentMemberData = [
+  { date:'2026-03-25', member:'김민준', part:'knee',     prog:'무릎 전방십자인대 재활', trainer:'김민수 트레이너', progress:38, status:'active' },
+  { date:'2026-03-25', member:'이서연', part:'shoulder', prog:'어깨 회전근개 재활',      trainer:'이수진 트레이너', progress:62, status:'active' },
+  { date:'2026-03-24', member:'박도현', part:'back',     prog:'요통 코어 안정화',         trainer:'김민수 트레이너', progress:80, status:'active' },
+  { date:'2026-03-24', member:'정우진', part:'neck',     prog:'경추 자세 교정',           trainer:'최예은 트레이너', progress:52, status:'active' },
+  { date:'2026-03-23', member:'최수아', part:'ankle',    prog:'발목 염좌 재활',           trainer:'박지훈 트레이너', progress:100, status:'done'  },
+  { date:'2026-03-23', member:'강하은', part:'hip',      prog:'고관절 충돌증후군',         trainer:'이수진 트레이너', progress:27, status:'active' },
+  { date:'2026-03-22', member:'오태양', part:'knee',     prog:'무릎 전방십자인대 재활', trainer:'김민수 트레이너', progress:55, status:'active' },
+  { date:'2026-03-22', member:'한소희', part:'shoulder', prog:'어깨 충돌증후군 재활',      trainer:'박지훈 트레이너', progress:70, status:'active' },
+  { date:'2026-03-21', member:'윤재원', part:'back',     prog:'디스크 재활 프로그램',      trainer:'최예은 트레이너', progress:45, status:'hold'  },
+  { date:'2026-03-20', member:'장민서', part:'ankle',    prog:'발목 염좌 재활',           trainer:'이수진 트레이너', progress:90, status:'active' },
+];
+
+let _dashMemberSearch = '';
+
+function filterRecentMembers(val) {
+  _dashMemberSearch = val.trim();
+  renderRecentMembers();
+}
+
+function renderRecentMembers() {
+  const q = _dashMemberSearch;
+  const list = q ? recentMemberData.filter(r => r.member.includes(q)) : recentMemberData;
+  const statusBadge = { active:'badge-green', done:'badge-blue', hold:'badge-orange' };
+  const statusText  = { active:'진행 중', done:'완료', hold:'일시중단' };
+  document.getElementById('recent-member-tbody').innerHTML = list.map(r => `<tr>
+    <td style="color:#718096;font-size:12px;">${r.date}</td>
+    <td><strong>${r.member}</strong></td>
+    <td><span class="badge ${partBadge[r.part]}">${partMap[r.part]}</span></td>
+    <td>${r.prog}</td>
+    <td style="font-size:12px;color:#4A5568;">${r.trainer}</td>
+    <td style="min-width:130px;">
+      <div style="display:flex;align-items:center;gap:8px;">
+        <div class="progress-bar-wrap" style="flex:1;"><div class="progress-bar" style="width:${r.progress}%;"></div></div>
+        <span style="font-size:12px;font-weight:700;color:#2F855A;">${r.progress}%</span>
+      </div>
+    </td>
+    <td><span class="badge ${statusBadge[r.status]}">${statusText[r.status]}</span></td>
+  </tr>`).join('') || `<tr><td colspan="7" style="text-align:center;padding:24px;color:#A0AEC0;">검색 결과 없음</td></tr>`;
+}
+
 function renderDashboard() {
-  const tbody = document.getElementById('recent-rx-tbody');
-  tbody.innerHTML = rxData.slice(0,6).map((r,i) => {
-    const statusBadge = { active:'badge-green', done:'badge-blue', hold:'badge-orange' }[r.status];
-    const statusText  = { active:'진행 중', done:'완료', hold:'일시중단' }[r.status];
-    return `<tr>
-      <td>${r.date}</td>
-      <td><strong>${r.member}</strong></td>
-      <td><span class="badge ${partBadge[r.part]}">${partMap[r.part]}</span></td>
-      <td>${r.prog}</td>
-      <td>${r.trainer}</td>
-      <td style="min-width:120px;">
-        <div style="display:flex;align-items:center;gap:8px;">
-          <div class="progress-bar-wrap" style="flex:1;">
-            <div class="progress-bar" style="width:${r.progress}%;"></div>
-          </div>
-          <span style="font-size:12px;font-weight:700;color:#2F855A;">${r.progress}%</span>
-        </div>
-      </td>
-      <td><span class="badge ${statusBadge}">${statusText}</span></td>
-    </tr>`;
-  }).join('');
+  renderRecentMembers();
 
   // 부위별 통계
   const partCounts = {};
