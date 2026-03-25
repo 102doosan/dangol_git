@@ -3,708 +3,789 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>재활운동 화면 디자인</title>
+  <title>재활운동 프로토타입</title>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet" />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
     body {
       font-family: 'Noto Sans KR', sans-serif;
       background: #1A1A2E;
       min-height: 100vh;
-      display: flex; flex-direction: column; align-items: center;
-      padding: 24px 16px 48px; gap: 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 28px 16px 60px;
+      gap: 20px;
     }
 
     /* ── 툴바 ── */
     .toolbar {
-      width: 100%; max-width: 1100px;
-      display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+      width: 100%;
+      max-width: 480px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
     }
-    .toolbar-title { font-size: 18px; font-weight: 900; color: #fff; margin-right: auto; }
+    .toolbar-title {
+      font-size: 16px;
+      font-weight: 900;
+      color: #fff;
+      margin-right: auto;
+      letter-spacing: -0.3px;
+    }
     .screen-btn {
-      padding: 7px 15px; border-radius: 99px; border: none; cursor: pointer;
-      font-size: 12px; font-weight: 700; font-family: 'Noto Sans KR', sans-serif;
-      background: #2A2A4A; color: #A0AEC0; transition: all 0.2s;
+      padding: 6px 14px;
+      border-radius: 99px;
+      border: none;
+      cursor: pointer;
+      font-size: 11px;
+      font-weight: 700;
+      font-family: 'Noto Sans KR', sans-serif;
+      background: #2A2A4A;
+      color: #A0AEC0;
+      transition: all 0.18s;
     }
     .screen-btn.active { background: #E53E3E; color: #fff; }
     .screen-btn:hover:not(.active) { background: #3A3A5A; color: #fff; }
 
-    /* ── 워크스페이스 ── */
-    .workspace { width: 100%; max-width: 1100px; display: flex; gap: 32px; align-items: flex-start; }
-
     /* ── 폰 프레임 ── */
     .phone {
-      width: 375px; min-height: 740px; background: #fff;
+      width: 375px;
+      height: 780px;
+      background: #f5f5f5;
       border-radius: 44px;
-      box-shadow: 0 0 0 10px #111, 0 30px 80px rgba(0,0,0,0.6);
-      overflow: hidden; position: relative;
-      display: flex; flex-direction: column; flex-shrink: 0;
+      box-shadow: 0 0 0 10px #111, 0 32px 80px rgba(0,0,0,0.65);
+      overflow: hidden;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
     }
     .phone-notch {
-      position: absolute; top: 0; left: 50%; transform: translateX(-50%);
-      width: 120px; height: 28px; background: #111; border-radius: 0 0 18px 18px; z-index: 10;
+      position: absolute;
+      top: 0; left: 50%;
+      transform: translateX(-50%);
+      width: 120px; height: 28px;
+      background: #111;
+      border-radius: 0 0 18px 18px;
+      z-index: 20;
     }
-    .phone-screen { flex: 1; overflow: hidden; position: relative; margin-top: 28px; }
-    .screen-frame {
-      position: absolute; inset: 0;
-      display: none; flex-direction: column;
-      background: #FFF5F5; overflow-y: auto;
+    .phone-inner {
+      flex: 1;
+      margin-top: 28px;
+      overflow: hidden;
+      position: relative;
     }
-    .screen-frame.active { display: flex; }
 
-    /* ── 메모판 ── */
-    .memo-panel {
-      flex: 1; background: #16213E; border-radius: 20px; padding: 24px;
-      min-height: 600px; display: flex; flex-direction: column; gap: 14px;
+    /* ── 화면 공통 ── */
+    .screen {
+      position: absolute;
+      inset: 0;
+      display: none;
+      flex-direction: column;
+      background: #fff;
     }
-    .memo-panel h3 { font-size: 14px; font-weight: 800; color: #FC8181; letter-spacing: 1px; }
-    .memo-field { background: #0F3460; border-radius: 12px; padding: 14px 16px; }
-    .memo-field label { display: block; font-size: 11px; font-weight: 700; color: #FC8181; margin-bottom: 6px; }
-    .memo-field textarea, .memo-field input {
-      width: 100%; background: transparent; border: none; outline: none;
-      color: #E2E8F0; font-family: 'Noto Sans KR', sans-serif; font-size: 13px; resize: none;
-    }
-    .memo-field textarea { min-height: 70px; line-height: 1.6; }
-    .memo-divider { height: 1px; background: #1E3A5F; }
+    .screen.active { display: flex; }
 
-    /* ── 공통 앱 헤더 ── */
+    /* ── 앱 헤더 ── */
     .app-header {
-      background: #C53030; color: #fff;
-      padding: 14px 20px;
-      display: flex; align-items: center; gap: 12px; flex-shrink: 0;
-    }
-    .app-header .back { font-size: 18px; cursor: pointer; opacity: 0.9; }
-    .app-header .title { font-size: 17px; font-weight: 700; }
-    .app-header .count {
-      margin-left: auto; background: rgba(255,255,255,0.25);
-      border-radius: 99px; padding: 3px 12px; font-size: 12px; font-weight: 700;
-    }
-    .app-body { flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 12px; }
-
-    /* ────────────────────────────────────────
-       ① 메인: 시술·수술 카테고리 선택
-    ──────────────────────────────────────── */
-    .main-top {
-      background: linear-gradient(135deg, #C53030 0%, #E53E3E 60%, #FC8181 100%);
-      padding: 20px 20px 28px; color: #fff; flex-shrink: 0;
-    }
-    .main-top .sub { font-size: 13px; opacity: 0.85; margin-bottom: 4px; }
-    .main-top .heading { font-size: 22px; font-weight: 900; }
-    .main-top .desc { font-size: 13px; opacity: 0.8; margin-top: 6px; line-height: 1.5; }
-    .notice-box {
-      margin: 16px 16px 0;
-      background: #FFF5F5; border-radius: 12px; padding: 12px 14px;
-      border-left: 4px solid #FC8181; flex-shrink: 0;
-    }
-    .notice-box .notice-title { font-size: 11px; font-weight: 800; color: #E53E3E; margin-bottom: 4px; }
-    .notice-box .notice-text { font-size: 12px; color: #742A2A; line-height: 1.5; }
-    .section-label {
-      padding: 16px 16px 8px; font-size: 11px; font-weight: 800;
-      color: #718096; letter-spacing: 1.5px; flex-shrink: 0;
-    }
-    .cat-grid { padding: 0 16px 8px; display: flex; flex-direction: column; gap: 10px; }
-    .cat-card {
-      background: #fff; border-radius: 16px;
-      display: flex; align-items: center; gap: 14px;
+      background: #E53E3E;
+      color: #fff;
       padding: 14px 16px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.07);
-      cursor: pointer; transition: all 0.15s;
-      border: 2px solid transparent;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+      min-height: 54px;
     }
-    .cat-card:hover { border-color: #E53E3E; box-shadow: 0 4px 16px rgba(229,62,62,0.15); }
-    .cat-icon {
-      width: 48px; height: 48px; border-radius: 14px;
+    .app-header .header-title {
+      font-size: 17px;
+      font-weight: 900;
+      letter-spacing: -0.5px;
+      flex: 1;
+    }
+    .back-btn {
+      background: rgba(255,255,255,0.2);
+      border: none;
+      color: #fff;
+      width: 32px; height: 32px;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 15px;
       display: flex; align-items: center; justify-content: center;
-      font-size: 24px; flex-shrink: 0;
+      flex-shrink: 0;
+      transition: background 0.15s;
     }
-    .icon-red { background: #FFF5F5; }
-    .icon-orange { background: #FFFAF0; }
-    .icon-blue { background: #EBF8FF; }
-    .icon-purple { background: #FAF5FF; }
-    .cat-info { flex: 1; }
-    .cat-name { font-size: 15px; font-weight: 700; color: #1A202C; }
-    .cat-desc { font-size: 12px; color: #A0AEC0; margin-top: 2px; }
-    .cat-arrow { font-size: 18px; color: #CBD5E0; }
-    .type-badge {
-      font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 99px;
-    }
-    .badge-red { background: #FED7D7; color: #742A2A; }
-    .badge-orange { background: #FEEBC8; color: #744210; }
+    .back-btn:hover { background: rgba(255,255,255,0.35); }
 
-    /* ────────────────────────────────────────
-       ② 카테고리별 재활운동 목록
-    ──────────────────────────────────────── */
-    .stage-header {
-      background: #fff; padding: 12px 16px 0; flex-shrink: 0;
-      border-bottom: 1px solid #E2E8F0;
+    /* ── 탭 바 ── */
+    .tab-bar {
+      display: flex;
+      background: #fff;
+      border-bottom: 1px solid #e9ecef;
+      flex-shrink: 0;
     }
-    .stage-tabs { display: flex; gap: 0; }
-    .stage-tab {
-      flex: 1; padding: 10px 0; text-align: center;
-      font-size: 12px; font-weight: 700; color: #A0AEC0;
-      border-bottom: 2px solid transparent; cursor: pointer; transition: all 0.15s;
-    }
-    .stage-tab.on { color: #E53E3E; border-bottom-color: #E53E3E; }
-    .stage-info {
-      background: #FFF5F5; padding: 10px 16px;
-      font-size: 12px; color: #742A2A; flex-shrink: 0;
-      border-bottom: 1px solid #FED7D7;
-    }
-    .ex-item {
-      background: #fff; border-radius: 16px;
-      display: flex; align-items: center; gap: 12px;
-      padding: 14px 16px; box-shadow: 0 1px 6px rgba(0,0,0,0.06); cursor: pointer;
-    }
-    .check-box {
-      width: 24px; height: 24px; border-radius: 8px;
-      border: 2px solid #CBD5E0; flex-shrink: 0;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 14px; transition: all 0.15s;
-    }
-    .check-box.on { background: #E53E3E; border-color: #E53E3E; color: #fff; }
-    .ex-thumb {
-      width: 56px; height: 56px; border-radius: 14px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 26px; flex-shrink: 0;
-    }
-    .thumb-init { background: linear-gradient(135deg, #FC8181, #E53E3E); }
-    .thumb-mid  { background: linear-gradient(135deg, #F6AD55, #ED8936); }
-    .thumb-late { background: linear-gradient(135deg, #68D391, #38A169); }
-    .ex-info { flex: 1; }
-    .ex-name { font-size: 14px; font-weight: 700; color: #1A202C; }
-    .ex-meta { font-size: 12px; color: #A0AEC0; margin-top: 3px; }
-    .stage-badge {
-      font-size: 10px; font-weight: 700; padding: 3px 10px;
-      border-radius: 99px; flex-shrink: 0;
-    }
-    .s-init { background: #FED7D7; color: #742A2A; }
-    .s-mid  { background: #FEEBC8; color: #744210; }
-    .s-late { background: #C6F6D5; color: #276749; }
-    .select-bar {
-      background: #fff; border-top: 1px solid #E2E8F0;
-      padding: 12px 16px; display: flex; align-items: center; gap: 10px; flex-shrink: 0;
-    }
-    .select-bar .sel-count { font-size: 13px; font-weight: 700; color: #E53E3E; flex: 1; }
-    .btn-add {
-      background: #E53E3E; color: #fff; border: none; border-radius: 12px;
-      padding: 11px 18px; font-size: 13px; font-weight: 700; cursor: pointer;
+    .tab-btn {
+      flex: 1;
+      padding: 12px 0;
+      border: none;
+      background: transparent;
+      font-size: 13px;
+      font-weight: 600;
       font-family: 'Noto Sans KR', sans-serif;
+      color: #aaa;
+      cursor: pointer;
+      border-bottom: 3px solid transparent;
+      transition: all 0.15s;
+    }
+    .tab-btn.active {
+      color: #E53E3E;
+      border-bottom-color: #E53E3E;
     }
 
-    /* ────────────────────────────────────────
-       ③ 재활운동 상세
-    ──────────────────────────────────────── */
-    .detail-img {
-      width: 100%; height: 220px;
-      background: linear-gradient(135deg, #C53030 0%, #FC8181 100%);
-      display: flex; align-items: center; justify-content: center; font-size: 70px;
-      flex-shrink: 0; position: relative;
+    /* ── 스크롤 본문 ── */
+    .scroll-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
     }
-    .detail-back {
-      position: absolute; top: 14px; left: 16px;
-      background: rgba(0,0,0,0.3); border-radius: 50%;
-      width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;
-      color: #fff; font-size: 16px; cursor: pointer;
+    .scroll-body::-webkit-scrollbar { width: 3px; }
+    .scroll-body::-webkit-scrollbar-thumb { background: #ddd; border-radius: 99px; }
+
+    /* ── 탭 패널 ── */
+    .tab-panel { display: none; flex-direction: column; gap: 10px; }
+    .tab-panel.active { display: flex; }
+
+    /* ── 루틴 카드 ── */
+    .routine-card {
+      background: #fff;
+      border: 1px solid #f0f0f0;
+      border-radius: 14px;
+      padding: 14px 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      cursor: pointer;
+      transition: all 0.15s;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.06);
     }
-    .detail-body { padding: 20px 16px; display: flex; flex-direction: column; gap: 14px; overflow-y: auto; flex: 1; }
-    .detail-name { font-size: 22px; font-weight: 900; color: #1A202C; }
-    .detail-tags { display: flex; gap: 8px; flex-wrap: wrap; }
-    .tag { padding: 4px 12px; border-radius: 99px; font-size: 12px; font-weight: 700; }
-    .tag-red { background: #FED7D7; color: #742A2A; }
-    .tag-blue { background: #BEE3F8; color: #2A4365; }
-    .tag-orange { background: #FEEBC8; color: #744210; }
-    .section-title { font-size: 13px; font-weight: 800; color: #4A5568; letter-spacing: 0.5px; }
-    .set-info { display: flex; gap: 10px; }
-    .set-box {
-      flex: 1; background: #FFF5F5; border-radius: 12px; padding: 14px; text-align: center;
+    .routine-card:hover { border-color: #E53E3E; box-shadow: 0 2px 10px rgba(229,62,62,0.12); transform: translateY(-1px); }
+    .routine-card:active { transform: scale(0.98); }
+    .rc-icon {
+      width: 44px; height: 44px;
+      border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px;
+      flex-shrink: 0;
     }
-    .set-val { font-size: 22px; font-weight: 900; color: #E53E3E; }
-    .set-lbl { font-size: 11px; color: #FC8181; margin-top: 2px; font-weight: 700; }
-    .desc-box {
-      background: #F7FAFC; border-radius: 12px; padding: 14px 16px;
-      font-size: 13px; color: #4A5568; line-height: 1.7;
+    .rc-info { flex: 1; }
+    .rc-name { font-size: 14px; font-weight: 700; color: #1a1a1a; margin-bottom: 3px; }
+    .rc-meta { font-size: 11px; color: #888; }
+    .rc-arrow { font-size: 14px; color: #ccc; flex-shrink: 0; }
+
+    /* ── 프로그램 카드 ── */
+    .prog-card {
+      background: #fff;
+      border: 1px solid #f0f0f0;
+      border-radius: 14px;
+      padding: 14px 16px;
+      cursor: pointer;
+      transition: all 0.15s;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.06);
     }
-    .warn-box {
-      background: #FFF5F5; border-radius: 12px; padding: 14px 16px;
-      border-left: 4px solid #E53E3E;
+    .prog-card:hover { border-color: #E53E3E; box-shadow: 0 2px 10px rgba(229,62,62,0.12); transform: translateY(-1px); }
+    .prog-card:active { transform: scale(0.98); }
+    .pc-top { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+    .pc-icon {
+      width: 40px; height: 40px;
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px;
+      flex-shrink: 0;
     }
-    .warn-box .warn-title { font-size: 12px; font-weight: 800; color: #E53E3E; margin-bottom: 6px; }
-    .warn-box .warn-text { font-size: 13px; color: #742A2A; line-height: 1.7; }
-    .surgery-box {
-      background: #FFF0F0; border-radius: 12px; padding: 14px 16px;
+    .pc-name { font-size: 14px; font-weight: 700; color: #1a1a1a; flex: 1; }
+    .pc-meta { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+    .pc-tag {
+      font-size: 10px;
+      color: #666;
+      background: #f5f5f5;
+      padding: 2px 7px;
+      border-radius: 99px;
+    }
+    .badge {
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 99px;
+    }
+    .badge-green { background: #C6F6D5; color: #276749; }
+    .badge-orange { background: #FEEBC8; color: #9C4221; }
+    .badge-red { background: #FED7D7; color: #9B2C2C; }
+
+    /* ── 회복 루틴 상세 ── */
+    .timeline { display: flex; flex-direction: column; gap: 0; }
+    .week-item { border-radius: 12px; overflow: hidden; margin-bottom: 8px; border: 1px solid #f0f0f0; }
+    .week-header {
+      display: flex;
+      align-items: center;
+      padding: 13px 16px;
+      background: #fff;
+      cursor: pointer;
+      gap: 10px;
+      transition: background 0.12s;
+    }
+    .week-header:hover { background: #FFF5F5; }
+    .week-badge {
+      background: #E53E3E;
+      color: #fff;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 3px 9px;
+      border-radius: 99px;
+      flex-shrink: 0;
+    }
+    .week-goal { font-size: 12px; font-weight: 600; color: #333; flex: 1; }
+    .week-arrow { font-size: 12px; color: #ccc; transition: transform 0.2s; }
+    .week-arrow.open { transform: rotate(90deg); }
+    .week-body {
+      display: none;
+      border-top: 1px solid #f5f5f5;
+      background: #FFFAFA;
+    }
+    .week-body.open { display: block; }
+    .caution-box {
+      margin: 10px 14px 0;
+      background: #FFF5F5;
       border: 1px solid #FED7D7;
+      border-radius: 8px;
+      padding: 8px 12px;
+      font-size: 11px;
+      color: #C53030;
+      display: flex;
+      gap: 6px;
+      align-items: flex-start;
     }
-    .surgery-box .s-title { font-size: 12px; font-weight: 800; color: #C53030; margin-bottom: 8px; }
-    .surgery-box .s-item { font-size: 12px; color: #742A2A; line-height: 1.8; }
-    .btn-add-my {
-      background: #E53E3E; color: #fff; border: none; border-radius: 14px;
-      padding: 15px; font-size: 15px; font-weight: 700; cursor: pointer;
-      font-family: 'Noto Sans KR', sans-serif; width: 100%;
+    .ex-list { padding: 10px 14px 14px; display: flex; flex-direction: column; gap: 7px; }
+    .ex-item {
+      background: #fff;
+      border: 1px solid #f0f0f0;
+      border-radius: 8px;
+      padding: 9px 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+    }
+    .ex-name { font-size: 12px; font-weight: 600; color: #1a1a1a; }
+    .ex-reps { font-size: 11px; color: #E53E3E; font-weight: 700; white-space: nowrap; }
+    .ex-note { font-size: 10px; color: #888; margin-top: 2px; }
+
+    /* ── 재활 프로그램 상세 ── */
+    .prog-info-box {
+      background: #FFF5F5;
+      border-radius: 12px;
+      padding: 14px 16px;
+      margin-bottom: 4px;
+    }
+    .prog-info-title { font-size: 16px; font-weight: 900; color: #1a1a1a; margin-bottom: 10px; }
+    .prog-info-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+    }
+    .prog-info-item {
+      background: #fff;
+      border-radius: 8px;
+      padding: 8px 10px;
+      font-size: 11px;
+    }
+    .prog-info-label { color: #999; margin-bottom: 2px; }
+    .prog-info-value { font-weight: 700; color: #1a1a1a; font-size: 13px; }
+
+    .section-label {
+      font-size: 12px;
+      font-weight: 700;
+      color: #888;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 8px;
+      margin-top: 4px;
+    }
+    .motion-card {
+      background: #fff;
+      border: 1px solid #f0f0f0;
+      border-radius: 12px;
+      padding: 12px 14px;
+      margin-bottom: 7px;
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+    }
+    .motion-icon {
+      width: 38px; height: 38px;
+      border-radius: 10px;
+      background: #FFF5F5;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 17px;
+      flex-shrink: 0;
+    }
+    .motion-info { flex: 1; }
+    .motion-name { font-size: 13px; font-weight: 700; color: #1a1a1a; margin-bottom: 3px; }
+    .motion-reps { font-size: 11px; color: #E53E3E; font-weight: 600; margin-bottom: 3px; }
+    .motion-desc { font-size: 10px; color: #888; line-height: 1.5; }
+    .motion-simple {
+      background: #fff;
+      border: 1px solid #f0f0f0;
+      border-radius: 10px;
+      padding: 10px 14px;
+      margin-bottom: 7px;
+      font-size: 12px;
+      font-weight: 600;
+      color: #333;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .motion-simple::before { content: '•'; color: #E53E3E; font-size: 14px; }
+
+    .prog-note-box {
+      background: #FFF5F5;
+      border: 1px solid #FED7D7;
+      border-radius: 10px;
+      padding: 10px 14px;
+      font-size: 11px;
+      color: #C53030;
+      display: flex;
+      gap: 8px;
+      align-items: flex-start;
     }
 
-    /* ────────────────────────────────────────
-       ④ 나만의 재활운동 만들기
-    ──────────────────────────────────────── */
-    .make-header-sub {
-      background: #FFF5F5; padding: 12px 16px;
-      font-size: 13px; color: #742A2A; font-weight: 600; flex-shrink: 0;
-      border-bottom: 1px solid #FED7D7;
+    /* ── 빈 상태 ── */
+    .empty-state {
+      text-align: center;
+      padding: 40px 20px;
+      color: #ccc;
+      font-size: 13px;
     }
-    .title-input-wrap { background: #fff; border-radius: 14px; padding: 14px 16px; box-shadow: 0 1px 6px rgba(0,0,0,0.06); }
-    .title-input-wrap label { font-size: 11px; font-weight: 800; color: #E53E3E; display: block; margin-bottom: 6px; }
-    .title-input-wrap input {
-      width: 100%; border: none; outline: none; border-bottom: 2px solid #E2E8F0;
-      font-size: 16px; font-weight: 700; color: #1A202C; padding: 4px 0;
-      font-family: 'Noto Sans KR', sans-serif; background: transparent;
-    }
-    .my-ex-item {
-      background: #fff; border-radius: 14px; padding: 14px 16px;
-      display: flex; align-items: center; gap: 12px;
-      box-shadow: 0 1px 6px rgba(0,0,0,0.06);
-    }
-    .drag-handle { font-size: 18px; color: #CBD5E0; cursor: grab; }
-    .my-ex-num {
-      width: 26px; height: 26px; border-radius: 50%;
-      background: #E53E3E; color: #fff; font-size: 12px; font-weight: 700;
-      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
-    }
-    .my-ex-info { flex: 1; }
-    .my-ex-name { font-size: 14px; font-weight: 700; color: #1A202C; }
-    .my-ex-detail { font-size: 12px; color: #A0AEC0; margin-top: 2px; }
-    .my-ex-del { font-size: 18px; color: #FC8181; cursor: pointer; }
-    .btn-save-wrap { padding: 0 16px 16px; flex-shrink: 0; }
-    .btn-save {
-      background: #E53E3E; color: #fff; border: none; border-radius: 14px;
-      padding: 15px; font-size: 15px; font-weight: 700; cursor: pointer;
-      font-family: 'Noto Sans KR', sans-serif; width: 100%;
-    }
-
-    /* ────────────────────────────────────────
-       ⑤ 저장 완료
-    ──────────────────────────────────────── */
-    .done-body {
-      flex: 1; display: flex; flex-direction: column;
-      align-items: center; justify-content: center;
-      padding: 32px 24px; gap: 16px; text-align: center;
-    }
-    .done-icon { font-size: 80px; }
-    .done-title { font-size: 22px; font-weight: 900; color: #1A202C; }
-    .done-sub { font-size: 14px; color: #718096; line-height: 1.6; }
-    .done-card {
-      background: #FFF5F5; border-radius: 16px; padding: 16px 20px;
-      border: 2px solid #FED7D7; width: 100%; text-align: left;
-    }
-    .done-card .dc-label { font-size: 11px; font-weight: 800; color: #E53E3E; margin-bottom: 6px; }
-    .done-card .dc-name { font-size: 16px; font-weight: 900; color: #1A202C; }
-    .done-card .dc-count { font-size: 13px; color: #718096; margin-top: 4px; }
-    .btn-routine {
-      background: #E53E3E; color: #fff; border: none; border-radius: 14px;
-      padding: 15px; font-size: 15px; font-weight: 700; cursor: pointer;
-      font-family: 'Noto Sans KR', sans-serif; width: 100%;
-    }
-    .btn-outline {
-      background: #fff; color: #E53E3E; border: 2px solid #E53E3E; border-radius: 14px;
-      padding: 13px; font-size: 14px; font-weight: 700; cursor: pointer;
-      font-family: 'Noto Sans KR', sans-serif; width: 100%;
-    }
+    .empty-state .empty-icon { font-size: 36px; margin-bottom: 10px; }
   </style>
 </head>
 <body>
 
+<!-- 툴바 -->
 <div class="toolbar">
-  <span class="toolbar-title">🩺 재활운동 화면 디자인</span>
-  <button class="screen-btn active" onclick="go('main')">① 메인</button>
-  <button class="screen-btn" onclick="go('list')">② 재활운동 목록</button>
-  <button class="screen-btn" onclick="go('detail')">③ 운동 상세</button>
-  <button class="screen-btn" onclick="go('make')">④ 나만의 재활운동</button>
-  <button class="screen-btn" onclick="go('done')">⑤ 저장 완료</button>
+  <span class="toolbar-title">📱 재활운동 프로토타입</span>
+  <button class="screen-btn active" onclick="go('main')">① 메인/홈</button>
+  <button class="screen-btn" onclick="go('routine')">② 회복 루틴 상세</button>
+  <button class="screen-btn" onclick="go('program')">③ 재활 프로그램 상세</button>
 </div>
 
-<div class="workspace">
+<!-- 폰 프레임 -->
+<div class="phone">
+  <div class="phone-notch"></div>
+  <div class="phone-inner">
 
-  <!-- 폰 프레임 -->
-  <div class="phone">
-    <div class="phone-notch"></div>
-    <div class="phone-screen">
-
-      <!-- ① 메인 -->
-      <div class="screen-frame active" id="screen-main">
-        <div class="main-top">
-          <div class="sub">🩺 재활운동</div>
-          <div class="heading">시술·수술별<br>재활운동</div>
-          <div class="desc">해당하는 카테고리를 선택해<br>맞춤 재활운동을 시작하세요</div>
-        </div>
-        <div class="notice-box">
-          <div class="notice-title">⚠ 주의사항</div>
-          <div class="notice-text">재활운동은 담당 트레이너 또는 의료진의 지도 하에 진행하세요. 통증 발생 시 즉시 중단하세요.</div>
-        </div>
-        <div class="section-label">💊 시술</div>
-        <div class="cat-grid">
-          <div class="cat-card" onclick="go('list')">
-            <div class="cat-icon icon-red">💉</div>
-            <div class="cat-info">
-              <div class="cat-name">디스크 시술</div>
-              <div class="cat-desc">경막외 차단술·신경성형술 후 재활</div>
-            </div>
-            <span class="type-badge badge-red">시술</span>
-            <span class="cat-arrow">›</span>
-          </div>
-        </div>
-        <div class="section-label">🔪 수술</div>
-        <div class="cat-grid" style="padding-bottom:16px;">
-          <div class="cat-card" onclick="go('list')">
-            <div class="cat-icon icon-orange">🦴</div>
-            <div class="cat-info">
-              <div class="cat-name">디스크 수술</div>
-              <div class="cat-desc">추간판 절제술·유합술 후 재활</div>
-            </div>
-            <span class="type-badge badge-orange">수술</span>
-            <span class="cat-arrow">›</span>
-          </div>
-          <div class="cat-card" onclick="go('list')">
-            <div class="cat-icon icon-blue">🦷</div>
-            <div class="cat-info">
-              <div class="cat-name">목척추 수술</div>
-              <div class="cat-desc">경추 수술 후 재활</div>
-            </div>
-            <span class="type-badge badge-orange">수술</span>
-            <span class="cat-arrow">›</span>
-          </div>
-          <div class="cat-card" onclick="go('list')">
-            <div class="cat-icon icon-red">🔩</div>
-            <div class="cat-info">
-              <div class="cat-name">허리척추 수술</div>
-              <div class="cat-desc">요추 수술 후 재활</div>
-            </div>
-            <span class="type-badge badge-orange">수술</span>
-            <span class="cat-arrow">›</span>
-          </div>
-          <div class="cat-card" onclick="go('list')">
-            <div class="cat-icon icon-purple">🦵</div>
-            <div class="cat-info">
-              <div class="cat-name">무릎 인공관절</div>
-              <div class="cat-desc">TKA(전치환술) 후 재활</div>
-            </div>
-            <span class="type-badge badge-orange">수술</span>
-            <span class="cat-arrow">›</span>
-          </div>
-          <div class="cat-card" onclick="go('list')">
-            <div class="cat-icon icon-orange">🏥</div>
-            <div class="cat-info">
-              <div class="cat-name">무릎 수술</div>
-              <div class="cat-desc">십자인대·반월상연골 수술 후 재활</div>
-            </div>
-            <span class="type-badge badge-orange">수술</span>
-            <span class="cat-arrow">›</span>
-          </div>
-          <div class="cat-card" onclick="go('list')">
-            <div class="cat-icon icon-blue">🦷</div>
-            <div class="cat-info">
-              <div class="cat-name">엉덩이 인공관절</div>
-              <div class="cat-desc">THA(고관절 치환술) 후 재활</div>
-            </div>
-            <span class="type-badge badge-orange">수술</span>
-            <span class="cat-arrow">›</span>
-          </div>
-          <div class="cat-card" onclick="go('list')">
-            <div class="cat-icon icon-purple">💪</div>
-            <div class="cat-info">
-              <div class="cat-name">어깨 수술</div>
-              <div class="cat-desc">회전근개·관절경 수술 후 재활</div>
-            </div>
-            <span class="type-badge badge-orange">수술</span>
-            <span class="cat-arrow">›</span>
-          </div>
-        </div>
+    <!-- ① 메인 화면 -->
+    <div class="screen active" id="screen-main">
+      <div class="app-header">
+        <span class="header-title">🩺 재활운동</span>
       </div>
-
-      <!-- ② 카테고리별 재활운동 목록 -->
-      <div class="screen-frame" id="screen-list">
-        <div class="app-header">
-          <span class="back" onclick="go('main')">←</span>
-          <span class="title">디스크 시술</span>
-          <span class="count">1개 선택</span>
-        </div>
-        <div class="stage-header">
-          <div class="stage-tabs">
-            <div class="stage-tab on">초기</div>
-            <div class="stage-tab">중기</div>
-            <div class="stage-tab">후기</div>
-          </div>
-        </div>
-        <div class="stage-info">
-          🗓 시술 후 1~4주 · 통증 완화 및 기본 안정화 운동
-        </div>
-        <div class="app-body">
-          <div class="ex-item" onclick="go('detail')">
-            <div class="check-box on">✓</div>
-            <div class="ex-thumb thumb-init">🧘</div>
-            <div class="ex-info">
-              <div class="ex-name">누운 자세 무릎 당기기</div>
-              <div class="ex-meta">2세트 × 10회 · 약 5분</div>
-            </div>
-            <span class="stage-badge s-init">초기</span>
-          </div>
-          <div class="ex-item" onclick="go('detail')">
-            <div class="check-box"></div>
-            <div class="ex-thumb thumb-init">🌊</div>
-            <div class="ex-info">
-              <div class="ex-name">골반 기울이기 운동</div>
-              <div class="ex-meta">3세트 × 15회 · 약 7분</div>
-            </div>
-            <span class="stage-badge s-init">초기</span>
-          </div>
-          <div class="ex-item" onclick="go('detail')">
-            <div class="check-box"></div>
-            <div class="ex-thumb thumb-init">🦵</div>
-            <div class="ex-info">
-              <div class="ex-name">복식 호흡 운동</div>
-              <div class="ex-meta">3세트 × 20회 · 약 10분</div>
-            </div>
-            <span class="stage-badge s-init">초기</span>
-          </div>
-          <div class="ex-item" onclick="go('detail')">
-            <div class="check-box"></div>
-            <div class="ex-thumb thumb-mid">🏋️</div>
-            <div class="ex-info">
-              <div class="ex-name">맥켄지 신전 운동</div>
-              <div class="ex-meta">3세트 × 10회 · 약 8분</div>
-            </div>
-            <span class="stage-badge s-mid">중기</span>
-          </div>
-          <div class="ex-item" onclick="go('detail')">
-            <div class="check-box"></div>
-            <div class="ex-thumb thumb-mid">💪</div>
-            <div class="ex-info">
-              <div class="ex-name">코어 안정화 (데드버그)</div>
-              <div class="ex-meta">3세트 × 10회 · 약 10분</div>
-            </div>
-            <span class="stage-badge s-mid">중기</span>
-          </div>
-        </div>
-        <div class="select-bar">
-          <span class="sel-count">1개 선택됨</span>
-          <button class="btn-add" onclick="go('make')">나만의 운동에 추가 →</button>
-        </div>
+      <div class="tab-bar">
+        <button class="tab-btn active" id="tab-btn-routine" onclick="switchTab('routine')">🗓 회복 루틴</button>
+        <button class="tab-btn" id="tab-btn-program" onclick="switchTab('program')">📋 재활 프로그램</button>
       </div>
-
-      <!-- ③ 재활운동 상세 -->
-      <div class="screen-frame" id="screen-detail">
-        <div class="detail-img">
-          <div class="detail-back" onclick="go('list')">←</div>
-          🧘
-        </div>
-        <div class="detail-body">
-          <div class="detail-name">누운 자세 무릎 당기기</div>
-          <div class="detail-tags">
-            <span class="tag tag-red">초기</span>
-            <span class="tag tag-blue">디스크 시술</span>
-            <span class="tag tag-orange">허리</span>
-          </div>
-          <div class="set-info">
-            <div class="set-box">
-              <div class="set-val">2</div>
-              <div class="set-lbl">세트</div>
-            </div>
-            <div class="set-box">
-              <div class="set-val">10</div>
-              <div class="set-lbl">회</div>
-            </div>
-            <div class="set-box">
-              <div class="set-val">5분</div>
-              <div class="set-lbl">예상시간</div>
-            </div>
-          </div>
-          <div>
-            <div class="section-title" style="margin-bottom:8px;">운동 방법</div>
-            <div class="desc-box">
-              1. 바닥에 등을 대고 눕습니다.<br>
-              2. 한쪽 무릎을 가슴 쪽으로 천천히 당깁니다.<br>
-              3. 10~15초 유지 후 천천히 내립니다.<br>
-              4. 반대쪽도 동일하게 반복합니다.
-            </div>
-          </div>
-          <div>
-            <div class="section-title" style="margin-bottom:8px;">시술 후 주의사항</div>
-            <div class="surgery-box">
-              <div class="s-title">🩺 디스크 시술 후 공통 주의사항</div>
-              <div class="s-item">
-                · 시술 후 24시간은 안정을 취하세요<br>
-                · 허리를 과도하게 구부리거나 비틀지 마세요<br>
-                · 통증 악화 시 즉시 중단하고 연락하세요<br>
-                · 무거운 물건(5kg 이상) 들기 금지
-              </div>
-            </div>
-          </div>
-          <div>
-            <div class="section-title" style="margin-bottom:8px;">운동 주의</div>
-            <div class="warn-box">
-              <div class="warn-title">⚠ 주의</div>
-              <div class="warn-text">날카로운 통증이나 다리 저림이 심해지면 즉시 중단하세요. 통증 없는 범위 내에서만 진행합니다.</div>
-            </div>
-          </div>
-        </div>
-        <div style="padding: 0 16px 16px; flex-shrink:0;">
-          <button class="btn-add-my" onclick="go('make')">+ 나만의 운동에 추가</button>
-        </div>
+      <div class="scroll-body" id="main-scroll">
+        <!-- 회복 루틴 탭 -->
+        <div class="tab-panel active" id="panel-routine"></div>
+        <!-- 재활 프로그램 탭 -->
+        <div class="tab-panel" id="panel-program"></div>
       </div>
-
-      <!-- ④ 나만의 재활운동 만들기 -->
-      <div class="screen-frame" id="screen-make">
-        <div class="app-header">
-          <span class="back" onclick="go('list')">←</span>
-          <span class="title">나만의 재활운동 만들기</span>
-        </div>
-        <div class="make-header-sub">
-          ✅ 선택한 재활운동 순서를 조정하고 제목을 입력하세요
-        </div>
-        <div class="app-body">
-          <div class="title-input-wrap">
-            <label>운동 제목</label>
-            <input type="text" placeholder="예) 디스크 시술 후 초기 재활" value="디스크 시술 초기 재활 루틴" />
-          </div>
-          <div class="my-ex-item">
-            <span class="drag-handle">⠿</span>
-            <div class="my-ex-num">1</div>
-            <div class="my-ex-info">
-              <div class="my-ex-name">누운 자세 무릎 당기기</div>
-              <div class="my-ex-detail">2세트 × 10회 · 초기</div>
-            </div>
-            <span class="my-ex-del">✕</span>
-          </div>
-          <div class="my-ex-item">
-            <span class="drag-handle">⠿</span>
-            <div class="my-ex-num">2</div>
-            <div class="my-ex-info">
-              <div class="my-ex-name">골반 기울이기 운동</div>
-              <div class="my-ex-detail">3세트 × 15회 · 초기</div>
-            </div>
-            <span class="my-ex-del">✕</span>
-          </div>
-          <div class="my-ex-item">
-            <span class="drag-handle">⠿</span>
-            <div class="my-ex-num">3</div>
-            <div class="my-ex-info">
-              <div class="my-ex-name">복식 호흡 운동</div>
-              <div class="my-ex-detail">3세트 × 20회 · 초기</div>
-            </div>
-            <span class="my-ex-del">✕</span>
-          </div>
-          <div style="border: 2px dashed #FED7D7; border-radius: 14px; padding: 16px; text-align:center; color:#FC8181; font-size:13px; font-weight:600; cursor:pointer;" onclick="go('list')">
-            + 운동 더 추가하기
-          </div>
-        </div>
-        <div class="btn-save-wrap">
-          <button class="btn-save" onclick="go('done')">마이루틴에 저장</button>
-        </div>
-      </div>
-
-      <!-- ⑤ 저장 완료 -->
-      <div class="screen-frame" id="screen-done">
-        <div class="done-body">
-          <div class="done-icon">✅</div>
-          <div class="done-title">저장 완료!</div>
-          <div class="done-sub">나만의 재활운동이 마이루틴에 추가됐어요.<br>꾸준히 따라 해보세요.</div>
-          <div class="done-card">
-            <div class="dc-label">🩺 저장된 재활운동</div>
-            <div class="dc-name">디스크 시술 초기 재활 루틴</div>
-            <div class="dc-count">운동 3개 · 약 22분</div>
-          </div>
-          <button class="btn-routine">마이루틴에서 보기 →</button>
-          <button class="btn-outline" onclick="go('main')">다른 재활운동 더 보기</button>
-        </div>
-      </div>
-
     </div>
+
+    <!-- ② 회복 루틴 상세 -->
+    <div class="screen" id="screen-routine">
+      <div class="app-header">
+        <button class="back-btn" onclick="go('main')">←</button>
+        <span class="header-title" id="routine-header-title">회복 루틴 상세</span>
+      </div>
+      <div class="scroll-body" id="routine-scroll">
+        <div class="timeline" id="routine-timeline"></div>
+      </div>
+    </div>
+
+    <!-- ③ 재활 프로그램 상세 -->
+    <div class="screen" id="screen-program">
+      <div class="app-header">
+        <button class="back-btn" onclick="go('main')">←</button>
+        <span class="header-title" id="program-header-title">재활 프로그램 상세</span>
+      </div>
+      <div class="scroll-body" id="program-scroll">
+        <div id="program-detail"></div>
+      </div>
+    </div>
+
   </div>
-
-  <!-- 메모판 -->
-  <div class="memo-panel">
-    <h3>🩺 재활운동 화면 메모</h3>
-
-    <div class="memo-field">
-      <label>현재 화면</label>
-      <input type="text" id="memo-screen-name" value="① 메인 — 시술·수술 카테고리 선택" readonly />
-    </div>
-
-    <div class="memo-divider"></div>
-
-    <div class="memo-field">
-      <label>화면 설명 / 목적</label>
-      <textarea placeholder="이 화면의 역할과 목적..."></textarea>
-    </div>
-
-    <div class="memo-field">
-      <label>주요 컴포넌트</label>
-      <textarea placeholder="버튼, 카드, 탭 등 UI 요소..."></textarea>
-    </div>
-
-    <div class="memo-field">
-      <label>UX 고려사항</label>
-      <textarea placeholder="사용자 흐름, 예외 처리, 피드백..."></textarea>
-    </div>
-
-    <div class="memo-field">
-      <label>개발 메모</label>
-      <textarea placeholder="API, 상태 관리, 조건부 렌더링..."></textarea>
-    </div>
-
-    <div class="memo-divider"></div>
-
-    <div class="memo-field">
-      <label>화면 흐름</label>
-      <textarea readonly style="color:#FC8181; font-size:12px;">① 메인 (시술·수술 카테고리 선택)
-  ↓ 카테고리 클릭
-② 재활운동 목록
-  (초기 / 중기 / 후기 탭)
-  ↓ 운동 클릭
-③ 재활운동 상세
-  (운동 방법 + 시술 후 주의사항)
-  ↓ [나만의 운동에 추가]
-④ 나만의 재활운동 만들기
-  ↓ [마이루틴에 저장]
-⑤ 저장 완료 → 마이루틴으로 이동</textarea>
-    </div>
-
-    <div class="memo-divider"></div>
-
-    <div class="memo-field">
-      <label>카테고리 목록 (8종)</label>
-      <textarea readonly style="color:#A0AEC0; font-size:12px;">💉 시술
-  - 디스크 시술
-
-🔪 수술
-  - 디스크 수술
-  - 목척추 수술
-  - 허리척추 수술
-  - 무릎 인공관절
-  - 무릎 수술
-  - 엉덩이 인공관절
-  - 어깨 수술</textarea>
-    </div>
-  </div>
-
 </div>
 
 <script>
-  const screenNames = {
-    main:   '① 메인 — 시술·수술 카테고리 선택',
-    list:   '② 재활운동 목록 (초기·중기·후기)',
-    detail: '③ 재활운동 상세',
-    make:   '④ 나만의 재활운동 만들기',
-    done:   '⑤ 저장 완료',
-  };
+/* ── 데이터 ── */
+const partMap  = { shoulder:'어깨', knee:'무릎', back:'허리', ankle:'발목', neck:'목', hip:'고관절', etc:'기타' };
+const partIcon = { shoulder:'🦾', knee:'🦵', back:'🧘', ankle:'🦶', neck:'🦒', hip:'🍑', etc:'⭕' };
+const partBg   = { shoulder:'#EBF8FF', knee:'#F0FFF4', back:'#FFFAF0', ankle:'#FAF5FF', neck:'#FFF5F5', hip:'#FEFCBF', etc:'#F7FAFC' };
+const levelBadge = { '초급':'badge-green', '중급':'badge-orange', '고급':'badge-red' };
 
-  function go(id) {
-    document.querySelectorAll('.screen-frame').forEach(el => el.classList.remove('active'));
-    document.querySelectorAll('.screen-btn').forEach(el => el.classList.remove('active'));
-    document.getElementById('screen-' + id).classList.add('active');
-    document.querySelectorAll('.screen-btn').forEach(btn => {
-      if (btn.getAttribute('onclick').includes("'" + id + "'")) btn.classList.add('active');
+const progData = [
+  { part:'shoulder', name:'어깨 회전근개 재활', level:'초급', duration:'6주', freq:'주 3회', time:'40', motions:['펜들럼 스트레칭','어깨 외회전','밴드 내회전','월 슬라이드'], note:'급성기 통증 시 중단', active:true, count:8 },
+  { part:'shoulder', name:'오십견 가동성 향상', level:'중급', duration:'8주', freq:'주 4회', time:'50', motions:['크로스 바디 스트레칭','타월 스트레칭','어깨 굴곡 강화'], note:'', active:true, count:5 },
+  { part:'knee', name:'무릎 전방십자인대 재활', level:'중급', duration:'12주', freq:'주 3회', time:'60', motions:['쿼드셋','SLR 운동','클램쉘','미니 스쿼트'], note:'완전 신전 금지 초기 2주', active:true, count:6 },
+  { part:'back', name:'요통 코어 안정화', level:'초급', duration:'4주', freq:'주 3회', time:'30', motions:['맥켄지 신전 운동','코어 안정화 운동','고관절 스트레칭'], note:'', active:true, count:12 },
+  { part:'ankle', name:'발목 염좌 재활', level:'초급', duration:'4주', freq:'주 4회', time:'30', motions:['알파벳 쓰기','밸런스 보드','카프 레이즈'], note:'', active:true, count:7 },
+  { part:'neck', name:'경추 자세 교정', level:'초급', duration:'4주', freq:'주 3회', time:'30', motions:['턱 당기기','경추 굴곡','어깨 수축'], note:'', active:true, count:9 },
+  { part:'hip', name:'고관절 충돌증후군', level:'중급', duration:'8주', freq:'주 3회', time:'45', motions:['엉덩이 스트레칭','클램쉘','힙 힌지'], note:'', active:true, count:2 },
+];
+
+const motionData = [
+  { part:'shoulder', name:'펜들럼 스트레칭', level:'초급', icon:'🫨', reps:'10회 × 3세트', tool:'없음', desc:'상체를 앞으로 숙이고 팔을 자연스럽게 늘어뜨린 후 원을 그리듯 흔든다' },
+  { part:'shoulder', name:'어깨 외회전', level:'초급', icon:'🔄', reps:'15회 × 3세트', tool:'탄력밴드', desc:'탄력밴드를 이용해 팔꿈치를 90도 구부리고 바깥쪽으로 회전' },
+  { part:'shoulder', name:'월 슬라이드', level:'초급', icon:'🖐', reps:'10회 × 2세트', tool:'없음', desc:'벽에 손을 대고 위아래로 천천히 미끄러뜨린다' },
+  { part:'knee', name:'쿼드셋', level:'초급', icon:'🦵', reps:'10회 × 3세트 유지 5초', tool:'수건', desc:'무릎 아래 수건을 받치고 무릎을 꽉 누르며 대퇴사두근 수축' },
+  { part:'knee', name:'SLR 운동', level:'초급', icon:'🦿', reps:'15회 × 3세트', tool:'없음', desc:'누워서 한쪽 다리를 곧게 들어 올린다. 발목은 90도 유지' },
+  { part:'back', name:'맥켄지 신전 운동', level:'초급', icon:'🧘', reps:'10회 × 3세트', tool:'없음', desc:'엎드린 자세에서 상체를 팔꿈치로 받쳐 허리를 신전시킨다' },
+  { part:'back', name:'코어 안정화 운동', level:'초급', icon:'💪', reps:'15회 × 3세트', tool:'없음', desc:'복부에 힘을 주며 허리를 안정화하는 기본 코어 운동' },
+  { part:'ankle', name:'알파벳 쓰기', level:'초급', icon:'🔤', reps:'A-Z × 2세트', tool:'없음', desc:'발목으로 공중에 알파벳을 쓰듯 움직여 가동범위를 회복한다' },
+  { part:'ankle', name:'카프 레이즈', level:'초급', icon:'👟', reps:'20회 × 3세트', tool:'없음', desc:'발끝으로 서서 종아리 근육을 수축·이완시킨다' },
+  { part:'neck', name:'턱 당기기', level:'초급', icon:'😤', reps:'10회 × 3세트', tool:'없음', desc:'턱을 뒤로 당겨 경추를 정렬하는 운동' },
+  { part:'hip', name:'클램쉘', level:'초급', icon:'🦀', reps:'15회 × 3세트', tool:'탄력밴드', desc:'옆으로 누워 무릎을 벌렸다 닫는 고관절 외전 운동' },
+  { part:'hip', name:'힙 힌지', level:'초급', icon:'🍑', reps:'10회 × 3세트', tool:'없음', desc:'엉덩이를 뒤로 밀며 상체를 숙이는 고관절 힌지 패턴' },
+];
+
+const rxCatList = [
+  { id:1, name:'디스크 시술', part:'back' },
+  { id:2, name:'무릎 인공관절 수술', part:'knee' },
+  { id:3, name:'어깨 회전근개 수술', part:'shoulder' },
+  { id:4, name:'발목 인대 재건술', part:'ankle' },
+  { id:5, name:'경추 디스크 수술', part:'neck' },
+];
+
+const rxTemplates = [
+  { catId:1, weekStart:1, weekEnd:2, goal:'안정화 및 급성 통증 조절', caution:'앞으로 굽히는 동작 금지', exercises:[
+    { name:'복식 호흡', reps:'5분', sets:'1', rest:'', note:'' },
+    { name:'맥킨지 신전', reps:'10회', sets:'3', rest:'30초', note:'통증 없는 범위 내' },
+    { name:'발목 펌핑', reps:'20회', sets:'2', rest:'', note:'누운 자세' },
+  ]},
+  { catId:1, weekStart:3, weekEnd:4, goal:'유연성 회복 및 코어 안정화 시작', caution:'앞 굴곡 30도 이하', exercises:[
+    { name:'맥킨지 신전', reps:'10회', sets:'3', rest:'30초', note:'' },
+    { name:'브릿지', reps:'10회', sets:'3', rest:'60초', note:'천천히' },
+    { name:'캣-카우', reps:'10회', sets:'2', rest:'', note:'' },
+  ]},
+  { catId:1, weekStart:5, weekEnd:8, goal:'근력 강화 및 기능 회복', caution:'고강도 굴곡 주의', exercises:[
+    { name:'브릿지', reps:'15회', sets:'3', rest:'60초', note:'' },
+    { name:'버드독', reps:'10회', sets:'3', rest:'60초', note:'좌우 교대' },
+    { name:'플랭크', reps:'30초', sets:'3', rest:'60초', note:'' },
+    { name:'스쿼트', reps:'12회', sets:'3', rest:'90초', note:'낮은 범위' },
+  ]},
+  { catId:1, weekStart:9, weekEnd:12, goal:'일상 복귀 및 재발 방지', caution:'', exercises:[
+    { name:'버드독', reps:'15회', sets:'3', rest:'60초', note:'' },
+    { name:'데드버그', reps:'10회', sets:'3', rest:'60초', note:'' },
+    { name:'런지', reps:'10회', sets:'3', rest:'90초', note:'좌우 교대' },
+  ]},
+  { catId:2, weekStart:1, weekEnd:2, goal:'부종 감소, 기본 가동범위 회복', caution:'전체 체중 부하 금지', exercises:[
+    { name:'발목 펌핑', reps:'20회', sets:'3', rest:'', note:'시간당 1회' },
+    { name:'쿼드셋', reps:'10회', sets:'3', rest:'', note:'유지 5초' },
+    { name:'SLR 운동', reps:'10회', sets:'2', rest:'', note:'통증 시 중단' },
+  ]},
+  { catId:2, weekStart:3, weekEnd:4, goal:'보행 정상화, 굴곡 90도 목표', caution:'무릎 과신전 주의', exercises:[
+    { name:'미니 스쿼트', reps:'10회', sets:'3', rest:'60초', note:'0~30도' },
+    { name:'레그 프레스', reps:'10회', sets:'3', rest:'60초', note:'낮은 저항' },
+    { name:'스텝업', reps:'10회', sets:'2', rest:'60초', note:'낮은 계단' },
+  ]},
+  { catId:2, weekStart:5, weekEnd:8, goal:'근력 강화, 굴곡 120도 목표', caution:'', exercises:[
+    { name:'레그 익스텐션', reps:'12회', sets:'3', rest:'60초', note:'' },
+    { name:'레그 컬', reps:'12회', sets:'3', rest:'60초', note:'' },
+    { name:'계단 오르기', reps:'5분', sets:'2', rest:'', note:'' },
+  ]},
+  { catId:3, weekStart:1, weekEnd:4, goal:'보호기 — 수동 운동만', caution:'능동 거상 금지, 슬링 착용', exercises:[
+    { name:'펜들럼 스트레칭', reps:'10회', sets:'3', rest:'', note:'중력 이용' },
+    { name:'손목·손가락 운동', reps:'10회', sets:'3', rest:'', note:'' },
+  ]},
+  { catId:3, weekStart:5, weekEnd:8, goal:'수동→능동 보조 운동', caution:'능동 거상 90도 이하', exercises:[
+    { name:'도르래 운동', reps:'10회', sets:'3', rest:'30초', note:'' },
+    { name:'어깨 외회전', reps:'10회', sets:'3', rest:'30초', note:'저저항' },
+  ]},
+  { catId:4, weekStart:1, weekEnd:2, goal:'부종 조절, 발목 안정화', caution:'체중 부하 금지', exercises:[
+    { name:'발가락 운동', reps:'10회', sets:'3', rest:'', note:'' },
+    { name:'발목 알파벳', reps:'1세트', sets:'2', rest:'', note:'' },
+  ]},
+  { catId:4, weekStart:3, weekEnd:6, goal:'가동범위 회복', caution:'외번 동작 주의', exercises:[
+    { name:'카프 레이즈', reps:'15회', sets:'3', rest:'60초', note:'양발→한발' },
+    { name:'밸런스 훈련', reps:'30초', sets:'3', rest:'', note:'' },
+  ]},
+  { catId:5, weekStart:1, weekEnd:2, goal:'경추 안정화, 급성 통증 조절', caution:'목 회전·굴곡 금지', exercises:[
+    { name:'턱 당기기', reps:'10회', sets:'3', rest:'', note:'통증 없는 범위' },
+    { name:'어깨 수축', reps:'10회', sets:'3', rest:'', note:'' },
+  ]},
+  { catId:5, weekStart:3, weekEnd:6, goal:'가동범위 회복 및 근력 강화', caution:'', exercises:[
+    { name:'경추 굴곡 스트레칭', reps:'30초', sets:'3', rest:'', note:'' },
+    { name:'어깨 외회전', reps:'12회', sets:'3', rest:'30초', note:'' },
+  ]},
+];
+
+/* ── 상태 ── */
+let _curScreen = 'main';
+let _curTab = 'routine';
+let _selectedCatId = null;
+let _selectedProgIdx = null;
+
+/* ── 화면 전환 ── */
+function go(screenId) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-' + screenId).classList.add('active');
+  _curScreen = screenId;
+
+  document.querySelectorAll('.screen-btn').forEach((b, i) => {
+    const ids = ['main','routine','program'];
+    b.classList.toggle('active', ids[i] === screenId);
+  });
+
+  if (screenId === 'routine') renderRoutineDetail();
+  if (screenId === 'program') renderProgramDetail();
+
+  // 스크롤 맨 위로
+  const scrollEl = document.getElementById(screenId === 'main' ? 'main-scroll' : screenId + '-scroll');
+  if (scrollEl) scrollEl.scrollTop = 0;
+}
+
+/* ── 탭 전환 ── */
+function switchTab(tab) {
+  _curTab = tab;
+  document.getElementById('tab-btn-routine').classList.toggle('active', tab === 'routine');
+  document.getElementById('tab-btn-program').classList.toggle('active', tab === 'program');
+  document.getElementById('panel-routine').classList.toggle('active', tab === 'routine');
+  document.getElementById('panel-program').classList.toggle('active', tab === 'program');
+}
+
+/* ── 루틴 상세로 이동 ── */
+function openRoutineDetail(catId) {
+  _selectedCatId = catId;
+  go('routine');
+}
+
+/* ── 프로그램 상세로 이동 ── */
+function openProgramDetail(idx) {
+  _selectedProgIdx = idx;
+  go('program');
+}
+
+/* ── 아코디언 토글 ── */
+function toggleWeek(el) {
+  const body = el.nextElementSibling;
+  const arrow = el.querySelector('.week-arrow');
+  const isOpen = body.classList.contains('open');
+  body.classList.toggle('open', !isOpen);
+  arrow.classList.toggle('open', !isOpen);
+}
+
+/* ── 메인 화면 렌더링 ── */
+function renderMain() {
+  // 회복 루틴 패널
+  const routinePanel = document.getElementById('panel-routine');
+  routinePanel.innerHTML = '';
+  if (rxCatList.length === 0) {
+    routinePanel.innerHTML = '<div class="empty-state"><div class="empty-icon">🗓</div>등록된 회복 루틴이 없습니다</div>';
+  } else {
+    rxCatList.forEach(cat => {
+      const weekCount = rxTemplates.filter(t => t.catId === cat.id).length;
+      const bg = partBg[cat.part] || '#F7FAFC';
+      const icon = partIcon[cat.part] || '⭕';
+      const partName = partMap[cat.part] || cat.part;
+      const card = document.createElement('div');
+      card.className = 'routine-card';
+      card.onclick = () => openRoutineDetail(cat.id);
+      card.innerHTML = `
+        <div class="rc-icon" style="background:${bg}">${icon}</div>
+        <div class="rc-info">
+          <div class="rc-name">${cat.name}</div>
+          <div class="rc-meta">${partName} · ${weekCount}단계 구성</div>
+        </div>
+        <div class="rc-arrow">›</div>
+      `;
+      routinePanel.appendChild(card);
     });
-    document.getElementById('memo-screen-name').value = screenNames[id] || id;
   }
-</script>
 
+  // 재활 프로그램 패널
+  const programPanel = document.getElementById('panel-program');
+  programPanel.innerHTML = '';
+  const activeProgs = progData.filter(p => p.active);
+  if (activeProgs.length === 0) {
+    programPanel.innerHTML = '<div class="empty-state"><div class="empty-icon">📋</div>등록된 프로그램이 없습니다</div>';
+  } else {
+    activeProgs.forEach((prog, i) => {
+      const realIdx = progData.indexOf(prog);
+      const bg = partBg[prog.part] || '#F7FAFC';
+      const icon = partIcon[prog.part] || '⭕';
+      const partName = partMap[prog.part] || prog.part;
+      const badgeClass = levelBadge[prog.level] || 'badge-green';
+      const card = document.createElement('div');
+      card.className = 'prog-card';
+      card.onclick = () => openProgramDetail(realIdx);
+      card.innerHTML = `
+        <div class="pc-top">
+          <div class="pc-icon" style="background:${bg}">${icon}</div>
+          <div class="pc-name">${prog.name}</div>
+          <span class="badge ${badgeClass}">${prog.level}</span>
+        </div>
+        <div class="pc-meta">
+          <span class="pc-tag">📅 ${prog.duration}</span>
+          <span class="pc-tag">🔄 ${prog.freq}</span>
+          <span class="pc-tag">⏱ ${prog.time}분</span>
+          <span class="pc-tag">👥 ${prog.count}명</span>
+        </div>
+      `;
+      programPanel.appendChild(card);
+    });
+  }
+}
+
+/* ── 회복 루틴 상세 렌더링 ── */
+function renderRoutineDetail() {
+  const cat = rxCatList.find(c => c.id === _selectedCatId);
+  if (!cat) return;
+
+  document.getElementById('routine-header-title').textContent = cat.name;
+
+  const templates = rxTemplates.filter(t => t.catId === _selectedCatId);
+  const container = document.getElementById('routine-timeline');
+  container.innerHTML = '';
+
+  if (templates.length === 0) {
+    container.innerHTML = '<div class="empty-state"><div class="empty-icon">📋</div>등록된 루틴이 없습니다</div>';
+    return;
+  }
+
+  templates.forEach((tmpl, idx) => {
+    const weekLabel = tmpl.weekStart === tmpl.weekEnd
+      ? `${tmpl.weekStart}주차`
+      : `${tmpl.weekStart}~${tmpl.weekEnd}주차`;
+
+    const item = document.createElement('div');
+    item.className = 'week-item';
+
+    const cautionHTML = tmpl.caution
+      ? `<div class="caution-box">⚠️ <span>${tmpl.caution}</span></div>`
+      : '';
+
+    const exHTML = tmpl.exercises.map(ex => {
+      const repsStr = ex.sets && ex.sets !== '1'
+        ? `${ex.reps} × ${ex.sets}세트${ex.rest ? ' / 휴식 ' + ex.rest : ''}`
+        : `${ex.reps}${ex.rest ? ' / 휴식 ' + ex.rest : ''}`;
+      const noteHTML = ex.note ? `<div class="ex-note">${ex.note}</div>` : '';
+      return `
+        <div class="ex-item">
+          <div>
+            <div class="ex-name">${ex.name}</div>
+            ${noteHTML}
+          </div>
+          <div class="ex-reps">${repsStr}</div>
+        </div>`;
+    }).join('');
+
+    item.innerHTML = `
+      <div class="week-header" onclick="toggleWeek(this)">
+        <span class="week-badge">${weekLabel}</span>
+        <span class="week-goal">${tmpl.goal}</span>
+        <span class="week-arrow ${idx === 0 ? 'open' : ''}">›</span>
+      </div>
+      <div class="week-body ${idx === 0 ? 'open' : ''}">
+        ${cautionHTML}
+        <div class="ex-list">${exHTML}</div>
+      </div>
+    `;
+    container.appendChild(item);
+  });
+}
+
+/* ── 재활 프로그램 상세 렌더링 ── */
+function renderProgramDetail() {
+  if (_selectedProgIdx === null) return;
+  const prog = progData[_selectedProgIdx];
+  if (!prog) return;
+
+  document.getElementById('program-header-title').textContent = prog.name;
+
+  const bg = partBg[prog.part] || '#F7FAFC';
+  const icon = partIcon[prog.part] || '⭕';
+  const partName = partMap[prog.part] || prog.part;
+  const badgeClass = levelBadge[prog.level] || 'badge-green';
+
+  const container = document.getElementById('program-detail');
+
+  const motionsHTML = prog.motions.map(m => {
+    const mName = typeof m === 'object' ? m.name : m;
+    const mData = motionData.find(d => d.name === mName);
+    if (mData) {
+      return `
+        <div class="motion-card">
+          <div class="motion-icon">${mData.icon}</div>
+          <div class="motion-info">
+            <div class="motion-name">${mData.name}</div>
+            <div class="motion-reps">${mData.reps}</div>
+            <div class="motion-desc">${mData.desc}</div>
+          </div>
+        </div>`;
+    } else {
+      return `<div class="motion-simple">${mName}</div>`;
+    }
+  }).join('');
+
+  const noteHTML = prog.note
+    ? `<div class="prog-note-box">⚠️ <span>${prog.note}</span></div>`
+    : '';
+
+  container.innerHTML = `
+    <div class="prog-info-box">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+        <div style="width:46px;height:46px;border-radius:12px;background:${bg};display:flex;align-items:center;justify-content:center;font-size:22px">${icon}</div>
+        <div>
+          <div style="font-size:15px;font-weight:900;color:#1a1a1a">${prog.name}</div>
+          <div style="margin-top:4px"><span class="badge ${badgeClass}">${prog.level}</span> <span style="font-size:11px;color:#888;margin-left:4px">${partName}</span></div>
+        </div>
+      </div>
+      <div class="prog-info-grid">
+        <div class="prog-info-item">
+          <div class="prog-info-label">📅 기간</div>
+          <div class="prog-info-value">${prog.duration}</div>
+        </div>
+        <div class="prog-info-item">
+          <div class="prog-info-label">🔄 빈도</div>
+          <div class="prog-info-value">${prog.freq}</div>
+        </div>
+        <div class="prog-info-item">
+          <div class="prog-info-label">⏱ 세션</div>
+          <div class="prog-info-value">${prog.time}분</div>
+        </div>
+        <div class="prog-info-item">
+          <div class="prog-info-label">👥 참여</div>
+          <div class="prog-info-value">${prog.count}명</div>
+        </div>
+      </div>
+    </div>
+    ${noteHTML}
+    <div class="section-label">동작 구성</div>
+    ${motionsHTML}
+  `;
+}
+
+/* ── 초기화 ── */
+renderMain();
+// 기본값: 루틴 상세는 첫 번째 catId, 프로그램 상세는 첫 번째 active 항목
+_selectedCatId = rxCatList[0]?.id ?? null;
+_selectedProgIdx = progData.findIndex(p => p.active);
+</script>
 </body>
 </html>
