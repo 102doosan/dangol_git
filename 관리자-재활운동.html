@@ -880,7 +880,13 @@
     <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:16px;" id="mlog-summary"></div>
     <!-- 회차별 수행 이력 -->
     <div style="font-size:13px;font-weight:800;margin-bottom:12px;">☰ 회차별 수행 이력</div>
-    <div style="max-height:380px;overflow-y:auto;padding-right:4px;" id="mlog-timeline"></div>
+    <div style="max-height:340px;overflow-y:auto;padding-right:4px;" id="mlog-timeline"></div>
+    <div id="mlog-footer" style="display:none;padding:12px 0 0 28px;border-top:1px solid #F0F4F8;margin-top:8px;position:relative;">
+      <div style="position:absolute;left:0;top:14px;width:14px;height:14px;border-radius:50%;border:2px solid #CBD5E0;background:#fff;"></div>
+      <button id="mlog-more-btn" onclick="mlogShowMore()" style="display:none;color:#ED8936;font-size:13px;font-weight:700;cursor:pointer;background:none;border:none;font-family:'Noto Sans KR',sans-serif;padding:0;"></button>
+      <span id="mlog-sep" style="color:#CBD5E0;margin:0 8px;display:none;">|</span>
+      <button id="mlog-all-btn" onclick="mlogShowAll()" style="color:#2F855A;font-size:13px;font-weight:700;cursor:pointer;background:none;border:none;font-family:'Noto Sans KR',sans-serif;padding:0;"></button>
+    </div>
     <div class="modal-actions">
       <button class="btn-secondary" onclick="closeModal('modal-member-log')">닫기</button>
     </div>
@@ -1332,24 +1338,25 @@ function renderMlogTimeline() {
       }).join('')}
     </div>`;
 
-  // 더보기 / 전체보기 — 타임라인 마지막에 추가
+  // 더보기 / 전체보기 footer
   const remain = sessions.length - _mlogShowing;
+  const footer  = document.getElementById('mlog-footer');
+  const moreBtn = document.getElementById('mlog-more-btn');
+  const allBtn  = document.getElementById('mlog-all-btn');
+  const sep     = document.getElementById('mlog-sep');
   if (sessions.length > 0) {
-    const moreHtml = remain > 0
-      ? `<span onclick="mlogShowMore()" style="color:#ED8936;font-size:13px;font-weight:700;cursor:pointer;">▼ 더보기 (${remain}건 남음)</span>
-         <span style="color:#CBD5E0;margin:0 4px;">|</span>`
-      : '';
-    const allHtml = `<span onclick="mlogShowAll()" style="color:#2F855A;font-size:13px;font-weight:700;cursor:pointer;">≡ 전체 이력 보기 (${sessions.length}건)</span>`;
-    const timelineEl = document.getElementById('mlog-timeline');
-    timelineEl.innerHTML += `
-      <div class="mlog-timeline-wrap" style="margin-top:0;">
-        <div class="mlog-session" style="margin-bottom:4px;">
-          <div class="mlog-dot more"></div>
-          <div style="padding-top:0;display:flex;align-items:center;gap:0;">
-            ${moreHtml}${allHtml}
-          </div>
-        </div>
-      </div>`;
+    footer.style.display = 'block';
+    if (remain > 0) {
+      moreBtn.style.display = 'inline';
+      moreBtn.textContent   = `▼ 더보기 (${remain}건 남음)`;
+      sep.style.display     = 'inline';
+    } else {
+      moreBtn.style.display = 'none';
+      sep.style.display     = 'none';
+    }
+    allBtn.textContent = `≡ 전체 이력 보기 (${sessions.length}건)`;
+  } else {
+    footer.style.display = 'none';
   }
 }
 
