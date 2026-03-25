@@ -881,11 +881,11 @@
     <!-- 회차별 수행 이력 -->
     <div style="font-size:13px;font-weight:800;margin-bottom:12px;">☰ 회차별 수행 이력</div>
     <div style="max-height:340px;overflow-y:auto;padding-right:4px;" id="mlog-timeline"></div>
-    <div id="mlog-footer" style="display:none;padding:12px 0 0 28px;border-top:1px solid #F0F4F8;margin-top:8px;position:relative;">
-      <div style="position:absolute;left:0;top:14px;width:14px;height:14px;border-radius:50%;border:2px solid #CBD5E0;background:#fff;"></div>
-      <button id="mlog-more-btn" onclick="mlogShowMore()" style="display:none;color:#ED8936;font-size:13px;font-weight:700;cursor:pointer;background:none;border:none;font-family:'Noto Sans KR',sans-serif;padding:0;"></button>
+    <div id="mlog-footer" style="display:none;padding:12px 0 0 28px;border-top:1px solid #F0F4F8;margin-top:8px;position:relative;z-index:10;">
+      <div style="position:absolute;left:0;top:12px;width:14px;height:14px;border-radius:50%;border:2px solid #CBD5E0;background:#fff;"></div>
+      <span id="mlog-more-btn" style="display:none;color:#ED8936;font-size:13px;font-weight:700;cursor:pointer;user-select:none;"></span>
       <span id="mlog-sep" style="color:#CBD5E0;margin:0 8px;display:none;">|</span>
-      <button id="mlog-all-btn" onclick="mlogShowAll()" style="color:#2F855A;font-size:13px;font-weight:700;cursor:pointer;background:none;border:none;font-family:'Noto Sans KR',sans-serif;padding:0;"></button>
+      <span id="mlog-all-btn" style="color:#2F855A;font-size:13px;font-weight:700;cursor:pointer;user-select:none;"></span>
     </div>
     <div class="modal-actions">
       <button class="btn-secondary" onclick="closeModal('modal-member-log')">닫기</button>
@@ -1378,6 +1378,18 @@ function mlogShowAll() {
   _mlogShowing = _mlogAllSessions.length;
   renderMlogTimeline();
 }
+
+// 더보기/전체보기 버튼 이벤트 — 한 번만 등록
+(function() {
+  document.getElementById('mlog-more-btn').addEventListener('click', function(e) {
+    e.stopPropagation();
+    mlogShowMore();
+  });
+  document.getElementById('mlog-all-btn').addEventListener('click', function(e) {
+    e.stopPropagation();
+    mlogShowAll();
+  });
+})();
 
 function renderRecentMembers() {
   const q = _dashMemberSearch;
