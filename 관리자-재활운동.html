@@ -194,6 +194,32 @@
     .empty-state .icon { font-size: 48px; margin-bottom: 12px; }
     .empty-state p { font-size: 14px; font-weight: 600; }
 
+    /* 동영상 업로드 */
+    .video-upload-area { border: 2px dashed #CBD5E0; border-radius: 12px; padding: 28px 20px; text-align: center; cursor: pointer; transition: all .2s; background: #F7FAFC; }
+    .video-upload-area:hover, .video-upload-area.drag-over { border-color: #2F855A; background: #F0FFF4; }
+    .video-upload-icon { font-size: 36px; margin-bottom: 10px; }
+    .video-upload-text { font-size: 14px; font-weight: 700; color: #4A5568; margin-bottom: 4px; }
+    .video-upload-sub { font-size: 12px; color: #A0AEC0; margin-bottom: 14px; }
+    .video-upload-btn { display: inline-block; background: #2F855A; color: #fff; font-size: 12px; font-weight: 700; border-radius: 8px; padding: 8px 18px; cursor: pointer; border: none; font-family: 'Noto Sans KR', sans-serif; }
+    .video-divider { display: flex; align-items: center; gap: 12px; margin: 16px 0; color: #A0AEC0; font-size: 12px; font-weight: 700; }
+    .video-divider::before, .video-divider::after { content:''; flex:1; height:1px; background:#E2E8F0; }
+    .video-url-row { display: flex; gap: 10px; }
+    .video-url-row .form-input { flex: 1; }
+    .video-url-check { background: #F0FFF4; color: #2F855A; border: 1.5px solid #2F855A; border-radius: 10px; padding: 10px 16px; font-size: 12px; font-weight: 800; cursor: pointer; white-space: nowrap; font-family: 'Noto Sans KR', sans-serif; }
+    .video-preview-box { margin-top: 16px; border-radius: 12px; overflow: hidden; background: #000; position: relative; aspect-ratio: 16/9; max-height: 260px; }
+    .video-preview-box video, .video-preview-box iframe { width: 100%; height: 100%; border: none; object-fit: contain; }
+    .video-preview-remove { position: absolute; top: 8px; right: 8px; background: rgba(0,0,0,.6); color: #fff; border: none; border-radius: 50%; width: 26px; height: 26px; font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+    .video-file-name { margin-top: 8px; font-size: 12px; color: #718096; display: flex; align-items: center; gap: 8px; }
+    /* 동작 카드 영상 배지 */
+    .motion-video-badge { display: inline-flex; align-items: center; gap: 3px; font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 6px; background: #C6F6D5; color: #276749; cursor: pointer; margin-top: 4px; }
+    /* 영상 시청 모달 */
+    .video-watch-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 200; display: none; align-items: center; justify-content: center; flex-direction: column; gap: 16px; }
+    .video-watch-overlay.open { display: flex; }
+    .video-watch-title { color: #fff; font-size: 16px; font-weight: 800; }
+    .video-watch-box { width: min(760px, 92vw); aspect-ratio: 16/9; background: #000; border-radius: 12px; overflow: hidden; position: relative; }
+    .video-watch-box video, .video-watch-box iframe { width: 100%; height: 100%; border: none; }
+    .video-watch-close { position: absolute; top: -36px; right: 0; background: none; border: none; color: #fff; font-size: 28px; cursor: pointer; }
+
     /* ── 재활 처방 템플릿 ── */
     .rp-wrap { display: flex; gap: 0; align-items: flex-start; min-height: 600px; background: #fff; border-radius: 16px; box-shadow: 0 1px 6px rgba(0,0,0,0.06); overflow: hidden; }
 
@@ -692,6 +718,34 @@
       <label class="form-label">설명</label>
       <textarea class="form-textarea" id="motion-desc-input" placeholder="동작 방법 및 주의사항"></textarea>
     </div>
+    <!-- 동영상 섹션 -->
+    <div class="form-group" style="margin-top:4px;">
+      <label class="form-label">🎬 운동 동작 영상 (선택)</label>
+      <div class="video-upload-area" id="motionVideoDropZone"
+           ondragover="event.preventDefault();this.classList.add('drag-over')"
+           ondragleave="this.classList.remove('drag-over')"
+           ondrop="handleMotionVideoDrop(event)">
+        <div class="video-upload-icon">📹</div>
+        <div class="video-upload-text">영상 파일을 드래그하거나 버튼으로 업로드</div>
+        <div class="video-upload-sub">MP4, MOV, AVI 지원 · 최대 200MB</div>
+        <label class="video-upload-btn" for="motionVideoFileInput">파일 선택</label>
+        <input type="file" id="motionVideoFileInput" accept="video/*" style="display:none" onchange="handleMotionVideoFile(this)">
+      </div>
+      <div class="video-file-name" id="motionVideoFileName" style="display:none">
+        <span>🎞️</span><span id="motionVideoFileNameText"></span>
+      </div>
+      <div class="video-divider">또는 URL로 입력</div>
+      <div class="video-url-row">
+        <input class="form-input" type="url" id="motionVideoUrlInput" placeholder="YouTube URL 또는 직접 영상 링크를 붙여넣으세요" oninput="onMotionVideoUrlInput(this.value)" />
+        <button class="video-url-check" onclick="previewMotionVideoUrl()">미리보기</button>
+      </div>
+      <div style="margin-top:4px;font-size:11px;color:#A0AEC0;">예) https://www.youtube.com/watch?v=xxxxx</div>
+      <div id="motionVideoPreviewWrap" style="display:none">
+        <div class="video-preview-box" id="motionVideoPreviewBox">
+          <button class="video-preview-remove" onclick="clearMotionVideo()">✕</button>
+        </div>
+      </div>
+    </div>
     <div class="modal-actions">
       <button class="btn-secondary" onclick="closeModal('modal-motion')">취소</button>
       <button class="btn-primary" id="motion-save-btn" onclick="saveMotion()">등록</button>
@@ -932,6 +986,14 @@
   </div>
 </div>
 
+<!-- 영상 시청 오버레이 -->
+<div class="video-watch-overlay" id="video-watch-overlay" onclick="closeVideoWatch(event)">
+  <div class="video-watch-title" id="video-watch-title"></div>
+  <div class="video-watch-box" id="video-watch-box">
+    <button class="video-watch-close" onclick="closeVideoWatch()">✕</button>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
@@ -966,20 +1028,20 @@ let progData = [
 ];
 
 let motionData = [
-  { part:'shoulder', name:'펜들럼 스트레칭', level:'초급', icon:'🫨', reps:'10회 × 3세트', tool:'없음', desc:'상체를 앞으로 숙이고 팔을 자연스럽게 늘어뜨린 후 원을 그리듯 흔든다' },
-  { part:'shoulder', name:'어깨 외회전', level:'초급', icon:'🔄', reps:'15회 × 3세트', tool:'탄력밴드', desc:'탄력밴드를 이용해 팔꿈치를 90도 구부리고 바깥쪽으로 회전' },
-  { part:'shoulder', name:'월 슬라이드', level:'초급', icon:'🖐', reps:'10회 × 2세트', tool:'없음', desc:'벽에 손을 대고 위아래로 천천히 미끄러뜨린다' },
-  { part:'knee', name:'쿼드셋', level:'초급', icon:'🦵', reps:'10회 × 3세트 유지 5초', tool:'수건', desc:'무릎 아래 수건을 받치고 무릎을 꽉 누르며 대퇴사두근 수축' },
-  { part:'knee', name:'SLR 운동', level:'초급', icon:'🦿', reps:'15회 × 3세트', tool:'없음', desc:'누워서 한쪽 다리를 곧게 들어 올린다. 발목은 90도 유지' },
-  { part:'knee', name:'미니 스쿼트', level:'중급', icon:'🏋', reps:'12회 × 3세트', tool:'없음', desc:'0~30도 범위 내 미니 스쿼트, 무릎이 발끝을 넘지 않도록' },
-  { part:'back', name:'브릿지', level:'초급', icon:'🌉', reps:'10회 × 3세트 유지 5초', tool:'없음', desc:'누워서 무릎을 세우고 엉덩이를 들어올린다' },
-  { part:'back', name:'버드독', level:'중급', icon:'🐦', reps:'10회 × 3세트 좌우', tool:'요가매트', desc:'네발기기 자세에서 반대쪽 팔다리를 동시에 뻗는다' },
-  { part:'back', name:'캣-카우', level:'초급', icon:'🐱', reps:'10회 반복', tool:'요가매트', desc:'고양이 자세와 소 자세를 교대로 반복. 호흡과 함께' },
-  { part:'ankle', name:'알파벳 쓰기', level:'초급', icon:'🦶', reps:'양발 1세트', tool:'없음', desc:'앉아서 발로 알파벳을 쓰듯 발목을 모든 방향으로 움직인다' },
-  { part:'ankle', name:'카프 레이즈', level:'초급', icon:'⬆', reps:'15회 × 3세트', tool:'없음', desc:'발꿈치를 들어올렸다 내린다. 양발 → 한 발 순서로 진행' },
-  { part:'neck', name:'턱 당기기', level:'초급', icon:'😤', reps:'10회 × 3세트 유지 5초', tool:'없음', desc:'턱을 뒤로 당겨 이중 턱을 만들듯이. 목 뒤쪽이 늘어나는 느낌' },
-  { part:'hip', name:'클램쉘', level:'초급', icon:'🐚', reps:'15회 × 3세트 좌우', tool:'탄력밴드', desc:'옆으로 누워 무릎을 구부리고 위쪽 무릎을 벌린다' },
-  { part:'hip', name:'힙 힌지', level:'중급', icon:'🍑', reps:'12회 × 3세트', tool:'없음', desc:'엉덩이를 뒤로 밀며 상체를 앞으로 기울인다. 척추 중립 유지' },
+  { part:'shoulder', name:'펜들럼 스트레칭', level:'초급', icon:'🫨', reps:'10회 × 3세트', tool:'없음', desc:'상체를 앞으로 숙이고 팔을 자연스럽게 늘어뜨린 후 원을 그리듯 흔든다', video:null },
+  { part:'shoulder', name:'어깨 외회전', level:'초급', icon:'🔄', reps:'15회 × 3세트', tool:'탄력밴드', desc:'탄력밴드를 이용해 팔꿈치를 90도 구부리고 바깥쪽으로 회전', video:null },
+  { part:'shoulder', name:'월 슬라이드', level:'초급', icon:'🖐', reps:'10회 × 2세트', tool:'없음', desc:'벽에 손을 대고 위아래로 천천히 미끄러뜨린다', video:null },
+  { part:'knee', name:'쿼드셋', level:'초급', icon:'🦵', reps:'10회 × 3세트 유지 5초', tool:'수건', desc:'무릎 아래 수건을 받치고 무릎을 꽉 누르며 대퇴사두근 수축', video:null },
+  { part:'knee', name:'SLR 운동', level:'초급', icon:'🦿', reps:'15회 × 3세트', tool:'없음', desc:'누워서 한쪽 다리를 곧게 들어 올린다. 발목은 90도 유지', video:null },
+  { part:'knee', name:'미니 스쿼트', level:'중급', icon:'🏋', reps:'12회 × 3세트', tool:'없음', desc:'0~30도 범위 내 미니 스쿼트, 무릎이 발끝을 넘지 않도록', video:null },
+  { part:'back', name:'브릿지', level:'초급', icon:'🌉', reps:'10회 × 3세트 유지 5초', tool:'없음', desc:'누워서 무릎을 세우고 엉덩이를 들어올린다', video:null },
+  { part:'back', name:'버드독', level:'중급', icon:'🐦', reps:'10회 × 3세트 좌우', tool:'요가매트', desc:'네발기기 자세에서 반대쪽 팔다리를 동시에 뻗는다', video:null },
+  { part:'back', name:'캣-카우', level:'초급', icon:'🐱', reps:'10회 반복', tool:'요가매트', desc:'고양이 자세와 소 자세를 교대로 반복. 호흡과 함께', video:null },
+  { part:'ankle', name:'알파벳 쓰기', level:'초급', icon:'🦶', reps:'양발 1세트', tool:'없음', desc:'앉아서 발로 알파벳을 쓰듯 발목을 모든 방향으로 움직인다', video:null },
+  { part:'ankle', name:'카프 레이즈', level:'초급', icon:'⬆', reps:'15회 × 3세트', tool:'없음', desc:'발꿈치를 들어올렸다 내린다. 양발 → 한 발 순서로 진행', video:null },
+  { part:'neck', name:'턱 당기기', level:'초급', icon:'😤', reps:'10회 × 3세트 유지 5초', tool:'없음', desc:'턱을 뒤로 당겨 이중 턱을 만들듯이. 목 뒤쪽이 늘어나는 느낌', video:null },
+  { part:'hip', name:'클램쉘', level:'초급', icon:'🐚', reps:'15회 × 3세트 좌우', tool:'탄력밴드', desc:'옆으로 누워 무릎을 구부리고 위쪽 무릎을 벌린다', video:null },
+  { part:'hip', name:'힙 힌지', level:'중급', icon:'🍑', reps:'12회 × 3세트', tool:'없음', desc:'엉덩이를 뒤로 밀며 상체를 앞으로 기울인다. 척추 중립 유지', video:null },
 ];
 
 let rxData = [
@@ -1215,7 +1277,8 @@ function renderMotionGrid(part) {
         <span class="badge badge-gray">${m.reps}</span>
         ${m.tool !== '없음' ? `<span class="badge badge-teal">${m.tool}</span>` : ''}
       </div>
-      <div style="margin-top:10px;display:flex;gap:4px;">
+      ${m.video ? `<div class="motion-video-badge" onclick="watchMotionVideo(${realIdx})">▶ 영상 보기</div>` : ''}
+      <div style="margin-top:8px;display:flex;gap:4px;">
         <button class="btn-sm" style="background:#C6F6D5;color:#276749;flex:1;" onclick="editMotion(${realIdx})">수정</button>
         <button class="btn-sm" style="background:#FED7D7;color:#C53030;flex:1;" onclick="deleteMotion(${realIdx})">삭제</button>
       </div>
@@ -1235,6 +1298,11 @@ function searchMotion(val) {
   renderMotionGrid();
 }
 
+// ── 동영상 상태 ─────────────────────────────────────
+let _motionVideoFile = null;
+let _motionVideoDataUrl = null;
+let _motionVideoObj = null; // 저장된 video 객체
+
 function editMotion(idx) {
   const m = motionData[idx];
   document.getElementById('motion-modal-title').textContent = '🤸 동작 수정';
@@ -1246,6 +1314,19 @@ function editMotion(idx) {
   document.getElementById('motion-reps-input').value = m.reps;
   document.getElementById('motion-tool-input').value = m.tool;
   document.getElementById('motion-desc-input').value = m.desc;
+  // 기존 영상 로드
+  clearMotionVideoState();
+  if (m.video) {
+    _motionVideoObj = m.video;
+    const box = document.getElementById('motionVideoPreviewBox');
+    const wrap = document.getElementById('motionVideoPreviewWrap');
+    if (m.video.type === 'youtube') {
+      box.innerHTML = `<button class="video-preview-remove" onclick="clearMotionVideo()">✕</button><iframe src="${m.video.src}" allowfullscreen></iframe>`;
+    } else {
+      box.innerHTML = `<button class="video-preview-remove" onclick="clearMotionVideo()">✕</button><video src="${m.video.src}" controls playsinline></video>`;
+    }
+    wrap.style.display = 'block';
+  }
   document.getElementById('motion-save-btn').textContent = '저장';
   openModal('modal-motion');
 }
@@ -1254,6 +1335,18 @@ function saveMotion() {
   const idx  = parseInt(document.getElementById('motion-edit-idx').value);
   const name = document.getElementById('motion-name-input').value.trim();
   if (!name) { alert('동작명을 입력하세요.'); return; }
+  // 영상 처리
+  let video = _motionVideoObj; // 기존 유지 (수정 시)
+  const urlInput = document.getElementById('motionVideoUrlInput').value.trim();
+  if (_motionVideoDataUrl) {
+    video = { type: 'data', src: _motionVideoDataUrl };
+  } else if (urlInput) {
+    const yt = urlInput.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([A-Za-z0-9_-]{11})/);
+    video = yt ? { type:'youtube', src:'https://www.youtube.com/embed/' + yt[1] }
+               : { type:'url', src: urlInput };
+  } else if (!_motionVideoObj) {
+    video = null; // 영상 없음
+  }
   const obj = {
     part:  document.getElementById('motion-part-select').value,
     name,
@@ -1262,15 +1355,109 @@ function saveMotion() {
     reps:  document.getElementById('motion-reps-input').value.trim(),
     tool:  document.getElementById('motion-tool-input').value.trim() || '없음',
     desc:  document.getElementById('motion-desc-input').value.trim(),
+    video,
   };
   if (idx >= 0) { motionData[idx] = obj; showToast('✅ 동작이 수정되었습니다.'); }
   else          { motionData.push(obj); showToast('✅ 동작이 등록되었습니다.'); }
   closeModal('modal-motion');
   renderMotionGrid();
+  clearMotionVideoState();
   document.getElementById('motion-edit-idx').value = '-1';
   document.getElementById('motion-name-input').value = '';
   document.getElementById('motion-save-btn').textContent = '등록';
   document.getElementById('motion-modal-title').textContent = '🤸 동작 등록';
+}
+
+// ── 동영상 업로드 함수들 ──────────────────────────────
+function handleMotionVideoFile(input) {
+  const file = input.files[0];
+  if (!file) return;
+  _motionVideoFile = file;
+  _motionVideoObj = null;
+  document.getElementById('motionVideoUrlInput').value = '';
+  document.getElementById('motionVideoFileName').style.display = 'flex';
+  document.getElementById('motionVideoFileNameText').textContent = file.name + ' (' + (file.size/1024/1024).toFixed(1) + 'MB)';
+  const blobUrl = URL.createObjectURL(file);
+  const box = document.getElementById('motionVideoPreviewBox');
+  box.innerHTML = `<button class="video-preview-remove" onclick="clearMotionVideo()">✕</button><video src="${blobUrl}" controls playsinline></video>`;
+  document.getElementById('motionVideoPreviewWrap').style.display = 'block';
+  if (file.size < 5 * 1024 * 1024) {
+    const reader = new FileReader();
+    reader.onload = e => { _motionVideoDataUrl = e.target.result; };
+    reader.readAsDataURL(file);
+  }
+}
+
+function handleMotionVideoDrop(e) {
+  e.preventDefault();
+  document.getElementById('motionVideoDropZone').classList.remove('drag-over');
+  const file = e.dataTransfer.files[0];
+  if (!file || !file.type.startsWith('video/')) return;
+  const dt = new DataTransfer();
+  dt.items.add(file);
+  document.getElementById('motionVideoFileInput').files = dt.files;
+  handleMotionVideoFile(document.getElementById('motionVideoFileInput'));
+}
+
+function onMotionVideoUrlInput(val) {
+  if (!val) return;
+  _motionVideoFile = null;
+  _motionVideoDataUrl = null;
+  document.getElementById('motionVideoFileName').style.display = 'none';
+}
+
+function previewMotionVideoUrl() {
+  const url = document.getElementById('motionVideoUrlInput').value.trim();
+  if (!url) return;
+  _motionVideoObj = null;
+  const yt = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([A-Za-z0-9_-]{11})/);
+  const box = document.getElementById('motionVideoPreviewBox');
+  if (yt) {
+    box.innerHTML = `<button class="video-preview-remove" onclick="clearMotionVideo()">✕</button><iframe src="https://www.youtube.com/embed/${yt[1]}" allowfullscreen></iframe>`;
+  } else {
+    box.innerHTML = `<button class="video-preview-remove" onclick="clearMotionVideo()">✕</button><video src="${url}" controls playsinline></video>`;
+  }
+  document.getElementById('motionVideoPreviewWrap').style.display = 'block';
+}
+
+function clearMotionVideo() {
+  clearMotionVideoState();
+  document.getElementById('motionVideoPreviewWrap').style.display = 'none';
+  document.getElementById('motionVideoPreviewBox').innerHTML = '<button class="video-preview-remove" onclick="clearMotionVideo()">✕</button>';
+}
+
+function clearMotionVideoState() {
+  _motionVideoFile = null;
+  _motionVideoDataUrl = null;
+  _motionVideoObj = null;
+  const fi = document.getElementById('motionVideoFileInput');
+  if (fi) fi.value = '';
+  const ui = document.getElementById('motionVideoUrlInput');
+  if (ui) ui.value = '';
+  const fn = document.getElementById('motionVideoFileName');
+  if (fn) fn.style.display = 'none';
+}
+
+function watchMotionVideo(idx) {
+  const m = motionData[idx];
+  if (!m.video) return;
+  const overlay = document.getElementById('video-watch-overlay');
+  const box = document.getElementById('video-watch-box');
+  const title = document.getElementById('video-watch-title');
+  title.textContent = m.icon + ' ' + m.name;
+  if (m.video.type === 'youtube') {
+    box.innerHTML = `<button class="video-watch-close" onclick="closeVideoWatch()">✕</button><iframe src="${m.video.src}?autoplay=1" allow="autoplay; encrypted-media" allowfullscreen></iframe>`;
+  } else {
+    box.innerHTML = `<button class="video-watch-close" onclick="closeVideoWatch()">✕</button><video src="${m.video.src}" controls autoplay playsinline></video>`;
+  }
+  overlay.classList.add('open');
+}
+
+function closeVideoWatch(e) {
+  if (e && e.target !== document.getElementById('video-watch-overlay')) return;
+  const overlay = document.getElementById('video-watch-overlay');
+  overlay.classList.remove('open');
+  document.getElementById('video-watch-box').innerHTML = '<button class="video-watch-close" onclick="closeVideoWatch()">✕</button>';
 }
 
 function deleteMotion(idx) {
