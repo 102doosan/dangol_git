@@ -1,0 +1,1363 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>관리자 재활운동 관리</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Noto Sans KR', sans-serif; background: #F0F4F8; color: #1A202C; min-height: 100vh; padding: 24px 20px 48px; }
+
+    /* 상단 탭 */
+    .nav { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 28px; }
+    .nav-btn {
+      padding: 8px 18px; border-radius: 99px; border: 2px solid #E2E8F0;
+      background: #fff; font-size: 13px; font-weight: 700; cursor: pointer;
+      font-family: 'Noto Sans KR', sans-serif; color: #718096; transition: all 0.2s;
+    }
+    .nav-btn.active { background: #2F855A; border-color: #2F855A; color: #fff; box-shadow: 0 4px 12px rgba(47,133,90,0.35); }
+
+    .admin-wrap { display: flex; gap: 20px; align-items: flex-start; }
+
+    /* 사이드바 */
+    .sidebar {
+      width: 220px; flex-shrink: 0; background: #1E2A3A; border-radius: 16px;
+      padding: 20px 0; color: #fff; min-height: 600px;
+    }
+    .sidebar-logo { padding: 0 20px 16px; border-bottom: 1px solid #2D3F54; margin-bottom: 12px; }
+    .sidebar-logo-title { font-size: 15px; font-weight: 900; color: #fff; }
+    .sidebar-logo-sub { font-size: 11px; color: #718096; margin-top: 2px; }
+    .sidebar-section { font-size: 10px; font-weight: 800; color: #4A6080; letter-spacing: 1.5px; padding: 8px 20px 4px; }
+    .sidebar-item {
+      display: flex; align-items: center; gap: 10px; padding: 10px 20px;
+      font-size: 13px; font-weight: 600; color: #A0AEC0; cursor: pointer; transition: all 0.15s;
+    }
+    .sidebar-item:hover { background: #2D3F54; color: #fff; }
+    .sidebar-item.active { background: #2F855A; color: #fff; border-right: 3px solid #68D391; }
+    .sidebar-item-icon { font-size: 16px; width: 20px; text-align: center; }
+
+    .main { flex: 1; min-width: 0; }
+    .screen { display: none; }
+    .screen.active { display: block; }
+
+    /* 공통 */
+    .page-header {
+      background: #fff; border-radius: 16px; padding: 20px 24px;
+      margin-bottom: 16px; box-shadow: 0 1px 6px rgba(0,0,0,0.06);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .page-title { font-size: 18px; font-weight: 900; color: #1A202C; }
+    .page-sub { font-size: 13px; color: #A0AEC0; margin-top: 2px; }
+    .page-actions { display: flex; gap: 8px; }
+    .btn-primary { background: #2F855A; color: #fff; border: none; border-radius: 10px; padding: 10px 18px; font-size: 13px; font-weight: 700; cursor: pointer; font-family: 'Noto Sans KR', sans-serif; }
+    .btn-secondary { background: #F0F4F8; color: #4A5568; border: none; border-radius: 10px; padding: 10px 18px; font-size: 13px; font-weight: 700; cursor: pointer; font-family: 'Noto Sans KR', sans-serif; }
+    .btn-outline { background: #fff; color: #2F855A; border: 1.5px solid #2F855A; border-radius: 10px; padding: 9px 16px; font-size: 13px; font-weight: 700; cursor: pointer; font-family: 'Noto Sans KR', sans-serif; }
+    .btn-sm { padding: 5px 12px; border-radius: 8px; border: none; cursor: pointer; font-size: 12px; font-weight: 700; font-family: 'Noto Sans KR', sans-serif; }
+
+    /* 통계 카드 */
+    .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 16px; }
+    .stat-card {
+      background: #fff; border-radius: 14px; padding: 16px 18px;
+      box-shadow: 0 1px 6px rgba(0,0,0,0.06); cursor: pointer;
+      transition: box-shadow .18s, border .18s; border: 2px solid transparent;
+    }
+    .stat-card:hover { box-shadow: 0 4px 16px rgba(47,133,90,0.15); border-color: #2F855A; }
+    .stat-label { font-size: 11px; font-weight: 700; color: #718096; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
+    .stat-icon { font-size: 18px; }
+    .stat-value { font-size: 28px; font-weight: 900; color: #1A202C; }
+    .stat-change { font-size: 12px; font-weight: 700; color: #38A169; margin-top: 4px; }
+    .stat-change.down { color: #E53E3E; }
+
+    /* 필터 바 */
+    .filter-bar { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
+    .filter-chip {
+      padding: 6px 14px; border-radius: 99px; border: 1.5px solid #E2E8F0;
+      background: #fff; font-size: 12px; font-weight: 700; cursor: pointer;
+      font-family: 'Noto Sans KR', sans-serif; color: #718096; transition: all 0.15s;
+    }
+    .filter-chip.active { background: #2F855A; border-color: #2F855A; color: #fff; }
+    .search-input {
+      margin-left: auto; padding: 7px 14px; border-radius: 10px; border: 1.5px solid #E2E8F0;
+      font-size: 13px; font-family: 'Noto Sans KR', sans-serif; outline: none; width: 220px;
+    }
+    .search-input:focus { border-color: #2F855A; }
+
+    /* 카드 */
+    .card-wrap { background: #fff; border-radius: 16px; box-shadow: 0 1px 6px rgba(0,0,0,0.06); overflow: hidden; }
+    .card-wrap + .card-wrap { margin-top: 16px; }
+
+    /* 테이블 */
+    table { width: 100%; border-collapse: collapse; }
+    thead { background: #F7FAFC; }
+    th { padding: 11px 14px; font-size: 12px; font-weight: 800; color: #718096; text-align: left; border-bottom: 1px solid #E2E8F0; white-space: nowrap; }
+    td { padding: 11px 14px; font-size: 13px; color: #1A202C; border-bottom: 1px solid #F0F4F8; vertical-align: middle; }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: #F7FAFC; }
+
+    /* 배지 */
+    .badge { display: inline-block; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 6px; }
+    .badge-green  { background: #C6F6D5; color: #276749; }
+    .badge-blue   { background: #BEE3F8; color: #2A4365; }
+    .badge-orange { background: #FEEBC8; color: #C05621; }
+    .badge-red    { background: #FED7D7; color: #C53030; }
+    .badge-gray   { background: #EDF2F7; color: #4A5568; }
+    .badge-teal   { background: #B2F5EA; color: #234E52; }
+    .badge-purple { background: #E9D8FD; color: #553C9A; }
+
+    /* 프로그램 카드 그리드 */
+    .prog-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+    .prog-card {
+      background: #fff; border-radius: 16px; padding: 20px;
+      box-shadow: 0 1px 6px rgba(0,0,0,0.06); border: 2px solid transparent;
+      transition: all 0.15s;
+    }
+    .prog-card:hover { border-color: #2F855A; box-shadow: 0 4px 16px rgba(47,133,90,0.12); }
+    .prog-card-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 12px; }
+    .prog-icon { width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 22px; }
+    .prog-name { font-size: 15px; font-weight: 800; color: #1A202C; margin-bottom: 4px; }
+    .prog-part { font-size: 12px; color: #718096; }
+    .prog-meta { display: flex; gap: 8px; flex-wrap: wrap; margin: 10px 0; }
+    .prog-stat-row { display: flex; justify-content: space-between; margin-top: 12px; padding-top: 12px; border-top: 1px solid #F0F4F8; font-size: 12px; color: #718096; }
+    .prog-stat-row strong { color: #1A202C; }
+    .prog-actions { display: flex; gap: 6px; margin-top: 12px; }
+
+    /* 동작 DB */
+    .motion-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+    .motion-card {
+      background: #fff; border-radius: 14px; padding: 16px;
+      box-shadow: 0 1px 6px rgba(0,0,0,0.06); text-align: center;
+      border: 2px solid transparent; transition: all 0.15s; cursor: pointer;
+    }
+    .motion-card:hover { border-color: #2F855A; }
+    .motion-icon { font-size: 32px; margin-bottom: 8px; }
+    .motion-name { font-size: 13px; font-weight: 700; color: #1A202C; margin-bottom: 4px; }
+    .motion-part { font-size: 11px; color: #718096; margin-bottom: 8px; }
+    .motion-meta { display: flex; gap: 4px; justify-content: center; flex-wrap: wrap; }
+
+    /* 처방 상세 */
+    .rx-timeline { padding: 20px; }
+    .rx-day { margin-bottom: 20px; }
+    .rx-day-title { font-size: 13px; font-weight: 800; color: #2F855A; margin-bottom: 10px; padding-bottom: 6px; border-bottom: 1px solid #C6F6D5; }
+    .rx-item { display: flex; align-items: center; gap: 12px; padding: 10px 12px; background: #F7FAFC; border-radius: 10px; margin-bottom: 6px; }
+    .rx-item-icon { font-size: 22px; width: 36px; height: 36px; background: #C6F6D5; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .rx-item-info { flex: 1; }
+    .rx-item-name { font-size: 13px; font-weight: 700; color: #1A202C; }
+    .rx-item-meta { font-size: 12px; color: #718096; margin-top: 2px; }
+    .rx-item-done { font-size: 18px; }
+
+    /* 진행률 바 */
+    .progress-bar-wrap { background: #E2E8F0; border-radius: 99px; height: 8px; overflow: hidden; }
+    .progress-bar { height: 100%; border-radius: 99px; background: linear-gradient(90deg, #38A169, #68D391); transition: width 0.5s; }
+
+    /* 모달 */
+    .modal-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.45); z-index: 100;
+      display: none; align-items: center; justify-content: center;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal {
+      background: #fff; border-radius: 20px; width: 560px; max-width: 96vw;
+      max-height: 90vh; overflow-y: auto; padding: 28px 28px 24px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+    }
+    .modal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; cursor: grab; user-select: none; }
+    .modal-header:active { cursor: grabbing; }
+    .modal-title { font-size: 17px; font-weight: 900; color: #1A202C; }
+    .modal-close { font-size: 22px; cursor: pointer; color: #A0AEC0; background: none; border: none; }
+    .modal-actions { display: flex; gap: 10px; margin-top: 20px; justify-content: flex-end; }
+
+    /* 폼 */
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
+    .form-group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
+    .form-label { font-size: 12px; font-weight: 800; color: #4A5568; }
+    .req { color: #E53E3E; }
+    .form-input, .form-select, .form-textarea {
+      padding: 9px 12px; border-radius: 10px; border: 1.5px solid #E2E8F0;
+      font-size: 13px; font-family: 'Noto Sans KR', sans-serif; outline: none;
+      transition: border-color 0.15s;
+    }
+    .form-input:focus, .form-select:focus, .form-textarea:focus { border-color: #2F855A; }
+    .form-textarea { resize: vertical; min-height: 80px; }
+
+    /* 토스트 */
+    .toast {
+      position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+      background: #1A202C; color: #fff; padding: 12px 24px; border-radius: 12px;
+      font-size: 14px; font-weight: 700; z-index: 999; opacity: 0;
+      transition: opacity 0.3s; pointer-events: none;
+    }
+    .toast.show { opacity: 1; }
+
+    /* 빈 상태 */
+    .empty-state { text-align: center; padding: 60px 20px; color: #A0AEC0; }
+    .empty-state .icon { font-size: 48px; margin-bottom: 12px; }
+    .empty-state p { font-size: 14px; font-weight: 600; }
+  </style>
+</head>
+<body>
+
+<!-- 상단 탭 -->
+<div class="nav">
+  <span style="font-size:18px;font-weight:900;color:#2F855A;margin-right:8px;">🏥 단골짐</span>
+  <button class="nav-btn" onclick="location.href='관리자-대시보드.html'">📊 대시보드</button>
+  <button class="nav-btn" onclick="location.href='관리자-스토어.html'">🛒 스토어</button>
+  <button class="nav-btn" onclick="location.href='관리자-레슨.html'">🎾 레슨</button>
+  <button class="nav-btn" onclick="location.href='관리자-My운동처방.html'">💊 운동처방</button>
+  <button class="nav-btn active">🏥 재활운동</button>
+</div>
+
+<div class="admin-wrap">
+  <!-- 사이드바 -->
+  <div class="sidebar">
+    <div class="sidebar-logo">
+      <div class="sidebar-logo-title">🏥 재활운동 관리</div>
+      <div class="sidebar-logo-sub">Rehabilitation Admin</div>
+    </div>
+    <div class="sidebar-section">개요</div>
+    <div class="sidebar-item active" onclick="showScreen('dashboard',this)">
+      <span class="sidebar-item-icon">📊</span> 대시보드
+    </div>
+    <div class="sidebar-section">프로그램</div>
+    <div class="sidebar-item" onclick="showScreen('programs',this)">
+      <span class="sidebar-item-icon">📋</span> 재활 프로그램
+    </div>
+    <div class="sidebar-item" onclick="showScreen('motions',this)">
+      <span class="sidebar-item-icon">🤸</span> 동작 DB
+    </div>
+    <div class="sidebar-section">회원 관리</div>
+    <div class="sidebar-item" onclick="showScreen('prescriptions',this)">
+      <span class="sidebar-item-icon">💊</span> 처방 현황
+    </div>
+    <div class="sidebar-item" onclick="showScreen('schedule',this)">
+      <span class="sidebar-item-icon">📅</span> 예약 관리
+    </div>
+    <div class="sidebar-section">분석</div>
+    <div class="sidebar-item" onclick="showScreen('stats',this)">
+      <span class="sidebar-item-icon">📈</span> 통계/리포트
+    </div>
+  </div>
+
+  <!-- 메인 -->
+  <div class="main">
+
+    <!-- ① 대시보드 -->
+    <div class="screen active" id="screen-dashboard">
+      <div class="page-header">
+        <div>
+          <div class="page-title">📊 재활운동 대시보드</div>
+          <div class="page-sub">2026년 3월 기준</div>
+        </div>
+        <div class="page-actions">
+          <button class="btn-outline" onclick="window.print()">🖨 인쇄</button>
+          <button class="btn-primary" onclick="showScreen('prescriptions', document.querySelectorAll('.sidebar-item')[4])">+ 처방 등록</button>
+        </div>
+      </div>
+      <div class="stats-row">
+        <div class="stat-card" onclick="showScreen('programs', document.querySelectorAll('.sidebar-item')[2])">
+          <div class="stat-label"><span class="stat-icon">📋</span> 등록 프로그램</div>
+          <div class="stat-value">12</div>
+          <div class="stat-change">▲ 2 지난달 대비</div>
+        </div>
+        <div class="stat-card" onclick="showScreen('prescriptions', document.querySelectorAll('.sidebar-item')[4])">
+          <div class="stat-label"><span class="stat-icon">💊</span> 이달 처방</div>
+          <div class="stat-value">34</div>
+          <div class="stat-change">▲ 8 지난달 대비</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label"><span class="stat-icon">🏃</span> 진행 중 회원</div>
+          <div class="stat-value">21</div>
+          <div class="stat-change">▲ 3 지난달 대비</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label"><span class="stat-icon">✅</span> 이달 완료율</div>
+          <div class="stat-value">78%</div>
+          <div class="stat-change">▲ 5% 지난달 대비</div>
+        </div>
+      </div>
+
+      <!-- 최근 처방 -->
+      <div class="card-wrap">
+        <div style="padding:16px 20px 0; display:flex; align-items:center; justify-content:space-between;">
+          <div style="font-size:15px;font-weight:800;">최근 처방 현황</div>
+          <button class="btn-sm" style="background:#C6F6D5;color:#276749;" onclick="showScreen('prescriptions', document.querySelectorAll('.sidebar-item')[4])">전체 보기</button>
+        </div>
+        <table>
+          <thead><tr>
+            <th>처방일</th><th>회원명</th><th>부위</th><th>프로그램</th><th>담당자</th><th>진행률</th><th>상태</th>
+          </tr></thead>
+          <tbody id="recent-rx-tbody"></tbody>
+        </table>
+      </div>
+
+      <!-- 부위별 통계 -->
+      <div style="margin-top:16px; display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+        <div class="card-wrap" style="padding:20px;">
+          <div style="font-size:15px;font-weight:800;margin-bottom:16px;">부위별 처방 현황</div>
+          <div id="part-stats"></div>
+        </div>
+        <div class="card-wrap" style="padding:20px;">
+          <div style="font-size:15px;font-weight:800;margin-bottom:16px;">이달 완료 추이</div>
+          <div id="monthly-chart"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ② 재활 프로그램 -->
+    <div class="screen" id="screen-programs">
+      <div class="page-header">
+        <div>
+          <div class="page-title">📋 재활 프로그램 관리</div>
+          <div class="page-sub">부위별 재활 프로그램 등록 및 관리</div>
+        </div>
+        <div class="page-actions">
+          <button class="btn-secondary" onclick="filterProg('all')">전체</button>
+          <button class="btn-primary" onclick="openModal('modal-prog')">+ 프로그램 추가</button>
+        </div>
+      </div>
+      <div class="filter-bar" id="prog-filter-bar"></div>
+      <div class="prog-grid" id="prog-grid"></div>
+    </div>
+
+    <!-- ③ 동작 DB -->
+    <div class="screen" id="screen-motions">
+      <div class="page-header">
+        <div>
+          <div class="page-title">🤸 동작 DB 관리</div>
+          <div class="page-sub">재활 운동 동작 라이브러리</div>
+        </div>
+        <div class="page-actions">
+          <button class="btn-primary" onclick="openModal('modal-motion')">+ 동작 추가</button>
+        </div>
+      </div>
+      <div class="filter-bar">
+        <button class="filter-chip active" onclick="filterMotion('all',this)">전체</button>
+        <button class="filter-chip" onclick="filterMotion('shoulder',this)">어깨</button>
+        <button class="filter-chip" onclick="filterMotion('knee',this)">무릎</button>
+        <button class="filter-chip" onclick="filterMotion('back',this)">허리</button>
+        <button class="filter-chip" onclick="filterMotion('ankle',this)">발목</button>
+        <button class="filter-chip" onclick="filterMotion('neck',this)">목</button>
+        <button class="filter-chip" onclick="filterMotion('hip',this)">고관절</button>
+        <input class="search-input" placeholder="🔍 동작명 검색" oninput="searchMotion(this.value)" />
+      </div>
+      <div class="motion-grid" id="motion-grid"></div>
+    </div>
+
+    <!-- ④ 처방 현황 -->
+    <div class="screen" id="screen-prescriptions">
+      <div class="page-header">
+        <div>
+          <div class="page-title">💊 처방 현황</div>
+          <div class="page-sub">회원별 재활운동 처방 및 진행 현황</div>
+        </div>
+        <div class="page-actions">
+          <button class="btn-secondary" onclick="filterRx('all',null)">전체</button>
+          <button class="btn-primary" onclick="openModal('modal-rx')">+ 처방 등록</button>
+        </div>
+      </div>
+      <div class="filter-bar">
+        <button class="filter-chip active" onclick="filterRx('all',this)">전체</button>
+        <button class="filter-chip" onclick="filterRx('active',this)">진행 중</button>
+        <button class="filter-chip" onclick="filterRx('done',this)">완료</button>
+        <button class="filter-chip" onclick="filterRx('hold',this)">일시중단</button>
+        <input class="search-input" placeholder="🔍 회원명 검색" oninput="searchRx(this.value)" />
+      </div>
+      <div class="card-wrap">
+        <table>
+          <thead><tr>
+            <th>처방일</th><th>회원명</th><th>부위</th><th>프로그램</th>
+            <th>담당 트레이너</th><th>기간</th><th>진행률</th><th>상태</th><th>관리</th>
+          </tr></thead>
+          <tbody id="rx-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ⑤ 예약 관리 -->
+    <div class="screen" id="screen-schedule">
+      <div class="page-header">
+        <div>
+          <div class="page-title">📅 예약 관리</div>
+          <div class="page-sub">재활운동 세션 예약 현황</div>
+        </div>
+        <div class="page-actions">
+          <button class="btn-primary" onclick="openModal('modal-schedule')">+ 예약 등록</button>
+        </div>
+      </div>
+      <div class="filter-bar">
+        <button class="filter-chip active" onclick="filterSchedule('all',this)">전체</button>
+        <button class="filter-chip" onclick="filterSchedule('today',this)">오늘</button>
+        <button class="filter-chip" onclick="filterSchedule('week',this)">이번 주</button>
+        <button class="filter-chip" onclick="filterSchedule('upcoming',this)">예정</button>
+      </div>
+      <div class="card-wrap">
+        <table>
+          <thead><tr>
+            <th>날짜</th><th>시간</th><th>회원명</th><th>프로그램</th><th>트레이너</th><th>메모</th><th>상태</th><th>관리</th>
+          </tr></thead>
+          <tbody id="schedule-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ⑥ 통계/리포트 -->
+    <div class="screen" id="screen-stats">
+      <div class="page-header">
+        <div>
+          <div class="page-title">📈 통계 / 리포트</div>
+          <div class="page-sub">재활운동 성과 및 분석</div>
+        </div>
+        <div class="page-actions">
+          <button class="btn-outline" onclick="window.print()">🖨 인쇄</button>
+        </div>
+      </div>
+      <div class="stats-row">
+        <div class="stat-card">
+          <div class="stat-label"><span class="stat-icon">📅</span> 이달 처방 수</div>
+          <div class="stat-value">34</div>
+          <div class="stat-change">▲ 8 지난달 대비</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label"><span class="stat-icon">✅</span> 완료 처방</div>
+          <div class="stat-value">89</div>
+          <div class="stat-change">누적</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label"><span class="stat-icon">⭐</span> 평균 만족도</div>
+          <div class="stat-value">4.6</div>
+          <div class="stat-change">/ 5.0</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label"><span class="stat-icon">🔄</span> 재등록률</div>
+          <div class="stat-value">62%</div>
+          <div class="stat-change">▲ 4% 지난달 대비</div>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+        <div class="card-wrap" style="padding:20px;">
+          <div style="font-size:15px;font-weight:800;margin-bottom:16px;">월별 처방 추이</div>
+          <div id="monthly-trend"></div>
+        </div>
+        <div class="card-wrap" style="padding:20px;">
+          <div style="font-size:15px;font-weight:800;margin-bottom:16px;">부위별 처방 비율</div>
+          <div id="part-pie"></div>
+        </div>
+      </div>
+      <div class="card-wrap" style="margin-top:16px;">
+        <div style="padding:16px 20px 0;font-size:15px;font-weight:800;">트레이너별 담당 현황</div>
+        <table>
+          <thead><tr><th>트레이너</th><th>진행 중</th><th>이달 완료</th><th>누적 완료</th><th>평균 만족도</th><th>완료율</th></tr></thead>
+          <tbody id="trainer-stats-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+  </div><!-- /main -->
+</div><!-- /admin-wrap -->
+
+<!-- 모달: 프로그램 등록/수정 -->
+<div class="modal-overlay" id="modal-prog">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="prog-modal-title">📋 프로그램 등록</div>
+      <button class="modal-close" onclick="closeModal('modal-prog')">✕</button>
+    </div>
+    <input type="hidden" id="prog-edit-idx" value="-1" />
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">부위 <span class="req">*</span></label>
+        <select class="form-select" id="prog-part-select">
+          <option value="shoulder">어깨</option>
+          <option value="knee">무릎</option>
+          <option value="back">허리</option>
+          <option value="ankle">발목</option>
+          <option value="neck">목</option>
+          <option value="hip">고관절</option>
+          <option value="etc">기타</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">프로그램명 <span class="req">*</span></label>
+        <input class="form-input" id="prog-name-input" type="text" placeholder="예) 어깨 회전근개 재활" />
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">난이도</label>
+        <select class="form-select" id="prog-level-select">
+          <option value="초급">초급</option>
+          <option value="중급">중급</option>
+          <option value="고급">고급</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">기간</label>
+        <select class="form-select" id="prog-duration-select">
+          <option value="2주">2주</option>
+          <option value="4주">4주</option>
+          <option value="6주">6주</option>
+          <option value="8주">8주</option>
+          <option value="12주">12주</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">주 횟수</label>
+        <input class="form-input" id="prog-freq-input" type="text" placeholder="예) 주 3회" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">세션 시간(분)</label>
+        <input class="form-input" id="prog-time-input" type="text" placeholder="예) 40" />
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">동작 구성 (쉼표 구분)</label>
+      <input class="form-input" id="prog-motions-input" type="text" placeholder="예) 펜들럼 스트레칭, 어깨 외회전, 밴드 내회전" />
+    </div>
+    <div class="form-group">
+      <label class="form-label">주의사항</label>
+      <textarea class="form-textarea" id="prog-note-input" placeholder="금기 동작, 주의 사항 등"></textarea>
+    </div>
+    <div class="form-group">
+      <label class="form-label">상태</label>
+      <select class="form-select" id="prog-active-select">
+        <option value="true">활성</option>
+        <option value="false">비활성</option>
+      </select>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="closeModal('modal-prog')">취소</button>
+      <button class="btn-primary" id="prog-save-btn" onclick="saveProg()">등록</button>
+    </div>
+  </div>
+</div>
+
+<!-- 모달: 동작 등록/수정 -->
+<div class="modal-overlay" id="modal-motion">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="motion-modal-title">🤸 동작 등록</div>
+      <button class="modal-close" onclick="closeModal('modal-motion')">✕</button>
+    </div>
+    <input type="hidden" id="motion-edit-idx" value="-1" />
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">부위 <span class="req">*</span></label>
+        <select class="form-select" id="motion-part-select">
+          <option value="shoulder">어깨</option>
+          <option value="knee">무릎</option>
+          <option value="back">허리</option>
+          <option value="ankle">발목</option>
+          <option value="neck">목</option>
+          <option value="hip">고관절</option>
+          <option value="etc">기타</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">동작명 <span class="req">*</span></label>
+        <input class="form-input" id="motion-name-input" type="text" placeholder="예) 펜들럼 스트레칭" />
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">난이도</label>
+        <select class="form-select" id="motion-level-select">
+          <option value="초급">초급</option>
+          <option value="중급">중급</option>
+          <option value="고급">고급</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">이모지 아이콘</label>
+        <input class="form-input" id="motion-icon-input" type="text" placeholder="예) 🤸" />
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">횟수 / 시간</label>
+        <input class="form-input" id="motion-reps-input" type="text" placeholder="예) 10회 × 3세트" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">도구</label>
+        <input class="form-input" id="motion-tool-input" type="text" placeholder="예) 탄력밴드, 없음" />
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">설명</label>
+      <textarea class="form-textarea" id="motion-desc-input" placeholder="동작 방법 및 주의사항"></textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="closeModal('modal-motion')">취소</button>
+      <button class="btn-primary" id="motion-save-btn" onclick="saveMotion()">등록</button>
+    </div>
+  </div>
+</div>
+
+<!-- 모달: 처방 등록/수정 -->
+<div class="modal-overlay" id="modal-rx">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="rx-modal-title">💊 처방 등록</div>
+      <button class="modal-close" onclick="closeModal('modal-rx')">✕</button>
+    </div>
+    <input type="hidden" id="rx-edit-idx" value="-1" />
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">회원명 <span class="req">*</span></label>
+        <input class="form-input" id="rx-member-input" type="text" placeholder="회원명 입력" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">처방일 <span class="req">*</span></label>
+        <input class="form-input" id="rx-date-input" type="date" />
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">부위 <span class="req">*</span></label>
+        <select class="form-select" id="rx-part-select">
+          <option value="shoulder">어깨</option>
+          <option value="knee">무릎</option>
+          <option value="back">허리</option>
+          <option value="ankle">발목</option>
+          <option value="neck">목</option>
+          <option value="hip">고관절</option>
+          <option value="etc">기타</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">프로그램 <span class="req">*</span></label>
+        <select class="form-select" id="rx-prog-select"></select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">담당 트레이너</label>
+        <select class="form-select" id="rx-trainer-select">
+          <option>김민수 트레이너</option>
+          <option>이수진 트레이너</option>
+          <option>박지훈 트레이너</option>
+          <option>최예은 트레이너</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">목표 기간</label>
+        <select class="form-select" id="rx-period-select">
+          <option value="2주">2주</option>
+          <option value="4주">4주</option>
+          <option value="6주">6주</option>
+          <option value="8주">8주</option>
+          <option value="12주">12주</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">메모</label>
+      <textarea class="form-textarea" id="rx-note-input" placeholder="특이사항, 주의사항 등"></textarea>
+    </div>
+    <div class="form-group">
+      <label class="form-label">상태</label>
+      <select class="form-select" id="rx-status-select">
+        <option value="active">진행 중</option>
+        <option value="done">완료</option>
+        <option value="hold">일시중단</option>
+      </select>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="closeModal('modal-rx')">취소</button>
+      <button class="btn-primary" id="rx-save-btn" onclick="saveRx()">등록</button>
+    </div>
+  </div>
+</div>
+
+<!-- 모달: 예약 등록 -->
+<div class="modal-overlay" id="modal-schedule">
+  <div class="modal" style="width:480px;">
+    <div class="modal-header">
+      <div class="modal-title">📅 예약 등록</div>
+      <button class="modal-close" onclick="closeModal('modal-schedule')">✕</button>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">날짜 <span class="req">*</span></label>
+        <input class="form-input" id="sch-date-input" type="date" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">시간 <span class="req">*</span></label>
+        <input class="form-input" id="sch-time-input" type="time" />
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">회원명 <span class="req">*</span></label>
+        <input class="form-input" id="sch-member-input" type="text" placeholder="회원명" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">트레이너</label>
+        <select class="form-select" id="sch-trainer-select">
+          <option>김민수 트레이너</option>
+          <option>이수진 트레이너</option>
+          <option>박지훈 트레이너</option>
+          <option>최예은 트레이너</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">프로그램</label>
+      <select class="form-select" id="sch-prog-select"></select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">메모</label>
+      <input class="form-input" id="sch-note-input" type="text" placeholder="특이사항" />
+    </div>
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="closeModal('modal-schedule')">취소</button>
+      <button class="btn-primary" onclick="saveSchedule()">등록</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ── 데이터 ────────────────────────────────────────────
+const partMap = {
+  shoulder:'어깨', knee:'무릎', back:'허리',
+  ankle:'발목', neck:'목', hip:'고관절', etc:'기타'
+};
+const partIcon = {
+  shoulder:'🦾', knee:'🦵', back:'🔙', ankle:'🦶', neck:'📿', hip:'🍑', etc:'💪'
+};
+const partBg = {
+  shoulder:'#EBF8FF', knee:'#FFFAF0', back:'#F0FFF4',
+  ankle:'#FFF5F5', neck:'#FAF5FF', hip:'#FFFFF0', etc:'#F7FAFC'
+};
+const partBadge = {
+  shoulder:'badge-blue', knee:'badge-orange', back:'badge-green',
+  ankle:'badge-red', neck:'badge-purple', hip:'badge-teal', etc:'badge-gray'
+};
+const levelBadge = { '초급':'badge-green', '중급':'badge-orange', '고급':'badge-red' };
+
+let progData = [
+  { part:'shoulder', name:'어깨 회전근개 재활', level:'초급', duration:'6주', freq:'주 3회', time:'40', motions:['펜들럼 스트레칭','어깨 외회전','밴드 내회전','월 슬라이드'], note:'급성기 통증 시 중단', active:true, count:8 },
+  { part:'shoulder', name:'오십견 가동성 향상', level:'중급', duration:'8주', freq:'주 4회', time:'50', motions:['크로스 바디 스트레칭','타월 스트레칭','어깨 굴곡 강화'], note:'', active:true, count:5 },
+  { part:'knee', name:'무릎 전방십자인대 재활', level:'중급', duration:'12주', freq:'주 3회', time:'60', motions:['쿼드셋','SLR 운동','클램쉘','미니 스쿼트'], note:'완전 신전 금지 초기 2주', active:true, count:6 },
+  { part:'knee', name:'무릎 연골 보호 운동', level:'초급', duration:'4주', freq:'주 2회', time:'30', motions:['수중 걷기','의자 레그 레이즈','쿼드 스트레칭'], note:'', active:true, count:3 },
+  { part:'back', name:'요통 코어 안정화', level:'초급', duration:'6주', freq:'주 3회', time:'45', motions:['맥킨지 신전','브릿지','버드독','캣-카우'], note:'디스크 탈출 시 굴곡 금기', active:true, count:11 },
+  { part:'back', name:'척추 측만증 교정', level:'중급', duration:'12주', freq:'주 3회', time:'50', motions:['사이드 플랭크','등척성 수축','슈로트 호흡'], note:'', active:true, count:4 },
+  { part:'ankle', name:'발목 염좌 재활', level:'초급', duration:'4주', freq:'주 4회', time:'30', motions:['알파벳 쓰기','밸런스 보드','카프 레이즈'], note:'', active:true, count:7 },
+  { part:'neck', name:'경추 자세 교정', level:'초급', duration:'4주', freq:'주 3회', time:'30', motions:['턱 당기기','경추 굴곡','어깨 수축'], note:'', active:true, count:9 },
+  { part:'hip', name:'고관절 충돌증후군', level:'중급', duration:'8주', freq:'주 3회', time:'45', motions:['엉덩이 스트레칭','클램쉘','힙 힌지'], note:'', active:true, count:2 },
+];
+
+let motionData = [
+  { part:'shoulder', name:'펜들럼 스트레칭', level:'초급', icon:'🫨', reps:'10회 × 3세트', tool:'없음', desc:'상체를 앞으로 숙이고 팔을 자연스럽게 늘어뜨린 후 원을 그리듯 흔든다' },
+  { part:'shoulder', name:'어깨 외회전', level:'초급', icon:'🔄', reps:'15회 × 3세트', tool:'탄력밴드', desc:'탄력밴드를 이용해 팔꿈치를 90도 구부리고 바깥쪽으로 회전' },
+  { part:'shoulder', name:'월 슬라이드', level:'초급', icon:'🖐', reps:'10회 × 2세트', tool:'없음', desc:'벽에 손을 대고 위아래로 천천히 미끄러뜨린다' },
+  { part:'knee', name:'쿼드셋', level:'초급', icon:'🦵', reps:'10회 × 3세트 유지 5초', tool:'수건', desc:'무릎 아래 수건을 받치고 무릎을 꽉 누르며 대퇴사두근 수축' },
+  { part:'knee', name:'SLR 운동', level:'초급', icon:'🦿', reps:'15회 × 3세트', tool:'없음', desc:'누워서 한쪽 다리를 곧게 들어 올린다. 발목은 90도 유지' },
+  { part:'knee', name:'미니 스쿼트', level:'중급', icon:'🏋', reps:'12회 × 3세트', tool:'없음', desc:'0~30도 범위 내 미니 스쿼트, 무릎이 발끝을 넘지 않도록' },
+  { part:'back', name:'브릿지', level:'초급', icon:'🌉', reps:'10회 × 3세트 유지 5초', tool:'없음', desc:'누워서 무릎을 세우고 엉덩이를 들어올린다' },
+  { part:'back', name:'버드독', level:'중급', icon:'🐦', reps:'10회 × 3세트 좌우', tool:'요가매트', desc:'네발기기 자세에서 반대쪽 팔다리를 동시에 뻗는다' },
+  { part:'back', name:'캣-카우', level:'초급', icon:'🐱', reps:'10회 반복', tool:'요가매트', desc:'고양이 자세와 소 자세를 교대로 반복. 호흡과 함께' },
+  { part:'ankle', name:'알파벳 쓰기', level:'초급', icon:'🦶', reps:'양발 1세트', tool:'없음', desc:'앉아서 발로 알파벳을 쓰듯 발목을 모든 방향으로 움직인다' },
+  { part:'ankle', name:'카프 레이즈', level:'초급', icon:'⬆', reps:'15회 × 3세트', tool:'없음', desc:'발꿈치를 들어올렸다 내린다. 양발 → 한 발 순서로 진행' },
+  { part:'neck', name:'턱 당기기', level:'초급', icon:'😤', reps:'10회 × 3세트 유지 5초', tool:'없음', desc:'턱을 뒤로 당겨 이중 턱을 만들듯이. 목 뒤쪽이 늘어나는 느낌' },
+  { part:'hip', name:'클램쉘', level:'초급', icon:'🐚', reps:'15회 × 3세트 좌우', tool:'탄력밴드', desc:'옆으로 누워 무릎을 구부리고 위쪽 무릎을 벌린다' },
+  { part:'hip', name:'힙 힌지', level:'중급', icon:'🍑', reps:'12회 × 3세트', tool:'없음', desc:'엉덩이를 뒤로 밀며 상체를 앞으로 기울인다. 척추 중립 유지' },
+];
+
+let rxData = [
+  { date:'2026-03-24', member:'김민준', part:'knee', prog:'무릎 전방십자인대 재활', trainer:'김민수 트레이너', period:'12주', progress:35, status:'active', note:'수술 후 8주차' },
+  { date:'2026-03-22', member:'이서연', part:'shoulder', prog:'어깨 회전근개 재활', trainer:'이수진 트레이너', period:'6주', progress:60, status:'active', note:'' },
+  { date:'2026-03-20', member:'박도현', part:'back', prog:'요통 코어 안정화', trainer:'김민수 트레이너', period:'6주', progress:80, status:'active', note:'디스크 L4-L5' },
+  { date:'2026-03-18', member:'최수아', part:'ankle', prog:'발목 염좌 재활', trainer:'박지훈 트레이너', period:'4주', progress:100, status:'done', note:'' },
+  { date:'2026-03-15', member:'정우진', part:'neck', prog:'경추 자세 교정', trainer:'최예은 트레이너', period:'4주', progress:50, status:'active', note:'일자목' },
+  { date:'2026-03-12', member:'강하은', part:'hip', prog:'고관절 충돌증후군', trainer:'이수진 트레이너', period:'8주', progress:25, status:'active', note:'' },
+  { date:'2026-03-10', member:'윤재혁', part:'back', prog:'척추 측만증 교정', trainer:'김민수 트레이너', period:'12주', progress:15, status:'hold', note:'통증 악화로 중단' },
+  { date:'2026-03-05', member:'한지민', part:'shoulder', prog:'오십견 가동성 향상', trainer:'최예은 트레이너', period:'8주', progress:100, status:'done', note:'' },
+  { date:'2026-03-01', member:'임준서', part:'knee', prog:'무릎 연골 보호 운동', trainer:'박지훈 트레이너', period:'4주', progress:100, status:'done', note:'' },
+];
+
+let scheduleData = [
+  { date:'2026-03-25', time:'09:00', member:'김민준', prog:'무릎 전방십자인대 재활', trainer:'김민수 트레이너', note:'', status:'예정' },
+  { date:'2026-03-25', time:'10:30', member:'이서연', prog:'어깨 회전근개 재활', trainer:'이수진 트레이너', note:'', status:'예정' },
+  { date:'2026-03-25', time:'14:00', member:'박도현', prog:'요통 코어 안정화', trainer:'김민수 트레이너', note:'', status:'예정' },
+  { date:'2026-03-24', time:'11:00', member:'정우진', prog:'경추 자세 교정', trainer:'최예은 트레이너', note:'', status:'완료' },
+  { date:'2026-03-24', time:'15:00', member:'강하은', prog:'고관절 충돌증후군', trainer:'이수진 트레이너', note:'', status:'완료' },
+  { date:'2026-03-23', time:'09:30', member:'김민준', prog:'무릎 전방십자인대 재활', trainer:'김민수 트레이너', note:'', status:'완료' },
+  { date:'2026-03-26', time:'10:00', member:'이서연', prog:'어깨 회전근개 재활', trainer:'이수진 트레이너', note:'', status:'예정' },
+  { date:'2026-03-27', time:'13:00', member:'박도현', prog:'요통 코어 안정화', trainer:'김민수 트레이너', note:'', status:'예정' },
+];
+
+// ── 화면 전환 ──────────────────────────────────────────
+function showScreen(id, el) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.sidebar-item').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-' + id).classList.add('active');
+  if (el) el.classList.add('active');
+  if (id === 'dashboard') renderDashboard();
+  if (id === 'programs') renderProgGrid();
+  if (id === 'motions') renderMotionGrid('all');
+  if (id === 'prescriptions') renderRxTable('all');
+  if (id === 'schedule') renderScheduleTable('all');
+  if (id === 'stats') renderStats();
+}
+
+// ── 대시보드 ──────────────────────────────────────────
+function renderDashboard() {
+  const tbody = document.getElementById('recent-rx-tbody');
+  tbody.innerHTML = rxData.slice(0,6).map((r,i) => {
+    const statusBadge = { active:'badge-green', done:'badge-blue', hold:'badge-orange' }[r.status];
+    const statusText  = { active:'진행 중', done:'완료', hold:'일시중단' }[r.status];
+    return `<tr>
+      <td>${r.date}</td>
+      <td><strong>${r.member}</strong></td>
+      <td><span class="badge ${partBadge[r.part]}">${partMap[r.part]}</span></td>
+      <td>${r.prog}</td>
+      <td>${r.trainer}</td>
+      <td style="min-width:120px;">
+        <div style="display:flex;align-items:center;gap:8px;">
+          <div class="progress-bar-wrap" style="flex:1;">
+            <div class="progress-bar" style="width:${r.progress}%;"></div>
+          </div>
+          <span style="font-size:12px;font-weight:700;color:#2F855A;">${r.progress}%</span>
+        </div>
+      </td>
+      <td><span class="badge ${statusBadge}">${statusText}</span></td>
+    </tr>`;
+  }).join('');
+
+  // 부위별 통계
+  const partCounts = {};
+  rxData.forEach(r => { partCounts[r.part] = (partCounts[r.part]||0) + 1; });
+  const total = rxData.length;
+  document.getElementById('part-stats').innerHTML = Object.entries(partCounts).map(([k,v]) => `
+    <div style="margin-bottom:12px;">
+      <div style="display:flex;justify-content:space-between;font-size:12px;font-weight:700;margin-bottom:4px;">
+        <span>${partIcon[k]} ${partMap[k]}</span><span>${v}건</span>
+      </div>
+      <div class="progress-bar-wrap">
+        <div class="progress-bar" style="width:${Math.round(v/total*100)}%;"></div>
+      </div>
+    </div>`).join('');
+
+  // 월별 완료 추이 (간이 바 차트)
+  const months = ['10월','11월','12월','1월','2월','3월'];
+  const vals   = [12, 15, 11, 18, 22, 26];
+  const maxV   = Math.max(...vals);
+  document.getElementById('monthly-chart').innerHTML = `
+    <div style="display:flex;align-items:flex-end;gap:10px;height:120px;">
+      ${months.map((m,i) => `
+        <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;">
+          <div style="font-size:11px;font-weight:700;color:#2F855A;">${vals[i]}</div>
+          <div style="width:100%;background:${i===5?'#38A169':'#C6F6D5'};border-radius:6px 6px 0 0;height:${Math.round(vals[i]/maxV*90)}px;"></div>
+          <div style="font-size:10px;color:#718096;">${m}</div>
+        </div>`).join('')}
+    </div>`;
+}
+
+// ── 프로그램 ──────────────────────────────────────────
+let _progFilter = 'all';
+
+function renderProgFilterBar() {
+  const parts = ['all', ...Object.keys(partMap)];
+  document.getElementById('prog-filter-bar').innerHTML = parts.map(p => `
+    <button class="filter-chip ${p === _progFilter ? 'active' : ''}" onclick="filterProg('${p}')">
+      ${p === 'all' ? '전체' : (partIcon[p] + ' ' + partMap[p])}
+    </button>`).join('');
+}
+
+function filterProg(part) {
+  _progFilter = part;
+  renderProgFilterBar();
+  renderProgGrid();
+}
+
+function renderProgGrid() {
+  renderProgFilterBar();
+  const list = _progFilter === 'all' ? progData : progData.filter(p => p.part === _progFilter);
+  document.getElementById('prog-grid').innerHTML = list.map((p, i) => {
+    const realIdx = progData.indexOf(p);
+    return `
+    <div class="prog-card">
+      <div class="prog-card-header">
+        <div style="display:flex;gap:12px;align-items:flex-start;">
+          <div class="prog-icon" style="background:${partBg[p.part]};">${partIcon[p.part]}</div>
+          <div>
+            <div class="prog-name">${p.name}</div>
+            <div class="prog-part">${partMap[p.part]} · ${p.duration} · ${p.freq}</div>
+          </div>
+        </div>
+        <label style="cursor:pointer;">
+          <input type="checkbox" ${p.active ? 'checked' : ''} onchange="toggleProg(${realIdx},this.checked)" style="display:none;">
+          <span style="font-size:20px;">${p.active ? '🟢' : '⚫'}</span>
+        </label>
+      </div>
+      <div class="prog-meta">
+        <span class="badge ${levelBadge[p.level]}">${p.level}</span>
+        <span class="badge badge-gray">⏱ ${p.time}분</span>
+        <span class="badge badge-gray">동작 ${p.motions.length}개</span>
+      </div>
+      <div style="font-size:12px;color:#718096;line-height:1.6;">
+        ${p.motions.map(m => `✔ ${m}`).join(' · ')}
+      </div>
+      ${p.note ? `<div style="margin-top:8px;font-size:11px;color:#E53E3E;background:#FFF5F5;padding:6px 10px;border-radius:8px;">⚠ ${p.note}</div>` : ''}
+      <div class="prog-stat-row">
+        <span>현재 이용 <strong>${p.count}</strong>명</span>
+        <span>${p.active ? '<span style="color:#38A169;">● 활성</span>' : '<span style="color:#A0AEC0;">● 비활성</span>'}</span>
+      </div>
+      <div class="prog-actions">
+        <button class="btn-sm" style="background:#C6F6D5;color:#276749;flex:1;" onclick="editProg(${realIdx})">수정</button>
+        <button class="btn-sm" style="background:#FED7D7;color:#C53030;flex:1;" onclick="deleteProg(${realIdx})">삭제</button>
+      </div>
+    </div>`;
+  }).join('') || '<div class="empty-state"><div class="icon">📋</div><p>등록된 프로그램이 없습니다.</p></div>';
+}
+
+function toggleProg(idx, checked) {
+  progData[idx].active = checked;
+  renderProgGrid();
+  showToast(checked ? '✅ 프로그램 활성화' : '⏸ 프로그램 비활성화');
+}
+
+function editProg(idx) {
+  const p = progData[idx];
+  document.getElementById('prog-modal-title').textContent = '📋 프로그램 수정';
+  document.getElementById('prog-edit-idx').value = idx;
+  document.getElementById('prog-part-select').value = p.part;
+  document.getElementById('prog-name-input').value = p.name;
+  document.getElementById('prog-level-select').value = p.level;
+  document.getElementById('prog-duration-select').value = p.duration;
+  document.getElementById('prog-freq-input').value = p.freq;
+  document.getElementById('prog-time-input').value = p.time;
+  document.getElementById('prog-motions-input').value = p.motions.join(', ');
+  document.getElementById('prog-note-input').value = p.note;
+  document.getElementById('prog-active-select').value = p.active ? 'true' : 'false';
+  document.getElementById('prog-save-btn').textContent = '저장';
+  openModal('modal-prog');
+}
+
+function saveProg() {
+  const idx  = parseInt(document.getElementById('prog-edit-idx').value);
+  const name = document.getElementById('prog-name-input').value.trim();
+  if (!name) { alert('프로그램명을 입력하세요.'); return; }
+  const obj = {
+    part:    document.getElementById('prog-part-select').value,
+    name,
+    level:   document.getElementById('prog-level-select').value,
+    duration:document.getElementById('prog-duration-select').value,
+    freq:    document.getElementById('prog-freq-input').value.trim(),
+    time:    document.getElementById('prog-time-input').value.trim(),
+    motions: document.getElementById('prog-motions-input').value.trim().split(',').map(s=>s.trim()).filter(Boolean),
+    note:    document.getElementById('prog-note-input').value.trim(),
+    active:  document.getElementById('prog-active-select').value === 'true',
+    count:   idx >= 0 ? progData[idx].count : 0,
+  };
+  if (idx >= 0) { progData[idx] = obj; showToast('✅ 프로그램이 수정되었습니다.'); }
+  else          { progData.push(obj); showToast('✅ 프로그램이 등록되었습니다.'); }
+  closeModal('modal-prog');
+  renderProgGrid();
+  resetProgModal();
+}
+
+function deleteProg(idx) {
+  if (!confirm(`"${progData[idx].name}"을(를) 삭제하시겠습니까?`)) return;
+  progData.splice(idx, 1);
+  renderProgGrid();
+  showToast('🗑 프로그램이 삭제되었습니다.');
+}
+
+function resetProgModal() {
+  document.getElementById('prog-edit-idx').value = '-1';
+  document.getElementById('prog-name-input').value = '';
+  document.getElementById('prog-freq-input').value = '';
+  document.getElementById('prog-time-input').value = '';
+  document.getElementById('prog-motions-input').value = '';
+  document.getElementById('prog-note-input').value = '';
+  document.getElementById('prog-save-btn').textContent = '등록';
+  document.getElementById('prog-modal-title').textContent = '📋 프로그램 등록';
+}
+
+// ── 동작 DB ──────────────────────────────────────────
+let _motionFilter = 'all', _motionSearch = '';
+
+function renderMotionGrid(part) {
+  if (part !== undefined) _motionFilter = part;
+  let list = motionData;
+  if (_motionFilter !== 'all') list = list.filter(m => m.part === _motionFilter);
+  if (_motionSearch) list = list.filter(m => m.name.includes(_motionSearch));
+  document.getElementById('motion-grid').innerHTML = list.map((m, i) => {
+    const realIdx = motionData.indexOf(m);
+    return `
+    <div class="motion-card" title="${m.desc}">
+      <div class="motion-icon">${m.icon}</div>
+      <div class="motion-name">${m.name}</div>
+      <div class="motion-part"><span class="badge ${partBadge[m.part]}">${partMap[m.part]}</span></div>
+      <div class="motion-meta">
+        <span class="badge ${levelBadge[m.level]}">${m.level}</span>
+        <span class="badge badge-gray">${m.reps}</span>
+        ${m.tool !== '없음' ? `<span class="badge badge-teal">${m.tool}</span>` : ''}
+      </div>
+      <div style="margin-top:10px;display:flex;gap:4px;">
+        <button class="btn-sm" style="background:#C6F6D5;color:#276749;flex:1;" onclick="editMotion(${realIdx})">수정</button>
+        <button class="btn-sm" style="background:#FED7D7;color:#C53030;flex:1;" onclick="deleteMotion(${realIdx})">삭제</button>
+      </div>
+    </div>`;
+  }).join('') || '<div style="grid-column:1/-1;"><div class="empty-state"><div class="icon">🤸</div><p>등록된 동작이 없습니다.</p></div></div>';
+}
+
+function filterMotion(part, el) {
+  _motionFilter = part;
+  document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+  if (el) el.classList.add('active');
+  renderMotionGrid();
+}
+
+function searchMotion(val) {
+  _motionSearch = val.trim();
+  renderMotionGrid();
+}
+
+function editMotion(idx) {
+  const m = motionData[idx];
+  document.getElementById('motion-modal-title').textContent = '🤸 동작 수정';
+  document.getElementById('motion-edit-idx').value = idx;
+  document.getElementById('motion-part-select').value = m.part;
+  document.getElementById('motion-name-input').value = m.name;
+  document.getElementById('motion-level-select').value = m.level;
+  document.getElementById('motion-icon-input').value = m.icon;
+  document.getElementById('motion-reps-input').value = m.reps;
+  document.getElementById('motion-tool-input').value = m.tool;
+  document.getElementById('motion-desc-input').value = m.desc;
+  document.getElementById('motion-save-btn').textContent = '저장';
+  openModal('modal-motion');
+}
+
+function saveMotion() {
+  const idx  = parseInt(document.getElementById('motion-edit-idx').value);
+  const name = document.getElementById('motion-name-input').value.trim();
+  if (!name) { alert('동작명을 입력하세요.'); return; }
+  const obj = {
+    part:  document.getElementById('motion-part-select').value,
+    name,
+    level: document.getElementById('motion-level-select').value,
+    icon:  document.getElementById('motion-icon-input').value.trim() || '🤸',
+    reps:  document.getElementById('motion-reps-input').value.trim(),
+    tool:  document.getElementById('motion-tool-input').value.trim() || '없음',
+    desc:  document.getElementById('motion-desc-input').value.trim(),
+  };
+  if (idx >= 0) { motionData[idx] = obj; showToast('✅ 동작이 수정되었습니다.'); }
+  else          { motionData.push(obj); showToast('✅ 동작이 등록되었습니다.'); }
+  closeModal('modal-motion');
+  renderMotionGrid();
+  document.getElementById('motion-edit-idx').value = '-1';
+  document.getElementById('motion-name-input').value = '';
+  document.getElementById('motion-save-btn').textContent = '등록';
+  document.getElementById('motion-modal-title').textContent = '🤸 동작 등록';
+}
+
+function deleteMotion(idx) {
+  if (!confirm(`"${motionData[idx].name}"을(를) 삭제하시겠습니까?`)) return;
+  motionData.splice(idx, 1);
+  renderMotionGrid();
+  showToast('🗑 동작이 삭제되었습니다.');
+}
+
+// ── 처방 현황 ──────────────────────────────────────────
+let _rxFilter = 'all', _rxSearch = '';
+
+function renderRxTable(filter) {
+  if (filter !== undefined) _rxFilter = filter;
+  let list = rxData;
+  if (_rxFilter !== 'all') list = list.filter(r => r.status === _rxFilter);
+  if (_rxSearch) list = list.filter(r => r.member.includes(_rxSearch));
+  const tbody = document.getElementById('rx-tbody');
+  if (!tbody) return;
+  tbody.innerHTML = list.map((r, i) => {
+    const realIdx = rxData.indexOf(r);
+    const statusBadge = { active:'badge-green', done:'badge-blue', hold:'badge-orange' }[r.status];
+    const statusText  = { active:'진행 중', done:'완료', hold:'일시중단' }[r.status];
+    return `<tr>
+      <td>${r.date}</td>
+      <td><strong>${r.member}</strong></td>
+      <td><span class="badge ${partBadge[r.part]}">${partMap[r.part]}</span></td>
+      <td>${r.prog}</td>
+      <td>${r.trainer}</td>
+      <td style="text-align:center;">${r.period}</td>
+      <td style="min-width:130px;">
+        <div style="display:flex;align-items:center;gap:8px;">
+          <div class="progress-bar-wrap" style="flex:1;">
+            <div class="progress-bar" style="width:${r.progress}%;"></div>
+          </div>
+          <span style="font-size:12px;font-weight:700;color:#2F855A;width:32px;">${r.progress}%</span>
+        </div>
+      </td>
+      <td><span class="badge ${statusBadge}">${statusText}</span></td>
+      <td>
+        <button class="btn-sm" style="background:#C6F6D5;color:#276749;" onclick="editRx(${realIdx})">수정</button>
+        <button class="btn-sm" style="background:#FED7D7;color:#C53030;margin-left:4px;" onclick="deleteRx(${realIdx})">삭제</button>
+      </td>
+    </tr>`;
+  }).join('') || `<tr><td colspan="9" style="text-align:center;padding:40px;color:#A0AEC0;">처방 내역이 없습니다.</td></tr>`;
+}
+
+function filterRx(filter, el) {
+  _rxFilter = filter;
+  document.querySelectorAll('#screen-prescriptions .filter-chip').forEach(c => c.classList.remove('active'));
+  if (el) el.classList.add('active');
+  renderRxTable();
+}
+
+function searchRx(val) {
+  _rxSearch = val.trim();
+  renderRxTable();
+}
+
+function editRx(idx) {
+  const r = rxData[idx];
+  document.getElementById('rx-modal-title').textContent = '💊 처방 수정';
+  document.getElementById('rx-edit-idx').value = idx;
+  document.getElementById('rx-member-input').value = r.member;
+  document.getElementById('rx-date-input').value = r.date;
+  document.getElementById('rx-part-select').value = r.part;
+  updateRxProgSelect(r.prog);
+  document.getElementById('rx-trainer-select').value = r.trainer;
+  document.getElementById('rx-period-select').value = r.period;
+  document.getElementById('rx-note-input').value = r.note;
+  document.getElementById('rx-status-select').value = r.status;
+  document.getElementById('rx-save-btn').textContent = '저장';
+  openModal('modal-rx');
+}
+
+function saveRx() {
+  const idx    = parseInt(document.getElementById('rx-edit-idx').value);
+  const member = document.getElementById('rx-member-input').value.trim();
+  if (!member) { alert('회원명을 입력하세요.'); return; }
+  const obj = {
+    date:    document.getElementById('rx-date-input').value,
+    member,
+    part:    document.getElementById('rx-part-select').value,
+    prog:    document.getElementById('rx-prog-select').value,
+    trainer: document.getElementById('rx-trainer-select').value,
+    period:  document.getElementById('rx-period-select').value,
+    note:    document.getElementById('rx-note-input').value.trim(),
+    status:  document.getElementById('rx-status-select').value,
+    progress: idx >= 0 ? rxData[idx].progress : 0,
+  };
+  if (idx >= 0) { rxData[idx] = obj; showToast('✅ 처방이 수정되었습니다.'); }
+  else          { rxData.unshift(obj); showToast('✅ 처방이 등록되었습니다.'); }
+  closeModal('modal-rx');
+  renderRxTable();
+  resetRxModal();
+}
+
+function deleteRx(idx) {
+  if (!confirm(`"${rxData[idx].member}" 처방을 삭제하시겠습니까?`)) return;
+  rxData.splice(idx, 1);
+  renderRxTable();
+  showToast('🗑 처방이 삭제되었습니다.');
+}
+
+function resetRxModal() {
+  document.getElementById('rx-edit-idx').value = '-1';
+  document.getElementById('rx-member-input').value = '';
+  document.getElementById('rx-date-input').value = '';
+  document.getElementById('rx-note-input').value = '';
+  document.getElementById('rx-save-btn').textContent = '등록';
+  document.getElementById('rx-modal-title').textContent = '💊 처방 등록';
+}
+
+function updateRxProgSelect(selectedName) {
+  const sel = document.getElementById('rx-prog-select');
+  sel.innerHTML = progData.map(p => `<option ${p.name === selectedName ? 'selected' : ''}>${p.name}</option>`).join('');
+}
+
+// ── 예약 관리 ──────────────────────────────────────────
+let _schedFilter = 'all';
+
+function renderScheduleTable(filter) {
+  if (filter !== undefined) _schedFilter = filter;
+  const today = '2026-03-25';
+  let list = [...scheduleData].sort((a,b) => (a.date+a.time).localeCompare(b.date+b.time));
+  if (_schedFilter === 'today')    list = list.filter(s => s.date === today);
+  if (_schedFilter === 'week')     list = list.filter(s => s.date >= '2026-03-23' && s.date <= '2026-03-29');
+  if (_schedFilter === 'upcoming') list = list.filter(s => s.date >= today && s.status === '예정');
+  const tbody = document.getElementById('schedule-tbody');
+  if (!tbody) return;
+  tbody.innerHTML = list.map((s, i) => {
+    const realIdx = scheduleData.indexOf(s);
+    const statusBadge = s.status === '완료' ? 'badge-blue' : s.status === '취소' ? 'badge-red' : 'badge-green';
+    return `<tr>
+      <td>${s.date}</td>
+      <td><strong>${s.time}</strong></td>
+      <td>${s.member}</td>
+      <td>${s.prog}</td>
+      <td>${s.trainer}</td>
+      <td style="color:#718096;">${s.note || '-'}</td>
+      <td><span class="badge ${statusBadge}">${s.status}</span></td>
+      <td>
+        ${s.status === '예정' ? `<button class="btn-sm" style="background:#C6F6D5;color:#276749;" onclick="completeSchedule(${realIdx})">완료</button>` : ''}
+        <button class="btn-sm" style="background:#FED7D7;color:#C53030;margin-left:4px;" onclick="deleteSchedule(${realIdx})">삭제</button>
+      </td>
+    </tr>`;
+  }).join('') || `<tr><td colspan="8" style="text-align:center;padding:40px;color:#A0AEC0;">예약 내역이 없습니다.</td></tr>`;
+}
+
+function filterSchedule(filter, el) {
+  _schedFilter = filter;
+  document.querySelectorAll('#screen-schedule .filter-chip').forEach(c => c.classList.remove('active'));
+  if (el) el.classList.add('active');
+  renderScheduleTable();
+}
+
+function completeSchedule(idx) {
+  scheduleData[idx].status = '완료';
+  renderScheduleTable();
+  showToast('✅ 세션 완료 처리되었습니다.');
+}
+
+function deleteSchedule(idx) {
+  if (!confirm('예약을 삭제하시겠습니까?')) return;
+  scheduleData.splice(idx, 1);
+  renderScheduleTable();
+  showToast('🗑 예약이 삭제되었습니다.');
+}
+
+function saveSchedule() {
+  const member = document.getElementById('sch-member-input').value.trim();
+  if (!member) { alert('회원명을 입력하세요.'); return; }
+  scheduleData.push({
+    date:    document.getElementById('sch-date-input').value,
+    time:    document.getElementById('sch-time-input').value,
+    member,
+    prog:    document.getElementById('sch-prog-select').value,
+    trainer: document.getElementById('sch-trainer-select').value,
+    note:    document.getElementById('sch-note-input').value.trim(),
+    status:  '예정',
+  });
+  closeModal('modal-schedule');
+  renderScheduleTable();
+  showToast('✅ 예약이 등록되었습니다.');
+}
+
+// ── 통계 ──────────────────────────────────────────────
+function renderStats() {
+  // 월별 추이
+  const months = ['10월','11월','12월','1월','2월','3월'];
+  const vals   = [18, 22, 16, 25, 28, 34];
+  const maxV   = Math.max(...vals);
+  document.getElementById('monthly-trend').innerHTML = `
+    <div style="display:flex;align-items:flex-end;gap:8px;height:140px;">
+      ${months.map((m,i) => `
+        <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;">
+          <div style="font-size:11px;font-weight:700;color:#2F855A;">${vals[i]}</div>
+          <div style="width:100%;background:${i===5?'#38A169':'#C6F6D5'};border-radius:6px 6px 0 0;height:${Math.round(vals[i]/maxV*110)}px;"></div>
+          <div style="font-size:10px;color:#718096;">${m}</div>
+        </div>`).join('')}
+    </div>`;
+
+  // 부위별 비율
+  const partCounts = {};
+  rxData.forEach(r => { partCounts[r.part] = (partCounts[r.part]||0) + 1; });
+  const total = rxData.length;
+  document.getElementById('part-pie').innerHTML = Object.entries(partCounts).map(([k,v]) => `
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+      <div style="font-size:18px;width:28px;">${partIcon[k]}</div>
+      <div style="flex:1;">
+        <div style="display:flex;justify-content:space-between;font-size:12px;font-weight:700;margin-bottom:3px;">
+          <span>${partMap[k]}</span><span>${v}건 (${Math.round(v/total*100)}%)</span>
+        </div>
+        <div class="progress-bar-wrap">
+          <div class="progress-bar" style="width:${Math.round(v/total*100)}%;"></div>
+        </div>
+      </div>
+    </div>`).join('');
+
+  // 트레이너별
+  const trainers = [
+    { name:'김민수 트레이너', active:3, monthly:5, total:28, score:4.8 },
+    { name:'이수진 트레이너', active:2, monthly:4, total:21, score:4.7 },
+    { name:'박지훈 트레이너', active:2, monthly:3, total:19, score:4.5 },
+    { name:'최예은 트레이너', active:2, monthly:3, total:15, score:4.6 },
+  ];
+  document.getElementById('trainer-stats-tbody').innerHTML = trainers.map(t => `
+    <tr>
+      <td><strong>${t.name}</strong></td>
+      <td style="text-align:center;"><span class="badge badge-green">${t.active}명</span></td>
+      <td style="text-align:center;">${t.monthly}건</td>
+      <td style="text-align:center;">${t.total}건</td>
+      <td style="text-align:center;">⭐ ${t.score}</td>
+      <td style="text-align:center;"><span class="badge badge-blue">${Math.round(t.total/(t.total+3)*100)}%</span></td>
+    </tr>`).join('');
+}
+
+// ── 모달 공통 ──────────────────────────────────────────
+function openModal(id) {
+  const overlay = document.getElementById(id);
+  overlay.classList.add('open');
+  const modal = overlay.querySelector('.modal');
+  if (modal) {
+    modal.style.position = '';
+    modal.style.left = '';
+    modal.style.top = '';
+    modal.style.margin = '';
+    makeDraggable(modal);
+  }
+  // 처방/예약 모달 프로그램 드롭다운 채우기
+  if (id === 'modal-rx' || id === 'modal-schedule') {
+    const selId = id === 'modal-rx' ? 'rx-prog-select' : 'sch-prog-select';
+    const sel = document.getElementById(selId);
+    if (sel) sel.innerHTML = progData.map(p => `<option>${p.name}</option>`).join('');
+  }
+}
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+function makeDraggable(modal) {
+  if (modal._dragReady) return;
+  modal._dragReady = true;
+  const header = modal.querySelector('.modal-header');
+  if (!header) return;
+  header.addEventListener('mousedown', function(e) {
+    if (e.target.closest('button')) return;
+    if (!modal.style.left) {
+      const r = modal.getBoundingClientRect();
+      modal.style.position = 'fixed';
+      modal.style.left = r.left + 'px';
+      modal.style.top  = r.top  + 'px';
+      modal.style.margin = '0';
+    }
+    const sx = e.clientX, sy = e.clientY;
+    const sl = parseFloat(modal.style.left), st = parseFloat(modal.style.top);
+    header.style.cursor = 'grabbing';
+    const onMove = e => {
+      modal.style.left = (sl + e.clientX - sx) + 'px';
+      modal.style.top  = (st + e.clientY - sy) + 'px';
+    };
+    const onUp = () => {
+      header.style.cursor = 'grab';
+      document.removeEventListener('mousemove', onMove);
+      document.removeEventListener('mouseup', onUp);
+    };
+    document.addEventListener('mousemove', onMove);
+    document.addEventListener('mouseup', onUp);
+    e.preventDefault();
+  });
+}
+
+document.querySelectorAll('.modal-overlay').forEach(o => {
+  o.addEventListener('click', e => { if (e.target === o) o.classList.remove('open'); });
+});
+
+// ── 토스트 ──────────────────────────────────────────
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2800);
+}
+
+// ── 초기화 ──────────────────────────────────────────
+renderDashboard();
+</script>
+</body>
+</html>
