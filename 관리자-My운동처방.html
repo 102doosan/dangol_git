@@ -737,11 +737,55 @@
               </div>
             </div>
           </div>
+          <!-- 프로그램 불러오기 -->
+          <div class="form-row-full" style="margin-top:4px;">
+            <div class="form-group">
+              <div class="form-label" style="margin-bottom:10px;">📥 프로그램 불러오기 <span style="font-size:11px;font-weight:400;color:#A0AEC0;">(선택사항 · STEP 3 운동 목록에 자동 채워집니다)</span></div>
+              <div style="background:#F7FAFC;border:1.5px solid #E2E8F0;border-radius:14px;padding:16px;">
+                <!-- 탭 -->
+                <div style="display:flex;gap:8px;margin-bottom:14px;">
+                  <button id="imp-tab-prog" onclick="switchImportTab('prog')" class="active" style="padding:7px 16px;border-radius:99px;border:1.5px solid #2F855A;background:#2F855A;color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:'Noto Sans KR',sans-serif;transition:all .15s;">🩺 재활 프로그램</button>
+                  <button id="imp-tab-routine" onclick="switchImportTab('routine')" style="padding:7px 16px;border-radius:99px;border:1.5px solid #E2E8F0;background:#fff;color:#718096;font-size:12px;font-weight:700;cursor:pointer;font-family:'Noto Sans KR',sans-serif;transition:all .15s;">🔄 회복 루틴</button>
+                </div>
+                <!-- 재활 프로그램 패널 -->
+                <div id="imp-panel-prog" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+                  <select id="imp-prog-sel" class="form-select" style="flex:1;min-width:200px;">
+                    <option value="">재활 프로그램 선택</option>
+                    <option value="0">어깨 회전근개 재활 (초급)</option>
+                    <option value="1">오십견 가동성 향상 (중급)</option>
+                    <option value="2">무릎 전방십자인대 재활 (중급)</option>
+                    <option value="3">무릎 연골 보호 운동 (초급)</option>
+                    <option value="4">요통 코어 안정화 (초급)</option>
+                    <option value="5">척추 측만증 교정 (중급)</option>
+                    <option value="6">발목 염좌 재활 (초급)</option>
+                    <option value="7">경추 자세 교정 (초급)</option>
+                    <option value="8">고관절 충돌증후군 (중급)</option>
+                  </select>
+                  <button onclick="loadProgToStep3()" style="background:#E67E22;color:#fff;border:none;border-radius:10px;padding:10px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Noto Sans KR',sans-serif;white-space:nowrap;">STEP 3에 불러오기</button>
+                </div>
+                <!-- 회복 루틴 패널 -->
+                <div id="imp-panel-routine" style="display:none;gap:10px;align-items:center;flex-wrap:wrap;">
+                  <select id="imp-cat-sel" class="form-select" onchange="onImportCatChange()" style="flex:1;min-width:160px;">
+                    <option value="">시술/수술 유형 선택</option>
+                    <option value="0">디스크 시술</option>
+                    <option value="1">무릎 인공관절 수술</option>
+                    <option value="2">어깨 회전근개 수술</option>
+                    <option value="3">발목 인대 재건술</option>
+                    <option value="4">경추 디스크 수술</option>
+                  </select>
+                  <select id="imp-week-sel" class="form-select" style="flex:1;min-width:200px;">
+                    <option value="">주차 선택</option>
+                  </select>
+                  <button onclick="loadRoutineToStep3()" style="background:#E67E22;color:#fff;border:none;border-radius:10px;padding:10px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Noto Sans KR',sans-serif;white-space:nowrap;">STEP 3에 불러오기</button>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
 
         <!-- STEP 3: 운동 구성 -->
         <div class="form-panel">
-          <div class="form-panel-title">🏋️ STEP 3 · 운동 동작 구성</div>
+          <div class="form-panel-title" data-step="3">🏋️ STEP 3 · 운동 동작 구성</div>
           <div class="step3-wrap">
             <!-- 왼쪽: 운동 검색 패널 -->
             <div class="step3-left">
@@ -1139,6 +1183,91 @@
       '목·어깨':'#805AD5','허리·척추':'#E53E3E','코어':'#E67E22',
       '하체':'#3182CE','상체':'#276749','전신':'#2A69AC'
     };
+
+    /* ── 재활운동 관리 데이터 (관리자-재활운동.html과 동기화) ── */
+    const importProgData = [
+      { part:'shoulder', name:'어깨 회전근개 재활', level:'초급', motions:['펜들럼 스트레칭','어깨 외회전','밴드 내회전','월 슬라이드'] },
+      { part:'shoulder', name:'오십견 가동성 향상', level:'중급', motions:['크로스 바디 스트레칭','타월 스트레칭','어깨 굴곡 강화'] },
+      { part:'knee',     name:'무릎 전방십자인대 재활', level:'중급', motions:['쿼드셋','SLR 운동','클램쉘','미니 스쿼트'] },
+      { part:'knee',     name:'무릎 연골 보호 운동', level:'초급', motions:['수중 걷기','의자 레그 레이즈','쿼드 스트레칭'] },
+      { part:'back',     name:'요통 코어 안정화', level:'초급', motions:['맥킨지 신전','브릿지','버드독','캣-카우'] },
+      { part:'back',     name:'척추 측만증 교정', level:'중급', motions:['사이드 플랭크','등척성 수축','슈로트 호흡'] },
+      { part:'ankle',    name:'발목 염좌 재활', level:'초급', motions:['알파벳 쓰기','밸런스 보드','카프 레이즈'] },
+      { part:'neck',     name:'경추 자세 교정', level:'초급', motions:['턱 당기기','경추 굴곡','어깨 수축'] },
+      { part:'hip',      name:'고관절 충돌증후군', level:'중급', motions:['엉덩이 스트레칭','클램쉘','힙 힌지'] },
+    ];
+    const importRxCatList = [
+      { id:1, name:'디스크 시술' },
+      { id:2, name:'무릎 인공관절 수술' },
+      { id:3, name:'어깨 회전근개 수술' },
+      { id:4, name:'발목 인대 재건술' },
+      { id:5, name:'경추 디스크 수술' },
+    ];
+    const importRxTemplates = [
+      { catId:1, weekStart:1, weekEnd:2,  goal:'안정화 및 급성 통증 조절', exercises:[{name:'복식 호흡',reps:'5분',sets:'1'},{name:'맥킨지 신전',reps:'10회',sets:'3'},{name:'발목 펌핑',reps:'20회',sets:'2'}] },
+      { catId:1, weekStart:3, weekEnd:4,  goal:'유연성 회복 및 코어 안정화 시작', exercises:[{name:'맥킨지 신전',reps:'10회',sets:'3'},{name:'브릿지',reps:'10회',sets:'3'},{name:'캣-카우',reps:'10회',sets:'2'}] },
+      { catId:1, weekStart:5, weekEnd:8,  goal:'근력 강화 및 기능 회복', exercises:[{name:'브릿지',reps:'15회',sets:'3'},{name:'버드독',reps:'10회',sets:'3'},{name:'플랭크',reps:'30초',sets:'3'},{name:'스쿼트',reps:'12회',sets:'3'}] },
+      { catId:1, weekStart:9, weekEnd:12, goal:'일상 복귀 및 재발 방지', exercises:[{name:'버드독',reps:'15회',sets:'3'},{name:'데드버그',reps:'10회',sets:'3'},{name:'런지',reps:'10회',sets:'3'}] },
+      { catId:2, weekStart:1, weekEnd:2,  goal:'부종 감소, 기본 가동범위 회복', exercises:[{name:'발목 펌핑',reps:'20회',sets:'3'},{name:'쿼드셋',reps:'10회',sets:'3'},{name:'SLR 운동',reps:'10회',sets:'2'}] },
+      { catId:2, weekStart:3, weekEnd:4,  goal:'보행 정상화, 굴곡 90도 목표', exercises:[{name:'미니 스쿼트',reps:'10회',sets:'3'},{name:'레그 프레스',reps:'10회',sets:'3'},{name:'스텝업',reps:'10회',sets:'2'}] },
+      { catId:2, weekStart:5, weekEnd:8,  goal:'근력 강화, 굴곡 120도 목표', exercises:[{name:'레그 익스텐션',reps:'12회',sets:'3'},{name:'레그 컬',reps:'12회',sets:'3'},{name:'계단 오르기',reps:'5분',sets:'2'}] },
+      { catId:3, weekStart:1, weekEnd:4,  goal:'보호기 — 수동 운동만', exercises:[{name:'펜들럼 스트레칭',reps:'10회',sets:'3'},{name:'손목·손가락 운동',reps:'10회',sets:'3'}] },
+      { catId:3, weekStart:5, weekEnd:8,  goal:'수동→능동 보조 운동', exercises:[{name:'도르래 운동',reps:'10회',sets:'3'},{name:'어깨 외회전',reps:'10회',sets:'3'}] },
+      { catId:4, weekStart:1, weekEnd:2,  goal:'부종 조절, 발목 안정화', exercises:[{name:'발가락 운동',reps:'10회',sets:'3'},{name:'발목 알파벳',reps:'1세트',sets:'2'}] },
+      { catId:4, weekStart:3, weekEnd:6,  goal:'가동범위 회복', exercises:[{name:'카프 레이즈',reps:'15회',sets:'3'},{name:'밸런스 훈련',reps:'30초',sets:'3'}] },
+    ];
+
+    let _importTab = 'prog'; // 'prog' | 'routine'
+
+    function switchImportTab(tab) {
+      _importTab = tab;
+      const tProg = document.getElementById('imp-tab-prog');
+      const tRout = document.getElementById('imp-tab-routine');
+      if (tab === 'prog') {
+        tProg.style.background = '#2F855A'; tProg.style.borderColor = '#2F855A'; tProg.style.color = '#fff';
+        tRout.style.background = '#fff';    tRout.style.borderColor = '#E2E8F0';  tRout.style.color = '#718096';
+      } else {
+        tRout.style.background = '#2F855A'; tRout.style.borderColor = '#2F855A'; tRout.style.color = '#fff';
+        tProg.style.background = '#fff';    tProg.style.borderColor = '#E2E8F0';  tProg.style.color = '#718096';
+      }
+      document.getElementById('imp-panel-prog').style.display = tab === 'prog' ? 'flex' : 'none';
+      document.getElementById('imp-panel-routine').style.display = tab === 'routine' ? 'flex' : 'none';
+    }
+
+    function onImportCatChange() {
+      const catIdx = parseInt(document.getElementById('imp-cat-sel').value);
+      const weekSel = document.getElementById('imp-week-sel');
+      weekSel.innerHTML = '<option value="">주차 선택</option>';
+      if (isNaN(catIdx) || catIdx < 0) return;
+      const cat = importRxCatList[catIdx];
+      importRxTemplates.filter(t => t.catId === cat.id).forEach((t, i) => {
+        const realIdx = importRxTemplates.indexOf(t);
+        weekSel.innerHTML += `<option value="${realIdx}">${t.weekStart}~${t.weekEnd}주차 · ${t.goal}</option>`;
+      });
+    }
+
+    function loadProgToStep3() {
+      const idx = parseInt(document.getElementById('imp-prog-sel').value);
+      if (isNaN(idx) || idx < 0) { alert('프로그램을 선택하세요.'); return; }
+      const prog = importProgData[idx];
+      const newItems = prog.motions.map(m => ({ name: m, sets: '3세트', reps: '10회', importance: '필수' }));
+      if (step3Items.length && !confirm(`현재 선택된 운동 ${step3Items.length}개가 교체됩니다. 계속하시겠습니까?`)) return;
+      step3Items = newItems;
+      renderStep3Selected();
+      renderStep3List();
+      document.querySelector('.form-panel-title[data-step="3"]')?.scrollIntoView({ behavior:'smooth', block:'start' });
+    }
+
+    function loadRoutineToStep3() {
+      const tmplIdx = parseInt(document.getElementById('imp-week-sel').value);
+      if (isNaN(tmplIdx) || tmplIdx < 0) { alert('카테고리와 주차를 선택하세요.'); return; }
+      const tmpl = importRxTemplates[tmplIdx];
+      const newItems = tmpl.exercises.map(e => ({ name: e.name, sets: e.sets + '세트', reps: e.reps, importance: '필수' }));
+      if (step3Items.length && !confirm(`현재 선택된 운동 ${step3Items.length}개가 교체됩니다. 계속하시겠습니까?`)) return;
+      step3Items = newItems;
+      renderStep3Selected();
+      renderStep3List();
+    }
 
     /* 회원별 처방 이력 데이터 (data.js 공유 데이터 사용) */
     const memberPrescriptions = window.APP_DATA.members;
