@@ -395,13 +395,6 @@
     <div class="sidebar-item" onclick="showScreen('motions',this)">
       <span class="sidebar-item-icon">🤸</span> 동작 DB
     </div>
-    <div class="sidebar-section">회원 관리</div>
-    <div class="sidebar-item" onclick="showScreen('prescriptions',this)">
-      <span class="sidebar-item-icon">💊</span> 처방 현황
-    </div>
-    <div class="sidebar-item" onclick="showScreen('schedule',this)">
-      <span class="sidebar-item-icon">📅</span> 예약 관리
-    </div>
     <div class="sidebar-section">분석</div>
     <div class="sidebar-item" onclick="showScreen('stats',this)">
       <span class="sidebar-item-icon">📈</span> 통계/리포트
@@ -420,7 +413,6 @@
         </div>
         <div class="page-actions">
           <button class="btn-outline" onclick="window.print()">🖨 인쇄</button>
-          <button class="btn-primary" onclick="showScreen('prescriptions', document.querySelectorAll('.sidebar-item')[4])">+ 처방 등록</button>
         </div>
       </div>
       <div class="stats-row">
@@ -429,11 +421,7 @@
           <div class="stat-value">12</div>
           <div class="stat-change">▲ 2 지난달 대비</div>
         </div>
-        <div class="stat-card" onclick="showScreen('prescriptions', document.querySelectorAll('.sidebar-item')[4])">
-          <div class="stat-label"><span class="stat-icon">💊</span> 이달 처방</div>
-          <div class="stat-value">34</div>
-          <div class="stat-change">▲ 8 지난달 대비</div>
-        </div>
+
         <div class="stat-card">
           <div class="stat-label"><span class="stat-icon">🏃</span> 진행 중 회원</div>
           <div class="stat-value">21</div>
@@ -513,64 +501,7 @@
       <div class="motion-grid" id="motion-grid"></div>
     </div>
 
-    <!-- ④ 처방 현황 -->
-    <div class="screen" id="screen-prescriptions">
-      <div class="page-header">
-        <div>
-          <div class="page-title">💊 처방 현황</div>
-          <div class="page-sub">회원별 재활운동 처방 및 진행 현황</div>
-        </div>
-        <div class="page-actions">
-          <button class="btn-secondary" onclick="filterRx('all',null)">전체</button>
-          <button class="btn-primary" onclick="openModal('modal-rx')">+ 처방 등록</button>
-        </div>
-      </div>
-      <div class="filter-bar">
-        <button class="filter-chip active" onclick="filterRx('all',this)">전체</button>
-        <button class="filter-chip" onclick="filterRx('active',this)">진행 중</button>
-        <button class="filter-chip" onclick="filterRx('done',this)">완료</button>
-        <button class="filter-chip" onclick="filterRx('hold',this)">일시중단</button>
-        <input class="search-input" placeholder="🔍 회원명 검색" oninput="searchRx(this.value)" />
-      </div>
-      <div class="card-wrap">
-        <table>
-          <thead><tr>
-            <th>처방일</th><th>회원명</th><th>부위</th><th>프로그램</th>
-            <th>담당 트레이너</th><th>기간</th><th>진행률</th><th>상태</th><th>관리</th>
-          </tr></thead>
-          <tbody id="rx-tbody"></tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- ⑤ 예약 관리 -->
-    <div class="screen" id="screen-schedule">
-      <div class="page-header">
-        <div>
-          <div class="page-title">📅 예약 관리</div>
-          <div class="page-sub">재활운동 세션 예약 현황</div>
-        </div>
-        <div class="page-actions">
-          <button class="btn-primary" onclick="openModal('modal-schedule')">+ 예약 등록</button>
-        </div>
-      </div>
-      <div class="filter-bar">
-        <button class="filter-chip active" onclick="filterSchedule('all',this)">전체</button>
-        <button class="filter-chip" onclick="filterSchedule('today',this)">오늘</button>
-        <button class="filter-chip" onclick="filterSchedule('week',this)">이번 주</button>
-        <button class="filter-chip" onclick="filterSchedule('upcoming',this)">예정</button>
-      </div>
-      <div class="card-wrap">
-        <table>
-          <thead><tr>
-            <th>날짜</th><th>시간</th><th>회원명</th><th>프로그램</th><th>트레이너</th><th>메모</th><th>상태</th><th>관리</th>
-          </tr></thead>
-          <tbody id="schedule-tbody"></tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- ⑥ 통계/리포트 -->
+    <!-- ④ 통계/리포트 -->
     <div class="screen" id="screen-stats">
       <div class="page-header">
         <div>
@@ -859,8 +790,8 @@
   </div>
 </div>
 
-<!-- 모달: 처방 등록/수정 -->
-<div class="modal-overlay" id="modal-rx">
+<!-- (처방/예약 모달 제거됨) -->
+<div class="modal-overlay" id="modal-rx" style="display:none!important;">
   <div class="modal">
     <div class="modal-header">
       <div class="modal-title" id="rx-modal-title">💊 처방 등록</div>
@@ -962,8 +893,7 @@
   </div>
 </div>
 
-<!-- 모달: 예약 등록 -->
-<div class="modal-overlay" id="modal-schedule">
+<div class="modal-overlay" id="modal-schedule" style="display:none!important;">
   <div class="modal" style="width:480px;">
     <div class="modal-header">
       <div class="modal-title">📅 예약 등록</div>
@@ -1210,8 +1140,6 @@ function showScreen(id, el) {
   if (id === 'protocols') { renderRpLeft(); if (_rpSelectedCat >= 0 && _rpSelectedTmpl >= 0) renderRpRight(); }
   if (id === 'programs') renderProgGrid();
   if (id === 'motions') renderMotionGrid('all');
-  if (id === 'prescriptions') renderRxTable('all');
-  if (id === 'schedule') renderScheduleTable('all');
   if (id === 'stats') renderStats();
 }
 
@@ -1918,182 +1846,6 @@ function deleteMotion(idx) {
   showToast('🗑 동작이 삭제되었습니다.');
 }
 
-// ── 처방 현황 ──────────────────────────────────────────
-let _rxFilter = 'all', _rxSearch = '';
-
-function renderRxTable(filter) {
-  if (filter !== undefined) _rxFilter = filter;
-  let list = rxData;
-  if (_rxFilter !== 'all') list = list.filter(r => r.status === _rxFilter);
-  if (_rxSearch) list = list.filter(r => r.member.includes(_rxSearch));
-  const tbody = document.getElementById('rx-tbody');
-  if (!tbody) return;
-  tbody.innerHTML = list.map((r, i) => {
-    const realIdx = rxData.indexOf(r);
-    const statusBadge = { active:'badge-green', done:'badge-blue', hold:'badge-orange' }[r.status];
-    const statusText  = { active:'진행 중', done:'완료', hold:'일시중단' }[r.status];
-    return `<tr>
-      <td>${r.date}</td>
-      <td><strong>${r.member}</strong></td>
-      <td><span class="badge ${partBadge[r.part]}">${partMap[r.part]}</span></td>
-      <td>${r.prog}</td>
-      <td>${r.trainer}</td>
-      <td style="text-align:center;">${r.period}</td>
-      <td style="min-width:130px;">
-        <div style="display:flex;align-items:center;gap:8px;">
-          <div class="progress-bar-wrap" style="flex:1;">
-            <div class="progress-bar" style="width:${r.progress}%;"></div>
-          </div>
-          <span style="font-size:12px;font-weight:700;color:#2F855A;width:32px;">${r.progress}%</span>
-        </div>
-      </td>
-      <td><span class="badge ${statusBadge}">${statusText}</span></td>
-      <td>
-        <button class="btn-sm" style="background:#C6F6D5;color:#276749;" onclick="editRx(${realIdx})">수정</button>
-        <button class="btn-sm" style="background:#FED7D7;color:#C53030;margin-left:4px;" onclick="deleteRx(${realIdx})">삭제</button>
-      </td>
-    </tr>`;
-  }).join('') || `<tr><td colspan="9" style="text-align:center;padding:40px;color:#A0AEC0;">처방 내역이 없습니다.</td></tr>`;
-}
-
-function filterRx(filter, el) {
-  _rxFilter = filter;
-  document.querySelectorAll('#screen-prescriptions .filter-chip').forEach(c => c.classList.remove('active'));
-  if (el) el.classList.add('active');
-  renderRxTable();
-}
-
-function searchRx(val) {
-  _rxSearch = val.trim();
-  renderRxTable();
-}
-
-function editRx(idx) {
-  const r = rxData[idx];
-  document.getElementById('rx-modal-title').textContent = '💊 처방 수정';
-  document.getElementById('rx-edit-idx').value = idx;
-  document.getElementById('rx-member-input').value = r.member;
-  document.getElementById('rx-date-input').value = r.date;
-  document.getElementById('rx-part-select').value = r.part;
-  updateRxProgSelect(r.prog);
-  document.getElementById('rx-trainer-select').value = r.trainer;
-  document.getElementById('rx-period-select').value = r.period;
-  document.getElementById('rx-note-input').value = r.note;
-  document.getElementById('rx-status-select').value = r.status;
-  document.getElementById('rx-save-btn').textContent = '저장';
-  openModal('modal-rx');
-}
-
-function saveRx() {
-  const idx    = parseInt(document.getElementById('rx-edit-idx').value);
-  const member = document.getElementById('rx-member-input').value.trim();
-  if (!member) { alert('회원명을 입력하세요.'); return; }
-  const obj = {
-    date:    document.getElementById('rx-date-input').value,
-    member,
-    part:    document.getElementById('rx-part-select').value,
-    prog:    document.getElementById('rx-prog-select').value,
-    trainer: document.getElementById('rx-trainer-select').value,
-    period:  document.getElementById('rx-period-select').value,
-    note:    document.getElementById('rx-note-input').value.trim(),
-    status:  document.getElementById('rx-status-select').value,
-    progress: idx >= 0 ? rxData[idx].progress : 0,
-  };
-  if (idx >= 0) { rxData[idx] = obj; showToast('✅ 처방이 수정되었습니다.'); }
-  else          { rxData.unshift(obj); showToast('✅ 처방이 등록되었습니다.'); }
-  closeModal('modal-rx');
-  renderRxTable();
-  resetRxModal();
-}
-
-function deleteRx(idx) {
-  if (!confirm(`"${rxData[idx].member}" 처방을 삭제하시겠습니까?`)) return;
-  rxData.splice(idx, 1);
-  renderRxTable();
-  showToast('🗑 처방이 삭제되었습니다.');
-}
-
-function resetRxModal() {
-  document.getElementById('rx-edit-idx').value = '-1';
-  document.getElementById('rx-member-input').value = '';
-  document.getElementById('rx-date-input').value = '';
-  document.getElementById('rx-note-input').value = '';
-  document.getElementById('rx-save-btn').textContent = '등록';
-  document.getElementById('rx-modal-title').textContent = '💊 처방 등록';
-}
-
-function updateRxProgSelect(selectedName) {
-  const sel = document.getElementById('rx-prog-select');
-  sel.innerHTML = progData.map(p => `<option ${p.name === selectedName ? 'selected' : ''}>${p.name}</option>`).join('');
-}
-
-// ── 예약 관리 ──────────────────────────────────────────
-let _schedFilter = 'all';
-
-function renderScheduleTable(filter) {
-  if (filter !== undefined) _schedFilter = filter;
-  const today = '2026-03-25';
-  let list = [...scheduleData].sort((a,b) => (a.date+a.time).localeCompare(b.date+b.time));
-  if (_schedFilter === 'today')    list = list.filter(s => s.date === today);
-  if (_schedFilter === 'week')     list = list.filter(s => s.date >= '2026-03-23' && s.date <= '2026-03-29');
-  if (_schedFilter === 'upcoming') list = list.filter(s => s.date >= today && s.status === '예정');
-  const tbody = document.getElementById('schedule-tbody');
-  if (!tbody) return;
-  tbody.innerHTML = list.map((s, i) => {
-    const realIdx = scheduleData.indexOf(s);
-    const statusBadge = s.status === '완료' ? 'badge-blue' : s.status === '취소' ? 'badge-red' : 'badge-green';
-    return `<tr>
-      <td>${s.date}</td>
-      <td><strong>${s.time}</strong></td>
-      <td>${s.member}</td>
-      <td>${s.prog}</td>
-      <td>${s.trainer}</td>
-      <td style="color:#718096;">${s.note || '-'}</td>
-      <td><span class="badge ${statusBadge}">${s.status}</span></td>
-      <td>
-        ${s.status === '예정' ? `<button class="btn-sm" style="background:#C6F6D5;color:#276749;" onclick="completeSchedule(${realIdx})">완료</button>` : ''}
-        <button class="btn-sm" style="background:#FED7D7;color:#C53030;margin-left:4px;" onclick="deleteSchedule(${realIdx})">삭제</button>
-      </td>
-    </tr>`;
-  }).join('') || `<tr><td colspan="8" style="text-align:center;padding:40px;color:#A0AEC0;">예약 내역이 없습니다.</td></tr>`;
-}
-
-function filterSchedule(filter, el) {
-  _schedFilter = filter;
-  document.querySelectorAll('#screen-schedule .filter-chip').forEach(c => c.classList.remove('active'));
-  if (el) el.classList.add('active');
-  renderScheduleTable();
-}
-
-function completeSchedule(idx) {
-  scheduleData[idx].status = '완료';
-  renderScheduleTable();
-  showToast('✅ 세션 완료 처리되었습니다.');
-}
-
-function deleteSchedule(idx) {
-  if (!confirm('예약을 삭제하시겠습니까?')) return;
-  scheduleData.splice(idx, 1);
-  renderScheduleTable();
-  showToast('🗑 예약이 삭제되었습니다.');
-}
-
-function saveSchedule() {
-  const member = document.getElementById('sch-member-input').value.trim();
-  if (!member) { alert('회원명을 입력하세요.'); return; }
-  scheduleData.push({
-    date:    document.getElementById('sch-date-input').value,
-    time:    document.getElementById('sch-time-input').value,
-    member,
-    prog:    document.getElementById('sch-prog-select').value,
-    trainer: document.getElementById('sch-trainer-select').value,
-    note:    document.getElementById('sch-note-input').value.trim(),
-    status:  '예정',
-  });
-  closeModal('modal-schedule');
-  renderScheduleTable();
-  showToast('✅ 예약이 등록되었습니다.');
-}
 
 // ── 통계 ──────────────────────────────────────────────
 function renderStats() {
@@ -2157,12 +1909,6 @@ function openModal(id) {
     modal.style.top = '';
     modal.style.margin = '';
     makeDraggable(modal);
-  }
-  // 처방/예약 모달 프로그램 드롭다운 채우기
-  if (id === 'modal-rx' || id === 'modal-schedule') {
-    const selId = id === 'modal-rx' ? 'rx-prog-select' : 'sch-prog-select';
-    const sel = document.getElementById(selId);
-    if (sel) sel.innerHTML = progData.map(p => `<option>${p.name}</option>`).join('');
   }
 }
 function closeModal(id) { document.getElementById(id).classList.remove('open'); }
