@@ -728,7 +728,7 @@
       </div>
       <div class="form-group">
         <label class="form-label">할인가</label>
-        <input class="form-input" type="text" placeholder="예) 63200 (20% 할인)" />
+        <input class="form-input" id="ticket-discount-input" type="text" placeholder="예) 63200 (20% 할인)" />
       </div>
     </div>
     <div class="form-row">
@@ -746,16 +746,16 @@
       </div>
       <div class="form-group">
         <label class="form-label">이용 횟수</label>
-        <input class="form-input" type="text" placeholder="횟수제일 경우 입력 (예: 10)" />
+        <input class="form-input" id="ticket-count-input" type="text" placeholder="횟수제일 경우 입력 (예: 10)" />
       </div>
     </div>
     <div class="form-group">
       <label class="form-label">혜택 설명</label>
-      <input class="form-input" type="text" placeholder="예) 입장 제한 없음, AI 코칭 포함" />
+      <input class="form-input" id="ticket-benefit-input" type="text" placeholder="예) 입장 제한 없음, AI 코칭 포함" />
     </div>
     <div class="form-group">
       <label class="form-label">상세 설명</label>
-      <textarea class="form-textarea" placeholder="이용권 상세 설명을 입력하세요..."></textarea>
+      <textarea class="form-textarea" id="ticket-desc-input" placeholder="이용권 상세 설명을 입력하세요..."></textarea>
     </div>
     <div class="form-row">
       <div class="form-group">
@@ -767,7 +767,7 @@
       </div>
       <div class="form-group">
         <label class="form-label">태그</label>
-        <input class="form-input" type="text" placeholder="예) 인기, NEW, 추천" />
+        <input class="form-input" id="ticket-tag-input" type="text" placeholder="예) 인기, NEW, 추천" />
       </div>
     </div>
     <div class="modal-actions">
@@ -1159,6 +1159,11 @@
         durSel.selectedIndex = i; break;
       }
     }
+    document.getElementById('ticket-discount-input').value = t.discount || '';
+    document.getElementById('ticket-count-input').value    = t.count    || '';
+    document.getElementById('ticket-benefit-input').value  = (t.features || []).join(', ');
+    document.getElementById('ticket-desc-input').value     = t.desc     || '';
+    document.getElementById('ticket-tag-input').value      = t.tag      || '';
     document.getElementById('ticket-save-btn').textContent = '저장';
     openModal('modal-ticket-add');
   }
@@ -1265,14 +1270,25 @@
     const idx = parseInt(document.getElementById('ticket-edit-idx').value);
     const name = document.getElementById('ticket-name-input').value.trim();
     if (!name) { alert('이용권명을 입력해주세요.'); return; }
-    const cat = document.getElementById('ticket-cat-select').value;
-    const price = document.getElementById('ticket-price-input').value.trim();
-    const active = document.getElementById('ticket-status-select').value === 'true';
+    const cat      = document.getElementById('ticket-cat-select').value;
+    const price    = document.getElementById('ticket-price-input').value.trim();
+    const active   = document.getElementById('ticket-status-select').value === 'true';
+    const discount = document.getElementById('ticket-discount-input').value.trim();
+    const count    = document.getElementById('ticket-count-input').value.trim();
+    const benefit  = document.getElementById('ticket-benefit-input').value.trim();
+    const desc     = document.getElementById('ticket-desc-input').value.trim();
+    const tag      = document.getElementById('ticket-tag-input').value.trim();
+    const features = benefit ? benefit.split(',').map(s => s.trim()).filter(Boolean) : [];
     if (idx >= 0) {
-      ticketData[idx].name = name;
-      ticketData[idx].cat = cat;
-      ticketData[idx].price = price;
-      ticketData[idx].active = active;
+      ticketData[idx].name     = name;
+      ticketData[idx].cat      = cat;
+      ticketData[idx].price    = price;
+      ticketData[idx].active   = active;
+      ticketData[idx].discount = discount;
+      ticketData[idx].count    = count;
+      ticketData[idx].features = features;
+      ticketData[idx].desc     = desc;
+      ticketData[idx].tag      = tag;
       closeModal('modal-ticket-add');
       renderTicketGrid();
       showToast('✅ 이용권이 수정되었습니다.');
@@ -1291,9 +1307,14 @@
     }
     // 모달 초기화
     document.getElementById('ticket-modal-title').textContent = '🎟️ 이용권 등록';
-    document.getElementById('ticket-edit-idx').value = '-1';
-    document.getElementById('ticket-name-input').value = '';
-    document.getElementById('ticket-price-input').value = '';
+    document.getElementById('ticket-edit-idx').value      = '-1';
+    document.getElementById('ticket-name-input').value     = '';
+    document.getElementById('ticket-price-input').value    = '';
+    document.getElementById('ticket-discount-input').value = '';
+    document.getElementById('ticket-count-input').value    = '';
+    document.getElementById('ticket-benefit-input').value  = '';
+    document.getElementById('ticket-desc-input').value     = '';
+    document.getElementById('ticket-tag-input').value      = '';
     document.getElementById('ticket-save-btn').textContent = '등록';
   }
 
