@@ -167,6 +167,32 @@
     .modal-close { font-size: 22px; cursor: pointer; color: #A0AEC0; background: none; border: none; }
     .modal-actions { display: flex; gap: 10px; margin-top: 20px; justify-content: flex-end; }
 
+    /* 회차별 수행 이력 타임라인 */
+    .mlog-timeline-wrap { position: relative; padding-left: 28px; }
+    .mlog-timeline-wrap::before { content:''; position:absolute; left:7px; top:8px; bottom:0; width:2px; background:#E2E8F0; }
+    .mlog-session { position: relative; margin-bottom: 18px; }
+    .mlog-dot { position:absolute; left:-21px; top:4px; width:14px; height:14px; border-radius:50%; background:#ED8936; border:2px solid #fff; box-shadow:0 0 0 2px #ED8936; z-index:1; }
+    .mlog-dot.done   { background:#ED8936; box-shadow:0 0 0 2px #ED8936; }
+    .mlog-dot.hold   { background:#FC8181; box-shadow:0 0 0 2px #FC8181; }
+    .mlog-dot.more   { background:#fff; border:2px solid #CBD5E0; box-shadow:none; }
+    .mlog-date-label { font-size:12px; color:#A0AEC0; font-weight:600; margin-bottom:6px; }
+    .mlog-card { background:#fff; border:1.5px solid #E2E8F0; border-radius:12px; padding:12px 14px; }
+    .mlog-card-title { font-size:13px; font-weight:800; color:#1A202C; margin-bottom:6px; display:flex; align-items:center; gap:8px; }
+    .mlog-badge { font-size:11px; font-weight:700; padding:2px 8px; border-radius:99px; }
+    .mlog-badge-done { background:#C6F6D5; color:#276749; }
+    .mlog-badge-hold { background:#FED7D7; color:#C53030; }
+    .mlog-card-meta  { font-size:12px; color:#4A5568; display:flex; gap:14px; flex-wrap:wrap; margin-bottom:6px; }
+    .mlog-card-meta strong { color:#1A202C; }
+    .mlog-detail-btn { font-size:12px; font-weight:700; color:#2F855A; cursor:pointer; background:none; border:none; padding:0; font-family:'Noto Sans KR',sans-serif; }
+    .mlog-detail-btn:hover { text-decoration:underline; }
+    .mlog-detail-body { display:none; margin-top:10px; border-top:1px dashed #E2E8F0; padding-top:10px; }
+    .mlog-detail-body.open { display:block; }
+    .mlog-ex-row { display:flex; align-items:center; gap:8px; padding:4px 0; font-size:12px; border-bottom:1px solid #F7FAFC; }
+    .mlog-ex-row:last-child { border-bottom:none; }
+    .mlog-ex-check { font-size:14px; flex-shrink:0; }
+    .mlog-ex-name { font-weight:700; flex:1; }
+    .mlog-ex-sets { color:#718096; }
+
     /* 와이드 모달 */
     .modal-wide { width: 900px !important; max-width: 98vw !important; }
 
@@ -911,7 +937,7 @@
 
 <!-- 모달: 회원 운동기록 -->
 <div class="modal-overlay" id="modal-member-log">
-  <div class="modal" style="width:680px;">
+  <div class="modal" style="width:600px;">
     <div class="modal-header">
       <div>
         <div class="modal-title" id="mlog-title">🏃 운동기록</div>
@@ -920,31 +946,15 @@
       <button class="modal-close" onclick="closeModal('modal-member-log')">✕</button>
     </div>
     <!-- 요약 카드 -->
-    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:18px;" id="mlog-summary"></div>
-    <!-- 진행률 바 -->
-    <div style="margin-bottom:18px;">
-      <div style="display:flex;justify-content:space-between;font-size:12px;font-weight:700;margin-bottom:6px;">
-        <span>전체 진행률</span><span id="mlog-progress-txt"></span>
-      </div>
-      <div class="progress-bar-wrap" style="height:10px;border-radius:6px;">
-        <div class="progress-bar" id="mlog-progress-bar" style="height:10px;border-radius:6px;"></div>
-      </div>
-    </div>
-    <!-- 운동 세션 기록 -->
-    <div style="font-size:13px;font-weight:800;margin-bottom:10px;">세션 기록</div>
-    <div style="max-height:280px;overflow-y:auto;border:1.5px solid #E2E8F0;border-radius:12px;">
-      <table style="width:100%;border-collapse:collapse;">
-        <thead style="background:#F7FAFC;position:sticky;top:0;">
-          <tr>
-            <th style="padding:9px 14px;font-size:11px;font-weight:800;color:#718096;text-align:left;border-bottom:1px solid #E2E8F0;">날짜</th>
-            <th style="padding:9px 14px;font-size:11px;font-weight:800;color:#718096;text-align:left;border-bottom:1px solid #E2E8F0;">운동 동작</th>
-            <th style="padding:9px 14px;font-size:11px;font-weight:800;color:#718096;text-align:left;border-bottom:1px solid #E2E8F0;">세트/횟수</th>
-            <th style="padding:9px 14px;font-size:11px;font-weight:800;color:#718096;text-align:left;border-bottom:1px solid #E2E8F0;">완료</th>
-            <th style="padding:9px 14px;font-size:11px;font-weight:800;color:#718096;text-align:left;border-bottom:1px solid #E2E8F0;">메모</th>
-          </tr>
-        </thead>
-        <tbody id="mlog-tbody"></tbody>
-      </table>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:16px;" id="mlog-summary"></div>
+    <!-- 회차별 수행 이력 -->
+    <div style="font-size:13px;font-weight:800;margin-bottom:12px;">☰ 회차별 수행 이력</div>
+    <div style="max-height:360px;overflow-y:auto;padding-right:4px;" id="mlog-timeline"></div>
+    <!-- 더보기 / 전체보기 -->
+    <div id="mlog-footer" style="display:none;padding:14px 0 0;border-top:1px solid #F0F4F8;margin-top:4px;display:flex;gap:12px;align-items:center;">
+      <span id="mlog-more-btn" onclick="mlogShowMore()" style="color:#ED8936;font-size:13px;font-weight:700;cursor:pointer;" ></span>
+      <span style="color:#E2E8F0;">|</span>
+      <span id="mlog-all-btn" onclick="mlogShowAll()" style="color:#2F855A;font-size:13px;font-weight:700;cursor:pointer;"></span>
     </div>
     <div class="modal-actions">
       <button class="btn-secondary" onclick="closeModal('modal-member-log')">닫기</button>
@@ -1227,92 +1237,201 @@ function filterRecentMembers(val) {
   renderRecentMembers();
 }
 
-// 회원별 운동 세션 기록 샘플
+// 회원별 세션 기록 샘플 (날짜별 → 운동 목록)
 const memberLogData = {
-  '김민준': { totalSessions:8, doneSessions:3, logs:[
-    { date:'2026-03-25', motion:'쿼드셋', setReps:'3세트 × 10회', done:true,  memo:'' },
-    { date:'2026-03-25', motion:'SLR 운동', setReps:'3세트 × 15회', done:true,  memo:'통증 호소 없음' },
-    { date:'2026-03-23', motion:'레그프레스 스트레칭', setReps:'2세트 × 30초', done:true,  memo:'' },
-    { date:'2026-03-21', motion:'쿼드셋', setReps:'3세트 × 10회', done:true,  memo:'약간 피로감' },
-    { date:'2026-03-19', motion:'SLR 운동', setReps:'3세트 × 15회', done:false, memo:'통증으로 조기 종료' },
+  '김민준': { total:8, done:3, sessions:[
+    { date:'2026-03-25', seq:3, status:'done', minutes:28, stopReason:'', exercises:[
+      { name:'쿼드셋',              sets:'3',reps:'10회',done:true  },
+      { name:'SLR 운동',            sets:'3',reps:'15회',done:true  },
+      { name:'레그프레스 스트레칭', sets:'2',reps:'30초',done:true  },
+    ]},
+    { date:'2026-03-21', seq:2, status:'done', minutes:31, stopReason:'', exercises:[
+      { name:'쿼드셋',  sets:'3',reps:'10회',done:true  },
+      { name:'SLR 운동',sets:'3',reps:'15회',done:false, memo:'약간 피로감' },
+    ]},
+    { date:'2026-03-17', seq:1, status:'hold', minutes:12, stopReason:'통증', exercises:[
+      { name:'SLR 운동',sets:'3',reps:'15회',done:false },
+    ]},
   ]},
-  '이서연': { totalSessions:10, doneSessions:6, logs:[
-    { date:'2026-03-25', motion:'펜들럼 스트레칭', setReps:'3세트 × 10회', done:true,  memo:'' },
-    { date:'2026-03-25', motion:'어깨 외회전', setReps:'3세트 × 15회', done:true,  memo:'' },
-    { date:'2026-03-22', motion:'월 슬라이드', setReps:'2세트 × 10회', done:true,  memo:'가동범위 향상' },
-    { date:'2026-03-20', motion:'펜들럼 스트레칭', setReps:'3세트 × 10회', done:true,  memo:'' },
-    { date:'2026-03-18', motion:'어깨 외회전', setReps:'3세트 × 15회', done:true,  memo:'' },
-    { date:'2026-03-16', motion:'월 슬라이드', setReps:'2세트 × 10회', done:false, memo:'통증 호소' },
+  '이서연': { total:10, done:6, sessions:[
+    { date:'2026-03-25', seq:6, status:'done', minutes:34, stopReason:'', exercises:[
+      { name:'펜들럼 스트레칭', sets:'3',reps:'10회',done:true },
+      { name:'어깨 외회전',     sets:'3',reps:'15회',done:true },
+      { name:'월 슬라이드',     sets:'2',reps:'10회',done:true },
+    ]},
+    { date:'2026-03-22', seq:5, status:'done', minutes:29, stopReason:'', exercises:[
+      { name:'펜들럼 스트레칭', sets:'3',reps:'10회',done:true },
+      { name:'어깨 외회전',     sets:'3',reps:'15회',done:true },
+    ]},
+    { date:'2026-03-18', seq:4, status:'hold', minutes:15, stopReason:'통증 호소', exercises:[
+      { name:'월 슬라이드', sets:'2',reps:'10회',done:false },
+    ]},
+    { date:'2026-03-15', seq:3, status:'done', minutes:32, stopReason:'', exercises:[
+      { name:'펜들럼 스트레칭', sets:'3',reps:'10회',done:true },
+      { name:'어깨 외회전',     sets:'3',reps:'15회',done:true },
+      { name:'월 슬라이드',     sets:'2',reps:'10회',done:true },
+    ]},
   ]},
-  '박도현': { totalSessions:10, doneSessions:8, logs:[
-    { date:'2026-03-24', motion:'맥켄지 신전 운동', setReps:'3세트 × 10회', done:true,  memo:'' },
-    { date:'2026-03-24', motion:'코어 안정화 운동', setReps:'3세트 × 15회', done:true,  memo:'자세 교정 양호' },
-    { date:'2026-03-22', motion:'고관절 스트레칭', setReps:'2세트 × 30초', done:true,  memo:'' },
-    { date:'2026-03-20', motion:'맥켄지 신전 운동', setReps:'3세트 × 10회', done:true,  memo:'' },
-    { date:'2026-03-18', motion:'코어 안정화 운동', setReps:'3세트 × 15회', done:true,  memo:'' },
+  '박도현': { total:10, done:8, sessions:[
+    { date:'2026-03-24', seq:8, status:'done', minutes:38, stopReason:'', exercises:[
+      { name:'맥켄지 신전 운동',  sets:'3',reps:'10회',done:true },
+      { name:'코어 안정화 운동',  sets:'3',reps:'15회',done:true },
+      { name:'고관절 스트레칭',   sets:'2',reps:'30초',done:true },
+    ]},
+    { date:'2026-03-20', seq:7, status:'done', minutes:35, stopReason:'', exercises:[
+      { name:'맥켄지 신전 운동', sets:'3',reps:'10회',done:true },
+      { name:'코어 안정화 운동', sets:'3',reps:'15회',done:true },
+    ]},
+    { date:'2026-03-17', seq:6, status:'done', minutes:40, stopReason:'', exercises:[
+      { name:'맥켄지 신전 운동', sets:'3',reps:'10회',done:true },
+      { name:'고관절 스트레칭',  sets:'2',reps:'30초',done:true },
+    ]},
   ]},
-  '정우진': { totalSessions:8, doneSessions:4, logs:[
-    { date:'2026-03-24', motion:'턱 당기기 운동', setReps:'3세트 × 10회', done:true,  memo:'' },
-    { date:'2026-03-24', motion:'경추 굴곡 스트레칭', setReps:'2세트 × 30초', done:true,  memo:'' },
-    { date:'2026-03-22', motion:'어깨 수축 운동', setReps:'3세트 × 15회', done:true,  memo:'뻣뻣함 감소' },
-    { date:'2026-03-20', motion:'턱 당기기 운동', setReps:'3세트 × 10회', done:false, memo:'' },
+  '정우진': { total:8, done:4, sessions:[
+    { date:'2026-03-24', seq:4, status:'done', minutes:25, stopReason:'', exercises:[
+      { name:'턱 당기기 운동',      sets:'3',reps:'10회',done:true },
+      { name:'경추 굴곡 스트레칭',  sets:'2',reps:'30초',done:true },
+    ]},
+    { date:'2026-03-20', seq:3, status:'done', minutes:22, stopReason:'', exercises:[
+      { name:'어깨 수축 운동', sets:'3',reps:'15회',done:true },
+    ]},
+    { date:'2026-03-16', seq:2, status:'hold', minutes:10, stopReason:'', exercises:[
+      { name:'턱 당기기 운동', sets:'3',reps:'10회',done:false },
+    ]},
   ]},
-  '최수아': { totalSessions:8, doneSessions:8, logs:[
-    { date:'2026-03-23', motion:'알파벳 쓰기', setReps:'2세트 × 1회', done:true,  memo:'완료' },
-    { date:'2026-03-23', motion:'카프 레이즈', setReps:'3세트 × 20회', done:true,  memo:'' },
-    { date:'2026-03-21', motion:'밸런스 보드', setReps:'3세트 × 30초', done:true,  memo:'' },
-    { date:'2026-03-19', motion:'알파벳 쓰기', setReps:'2세트 × 1회', done:true,  memo:'' },
+  '최수아': { total:8, done:8, sessions:[
+    { date:'2026-03-23', seq:8, status:'done', minutes:30, stopReason:'', exercises:[
+      { name:'알파벳 쓰기',  sets:'2',reps:'1세트',done:true },
+      { name:'카프 레이즈',  sets:'3',reps:'20회', done:true },
+      { name:'밸런스 보드',  sets:'3',reps:'30초', done:true },
+    ]},
+    { date:'2026-03-19', seq:7, status:'done', minutes:28, stopReason:'', exercises:[
+      { name:'알파벳 쓰기', sets:'2',reps:'1세트',done:true },
+      { name:'카프 레이즈', sets:'3',reps:'20회', done:true },
+    ]},
   ]},
-  '강하은': { totalSessions:10, doneSessions:3, logs:[
-    { date:'2026-03-23', motion:'엉덩이 스트레칭', setReps:'3세트 × 30초', done:true,  memo:'' },
-    { date:'2026-03-23', motion:'클램쉘', setReps:'3세트 × 15회', done:true,  memo:'' },
-    { date:'2026-03-21', motion:'힙 힌지', setReps:'3세트 × 10회', done:false, memo:'통증 있음' },
+  '강하은': { total:10, done:3, sessions:[
+    { date:'2026-03-23', seq:3, status:'done', minutes:22, stopReason:'', exercises:[
+      { name:'엉덩이 스트레칭', sets:'3',reps:'30초',done:true },
+      { name:'클램쉘',          sets:'3',reps:'15회',done:true },
+    ]},
+    { date:'2026-03-19', seq:2, status:'hold', minutes:8, stopReason:'통증 있음', exercises:[
+      { name:'힙 힌지', sets:'3',reps:'10회',done:false },
+    ]},
   ]},
 };
 
+const MLOG_PAGE = 4; // 기본 노출 개수
+let _mlogAllSessions = [];
+let _mlogShowing = MLOG_PAGE;
+
 function openMemberLog(memberName, progName, trainer, part, progress, statusKey) {
-  const logInfo = memberLogData[memberName];
-  const statusText = { active:'진행 중', done:'완료', hold:'일시중단' }[statusKey];
-  const statusColor= { active:'#276749', done:'#2B6CB0', hold:'#C05621' }[statusKey];
+  const info = memberLogData[memberName] || { total:10, done:Math.round(progress/10), sessions:[] };
+  const statusText  = { active:'진행 중', done:'완료', hold:'일시중단' }[statusKey];
+  const statusColor = { active:'#276749', done:'#2B6CB0', hold:'#C05621' }[statusKey];
+  const completedPct = info.total ? Math.round(info.done / info.total * 100) : progress;
 
   document.getElementById('mlog-title').textContent = `🏃 ${memberName} 운동기록`;
   document.getElementById('mlog-sub').textContent = `${progName} · ${trainer}`;
 
-  const total   = logInfo ? logInfo.totalSessions : 10;
-  const done    = logInfo ? logInfo.doneSessions  : Math.round(progress/100*10);
-  const remain  = total - done;
-
   document.getElementById('mlog-summary').innerHTML = `
-    <div style="background:#F0FFF4;border-radius:10px;padding:12px 14px;">
-      <div style="font-size:10px;font-weight:800;color:#276749;margin-bottom:4px;">부위</div>
-      <div style="font-size:16px;font-weight:900;color:#1A202C;">${partIcon[part]} ${partMap[part]}</div>
+    <div style="background:#F0FFF4;border-radius:10px;padding:10px 12px;">
+      <div style="font-size:10px;font-weight:800;color:#276749;margin-bottom:3px;">부위</div>
+      <div style="font-size:15px;font-weight:900;">${partIcon[part]} ${partMap[part]}</div>
     </div>
-    <div style="background:#EBF8FF;border-radius:10px;padding:12px 14px;">
-      <div style="font-size:10px;font-weight:800;color:#2B6CB0;margin-bottom:4px;">세션 현황</div>
-      <div style="font-size:16px;font-weight:900;color:#1A202C;">${done} <span style="font-size:12px;font-weight:600;color:#718096;">/ ${total}회</span></div>
+    <div style="background:#EBF8FF;border-radius:10px;padding:10px 12px;">
+      <div style="font-size:10px;font-weight:800;color:#2B6CB0;margin-bottom:3px;">세션</div>
+      <div style="font-size:15px;font-weight:900;">${info.done}<span style="font-size:11px;color:#718096;"> / ${info.total}회</span></div>
     </div>
-    <div style="background:#FFFBEB;border-radius:10px;padding:12px 14px;">
-      <div style="font-size:10px;font-weight:800;color:#C05621;margin-bottom:4px;">상태</div>
-      <div style="font-size:15px;font-weight:900;color:${statusColor};">${statusText}</div>
+    <div style="background:#FFFBEB;border-radius:10px;padding:10px 12px;">
+      <div style="font-size:10px;font-weight:800;color:#C05621;margin-bottom:3px;">진행률</div>
+      <div style="font-size:15px;font-weight:900;color:#2F855A;">${completedPct}%</div>
+    </div>
+    <div style="background:#FAF5FF;border-radius:10px;padding:10px 12px;">
+      <div style="font-size:10px;font-weight:800;color:#6B46C1;margin-bottom:3px;">상태</div>
+      <div style="font-size:13px;font-weight:900;color:${statusColor};">${statusText}</div>
     </div>`;
 
-  document.getElementById('mlog-progress-txt').textContent = `${progress}%`;
-  document.getElementById('mlog-progress-bar').style.width = progress + '%';
-
-  const logs = logInfo ? logInfo.logs : [];
-  document.getElementById('mlog-tbody').innerHTML = logs.length ? logs.map(l => `
-    <tr style="border-bottom:1px solid #F0F4F8;">
-      <td style="padding:9px 14px;font-size:12px;color:#718096;">${l.date}</td>
-      <td style="padding:9px 14px;font-size:13px;font-weight:700;">${l.motion}</td>
-      <td style="padding:9px 14px;font-size:12px;">${l.setReps}</td>
-      <td style="padding:9px 14px;">${l.done
-        ? '<span style="font-size:18px;">✅</span>'
-        : '<span style="font-size:18px;">❌</span>'}</td>
-      <td style="padding:9px 14px;font-size:12px;color:#718096;">${l.memo || '-'}</td>
-    </tr>`).join('')
-    : `<tr><td colspan="5" style="text-align:center;padding:28px;color:#A0AEC0;">세션 기록이 없습니다</td></tr>`;
-
+  _mlogAllSessions = info.sessions || [];
+  _mlogShowing = MLOG_PAGE;
+  renderMlogTimeline();
   openModal('modal-member-log');
+}
+
+function renderMlogTimeline() {
+  const sessions = _mlogAllSessions;
+  const showing  = sessions.slice(0, _mlogShowing);
+  const today    = '2026-03-25';
+
+  document.getElementById('mlog-timeline').innerHTML = sessions.length === 0
+    ? '<div style="text-align:center;padding:36px;color:#A0AEC0;">세션 기록이 없습니다</div>'
+    : `<div class="mlog-timeline-wrap">${showing.map((s, i) => {
+        const isToday  = s.date === today;
+        const dotClass = s.status === 'hold' ? 'hold' : 'done';
+        const badge    = s.status === 'hold'
+          ? `<span class="mlog-badge mlog-badge-hold">중단</span>`
+          : `<span class="mlog-badge mlog-badge-done">완료</span>`;
+        const doneCount = s.exercises.filter(e => e.done).length;
+        const totalEx   = s.exercises.length;
+        const totalSets = s.exercises.reduce((a,e)=>a+(parseInt(e.sets)||0),0);
+        const stopNote  = s.status==='hold' && s.stopReason ? `<span style="color:#C53030;font-weight:700;"> 중단 사유 ${s.stopReason}</span>` : '';
+        const uid = 'mls_' + i;
+        return `<div class="mlog-session">
+          <div class="mlog-dot ${dotClass}"></div>
+          <div class="mlog-date-label">${s.date.replace(/-/g,'.')}${isToday ? ' <strong style="color:#ED8936;">(오늘)</strong>' : ''}</div>
+          <div class="mlog-card">
+            <div class="mlog-card-title">${s.seq}회차 · ${badge}</div>
+            <div class="mlog-card-meta">
+              <span>소요시간 <strong>${s.minutes}분</strong></span>
+              <span>완료 운동 <strong>${doneCount}/${totalEx}</strong></span>
+              <span>총 세트 <strong>${totalSets}세트</strong></span>
+              ${stopNote}
+            </div>
+            <button class="mlog-detail-btn" onclick="mlogToggleDetail('${uid}')">▶ 운동 상세 보기</button>
+            <div class="mlog-detail-body" id="${uid}">
+              ${s.exercises.map(e => `
+                <div class="mlog-ex-row">
+                  <span class="mlog-ex-check">${e.done ? '✅' : '❌'}</span>
+                  <span class="mlog-ex-name">${e.name}</span>
+                  <span class="mlog-ex-sets">${e.sets}세트 × ${e.reps}</span>
+                  ${e.memo ? `<span style="color:#C05621;font-size:11px;">· ${e.memo}</span>` : ''}
+                </div>`).join('')}
+            </div>
+          </div>
+        </div>`;
+      }).join('')}
+    </div>`;
+
+  // 더보기 / 전체보기 footer
+  const footer = document.getElementById('mlog-footer');
+  const remain  = sessions.length - _mlogShowing;
+  if (sessions.length > MLOG_PAGE) {
+    footer.style.display = 'flex';
+    document.getElementById('mlog-more-btn').style.display = remain > 0 ? '' : 'none';
+    document.getElementById('mlog-more-btn').textContent = `▼ 더보기 (${remain}건 남음)`;
+    document.getElementById('mlog-all-btn').textContent  = `≡ 전체 이력 보기 (${sessions.length}건)`;
+  } else {
+    footer.style.display = 'none';
+  }
+}
+
+function mlogToggleDetail(uid) {
+  const el = document.getElementById(uid);
+  const btn = el.previousElementSibling;
+  if (el.classList.toggle('open')) {
+    btn.textContent = '▼ 운동 상세 닫기';
+  } else {
+    btn.textContent = '▶ 운동 상세 보기';
+  }
+}
+
+function mlogShowMore() {
+  _mlogShowing = Math.min(_mlogShowing + MLOG_PAGE, _mlogAllSessions.length);
+  renderMlogTimeline();
+}
+function mlogShowAll() {
+  _mlogShowing = _mlogAllSessions.length;
+  renderMlogTimeline();
 }
 
 function renderRecentMembers() {
