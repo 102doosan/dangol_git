@@ -909,6 +909,49 @@
   </div>
 </div>
 
+<!-- 모달: 회원 운동기록 -->
+<div class="modal-overlay" id="modal-member-log">
+  <div class="modal" style="width:680px;">
+    <div class="modal-header">
+      <div>
+        <div class="modal-title" id="mlog-title">🏃 운동기록</div>
+        <div style="font-size:12px;color:#A0AEC0;margin-top:2px;" id="mlog-sub"></div>
+      </div>
+      <button class="modal-close" onclick="closeModal('modal-member-log')">✕</button>
+    </div>
+    <!-- 요약 카드 -->
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:18px;" id="mlog-summary"></div>
+    <!-- 진행률 바 -->
+    <div style="margin-bottom:18px;">
+      <div style="display:flex;justify-content:space-between;font-size:12px;font-weight:700;margin-bottom:6px;">
+        <span>전체 진행률</span><span id="mlog-progress-txt"></span>
+      </div>
+      <div class="progress-bar-wrap" style="height:10px;border-radius:6px;">
+        <div class="progress-bar" id="mlog-progress-bar" style="height:10px;border-radius:6px;"></div>
+      </div>
+    </div>
+    <!-- 운동 세션 기록 -->
+    <div style="font-size:13px;font-weight:800;margin-bottom:10px;">세션 기록</div>
+    <div style="max-height:280px;overflow-y:auto;border:1.5px solid #E2E8F0;border-radius:12px;">
+      <table style="width:100%;border-collapse:collapse;">
+        <thead style="background:#F7FAFC;position:sticky;top:0;">
+          <tr>
+            <th style="padding:9px 14px;font-size:11px;font-weight:800;color:#718096;text-align:left;border-bottom:1px solid #E2E8F0;">날짜</th>
+            <th style="padding:9px 14px;font-size:11px;font-weight:800;color:#718096;text-align:left;border-bottom:1px solid #E2E8F0;">운동 동작</th>
+            <th style="padding:9px 14px;font-size:11px;font-weight:800;color:#718096;text-align:left;border-bottom:1px solid #E2E8F0;">세트/횟수</th>
+            <th style="padding:9px 14px;font-size:11px;font-weight:800;color:#718096;text-align:left;border-bottom:1px solid #E2E8F0;">완료</th>
+            <th style="padding:9px 14px;font-size:11px;font-weight:800;color:#718096;text-align:left;border-bottom:1px solid #E2E8F0;">메모</th>
+          </tr>
+        </thead>
+        <tbody id="mlog-tbody"></tbody>
+      </table>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="closeModal('modal-member-log')">닫기</button>
+    </div>
+  </div>
+</div>
+
 <!-- 모달: 예약 등록 -->
 <div class="modal-overlay" id="modal-schedule">
   <div class="modal" style="width:480px;">
@@ -1184,25 +1227,115 @@ function filterRecentMembers(val) {
   renderRecentMembers();
 }
 
+// 회원별 운동 세션 기록 샘플
+const memberLogData = {
+  '김민준': { totalSessions:8, doneSessions:3, logs:[
+    { date:'2026-03-25', motion:'쿼드셋', setReps:'3세트 × 10회', done:true,  memo:'' },
+    { date:'2026-03-25', motion:'SLR 운동', setReps:'3세트 × 15회', done:true,  memo:'통증 호소 없음' },
+    { date:'2026-03-23', motion:'레그프레스 스트레칭', setReps:'2세트 × 30초', done:true,  memo:'' },
+    { date:'2026-03-21', motion:'쿼드셋', setReps:'3세트 × 10회', done:true,  memo:'약간 피로감' },
+    { date:'2026-03-19', motion:'SLR 운동', setReps:'3세트 × 15회', done:false, memo:'통증으로 조기 종료' },
+  ]},
+  '이서연': { totalSessions:10, doneSessions:6, logs:[
+    { date:'2026-03-25', motion:'펜들럼 스트레칭', setReps:'3세트 × 10회', done:true,  memo:'' },
+    { date:'2026-03-25', motion:'어깨 외회전', setReps:'3세트 × 15회', done:true,  memo:'' },
+    { date:'2026-03-22', motion:'월 슬라이드', setReps:'2세트 × 10회', done:true,  memo:'가동범위 향상' },
+    { date:'2026-03-20', motion:'펜들럼 스트레칭', setReps:'3세트 × 10회', done:true,  memo:'' },
+    { date:'2026-03-18', motion:'어깨 외회전', setReps:'3세트 × 15회', done:true,  memo:'' },
+    { date:'2026-03-16', motion:'월 슬라이드', setReps:'2세트 × 10회', done:false, memo:'통증 호소' },
+  ]},
+  '박도현': { totalSessions:10, doneSessions:8, logs:[
+    { date:'2026-03-24', motion:'맥켄지 신전 운동', setReps:'3세트 × 10회', done:true,  memo:'' },
+    { date:'2026-03-24', motion:'코어 안정화 운동', setReps:'3세트 × 15회', done:true,  memo:'자세 교정 양호' },
+    { date:'2026-03-22', motion:'고관절 스트레칭', setReps:'2세트 × 30초', done:true,  memo:'' },
+    { date:'2026-03-20', motion:'맥켄지 신전 운동', setReps:'3세트 × 10회', done:true,  memo:'' },
+    { date:'2026-03-18', motion:'코어 안정화 운동', setReps:'3세트 × 15회', done:true,  memo:'' },
+  ]},
+  '정우진': { totalSessions:8, doneSessions:4, logs:[
+    { date:'2026-03-24', motion:'턱 당기기 운동', setReps:'3세트 × 10회', done:true,  memo:'' },
+    { date:'2026-03-24', motion:'경추 굴곡 스트레칭', setReps:'2세트 × 30초', done:true,  memo:'' },
+    { date:'2026-03-22', motion:'어깨 수축 운동', setReps:'3세트 × 15회', done:true,  memo:'뻣뻣함 감소' },
+    { date:'2026-03-20', motion:'턱 당기기 운동', setReps:'3세트 × 10회', done:false, memo:'' },
+  ]},
+  '최수아': { totalSessions:8, doneSessions:8, logs:[
+    { date:'2026-03-23', motion:'알파벳 쓰기', setReps:'2세트 × 1회', done:true,  memo:'완료' },
+    { date:'2026-03-23', motion:'카프 레이즈', setReps:'3세트 × 20회', done:true,  memo:'' },
+    { date:'2026-03-21', motion:'밸런스 보드', setReps:'3세트 × 30초', done:true,  memo:'' },
+    { date:'2026-03-19', motion:'알파벳 쓰기', setReps:'2세트 × 1회', done:true,  memo:'' },
+  ]},
+  '강하은': { totalSessions:10, doneSessions:3, logs:[
+    { date:'2026-03-23', motion:'엉덩이 스트레칭', setReps:'3세트 × 30초', done:true,  memo:'' },
+    { date:'2026-03-23', motion:'클램쉘', setReps:'3세트 × 15회', done:true,  memo:'' },
+    { date:'2026-03-21', motion:'힙 힌지', setReps:'3세트 × 10회', done:false, memo:'통증 있음' },
+  ]},
+};
+
+function openMemberLog(memberName, progName, trainer, part, progress, statusKey) {
+  const logInfo = memberLogData[memberName];
+  const statusText = { active:'진행 중', done:'완료', hold:'일시중단' }[statusKey];
+  const statusColor= { active:'#276749', done:'#2B6CB0', hold:'#C05621' }[statusKey];
+
+  document.getElementById('mlog-title').textContent = `🏃 ${memberName} 운동기록`;
+  document.getElementById('mlog-sub').textContent = `${progName} · ${trainer}`;
+
+  const total   = logInfo ? logInfo.totalSessions : 10;
+  const done    = logInfo ? logInfo.doneSessions  : Math.round(progress/100*10);
+  const remain  = total - done;
+
+  document.getElementById('mlog-summary').innerHTML = `
+    <div style="background:#F0FFF4;border-radius:10px;padding:12px 14px;">
+      <div style="font-size:10px;font-weight:800;color:#276749;margin-bottom:4px;">부위</div>
+      <div style="font-size:16px;font-weight:900;color:#1A202C;">${partIcon[part]} ${partMap[part]}</div>
+    </div>
+    <div style="background:#EBF8FF;border-radius:10px;padding:12px 14px;">
+      <div style="font-size:10px;font-weight:800;color:#2B6CB0;margin-bottom:4px;">세션 현황</div>
+      <div style="font-size:16px;font-weight:900;color:#1A202C;">${done} <span style="font-size:12px;font-weight:600;color:#718096;">/ ${total}회</span></div>
+    </div>
+    <div style="background:#FFFBEB;border-radius:10px;padding:12px 14px;">
+      <div style="font-size:10px;font-weight:800;color:#C05621;margin-bottom:4px;">상태</div>
+      <div style="font-size:15px;font-weight:900;color:${statusColor};">${statusText}</div>
+    </div>`;
+
+  document.getElementById('mlog-progress-txt').textContent = `${progress}%`;
+  document.getElementById('mlog-progress-bar').style.width = progress + '%';
+
+  const logs = logInfo ? logInfo.logs : [];
+  document.getElementById('mlog-tbody').innerHTML = logs.length ? logs.map(l => `
+    <tr style="border-bottom:1px solid #F0F4F8;">
+      <td style="padding:9px 14px;font-size:12px;color:#718096;">${l.date}</td>
+      <td style="padding:9px 14px;font-size:13px;font-weight:700;">${l.motion}</td>
+      <td style="padding:9px 14px;font-size:12px;">${l.setReps}</td>
+      <td style="padding:9px 14px;">${l.done
+        ? '<span style="font-size:18px;">✅</span>'
+        : '<span style="font-size:18px;">❌</span>'}</td>
+      <td style="padding:9px 14px;font-size:12px;color:#718096;">${l.memo || '-'}</td>
+    </tr>`).join('')
+    : `<tr><td colspan="5" style="text-align:center;padding:28px;color:#A0AEC0;">세션 기록이 없습니다</td></tr>`;
+
+  openModal('modal-member-log');
+}
+
 function renderRecentMembers() {
   const q = _dashMemberSearch;
   const list = q ? recentMemberData.filter(r => r.member.includes(q)) : recentMemberData;
   const statusBadge = { active:'badge-green', done:'badge-blue', hold:'badge-orange' };
   const statusText  = { active:'진행 중', done:'완료', hold:'일시중단' };
-  document.getElementById('recent-member-tbody').innerHTML = list.map(r => `<tr>
-    <td style="color:#718096;font-size:12px;">${r.date}</td>
-    <td><strong>${r.member}</strong></td>
-    <td><span class="badge ${partBadge[r.part]}">${partMap[r.part]}</span></td>
-    <td>${r.prog}</td>
-    <td style="font-size:12px;color:#4A5568;">${r.trainer}</td>
-    <td style="min-width:130px;">
-      <div style="display:flex;align-items:center;gap:8px;">
-        <div class="progress-bar-wrap" style="flex:1;"><div class="progress-bar" style="width:${r.progress}%;"></div></div>
-        <span style="font-size:12px;font-weight:700;color:#2F855A;">${r.progress}%</span>
-      </div>
-    </td>
-    <td><span class="badge ${statusBadge[r.status]}">${statusText[r.status]}</span></td>
-  </tr>`).join('') || `<tr><td colspan="7" style="text-align:center;padding:24px;color:#A0AEC0;">검색 결과 없음</td></tr>`;
+  document.getElementById('recent-member-tbody').innerHTML = list.map(r => `
+    <tr style="cursor:pointer;" onclick="openMemberLog('${r.member}','${r.prog}','${r.trainer}','${r.part}',${r.progress},'${r.status}')"
+        onmouseover="this.style.background='#F0FFF4'" onmouseout="this.style.background=''">
+      <td style="color:#718096;font-size:12px;">${r.date}</td>
+      <td><strong>${r.member}</strong></td>
+      <td><span class="badge ${partBadge[r.part]}">${partMap[r.part]}</span></td>
+      <td>${r.prog}</td>
+      <td style="font-size:12px;color:#4A5568;">${r.trainer}</td>
+      <td style="min-width:130px;">
+        <div style="display:flex;align-items:center;gap:8px;">
+          <div class="progress-bar-wrap" style="flex:1;"><div class="progress-bar" style="width:${r.progress}%;"></div></div>
+          <span style="font-size:12px;font-weight:700;color:#2F855A;">${r.progress}%</span>
+        </div>
+      </td>
+      <td><span class="badge ${statusBadge[r.status]}">${statusText[r.status]}</span></td>
+    </tr>`).join('') || `<tr><td colspan="7" style="text-align:center;padding:24px;color:#A0AEC0;">검색 결과 없음</td></tr>`;
 }
 
 function renderDashboard() {
