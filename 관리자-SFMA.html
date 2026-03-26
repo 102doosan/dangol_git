@@ -1,0 +1,1205 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>관리자 SFMA 관리</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Noto Sans KR', sans-serif; background: #F0F4F8; color: #1A202C; min-height: 100vh; padding: 24px 20px 48px; }
+
+    /* 상단 탭 */
+    .nav { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 28px; }
+    .nav-btn {
+      padding: 8px 18px; border-radius: 99px; border: 2px solid #E2E8F0;
+      background: #fff; font-size: 13px; font-weight: 700; cursor: pointer;
+      font-family: 'Noto Sans KR', sans-serif; color: #718096; transition: all 0.2s;
+    }
+    .nav-btn.active { background: #6B46C1; border-color: #6B46C1; color: #fff; box-shadow: 0 4px 12px rgba(107,70,193,0.35); }
+
+    .admin-wrap { display: flex; gap: 20px; align-items: flex-start; }
+
+    /* 사이드바 */
+    .sidebar { width: 220px; flex-shrink: 0; background: #1E1A2E; border-radius: 16px; padding: 20px 0; color: #fff; min-height: 600px; }
+    .sidebar-logo { padding: 0 20px 16px; border-bottom: 1px solid #2D2446; margin-bottom: 12px; }
+    .sidebar-logo-title { font-size: 15px; font-weight: 900; color: #fff; }
+    .sidebar-logo-sub { font-size: 11px; color: #718096; margin-top: 2px; }
+    .sidebar-section { font-size: 10px; font-weight: 800; color: #4A4070; letter-spacing: 1.5px; padding: 8px 20px 4px; }
+    .sidebar-item {
+      display: flex; align-items: center; gap: 10px; padding: 10px 20px;
+      font-size: 13px; font-weight: 600; color: #A0AEC0; cursor: pointer; transition: all 0.15s;
+    }
+    .sidebar-item:hover { background: #2D2446; color: #fff; }
+    .sidebar-item.active { background: #6B46C1; color: #fff; border-right: 3px solid #B794F4; }
+    .sidebar-item-icon { font-size: 16px; width: 20px; text-align: center; }
+
+    .main { flex: 1; min-width: 0; }
+    .screen { display: none; }
+    .screen.active { display: block; }
+
+    /* 공통 */
+    .page-header {
+      background: #fff; border-radius: 16px; padding: 20px 24px;
+      margin-bottom: 16px; box-shadow: 0 1px 6px rgba(0,0,0,0.06);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .page-title { font-size: 18px; font-weight: 900; color: #1A202C; }
+    .page-sub { font-size: 13px; color: #A0AEC0; margin-top: 2px; }
+    .page-actions { display: flex; gap: 8px; }
+    .btn-primary { background: #6B46C1; color: #fff; border: none; border-radius: 10px; padding: 10px 18px; font-size: 13px; font-weight: 700; cursor: pointer; font-family: 'Noto Sans KR', sans-serif; transition: background .15s; }
+    .btn-primary:hover { background: #553C9A; }
+    .btn-secondary { background: #F0F4F8; color: #4A5568; border: none; border-radius: 10px; padding: 10px 18px; font-size: 13px; font-weight: 700; cursor: pointer; font-family: 'Noto Sans KR', sans-serif; }
+    .btn-sm { padding: 5px 12px; border-radius: 8px; border: none; cursor: pointer; font-size: 12px; font-weight: 700; font-family: 'Noto Sans KR', sans-serif; }
+
+    /* 통계 카드 */
+    .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 16px; }
+    .stat-card { background: #fff; border-radius: 14px; padding: 16px 18px; box-shadow: 0 1px 6px rgba(0,0,0,0.06); }
+    .stat-label { font-size: 11px; font-weight: 700; color: #718096; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
+    .stat-value { font-size: 28px; font-weight: 900; color: #1A202C; }
+    .stat-change { font-size: 12px; font-weight: 700; color: #38A169; margin-top: 4px; }
+    .stat-change.down { color: #E53E3E; }
+
+    /* 카드 */
+    .card { background: #fff; border-radius: 14px; padding: 20px; box-shadow: 0 1px 6px rgba(0,0,0,0.06); margin-bottom: 14px; }
+    .card-title { font-size: 14px; font-weight: 800; color: #1A202C; margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
+
+    /* 필터/검색 바 */
+    .filter-bar { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-bottom: 14px; }
+    .search-input {
+      flex: 1; min-width: 200px; padding: 9px 14px; border: 1.5px solid #E2E8F0; border-radius: 10px;
+      font-size: 13px; font-family: 'Noto Sans KR', sans-serif; outline: none;
+    }
+    .search-input:focus { border-color: #9B84FF; }
+    .filter-select {
+      padding: 9px 12px; border: 1.5px solid #E2E8F0; border-radius: 10px;
+      font-size: 13px; font-family: 'Noto Sans KR', sans-serif; outline: none; background: #fff;
+    }
+    .filter-select:focus { border-color: #9B84FF; }
+
+    /* 테이블 */
+    .tbl-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    th { background: #F7F9FC; padding: 10px 14px; text-align: left; font-weight: 800; color: #718096; font-size: 11px; letter-spacing: 0.5px; border-bottom: 1px solid #E2E8F0; white-space: nowrap; }
+    td { padding: 12px 14px; border-bottom: 1px solid #F0F4F8; color: #2D3748; vertical-align: middle; }
+    tr:hover td { background: #F7F9FC; }
+    tr:last-child td { border-bottom: none; }
+    .td-name { font-weight: 700; color: #1A202C; }
+    .td-score { font-size: 15px; font-weight: 900; }
+    .td-good { color: #38A169; }
+    .td-warn { color: #D69E2E; }
+    .td-bad  { color: #E53E3E; }
+
+    /* 등급 배지 */
+    .grade-badge { font-size: 11px; font-weight: 700; padding: 3px 9px; border-radius: 99px; }
+    .g-excellent { background: #C6F6D5; color: #1A4731; }
+    .g-good      { background: #BEE3F8; color: #1A365D; }
+    .g-average   { background: #FEFCBF; color: #744210; }
+    .g-poor      { background: #FED7D7; color: #742A2A; }
+
+    /* 상태 배지 */
+    .status-badge { font-size: 11px; font-weight: 700; padding: 3px 9px; border-radius: 99px; }
+    .s-done    { background: #C6F6D5; color: #1A4731; }
+    .s-pending { background: #FEFCBF; color: #744210; }
+    .s-none    { background: #FED7D7; color: #742A2A; }
+
+    /* SFMA 패턴 점수 입력 */
+    .pattern-grid { display: flex; flex-direction: column; gap: 14px; }
+    .pattern-row { background: #F7F9FC; border-radius: 12px; padding: 14px 16px; }
+    .pattern-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+    .pattern-icon { font-size: 20px; width: 32px; text-align: center; flex-shrink: 0; }
+    .pattern-name { flex: 1; font-size: 14px; font-weight: 700; color: #1A202C; }
+    .pattern-score-display { font-size: 20px; font-weight: 900; color: #6B46C1; min-width: 36px; text-align: right; }
+    .score-slider { width: 100%; accent-color: #6B46C1; cursor: pointer; }
+    .check-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
+    .check-btn {
+      padding: 4px 10px; border-radius: 99px; font-size: 11px; font-weight: 700;
+      border: 1.5px solid #E2E8F0; background: #fff; cursor: pointer;
+      font-family: 'Noto Sans KR', sans-serif; transition: all .15s; color: #718096;
+    }
+    .check-btn.pass  { background: #C6F6D5; border-color: #68D391; color: #276749; }
+    .check-btn.fail  { background: #FED7D7; border-color: #FC8181; color: #742A2A; }
+    .check-btn.part  { background: #FEEBC8; border-color: #F6AD55; color: #744210; }
+
+    /* 폼 */
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
+    .form-group { display: flex; flex-direction: column; gap: 5px; }
+    .form-label { font-size: 12px; font-weight: 700; color: #4A5568; }
+    .form-input { padding: 9px 12px; border: 1.5px solid #E2E8F0; border-radius: 10px; font-size: 13px; font-family: 'Noto Sans KR', sans-serif; outline: none; }
+    .form-input:focus { border-color: #9B84FF; }
+    .form-select { padding: 9px 12px; border: 1.5px solid #E2E8F0; border-radius: 10px; font-size: 13px; font-family: 'Noto Sans KR', sans-serif; outline: none; background: #fff; }
+    .form-textarea { padding: 10px 12px; border: 1.5px solid #E2E8F0; border-radius: 10px; font-size: 13px; font-family: 'Noto Sans KR', sans-serif; outline: none; resize: vertical; min-height: 80px; width: 100%; }
+    .form-textarea:focus { border-color: #9B84FF; }
+    .required { color: #E53E3E; margin-left: 2px; }
+
+    /* 비교 차트 */
+    .cmp-legend { display: flex; gap: 14px; margin-bottom: 12px; flex-wrap: wrap; }
+    .legend-dot { width: 12px; height: 12px; border-radius: 3px; flex-shrink: 0; }
+    .cmp-row { margin-bottom: 12px; }
+    .cmp-meta { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
+    .cmp-item-name { font-size: 12px; font-weight: 700; color: #4A5568; }
+    .cmp-bar-group { display: flex; flex-direction: column; gap: 3px; }
+    .cmp-bar-line { display: flex; align-items: center; gap: 8px; }
+    .cmp-bar-bg { flex: 1; background: #EDF2F7; border-radius: 99px; height: 10px; overflow: hidden; }
+    .cmp-bar-fill { height: 100%; border-radius: 99px; transition: width .6s ease; }
+    .cmp-score { font-size: 11px; font-weight: 700; width: 20px; color: #4A5568; }
+
+    /* 미측정 회원 목록 */
+    .unmeasured-item { display: flex; align-items: center; gap: 12px; padding: 10px 14px; border-bottom: 1px solid #F0F4F8; }
+    .unmeasured-item:last-child { border-bottom: none; }
+    .um-avatar { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 900; color: #fff; flex-shrink: 0; }
+    .um-info { flex: 1; }
+    .um-name { font-size: 13px; font-weight: 700; color: #1A202C; }
+    .um-meta { font-size: 11px; color: #A0AEC0; margin-top: 1px; }
+    .um-last { font-size: 11px; color: #E53E3E; font-weight: 700; }
+
+    /* 상세 패널 (결과 조회) */
+    .detail-panel { background: #fff; border-radius: 14px; padding: 20px; box-shadow: 0 1px 6px rgba(0,0,0,0.06); }
+    .detail-hero-box {
+      background: linear-gradient(135deg, #553C9A, #7B61FF);
+      border-radius: 12px; padding: 16px; color: #fff; margin-bottom: 16px;
+    }
+    .detail-pattern-row { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid #F0F4F8; }
+    .detail-pattern-row:last-child { border-bottom: none; }
+
+    /* 차트 바 인라인 */
+    .inline-bar { display: flex; align-items: center; gap: 8px; flex: 1; }
+    .bar-track { flex: 1; background: #EDF2F7; border-radius: 99px; height: 8px; overflow: hidden; }
+    .bar-fill  { height: 100%; border-radius: 99px; transition: width .5s ease; }
+
+    /* 토스트 */
+    .toast {
+      position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(20px);
+      background: #1A202C; color: #fff; padding: 12px 24px; border-radius: 12px;
+      font-size: 13px; font-weight: 700; opacity: 0; transition: all .3s; z-index: 999; white-space: nowrap;
+    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    /* ── 체크시트 탭 ── */
+    .sh-tab-bar{display:flex;overflow-x:auto;scrollbar-width:none;border-bottom:2px solid #E2E8F0;margin:-20px -20px 14px;padding:0 4px;}
+    .sh-tab-bar::-webkit-scrollbar{display:none;}
+    .sh-tab-btn{flex-shrink:0;padding:9px 13px;font-size:11px;font-weight:700;color:#718096;cursor:pointer;border:none;border-bottom:3px solid transparent;background:none;font-family:'Noto Sans KR',sans-serif;transition:all .15s;white-space:nowrap;line-height:1.3;text-align:center;}
+    .sh-tab-btn.active{color:#6B46C1;border-bottom-color:#6B46C1;background:#F9F7FF;}
+    /* ── 최고위평가 그리드 ── */
+    .top-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+    .pat-card{background:#F7F9FC;border-radius:12px;padding:12px 10px;border:1.5px solid #E2E8F0;}
+    .pat-num{font-size:10px;font-weight:700;color:#A0AEC0;margin-bottom:1px;}
+    .pat-name{font-size:12px;font-weight:800;color:#1A202C;margin-bottom:8px;line-height:1.4;}
+    /* ── 체크 심볼 ── */
+    .sym-row{display:flex;align-items:center;gap:2px;margin-bottom:3px;}
+    .sym-row:last-child{margin-bottom:0;}
+    .lr-tag{font-size:11px;font-weight:800;color:#718096;width:14px;flex-shrink:0;margin-right:3px;}
+    .sym-group{display:flex;gap:4px;}
+    .sym-item{display:flex;flex-direction:column;align-items:center;cursor:pointer;padding:2px 3px;border-radius:6px;transition:background .1s;user-select:none;}
+    .sym-item:hover{background:#EDE9FE;}
+    .sym-item svg{display:block;}
+    .sym-lbl{font-size:9px;font-weight:700;margin-top:1px;}
+    .lbl-fn{color:#2B6CB0;} .lbl-fp{color:#B7791F;} .lbl-dp{color:#C53030;} .lbl-dn{color:#718096;}
+    /* ── 세부 카드 ── */
+    .sh-detail-card{background:#F7F9FC;border-radius:12px;padding:13px;border:1.5px solid #E2E8F0;margin-bottom:10px;}
+    .sh-detail-inner{display:flex;gap:10px;align-items:flex-start;}
+    .sh-photo{width:58px;height:48px;background:#EDF2F7;border-radius:7px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:20px;}
+    .sh-body{flex:1;min-width:0;}
+    .sh-hdr{display:flex;align-items:center;gap:7px;margin-bottom:6px;}
+    .sh-num{background:#EBF8FF;color:#2B6CB0;font-size:10px;font-weight:900;padding:2px 7px;border-radius:5px;flex-shrink:0;}
+    .sh-name{font-size:12.5px;font-weight:700;color:#1A202C;line-height:1.4;}
+    .sh-memo{width:100%;padding:6px 10px;border:1.5px solid #E2E8F0;border-radius:7px;font-size:12px;font-family:'Noto Sans KR',sans-serif;color:#4A5568;margin-bottom:8px;outline:none;}
+    .sh-memo:focus{border-color:#9B84FF;}
+    .sh-sym-rows{display:flex;flex-direction:column;gap:3px;}
+    /* ── 집계 칩 ── */
+    .sh-sum-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;}
+    .sh-sum-chip{display:flex;align-items:center;gap:5px;padding:4px 10px;border-radius:99px;font-size:11px;font-weight:700;}
+  </style>
+</head>
+<body>
+
+<!-- 상단 탭 -->
+<div class="nav">
+  <span style="font-size:18px;font-weight:900;color:#1A202C;margin-right:auto;">📊 관리자 · SFMA 관리</span>
+  <button class="nav-btn active" onclick="showScreen('dashboard', this)">📊 현황 대시보드</button>
+  <button class="nav-btn" onclick="showScreen('list', this)">🔍 결과 조회</button>
+  <button class="nav-btn" onclick="showScreen('input', this)">✏️ 결과 입력</button>
+  <button class="nav-btn" onclick="showScreen('compare', this)">📈 결과 비교</button>
+</div>
+
+<div class="admin-wrap">
+  <!-- 사이드바 -->
+  <div class="sidebar">
+    <div class="sidebar-logo">
+      <div class="sidebar-logo-title">📊 SFMA 관리</div>
+      <div class="sidebar-logo-sub">Selective FMA System</div>
+    </div>
+    <div class="sidebar-section">메뉴</div>
+    <div class="sidebar-item active" onclick="showScreen('dashboard', null, this)">
+      <span class="sidebar-item-icon">📊</span> 현황 대시보드
+    </div>
+    <div class="sidebar-item" onclick="showScreen('list', null, this)">
+      <span class="sidebar-item-icon">🔍</span> 결과 조회
+    </div>
+    <div class="sidebar-item" onclick="showScreen('input', null, this)">
+      <span class="sidebar-item-icon">✏️</span> 결과 입력
+    </div>
+    <div class="sidebar-item" onclick="showScreen('compare', null, this)">
+      <span class="sidebar-item-icon">📈</span> 결과 비교
+    </div>
+    <div class="sidebar-section" style="margin-top:12px;">빠른 현황</div>
+    <div style="padding:10px 20px;">
+      <div style="font-size:11px;color:#A0AEC0;margin-bottom:6px;">이번 달 측정</div>
+      <div style="font-size:22px;font-weight:900;color:#B794F4;">12<span style="font-size:12px;font-weight:600;color:#718096;"> / 38명</span></div>
+      <div style="background:#2D2446;border-radius:99px;height:6px;margin-top:6px;overflow:hidden;">
+        <div style="width:32%;height:100%;background:#7B61FF;border-radius:99px;"></div>
+      </div>
+    </div>
+    <div style="padding:10px 20px;margin-top:4px;">
+      <div style="font-size:11px;color:#A0AEC0;margin-bottom:6px;">평균 점수</div>
+      <div style="font-size:22px;font-weight:900;color:#B794F4;">73.4<span style="font-size:12px;font-weight:600;color:#718096;"> / 100</span></div>
+    </div>
+  </div>
+
+  <!-- 메인 -->
+  <div class="main">
+
+    <!-- ① 현황 대시보드 -->
+    <div class="screen active" id="screen-dashboard">
+      <div class="page-header">
+        <div>
+          <div class="page-title">📊 SFMA 현황 대시보드</div>
+          <div class="page-sub">전체 회원 측정 현황 및 통계 · 2026년 3월 기준</div>
+        </div>
+        <div class="page-actions">
+          <button class="btn-secondary" onclick="showScreen('input', document.querySelectorAll('.nav-btn')[2])">+ 결과 입력</button>
+        </div>
+      </div>
+
+      <!-- 요약 카드 -->
+      <div class="stats-row">
+        <div class="stat-card">
+          <div class="stat-label"><span>👥</span> 전체 회원</div>
+          <div class="stat-value">38</div>
+          <div class="stat-change">이번 달 신규 +3명</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label"><span>✅</span> 이번 달 측정</div>
+          <div class="stat-value" style="color:#6B46C1;">12</div>
+          <div class="stat-change">지난달 대비 +2</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label"><span>⚠️</span> 미측정 (3개월+)</div>
+          <div class="stat-value" style="color:#E53E3E;">9</div>
+          <div class="stat-change down">재측정 권고 대상</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label"><span>📈</span> 전체 평균 점수</div>
+          <div class="stat-value">73.4</div>
+          <div class="stat-change">전월 71.2 → ▲2.2</div>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;">
+        <!-- 패턴별 평균 점수 -->
+        <div class="card">
+          <div class="card-title">🧩 7패턴 평균 점수</div>
+          <div id="pattern-avg-chart"></div>
+        </div>
+        <!-- 등급 분포 -->
+        <div class="card">
+          <div class="card-title">🏅 등급 분포</div>
+          <div id="grade-dist-chart"></div>
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:14px;" id="grade-dist-nums"></div>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+        <!-- 최근 측정 목록 -->
+        <div class="card" style="margin-bottom:0;">
+          <div class="card-title">📋 최근 측정 (10건)
+            <button class="btn-sm" style="background:#EDE9FE;color:#6B46C1;margin-left:auto;" onclick="showScreen('list', document.querySelectorAll('.nav-btn')[1])">전체 보기</button>
+          </div>
+          <div class="tbl-wrap">
+            <table>
+              <thead>
+                <tr><th>회원</th><th>측정일</th><th>점수</th><th>등급</th><th>트레이너</th></tr>
+              </thead>
+              <tbody id="recent-tbl"></tbody>
+            </table>
+          </div>
+        </div>
+        <!-- 미측정 회원 -->
+        <div class="card" style="margin-bottom:0;">
+          <div class="card-title">🚨 재측정 필요 회원
+            <span style="font-size:11px;font-weight:600;color:#E53E3E;margin-left:6px;">3개월 이상 미측정</span>
+          </div>
+          <div id="unmeasured-list"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ② 결과 조회 -->
+    <div class="screen" id="screen-list">
+      <div class="page-header">
+        <div>
+          <div class="page-title">🔍 SFMA 결과 조회</div>
+          <div class="page-sub">회원 검색 후 측정 이력 및 상세 결과 확인</div>
+        </div>
+        <div class="page-actions">
+          <button class="btn-primary" onclick="showScreen('input', document.querySelectorAll('.nav-btn')[2])">+ 결과 입력</button>
+        </div>
+      </div>
+
+      <!-- 검색 바 -->
+      <div class="card">
+        <div class="filter-bar" style="margin-bottom:0;">
+          <input class="search-input" id="list-search" type="text" placeholder="🔍  회원명 또는 전화번호 검색" oninput="renderList()" />
+          <select class="filter-select" id="list-grade-filter" onchange="renderList()">
+            <option value="">전체 등급</option>
+            <option value="우수">우수 (90+)</option>
+            <option value="양호">양호 (75~89)</option>
+            <option value="보통">보통 (60~74)</option>
+            <option value="주의">주의 (~59)</option>
+          </select>
+          <select class="filter-select" id="list-trainer-filter" onchange="renderList()">
+            <option value="">전체 트레이너</option>
+            <option>김트레이너</option>
+            <option>박트레이너</option>
+            <option>이트레이너</option>
+          </select>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 420px;gap:14px;align-items:start;">
+        <!-- 목록 -->
+        <div class="card" style="margin-bottom:0;padding:0;overflow:hidden;">
+          <div class="tbl-wrap">
+            <table>
+              <thead>
+                <tr><th>회원명</th><th>최근 측정일</th><th>총점</th><th>등급</th><th>담당 트레이너</th><th>회차</th><th>액션</th></tr>
+              </thead>
+              <tbody id="list-tbl"></tbody>
+            </table>
+          </div>
+        </div>
+        <!-- 상세 패널 -->
+        <div id="detail-panel-wrap">
+          <div style="background:#fff;border-radius:14px;padding:40px 20px;text-align:center;color:#A0AEC0;box-shadow:0 1px 6px rgba(0,0,0,0.06);">
+            <div style="font-size:32px;margin-bottom:10px;">👈</div>
+            <div style="font-size:13px;">왼쪽 목록에서 회원을 선택하면<br>결과 상세가 표시됩니다</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ③ 결과 입력 -->
+    <div class="screen" id="screen-input">
+      <div class="page-header">
+        <div>
+          <div class="page-title">✏️ SFMA 결과 입력 / 수정</div>
+          <div class="page-sub">회원 선택 → 측정일 → SFMA 체크시트 입력 → 소견 작성 → 저장</div>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:300px 1fr;gap:14px;align-items:start;">
+        <!-- 좌: 기본정보 + 소견 + 저장 -->
+        <div>
+          <div class="card">
+            <div class="card-title">👤 STEP 1 · 기본 정보</div>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">회원 선택 <span class="required">*</span></label>
+                <select class="form-select" id="inp-member" onchange="onMemberChange()">
+                  <option value="">회원 선택</option>
+                  <option value="0">김민준 (010-1234-5678)</option>
+                  <option value="1">이서연 (010-2345-6789)</option>
+                  <option value="2">박도현 (010-3456-7890)</option>
+                  <option value="3">최수아 (010-4567-8901)</option>
+                  <option value="4">정우진 (010-5678-9012)</option>
+                  <option value="5">강하은 (010-6789-0123)</option>
+                  <option value="6">오태양 (010-7890-1234)</option>
+                  <option value="7">한소희 (010-8901-2345)</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">담당 트레이너 <span class="required">*</span></label>
+                <select class="form-select" id="inp-trainer">
+                  <option value="">트레이너 선택</option>
+                  <option>김트레이너</option>
+                  <option>박트레이너</option>
+                  <option>이트레이너</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-row" style="margin-bottom:0;">
+              <div class="form-group">
+                <label class="form-label">측정일 <span class="required">*</span></label>
+                <input class="form-input" id="inp-date" type="date" value="2026-03-25" />
+              </div>
+              <div class="form-group">
+                <label class="form-label">측정 회차</label>
+                <input class="form-input" id="inp-round" type="text" placeholder="예: 3차 (자동 계산)" readonly style="background:#F7F9FC;" />
+              </div>
+            </div>
+          </div>
+
+          <!-- 이전 결과 참고 -->
+          <div class="card" id="prev-ref-card" style="display:none;">
+            <div class="card-title">📋 이전 측정 참고 <span id="prev-ref-label" style="font-size:11px;font-weight:600;color:#A0AEC0;"></span></div>
+            <div id="prev-ref-body"></div>
+          </div>
+
+          <!-- 종합 소견 -->
+          <div class="card">
+            <div class="card-title">📝 STEP 3 · 트레이너 종합 소견</div>
+            <textarea class="form-textarea" id="inp-opinion" placeholder="측정 결과에 대한 종합 소견 및 권고사항을 작성하세요."></textarea>
+          </div>
+
+          <!-- 집계 + 저장 -->
+          <div class="card" style="background:linear-gradient(135deg,#553C9A,#7B61FF);color:#fff;">
+            <div style="font-size:12px;opacity:.8;margin-bottom:8px;">📊 체크 집계</div>
+            <div class="sh-sum-row" id="inp-sum-row">
+              <div class="sh-sum-chip" style="background:rgba(255,255,255,0.15);">FN <span id="s-fn">0</span></div>
+              <div class="sh-sum-chip" style="background:rgba(255,255,255,0.15);">FP <span id="s-fp">0</span></div>
+              <div class="sh-sum-chip" style="background:rgba(255,255,255,0.15);">DP <span id="s-dp">0</span></div>
+              <div class="sh-sum-chip" style="background:rgba(255,255,255,0.15);">DN <span id="s-dn">0</span></div>
+              <span style="font-size:11px;opacity:.7;align-self:center;">총 <span id="s-total">0</span>항목</span>
+            </div>
+            <div style="display:flex;gap:8px;">
+              <button class="btn-primary" style="flex:1;background:rgba(255,255,255,0.2);border:2px solid rgba(255,255,255,0.4);" onclick="saveResult()">💾 저장</button>
+              <button onclick="resetForm()" style="flex:1;background:transparent;border:2px solid rgba(255,255,255,0.3);color:#fff;border-radius:10px;padding:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Noto Sans KR',sans-serif;">초기화</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 우: STEP 2 체크시트 -->
+        <div class="card" style="padding:20px 20px 20px;">
+          <div class="card-title" style="margin-bottom:14px;">📋 STEP 2 · SFMA 체크시트
+            <button onclick="shToggleMemo()" id="shMemoBtn" style="margin-left:auto;background:#EDE9FE;color:#6B46C1;border:none;border-radius:8px;padding:4px 10px;font-size:11px;font-weight:700;cursor:pointer;font-family:'Noto Sans KR',sans-serif;">📝 메모</button>
+          </div>
+          <div class="sh-tab-bar">
+            <button class="sh-tab-btn active" onclick="switchSheetTab('top',this)">최고위<br>평가</button>
+            <button class="sh-tab-btn" onclick="switchSheetTab('cervical',this)">경추</button>
+            <button class="sh-tab-btn" onclick="switchSheetTab('upper',this)">상지패턴</button>
+            <button class="sh-tab-btn" onclick="switchSheetTab('msflex',this)">다중분절<br>굴곡</button>
+            <button class="sh-tab-btn" onclick="switchSheetTab('msext',this)">다중분절<br>신전</button>
+            <button class="sh-tab-btn" onclick="switchSheetTab('msrot',this)">다중분절<br>회전</button>
+            <button class="sh-tab-btn" onclick="switchSheetTab('singleleg',this)">한다리<br>자세</button>
+            <button class="sh-tab-btn" onclick="switchSheetTab('squat',this)">오버헤드<br>스쿼트</button>
+          </div>
+          <div id="sh-content"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ④ 결과 비교 -->
+    <div class="screen" id="screen-compare">
+      <div class="page-header">
+        <div>
+          <div class="page-title">📈 SFMA 결과 비교</div>
+          <div class="page-sub">회원을 선택하고 비교할 회차를 골라 변화 추이를 확인합니다</div>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:320px 1fr;gap:14px;align-items:start;">
+        <!-- 좌측: 회원 + 회차 선택 -->
+        <div>
+          <div class="card">
+            <div class="card-title">👤 회원 선택</div>
+            <select class="form-select" id="cmp-member" onchange="renderCompare()" style="width:100%;margin-bottom:10px;">
+              <option value="">회원 선택</option>
+              <option value="0">김민준</option>
+              <option value="1">이서연</option>
+              <option value="2">박도현</option>
+              <option value="3">최수아</option>
+              <option value="4">정우진</option>
+            </select>
+            <div class="card-title" style="margin-top:8px;">📅 비교 회차 선택 <span style="font-size:11px;font-weight:600;color:#A0AEC0;">(최대 3회)</span></div>
+            <div id="cmp-round-chips" style="display:flex;flex-direction:column;gap:6px;"></div>
+          </div>
+          <div class="card" id="cmp-member-info" style="display:none;margin-bottom:0;">
+            <div class="card-title">📊 회원 변화 요약</div>
+            <div id="cmp-summary"></div>
+          </div>
+        </div>
+        <!-- 우측: 비교 차트 -->
+        <div class="card" style="margin-bottom:0;">
+          <div id="cmp-content">
+            <div style="padding:40px 20px;text-align:center;color:#A0AEC0;">
+              <div style="font-size:32px;margin-bottom:10px;">📊</div>
+              <div style="font-size:13px;">좌측에서 회원과 회차를 선택하면<br>비교 차트가 표시됩니다</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- .main -->
+</div><!-- .admin-wrap -->
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ══════════════════════════════════════
+   데이터
+══════════════════════════════════════ */
+const PATTERNS = [
+  { id:'squat',    icon:'🧍', name:'심층 스쿼트',       checks:['좌측 수행','우측 수행','무릎 정렬','통증 없음'] },
+  { id:'walk',     icon:'🚶', name:'제자리 걷기',        checks:['리듬 균형','팔 대칭','고관절 분리','통증 없음'] },
+  { id:'rotation', icon:'🔄', name:'상체 회전',          checks:['좌측 회전','우측 회전','대칭성','통증 없음'] },
+  { id:'shoulder', icon:'🤸', name:'어깨 가동성',        checks:['좌측 도달','우측 도달','대칭','통증 없음'] },
+  { id:'slr',      icon:'🦵', name:'능동 하지 거상',     checks:['좌측 거상','우측 거상','각도 충분','통증 없음'] },
+  { id:'pushup',   icon:'🏋️', name:'체간 안정화 푸시업', checks:['자세 유지','요추 안정','어깨 안정','통증 없음'] },
+  { id:'rotStab',  icon:'🦶', name:'회전 안정성',        checks:['좌측 안정','우측 안정','동측 운동','통증 없음'] },
+];
+
+const MEMBERS = [
+  { name:'김민준', avatar:'#6B46C1', phone:'1234', trainer:'김트레이너', history:[
+    { date:'2026-03-25', round:3, total:76, grade:'양호', scores:{squat:7,walk:9,rotation:5,shoulder:8,slr:7,pushup:6,rotStab:9}, opinion:'흉추 회전 제한 지속. 재활운동 병행 권장.' },
+    { date:'2024-07-22', round:2, total:72, grade:'보통', scores:{squat:6,walk:9,rotation:4,shoulder:8,slr:5,pushup:7,rotStab:9}, opinion:'전반적 양호. 상체 회전 개선 필요.' },
+    { date:'2024-03-10', round:1, total:67, grade:'보통', scores:{squat:5,walk:8,rotation:3,shoulder:7,slr:5,pushup:6,rotStab:8}, opinion:'초기 측정. 코어 안정화 운동 시작 권고.' },
+  ]},
+  { name:'이서연', avatar:'#2B6CB0', phone:'2345', trainer:'이트레이너', history:[
+    { date:'2026-03-20', round:2, total:84, grade:'양호', scores:{squat:8,walk:9,rotation:8,shoulder:9,slr:8,pushup:7,rotStab:9}, opinion:'전반적 우수. 체간 안정화 지속 강화 권장.' },
+    { date:'2025-09-15', round:1, total:78, grade:'양호', scores:{squat:7,walk:9,rotation:7,shoulder:8,slr:8,pushup:6,rotStab:9}, opinion:'양호한 기초 수준.' },
+  ]},
+  { name:'박도현', avatar:'#C05621', phone:'3456', trainer:'김트레이너', history:[
+    { date:'2026-02-14', round:2, total:68, grade:'보통', scores:{squat:6,walk:7,rotation:5,shoulder:7,slr:7,pushup:5,rotStab:7}, opinion:'디스크 영향으로 체간 안정성 낮음. 맥킨지 신전 병행.' },
+    { date:'2025-08-20', round:1, total:61, grade:'보통', scores:{squat:5,walk:7,rotation:4,shoulder:7,slr:6,pushup:4,rotStab:7}, opinion:'허리 통증 호소. 재활 프로그램 시작.' },
+  ]},
+  { name:'최수아', avatar:'#276749', phone:'4567', trainer:'박트레이너', history:[
+    { date:'2026-01-10', round:3, total:91, grade:'우수', scores:{squat:9,walk:10,rotation:9,shoulder:9,slr:9,pushup:9,rotStab:9}, opinion:'전 항목 우수. 유지 운동 권장.' },
+    { date:'2025-07-05', round:2, total:85, grade:'양호', scores:{squat:8,walk:9,rotation:8,shoulder:9,slr:9,pushup:8,rotStab:9}, opinion:'꾸준한 향상. 계속 유지.' },
+    { date:'2025-01-18', round:1, total:79, grade:'양호', scores:{squat:8,walk:9,rotation:7,shoulder:8,slr:8,pushup:8,rotStab:9}, opinion:'초기 측정. 전반적 양호.' },
+  ]},
+  { name:'정우진', avatar:'#744210', phone:'5678', trainer:'이트레이너', history:[
+    { date:'2025-11-30', round:2, total:71, grade:'보통', scores:{squat:7,walk:7,rotation:6,shoulder:8,slr:7,pushup:6,rotStab:7}, opinion:'일자목 교정 병행 중. 상체 회전 개선 필요.' },
+    { date:'2025-04-12', round:1, total:65, grade:'보통', scores:{squat:6,walk:7,rotation:5,shoulder:7,slr:7,pushup:5,rotStab:7}, opinion:'초기 측정. 경추 안정화 운동 시작.' },
+  ]},
+  { name:'강하은', avatar:'#9B2C2C', phone:'6789', trainer:'이트레이너', history:[
+    { date:'2025-10-25', round:1, total:55, grade:'주의', scores:{squat:5,walk:6,rotation:4,shoulder:6,slr:6,pushup:4,rotStab:6}, opinion:'고관절 충돌 영향. 가동성 운동 집중 필요.' },
+  ]},
+  { name:'오태양', avatar:'#2C5282', phone:'7890', trainer:'김트레이너', history:[
+    { date:'2025-09-08', round:1, total:73, grade:'보통', scores:{squat:7,walk:8,rotation:6,shoulder:7,slr:7,pushup:7,rotStab:8}, opinion:'전반적 양호. 하지 거상 향상 목표.' },
+  ]},
+  { name:'한소희', avatar:'#553C9A', phone:'8901', trainer:'박트레이너', history:[
+    { date:'2025-07-22', round:1, total:79, grade:'양호', scores:{squat:8,walk:8,rotation:7,shoulder:8,slr:8,pushup:8,rotStab:8}, opinion:'양호. 지속적인 관리 필요.' },
+  ]},
+];
+
+const UNMEASURED = [
+  { name:'윤재혁', avatar:'#E53E3E', lastDate:'2025-06-12', reason:'허리 통증으로 중단', daysAgo:287 },
+  { name:'장민서', avatar:'#ED8936', lastDate:'2025-08-05', reason:'측정 예약 미이행', daysAgo:232 },
+  { name:'한지민', avatar:'#2B6CB0', lastDate:'2025-09-01', reason:'미측정', daysAgo:205 },
+  { name:'임준서', avatar:'#2F855A', lastDate:'2025-10-10', reason:'출장으로 연기', daysAgo:166 },
+  { name:'나유진', avatar:'#6B46C1', lastDate:'2025-11-20', reason:'부상 회복 중', daysAgo:125 },
+];
+
+const GRADE_INFO = total => {
+  if (total >= 90) return { label:'우수', cls:'g-excellent' };
+  if (total >= 75) return { label:'양호', cls:'g-good' };
+  if (total >= 60) return { label:'보통', cls:'g-average' };
+  return { label:'주의', cls:'g-poor' };
+};
+
+const SCORE_CLR = s => s >= 8 ? '#38A169' : s >= 6 ? '#D69E2E' : '#E53E3E';
+const SCORE_BAR = s => s >= 8 ? 'bar-good' : s >= 6 ? 'bar-warn' : 'bar-bad';
+
+/* ══════════════════════════════════════
+   입력 상태
+══════════════════════════════════════ */
+const inpScores = { squat:5, walk:5, rotation:5, shoulder:5, slr:5, pushup:5, rotStab:5 };
+const inpChecks = {};
+PATTERNS.forEach(p => { inpChecks[p.id] = {}; p.checks.forEach(c => { inpChecks[p.id][c] = ''; }); });
+
+let cmpSelected = [0];
+let listSelectedMember = null;
+
+/* ══════════════════════════════════════
+   화면 전환
+══════════════════════════════════════ */
+function showScreen(id, navBtn, sideBtn) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-' + id).classList.add('active');
+
+  if (navBtn) {
+    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+    navBtn.classList.add('active');
+  }
+  document.querySelectorAll('.sidebar-item').forEach(b => b.classList.remove('active'));
+  const sideItems = document.querySelectorAll('.sidebar-item');
+  const idxMap = { dashboard:0, list:1, input:2, compare:3 };
+  if (idxMap[id] !== undefined) sideItems[idxMap[id]]?.classList.add('active');
+  if (sideBtn) { document.querySelectorAll('.sidebar-item').forEach(b => b.classList.remove('active')); sideBtn.classList.add('active'); }
+
+  if (id === 'dashboard') renderDashboard();
+  if (id === 'list')      renderList();
+  if (id === 'input')     renderSheetContent();
+  if (id === 'compare')   renderCompare();
+}
+
+/* ══════════════════════════════════════
+   ① 대시보드
+══════════════════════════════════════ */
+function renderDashboard() {
+  // 7패턴 평균
+  const patternAvg = PATTERNS.map(p => {
+    const scores = MEMBERS.flatMap(m => m.history.map(h => h.scores[p.id]));
+    return { name: p.name, icon: p.icon, avg: (scores.reduce((a,b)=>a+b,0)/scores.length).toFixed(1) };
+  });
+  document.getElementById('pattern-avg-chart').innerHTML = patternAvg.map(pa => `
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:9px;">
+      <div style="font-size:14px;width:22px;text-align:center;">${pa.icon}</div>
+      <div style="font-size:12px;font-weight:600;color:#4A5568;width:110px;flex-shrink:0;">${pa.name}</div>
+      <div style="flex:1;background:#EDF2F7;border-radius:99px;height:8px;overflow:hidden;">
+        <div style="width:${pa.avg*10}%;height:100%;background:${pa.avg>=8?'#7B61FF':pa.avg>=6?'#B794F4':'#FC8181'};border-radius:99px;"></div>
+      </div>
+      <div style="font-size:12px;font-weight:800;color:#6B46C1;width:28px;text-align:right;">${pa.avg}</div>
+    </div>`).join('');
+
+  // 등급 분포
+  const grades = { '우수':0, '양호':0, '보통':0, '주의':0 };
+  MEMBERS.forEach(m => { if (m.history.length) grades[m.history[0].grade]++; });
+  const total = Object.values(grades).reduce((a,b)=>a+b,0);
+  const gColors = { '우수':'#38A169','양호':'#3182CE','보통':'#D69E2E','주의':'#E53E3E' };
+  const gBg    = { '우수':'#C6F6D5','양호':'#BEE3F8','보통':'#FEFCBF','주의':'#FED7D7' };
+  const gCls   = { '우수':'g-excellent','양호':'g-good','보통':'g-average','주의':'g-poor' };
+
+  // 막대형 등급 분포 차트
+  document.getElementById('grade-dist-chart').innerHTML = Object.entries(grades).map(([g, cnt]) => `
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:7px;">
+      <span style="font-size:11px;font-weight:700;width:28px;color:${gColors[g]};">${g}</span>
+      <div style="flex:1;background:#EDF2F7;border-radius:99px;height:14px;overflow:hidden;">
+        <div style="width:${total?cnt/total*100:0}%;height:100%;background:${gColors[g]};border-radius:99px;transition:width .6s;"></div>
+      </div>
+      <span style="font-size:12px;font-weight:800;color:${gColors[g]};width:20px;">${cnt}</span>
+    </div>`).join('');
+
+  document.getElementById('grade-dist-nums').innerHTML = Object.entries(grades).map(([g, cnt]) => `
+    <div style="background:${gBg[g]};border-radius:10px;padding:10px;text-align:center;">
+      <div style="font-size:18px;font-weight:900;color:${gColors[g]};">${cnt}</div>
+      <div style="font-size:10px;font-weight:700;color:${gColors[g]};margin-top:2px;">${g}</div>
+    </div>`).join('');
+
+  // 최근 측정 테이블
+  const recent = MEMBERS.flatMap(m => m.history.map(h => ({ ...h, name:m.name, trainer:m.trainer })))
+    .sort((a,b) => b.date.localeCompare(a.date)).slice(0, 10);
+  document.getElementById('recent-tbl').innerHTML = recent.map(r => {
+    const gd = GRADE_INFO(r.total);
+    return `<tr>
+      <td class="td-name">${r.name}</td>
+      <td style="color:#A0AEC0;">${r.date}</td>
+      <td class="td-score" style="color:${SCORE_CLR(r.total/10)};">${r.total}</td>
+      <td><span class="grade-badge ${gd.cls}">${gd.label}</span></td>
+      <td style="font-size:12px;color:#718096;">${r.trainer}</td>
+    </tr>`;
+  }).join('');
+
+  // 미측정 목록
+  document.getElementById('unmeasured-list').innerHTML = UNMEASURED.map(u => `
+    <div class="unmeasured-item">
+      <div class="um-avatar" style="background:${u.avatar};">${u.name[0]}</div>
+      <div class="um-info">
+        <div class="um-name">${u.name}</div>
+        <div class="um-meta">마지막 측정: ${u.lastDate}</div>
+      </div>
+      <div class="um-last">${u.daysAgo}일 경과</div>
+      <button class="btn-sm" style="background:#EDE9FE;color:#6B46C1;" onclick="openInputFor('${u.name}')">측정 입력</button>
+    </div>`).join('');
+}
+
+/* ══════════════════════════════════════
+   ② 결과 조회
+══════════════════════════════════════ */
+function renderList() {
+  const q = (document.getElementById('list-search')?.value || '').trim();
+  const gf = document.getElementById('list-grade-filter')?.value || '';
+  const tf = document.getElementById('list-trainer-filter')?.value || '';
+
+  const filtered = MEMBERS.filter(m => {
+    if (q && !m.name.includes(q)) return false;
+    if (gf && m.history.length && m.history[0].grade !== gf) return false;
+    if (tf && m.trainer !== tf) return false;
+    return true;
+  });
+
+  document.getElementById('list-tbl').innerHTML = filtered.map((m, i) => {
+    const h = m.history[0];
+    if (!h) return `<tr><td class="td-name">${m.name}</td><td colspan="5" style="color:#A0AEC0;">측정 이력 없음</td><td><button class="btn-sm" style="background:#EDE9FE;color:#6B46C1;" onclick="openInputFor('${m.name}')">입력</button></td></tr>`;
+    const gd = GRADE_INFO(h.total);
+    const isSelected = listSelectedMember === m.name;
+    return `<tr style="${isSelected?'background:#F5F3FF;':''}" onclick="showMemberDetail('${m.name}')">
+      <td class="td-name" style="cursor:pointer;">${m.name}</td>
+      <td style="color:#A0AEC0;font-size:12px;">${h.date}</td>
+      <td class="td-score" style="color:${SCORE_CLR(h.total/10)};">${h.total}</td>
+      <td><span class="grade-badge ${gd.cls}">${gd.label}</span></td>
+      <td style="font-size:12px;color:#718096;">${m.trainer}</td>
+      <td style="font-size:12px;color:#9B84FF;font-weight:700;">${m.history.length}회</td>
+      <td style="white-space:nowrap;">
+        <button class="btn-sm" style="background:#EDE9FE;color:#6B46C1;margin-right:4px;" onclick="event.stopPropagation();showMemberDetail('${m.name}')">상세</button>
+        <button class="btn-sm" style="background:#F0FFF4;color:#2F855A;" onclick="event.stopPropagation();openInputFor('${m.name}')">수정</button>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function showMemberDetail(name) {
+  listSelectedMember = name;
+  renderList();
+  const m = MEMBERS.find(mb => mb.name === name);
+  if (!m || !m.history.length) return;
+
+  const h = m.history[0]; // 최근 결과
+  const gd = GRADE_INFO(h.total);
+
+  document.getElementById('detail-panel-wrap').innerHTML = `
+    <div class="detail-panel">
+      <div class="detail-hero-box">
+        <div style="font-size:12px;opacity:.7;margin-bottom:4px;">${name} · ${h.date} · ${m.trainer}</div>
+        <div style="display:flex;align-items:baseline;gap:8px;margin-bottom:8px;">
+          <span style="font-size:40px;font-weight:900;">${h.total}</span>
+          <span style="font-size:14px;opacity:.7;">/ 100</span>
+          <span style="background:rgba(255,255,255,0.25);border-radius:8px;padding:3px 10px;font-size:13px;font-weight:800;">${gd.label}</span>
+        </div>
+        <div style="background:rgba(255,255,255,0.2);border-radius:99px;height:6px;overflow:hidden;">
+          <div style="width:${h.total}%;height:100%;background:#fff;border-radius:99px;"></div>
+        </div>
+        <div style="margin-top:8px;font-size:11px;opacity:.7;">3차 측정 · 총 ${m.history.length}회 이력</div>
+      </div>
+
+      <div style="margin-bottom:14px;">
+        <div style="font-size:11px;font-weight:800;color:#A0AEC0;letter-spacing:1px;margin-bottom:8px;">패턴별 점수</div>
+        ${PATTERNS.map(p => {
+          const sc = h.scores[p.id];
+          const color = SCORE_CLR(sc);
+          return `<div class="detail-pattern-row">
+            <span style="font-size:16px;width:24px;">${p.icon}</span>
+            <span style="flex:1;font-size:12px;font-weight:600;color:#2D3748;">${p.name}</span>
+            <div class="inline-bar">
+              <div class="bar-track"><div class="bar-fill" style="width:${sc*10}%;background:${color};"></div></div>
+            </div>
+            <span style="font-size:15px;font-weight:900;color:${color};width:24px;text-align:right;">${sc}</span>
+          </div>`;
+        }).join('')}
+      </div>
+
+      <div style="background:#F5F3FF;border-radius:10px;padding:12px;border-left:3px solid #7B61FF;margin-bottom:12px;">
+        <div style="font-size:11px;font-weight:800;color:#6B46C1;margin-bottom:6px;">📋 트레이너 소견</div>
+        <div style="font-size:12px;color:#44337A;line-height:1.6;">${h.opinion}</div>
+        <div style="font-size:10px;color:#9B84FF;margin-top:6px;">${m.trainer} · ${h.date}</div>
+      </div>
+
+      ${m.history.length > 1 ? `<div>
+        <div style="font-size:11px;font-weight:800;color:#A0AEC0;letter-spacing:1px;margin-bottom:8px;">이전 이력</div>
+        ${m.history.slice(1).map(prev => {
+          const pgd = GRADE_INFO(prev.total);
+          const diff = h.total - prev.total;
+          return `<div style="display:flex;align-items:center;gap:10px;padding:8px;background:#F7F9FC;border-radius:8px;margin-bottom:6px;">
+            <div style="flex:1;">
+              <div style="font-size:12px;font-weight:700;color:#1A202C;">${prev.round}차 · ${prev.date}</div>
+              <div style="font-size:11px;color:#A0AEC0;">${prev.trainer}</div>
+            </div>
+            <span style="font-size:18px;font-weight:900;color:#9B84FF;">${prev.total}</span>
+            <span class="grade-badge ${pgd.cls}">${pgd.label}</span>
+            <span style="font-size:11px;font-weight:700;color:${diff>0?'#38A169':'#E53E3E'};">${diff>0?'▲':'▼'}${Math.abs(diff)}</span>
+          </div>`;
+        }).join('')}
+      </div>` : ''}
+
+      <div style="display:flex;gap:8px;margin-top:4px;">
+        <button class="btn-primary" style="flex:1;font-size:12px;padding:9px;" onclick="openInputFor('${name}')">✏️ 결과 수정</button>
+        <button style="flex:1;background:#EDE9FE;color:#6B46C1;border:none;border-radius:10px;padding:9px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Noto Sans KR',sans-serif;" onclick="openCompareFor('${name}')">📈 비교 보기</button>
+      </div>
+    </div>`;
+}
+
+/* ══════════════════════════════════════
+   ③ 결과 입력 — SFMA 체크시트
+══════════════════════════════════════ */
+const SHEET_DATA = {
+  top: [
+    { id:'top1',  num:'01', name:'경추 패턴1',                bilateral:false, icon:'🧘' },
+    { id:'top2',  num:'02', name:'경추 패턴2',                bilateral:false, icon:'🧘' },
+    { id:'top3',  num:'03', name:'경추 패턴3',                bilateral:true,  icon:'🔄' },
+    { id:'top4',  num:'04', name:'상지 패턴1',                bilateral:true,  icon:'💪' },
+    { id:'top5',  num:'05', name:'상지 패턴2',                bilateral:true,  icon:'💪' },
+    { id:'top6',  num:'06', name:'다중 분절 굴곡',            bilateral:false, icon:'🫁' },
+    { id:'top7',  num:'07', name:'다중 분절 신전',            bilateral:false, icon:'📐' },
+    { id:'top8',  num:'08', name:'다중 분절 회전',            bilateral:true,  icon:'🌀' },
+    { id:'top9',  num:'09', name:'한 다리로 선 자세',         bilateral:true,  icon:'🦵' },
+    { id:'top10', num:'10', name:'팔을 머리 위로 든 스쿼트', bilateral:false, icon:'🏋️' },
+  ],
+  cervical: [
+    { id:'c1', num:'01', name:'누운 상태의 경추 굴곡 (턱→가슴으로 당기기)', bilateral:false, icon:'🤕' },
+    { id:'c2', num:'02', name:'누운 상태의 수동적인 경추 굴곡',              bilateral:false, icon:'🤕' },
+    { id:'c3', num:'03', name:'누운 상태의 OA 경추 굴곡 (20°)',             bilateral:true,  icon:'🤕' },
+    { id:'c4', num:'04', name:'누운 상태의 능동적인 경추 회전 (80°)',        bilateral:true,  icon:'🤕' },
+    { id:'c5', num:'05', name:'수동적인 경추 외전',                          bilateral:true,  icon:'🤕' },
+    { id:'c6', num:'06', name:'C1-C2 경추 네스트',                          bilateral:true,  icon:'🤕' },
+    { id:'c7', num:'07', name:'누운 상태의 경추 신전',                       bilateral:true,  icon:'🤕' },
+  ],
+  upper: [
+    { id:'u1', num:'01', name:'앉드린 상태의 능동적인 상지 패턴', bilateral:true, icon:'💪' },
+    { id:'u2', num:'02', name:'앉드린 상태의 수동적인 상지 패턴', bilateral:true, icon:'💪' },
+    { id:'u3', num:'03', name:'누운 상태의 상호적인 상지 패턴',   bilateral:true, icon:'💪' },
+  ],
+  msflex: [
+    { id:'mf1', num:'01', name:'한 다리 전굴',                               bilateral:true,  icon:'🦵' },
+    { id:'mf2', num:'02', name:'다리폐고 않은 상태에서 발끝 당기기',         bilateral:false, icon:'🦵' },
+    { id:'mf3', num:'03', name:'구르기',                                      bilateral:false, icon:'🔄' },
+    { id:'mf4', num:'04', name:'능동적인 스트레이트 레그 레이즈',            bilateral:true,  icon:'🦵' },
+    { id:'mf5', num:'05', name:'수동적인 스트레이트 레그 레이즈',            bilateral:true,  icon:'🦵' },
+    { id:'mf6', num:'06', name:'구르기',                                      bilateral:false, icon:'🔄' },
+    { id:'mf7', num:'07', name:'누운 상태에서 무릎 가슴으로 당기기',         bilateral:true,  icon:'🦵' },
+    { id:'mf8', num:'08', name:'아귄이 자세',                                 bilateral:false, icon:'🧘' },
+  ],
+  msext: [
+    { id:'me1',  num:'01', name:'엎드려 누워 고개들기',                               bilateral:false, icon:'🏃' },
+    { id:'me2',  num:'02', name:'앉아서 고관절 굴곡 없이 신전',                       bilateral:true,  icon:'🏃' },
+    { id:'me3',  num:'03', name:'앉드린 상태에서 무릎 들기',                          bilateral:true,  icon:'🏃' },
+    { id:'me4',  num:'04', name:'앉아서 고관절 굴곡을 하면서 능동 신전',              bilateral:true,  icon:'🏃' },
+    { id:'me5',  num:'05', name:'앉아서 고관절 굴곡을 수동적으로 신전',               bilateral:true,  icon:'🏃' },
+    { id:'me6',  num:'06', name:'앉드린 상태에서 통증을 느끼며 신전',                 bilateral:true,  icon:'🏃' },
+    { id:'me7',  num:'07', name:'완다리를 든 신전 고관절 신전',                       bilateral:true,  icon:'🏃' },
+    { id:'me8',  num:'08', name:'앉드린 상태의 능동적인 고관절 신전',                 bilateral:true,  icon:'🏃' },
+    { id:'me9',  num:'09', name:'한다리 수동적인 고관절 신전',                        bilateral:true,  icon:'🏃' },
+    { id:'me10', num:'10', name:'구르기',                                              bilateral:false, icon:'🔄' },
+    { id:'me11', num:'11', name:'파워브리지',                                          bilateral:false, icon:'🏃' },
+    { id:'me12', num:'12', name:'수동적인 토마스(Thomas) 테스트',                     bilateral:true,  icon:'🏃' },
+    { id:'me13', num:'13', name:'전면 다리 굴곡',                                      bilateral:false, icon:'🏃' },
+    { id:'me14', num:'14', name:'누운 상태에서 한쪽 고관절 굴곡 브리지',              bilateral:true,  icon:'🏃' },
+    { id:'me15', num:'15', name:'게이츠',                                              bilateral:false, icon:'🏃' },
+    { id:'me16', num:'16', name:'누운 상태에서 한쪽 고관절 굴곡 신전',               bilateral:true,  icon:'🏃' },
+    { id:'me17', num:'17', name:'고관절 굴곡을 신전',                                  bilateral:true,  icon:'🏃' },
+    { id:'me18', num:'18', name:'고관절 굴곡을 신전 (45°)',                           bilateral:true,  icon:'🏃' },
+    { id:'me19', num:'19', name:'고관절 굴곡을 신전 (30°)',                           bilateral:true,  icon:'🏃' },
+  ],
+  msrot: [
+    { id:'mr1',  num:'01', name:'앉아서 능동적 고관절 회전 신전',           bilateral:true,  icon:'🌀' },
+    { id:'mr2',  num:'02', name:'앉아서 고관절 굴곡 없이 회전 신전',        bilateral:true,  icon:'🌀' },
+    { id:'mr3',  num:'03', name:'능동적인 스트레이트 레그 레이즈 (회전)',    bilateral:true,  icon:'🌀' },
+    { id:'mr4',  num:'04', name:'구르기',                                     bilateral:false, icon:'🔄' },
+    { id:'mr5',  num:'05', name:'누운 상태에서 폭발적 회전',                 bilateral:true,  icon:'🌀' },
+    { id:'mr6',  num:'06', name:'구르기',                                     bilateral:false, icon:'🔄' },
+    { id:'mr7',  num:'07', name:'앉 상태의 능동적인 회전 신전',              bilateral:true,  icon:'🌀' },
+    { id:'mr8',  num:'08', name:'앉드린 상태의 능동적인 고관절 회전 신전',   bilateral:true,  icon:'🌀' },
+    { id:'mr9',  num:'09', name:'앉드린 상태의 수동적인 고관절 회전 신전',   bilateral:true,  icon:'🌀' },
+    { id:'mr10', num:'10', name:'구르기',                                     bilateral:false, icon:'🔄' },
+    { id:'mr11', num:'11', name:'게이트',                                     bilateral:false, icon:'🌀' },
+    { id:'mr12', num:'12', name:'앉 상태에서 고관절 신전 SP',                bilateral:true,  icon:'🌀' },
+    { id:'mr13', num:'13', name:'앉 상태에서 고관절 신전 사선형',            bilateral:true,  icon:'🌀' },
+    { id:'mr14', num:'14', name:'앉드린 상태에서 고관절 신전 4P',            bilateral:true,  icon:'🌀' },
+    { id:'mr15', num:'15', name:'앉드린 상태에서 고관절 수동적 신전',        bilateral:true,  icon:'🌀' },
+    { id:'mr16', num:'16', name:'구르기',                                     bilateral:false, icon:'🔄' },
+    { id:'mr17', num:'17', name:'앉 상태에서 고관절 신전 SP (회전)',         bilateral:true,  icon:'🌀' },
+    { id:'mr18', num:'18', name:'능동적 스트레이트 레그 레이즈 사선형',      bilateral:true,  icon:'🌀' },
+    { id:'mr19', num:'19', name:'앉 상태에서 고관절 신전 사선형 4P',         bilateral:true,  icon:'🌀' },
+    { id:'mr20', num:'20', name:'앉 상태에서 고관절 신전 사선형 수동',       bilateral:true,  icon:'🌀' },
+  ],
+  singleleg: [
+    { id:'sl1', num:'01', name:'한 다리로 서기 (눈 뜨고)',        bilateral:true, icon:'🦵' },
+    { id:'sl2', num:'02', name:'한 다리로 서기 (눈 감고)',        bilateral:true, icon:'🦵' },
+    { id:'sl3', num:'03', name:'한 다리 능동적 발 들기',           bilateral:true, icon:'🦵' },
+    { id:'sl4', num:'04', name:'한 다리 스쿼트 (무릎 굽히기)',    bilateral:true, icon:'🦵' },
+    { id:'sl5', num:'05', name:'한 다리 루마니안 데드리프트',      bilateral:true, icon:'🦵' },
+    { id:'sl6', num:'06', name:'한 다리 점프 착지',                bilateral:true, icon:'🦵' },
+    { id:'sl7', num:'07', name:'고관절 외전 근력 테스트',          bilateral:true, icon:'🦵' },
+    { id:'sl8', num:'08', name:'트렌델렌버그 징후 검사',           bilateral:true, icon:'🦵' },
+  ],
+  squat: [
+    { id:'sq1', num:'01', name:'목뒤에서 꽉지 끼고 스쿼트',                              bilateral:false, icon:'🏋️' },
+    { id:'sq2', num:'02', name:'보조받는 딥 스쿼트',                                      bilateral:false, icon:'🏋️' },
+    { id:'sq3', num:'03', name:'반 무릎 서기 복측굴곡',                                   bilateral:true,  icon:'🏋️' },
+    { id:'sq4', num:'04', name:'누운 상태에서 종아리 잡고 무릎 가슴으로 당기기',          bilateral:true,  icon:'🏋️' },
+    { id:'sq5', num:'05', name:'누운 상태에서 허벅지 잡고 무릎을 가슴으로 당기기',       bilateral:true,  icon:'🏋️' },
+  ],
+};
+
+let sheetChecks = {};   // { 'top1':'FN', 'c3_좌':'DN', ... }
+let sheetMemos  = {};   // { 'c1_memo':'...' }
+let shShowMemo  = false;
+let shCurrentTab = 'top';
+
+const SH_SYM = {
+  FN: { shape:'circle',   color:'#3182CE', lblCls:'lbl-fn' },
+  FP: { shape:'triangle', color:'#D69E2E', lblCls:'lbl-fp' },
+  DP: { shape:'triangle', color:'#E53E3E', lblCls:'lbl-dp' },
+  DN: { shape:'circle',   color:'#718096', lblCls:'lbl-dn' },
+};
+
+function shCircle(fill, stroke, sz){
+  return `<svg viewBox="0 0 38 38" width="${sz}" height="${sz}"><circle cx="19" cy="19" r="15" fill="${fill}" stroke="${stroke}" stroke-width="2.5"/></svg>`;
+}
+function shTri(fill, stroke, sz){
+  return `<svg viewBox="0 0 38 38" width="${sz}" height="${sz}"><polygon points="19,32 3,8 35,8" fill="${fill}" stroke="${stroke}" stroke-width="2.5" stroke-linejoin="round"/></svg>`;
+}
+
+function shSym(key, stateKey, sz){
+  const cfg = SH_SYM[key];
+  const sel  = sheetChecks[stateKey] === key;
+  const fill = sel ? cfg.color : '#FFFFFF';
+  const strk = sel ? cfg.color : '#CBD5E0';
+  const svg  = cfg.shape === 'circle' ? shCircle(fill, strk, sz) : shTri(fill, strk, sz);
+  return `<div class="sym-item" onclick="shToggle('${stateKey}','${key}')" title="${key}">
+    ${svg}<span class="sym-lbl ${cfg.lblCls}">${key}</span>
+  </div>`;
+}
+
+function shSymRow(id, side, sz){
+  const k   = side ? `${id}_${side}` : id;
+  const tag = side ? `<span class="lr-tag">${side}</span>` : `<span class="lr-tag"></span>`;
+  return `<div class="sym-row">${tag}<div class="sym-group">${['FN','FP','DP','DN'].map(s=>shSym(s,k,sz)).join('')}</div></div>`;
+}
+
+function shToggle(stateKey, val){
+  if(sheetChecks[stateKey] === val) delete sheetChecks[stateKey];
+  else sheetChecks[stateKey] = val;
+  renderSheetContent();
+  updateShSummary();
+}
+
+function renderSheetTopGrid(patterns){
+  return `<div class="top-grid">${patterns.map(p=>`
+    <div class="pat-card">
+      <div class="pat-num">${p.num}.</div>
+      <div class="pat-name">${p.name}</div>
+      ${p.bilateral ? shSymRow(p.id,'좌',26)+shSymRow(p.id,'우',26) : shSymRow(p.id,null,26)}
+    </div>`).join('')}</div>`;
+}
+
+function renderSheetDetailCards(patterns){
+  return patterns.map(p=>{
+    const mk = `${p.id}_memo`;
+    const memoHtml = shShowMemo
+      ? `<input class="sh-memo" placeholder="메모" value="${sheetMemos[mk]||''}" onchange="sheetMemos['${mk}']=this.value"/>`
+      : '';
+    const checks = p.bilateral
+      ? shSymRow(p.id,'좌',28)+shSymRow(p.id,'우',28)
+      : shSymRow(p.id,null,28);
+    return `<div class="sh-detail-card">
+      <div class="sh-detail-inner">
+        <div class="sh-photo">${p.icon}</div>
+        <div class="sh-body">
+          <div class="sh-hdr">
+            <span class="sh-num">${p.num}</span>
+            <span class="sh-name">${p.name}</span>
+          </div>
+          ${memoHtml}
+          <div class="sh-sym-rows">${checks}</div>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderSheetContent(){
+  const patterns = SHEET_DATA[shCurrentTab];
+  document.getElementById('sh-content').innerHTML =
+    shCurrentTab === 'top'
+      ? renderSheetTopGrid(patterns)
+      : renderSheetDetailCards(patterns);
+}
+
+function switchSheetTab(tab, btn){
+  shCurrentTab = tab;
+  document.querySelectorAll('.sh-tab-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderSheetContent();
+}
+
+function shToggleMemo(){
+  shShowMemo = !shShowMemo;
+  document.getElementById('shMemoBtn').style.background = shShowMemo ? '#6B46C1' : '#EDE9FE';
+  document.getElementById('shMemoBtn').style.color = shShowMemo ? '#fff' : '#6B46C1';
+  renderSheetContent();
+}
+
+function updateShSummary(){
+  const vals = Object.values(sheetChecks);
+  const cnt = {FN:0,FP:0,DP:0,DN:0};
+  vals.forEach(v=>{ if(cnt[v]!==undefined) cnt[v]++; });
+  document.getElementById('s-fn').textContent = cnt.FN;
+  document.getElementById('s-fp').textContent = cnt.FP;
+  document.getElementById('s-dp').textContent = cnt.DP;
+  document.getElementById('s-dn').textContent = cnt.DN;
+  document.getElementById('s-total').textContent = vals.length;
+}
+
+function onMemberChange() {
+  const idx = document.getElementById('inp-member').value;
+  if (idx === '') {
+    document.getElementById('prev-ref-card').style.display = 'none';
+    document.getElementById('inp-round').value = '';
+    return;
+  }
+  const m = MEMBERS[parseInt(idx)];
+  document.getElementById('inp-round').value = (m.history.length + 1) + '차';
+
+  if (m.history.length > 0) {
+    const prev = m.history[0];
+    document.getElementById('prev-ref-card').style.display = 'block';
+    document.getElementById('prev-ref-label').textContent = `이전 ${prev.round}차 · ${prev.date}`;
+    document.getElementById('prev-ref-body').innerHTML = PATTERNS.map(p => {
+      const sc = prev.scores[p.id];
+      return `<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+        <span style="font-size:13px;">${p.icon}</span>
+        <span style="flex:1;font-size:11px;color:#4A5568;">${p.name}</span>
+        <div style="flex:1;background:#EDF2F7;border-radius:99px;height:6px;overflow:hidden;">
+          <div style="width:${sc*10}%;height:100%;background:${SCORE_CLR(sc)};border-radius:99px;"></div>
+        </div>
+        <span style="font-size:12px;font-weight:800;color:${SCORE_CLR(sc)};width:16px;">${sc}</span>
+      </div>`;
+    }).join('');
+  }
+}
+
+function openInputFor(name) {
+  const idx = MEMBERS.findIndex(m => m.name === name);
+  if (idx >= 0) {
+    showScreen('input', document.querySelectorAll('.nav-btn')[2]);
+    document.getElementById('inp-member').value = idx;
+    onMemberChange();
+  }
+}
+
+function saveResult() {
+  const memberIdx = document.getElementById('inp-member').value;
+  const trainer = document.getElementById('inp-trainer').value;
+  const date = document.getElementById('inp-date').value;
+  if (!memberIdx || !trainer || !date) { showToast('⚠️ 회원, 트레이너, 측정일을 입력하세요.'); return; }
+  showToast('✅ SFMA 결과가 저장되었습니다.');
+}
+
+function resetForm() {
+  document.getElementById('inp-member').value = '';
+  document.getElementById('inp-trainer').value = '';
+  document.getElementById('inp-opinion').value = '';
+  document.getElementById('inp-round').value = '';
+  document.getElementById('prev-ref-card').style.display = 'none';
+  sheetChecks = {};
+  sheetMemos  = {};
+  renderSheetContent();
+  updateShSummary();
+}
+
+/* ══════════════════════════════════════
+   ④ 결과 비교
+══════════════════════════════════════ */
+function renderCompare() {
+  const memberIdx = document.getElementById('cmp-member').value;
+  if (memberIdx === '') {
+    document.getElementById('cmp-round-chips').innerHTML = '<div style="font-size:12px;color:#A0AEC0;">회원을 선택하면 회차 목록이 표시됩니다</div>';
+    document.getElementById('cmp-member-info').style.display = 'none';
+    return;
+  }
+  const m = MEMBERS[parseInt(memberIdx)];
+  cmpSelected = [0]; // 최근 회차 기본 선택
+
+  document.getElementById('cmp-round-chips').innerHTML = m.history.map((h, i) =>
+    `<label style="display:flex;align-items:center;gap:8px;padding:8px 12px;background:${cmpSelected.includes(i)?'#EDE9FE':'#F7F9FC'};border-radius:10px;cursor:pointer;border:1.5px solid ${cmpSelected.includes(i)?'#9B84FF':'#E2E8F0'};">
+      <input type="checkbox" ${cmpSelected.includes(i)?'checked':''} onchange="toggleCmpRound(${i}, ${memberIdx})" style="accent-color:#6B46C1;" />
+      <span style="font-size:13px;font-weight:700;color:#1A202C;">${h.round}차</span>
+      <span style="font-size:11px;color:#A0AEC0;">${h.date}</span>
+      <span style="margin-left:auto;font-size:14px;font-weight:900;color:${SCORE_CLR(h.total/10)};">${h.total}</span>
+      <span class="grade-badge ${GRADE_INFO(h.total).cls}" style="font-size:10px;">${GRADE_INFO(h.total).label}</span>
+    </label>`
+  ).join('');
+
+  renderCmpChart(m);
+}
+
+function toggleCmpRound(idx, memberIdx) {
+  if (cmpSelected.includes(idx)) {
+    if (cmpSelected.length <= 1) return;
+    cmpSelected = cmpSelected.filter(i => i !== idx);
+  } else {
+    if (cmpSelected.length >= 3) { showToast('⚠️ 최대 3회까지 비교할 수 있습니다.'); return; }
+    cmpSelected.push(idx);
+  }
+  renderCmpChart(MEMBERS[parseInt(document.getElementById('cmp-member').value)]);
+  // 체크박스 UI 재렌더
+  renderCompare();
+}
+
+function renderCmpChart(m) {
+  if (!m || !cmpSelected.length) return;
+  document.getElementById('cmp-member-info').style.display = 'block';
+  const sel = [...cmpSelected].sort((a,b) => b-a); // 최신순
+  const colors = ['#7B61FF','#9B84FF','#CBD5E0'];
+  const latest = m.history[sel[0]];
+  const oldest = m.history[sel[sel.length-1]];
+  const totalDiff = latest.total - oldest.total;
+
+  document.getElementById('cmp-summary').innerHTML = `
+    <div style="display:flex;align-items:center;gap:14px;margin-bottom:10px;">
+      ${sel.map((si, ci) => {
+        const h = m.history[si];
+        return `<div style="flex:1;text-align:center;background:${colors[ci]}18;border-radius:10px;padding:10px;border:2px solid ${colors[ci]}44;">
+          <div style="font-size:10px;color:#888;margin-bottom:2px;">${h.round}차 · ${h.date}</div>
+          <div style="font-size:24px;font-weight:900;color:${colors[ci]};">${h.total}</div>
+          <div style="font-size:11px;font-weight:700;color:${colors[ci]};">${GRADE_INFO(h.total).label}</div>
+        </div>`;
+      }).join('')}
+    </div>
+    ${sel.length > 1 ? `<div style="text-align:center;font-size:13px;font-weight:700;color:${totalDiff>0?'#38A169':totalDiff<0?'#E53E3E':'#718096'};">
+      ${totalDiff>0?'📈 +':'📉 '}${totalDiff}점 ${totalDiff>0?'향상':totalDiff<0?'하락':'유지'}
+    </div>` : ''}
+  `;
+
+  const legendHtml = sel.map((si, ci) => {
+    const h = m.history[si];
+    return `<div style="display:flex;align-items:center;gap:5px;font-size:11px;color:#718096;">
+      <div class="legend-dot" style="background:${colors[ci]};"></div>
+      ${h.round}차 (${h.date})
+    </div>`;
+  }).join('');
+
+  const barsHtml = PATTERNS.map(p => {
+    const scores = sel.map(si => m.history[si].scores[p.id]);
+    const firstScore = scores[0];
+    const lastScore = scores[scores.length-1];
+    const diff = firstScore - lastScore;
+    return `<div class="cmp-row">
+      <div class="cmp-meta">
+        <div class="cmp-item-name">${p.icon} ${p.name}</div>
+        ${sel.length > 1 ? `<span style="font-size:10px;font-weight:700;padding:2px 7px;border-radius:99px;background:${diff>0?'#C6F6D5':diff<0?'#FED7D7':'#EDF2F7'};color:${diff>0?'#276749':diff<0?'#742A2A':'#718096'};">${diff>0?'▲ +':'▼ '}${diff}${diff===0?'유지':''}</span>` : ''}
+      </div>
+      <div class="cmp-bar-group">
+        ${scores.map((sc, ci) => `<div class="cmp-bar-line">
+          <div style="font-size:10px;color:#A0AEC0;width:36px;text-align:right;">${m.history[sel[ci]].round}차</div>
+          <div class="cmp-bar-bg"><div class="cmp-bar-fill" style="width:${sc*10}%;background:${colors[ci]};"></div></div>
+          <div class="cmp-score">${sc}</div>
+        </div>`).join('')}
+      </div>
+    </div>`;
+  }).join('');
+
+  document.getElementById('cmp-content').innerHTML = `
+    <div class="card-title">📊 ${m.name} · 패턴별 비교</div>
+    <div class="cmp-legend">${legendHtml}</div>
+    ${barsHtml}
+  `;
+}
+
+function openCompareFor(name) {
+  const idx = MEMBERS.findIndex(m => m.name === name);
+  if (idx >= 0) {
+    showScreen('compare', document.querySelectorAll('.nav-btn')[3]);
+    document.getElementById('cmp-member').value = idx;
+    cmpSelected = [0];
+    renderCompare();
+  }
+}
+
+/* ══════════════════════════════════════
+   토스트
+══════════════════════════════════════ */
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2800);
+}
+
+/* ══════════════════════════════════════
+   초기화
+══════════════════════════════════════ */
+renderDashboard();
+</script>
+</body>
+</html>
