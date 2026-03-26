@@ -579,12 +579,25 @@
             <div style="font-size:11px;color:#A0AEC0;margin-top:4px;">모든 회원에게 적용되는 기본값</div>
           </div>
           <div class="form-group" style="margin:0;">
-            <label class="form-label">사전 알림 (D-)</label>
-            <div style="display:flex;align-items:center;gap:8px;">
-              <input class="form-input" id="set-notify-before" type="number" min="1" max="30" value="7" style="width:80px;text-align:center;">
-              <span style="font-size:13px;color:#718096;">일 전부터</span>
+            <label class="form-label">사전 알림 (D-) <span style="font-size:10px;font-weight:400;color:#A0AEC0;">최대 3단계</span></label>
+            <div style="display:flex;flex-direction:column;gap:6px;margin-top:2px;">
+              <div style="display:flex;align-items:center;gap:6px;">
+                <span style="font-size:11px;background:#FFF5F5;color:#C53030;padding:2px 6px;border-radius:4px;font-weight:700;min-width:24px;text-align:center;">1</span>
+                <input class="form-input" id="set-notify-before1" type="number" min="1" max="365" value="7" style="width:64px;text-align:center;padding:5px 8px;">
+                <span style="font-size:12px;color:#718096;">일 전</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:6px;">
+                <span style="font-size:11px;background:#FFF9E6;color:#D97706;padding:2px 6px;border-radius:4px;font-weight:700;min-width:24px;text-align:center;">2</span>
+                <input class="form-input" id="set-notify-before2" type="number" min="1" max="365" value="14" style="width:64px;text-align:center;padding:5px 8px;">
+                <span style="font-size:12px;color:#718096;">일 전</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:6px;">
+                <span style="font-size:11px;background:#EBF8FF;color:#2B6CB0;padding:2px 6px;border-radius:4px;font-weight:700;min-width:24px;text-align:center;">3</span>
+                <input class="form-input" id="set-notify-before3" type="number" min="1" max="365" value="30" style="width:64px;text-align:center;padding:5px 8px;">
+                <span style="font-size:12px;color:#718096;">일 전</span>
+              </div>
             </div>
-            <div style="font-size:11px;color:#A0AEC0;margin-top:4px;">재검사일 D-7부터 알림 표시</div>
+            <div style="font-size:11px;color:#A0AEC0;margin-top:4px;">단계별 알림 (빈칸 입력 시 비활성)</div>
           </div>
           <div class="form-group" style="margin:0;">
             <label class="form-label">알림 표시 조건</label>
@@ -764,7 +777,7 @@ const SCORE_BAR = s => s >= 8 ? 'bar-good' : s >= 6 ? 'bar-warn' : 'bar-bad';
 /* ── 재검사 알림 설정 데이터 ── */
 let SETTINGS = {
   defaultDays: 90,
-  notifyBefore: 7,
+  notifyBefore: [7, 14, 30],  // 3단계 사전 알림 (일)
   notifyDashboard: true,
   notifyBadge: true,
   notifyList: true,
@@ -859,10 +872,30 @@ function getAlertStatus(member) {
   const period = getReexamDays(member);
   const daysAgo = daysBetween(h.date, TODAY_DATE);
   const dDays = period - daysAgo; // 양수=D-남은일, 음수=초과
+  const thresholds = SETTINGS.notifyBefore.filter(v => v > 0).sort((a,b) => b-a);
+  const maxThreshold = thresholds[0] || 7;
   let status = 'ok';
-  if (dDays < 0) status = 'overdue';
-  else if (dDays <= SETTINGS.notifyBefore) status = 'soon';
-  return { status, daysAgo, dDays, period, lastDate:h.date };
+  let alertLevel = 0; // 1=3단계(파란), 2=2단계(노란), 3=1단계(빨간)
+  if (dDays < 0) { status = 'overdue'; alertLevel = 3; }
+  else if (thresholds[0] && dDays <= thresholds[0]) {
+    status = 'soon';
+    if (thresholds[2] && dDays <= thresholds[2]) alertLevel = 1;
+    else if (thresholds[1] && dDays <= thresholds[1]) alertLevel = 2;
+    else alertLevel = 3;
+  }
+  return { status, daysAgo, dDays, period, lastDate:h.date, alertLevel };
+}
+
+function alertBadgeHtml(a, size) {
+  const s = size === 'sm' ? 'font-size:10px;padding:1px 5px;' : 'font-size:11px;padding:2px 7px;';
+  if (a.status === 'overdue')
+    return `<span style="background:#FFF5F5;color:#C53030;border-radius:5px;font-weight:700;${s}">D+${Math.abs(a.dDays)} 초과</span>`;
+  if (a.status === 'soon') {
+    const colors = ['#EBF8FF;color:#2B6CB0', '#FFF9E6;color:#D97706', '#FFF5F5;color:#C53030'];
+    const c = colors[Math.min(a.alertLevel - 1, 2)] || colors[1];
+    return `<span style="background:${c};border-radius:5px;font-weight:700;${s}">D-${a.dDays}</span>`;
+  }
+  return '';
 }
 
 function previewDefaultPeriod() {
@@ -880,7 +913,9 @@ function previewDefaultPeriod() {
 function renderSettingsScreen() {
   // 폼에 현재 설정값 반영
   document.getElementById('set-default-days').value = SETTINGS.defaultDays;
-  document.getElementById('set-notify-before').value = SETTINGS.notifyBefore;
+  document.getElementById('set-notify-before1').value = SETTINGS.notifyBefore[0] || '';
+  document.getElementById('set-notify-before2').value = SETTINGS.notifyBefore[1] || '';
+  document.getElementById('set-notify-before3').value = SETTINGS.notifyBefore[2] || '';
   document.getElementById('set-notify-dashboard').checked = SETTINGS.notifyDashboard;
   document.getElementById('set-notify-badge').checked = SETTINGS.notifyBadge;
   document.getElementById('set-notify-list').checked = SETTINGS.notifyList;
@@ -934,7 +969,11 @@ function clearOverride(name) {
 
 function saveSettings() {
   SETTINGS.defaultDays = parseInt(document.getElementById('set-default-days').value) || 90;
-  SETTINGS.notifyBefore = parseInt(document.getElementById('set-notify-before').value) || 7;
+  SETTINGS.notifyBefore = [
+    parseInt(document.getElementById('set-notify-before1').value) || 0,
+    parseInt(document.getElementById('set-notify-before2').value) || 0,
+    parseInt(document.getElementById('set-notify-before3').value) || 0,
+  ].filter(v => v > 0);
   SETTINGS.notifyDashboard = document.getElementById('set-notify-dashboard').checked;
   SETTINGS.notifyBadge = document.getElementById('set-notify-badge').checked;
   SETTINGS.notifyList = document.getElementById('set-notify-list').checked;
@@ -954,9 +993,7 @@ function renderSettingsPreview() {
   const rows = MEMBERS.map(m => {
     const a = getAlertStatus(m);
     if (a.status === 'ok') return null;
-    const badgeHtml = a.status === 'overdue'
-      ? `<span style="background:#FFF5F5;color:#C53030;padding:2px 7px;border-radius:5px;font-size:11px;font-weight:700;">D+${Math.abs(a.dDays)} 초과</span>`
-      : `<span style="background:#FFF9E6;color:#D97706;padding:2px 7px;border-radius:5px;font-size:11px;font-weight:700;">D-${a.dDays} 임박</span>`;
+    const badgeHtml = alertBadgeHtml(a);
     const h = m.history[0];
     const grade = h ? GRADE_INFO(h.total) : null;
     return `<tr>
@@ -1130,12 +1167,9 @@ function renderList() {
     const gd = GRADE_INFO(h.total);
     const isSelected = listSelectedMember === m.name;
     const alert = SETTINGS.notifyList ? getAlertStatus(m) : { status:'ok' };
-    const alertBadge = alert.status === 'overdue'
-      ? `<span style="background:#FFF5F5;color:#C53030;padding:1px 5px;border-radius:4px;font-size:10px;font-weight:700;margin-left:4px;">D+${Math.abs(alert.dDays)}</span>`
-      : alert.status === 'soon'
-      ? `<span style="background:#FFF9E6;color:#D97706;padding:1px 5px;border-radius:4px;font-size:10px;font-weight:700;margin-left:4px;">D-${alert.dDays}</span>`
-      : '';
-    const rowBg = isSelected ? 'background:#F5F3FF;' : alert.status === 'overdue' ? 'background:#FFF5F5;' : alert.status === 'soon' ? 'background:#FFFBEB;' : '';
+    const alertBadge = alertBadgeHtml(alert, 'sm') ? `<span style="margin-left:4px;">${alertBadgeHtml(alert,'sm')}</span>` : '';
+    const lvlBg = { 3:'#FFF5F5', 2:'#FFFBEB', 1:'#EBF8FF' };
+    const rowBg = isSelected ? 'background:#F5F3FF;' : alert.status !== 'ok' ? `background:${lvlBg[alert.alertLevel]||'#FFF5F5'};` : '';
     return `<tr style="${rowBg}cursor:pointer;" onclick="showMemberDetail('${m.name}')"
       onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">
       <td class="td-name">${m.name}${alertBadge}</td>
@@ -1271,10 +1305,8 @@ function renderNextDateCard(m) {
   const savedDate = m.nextDate || autoDate;
   const alert = getAlertStatus(m);
 
-  const statusHtml = alert.status === 'overdue'
-    ? `<span style="background:#FFF5F5;color:#C53030;padding:2px 7px;border-radius:5px;font-size:11px;font-weight:700;">D+${Math.abs(alert.dDays)} 초과</span>`
-    : alert.status === 'soon'
-    ? `<span style="background:#FFF9E6;color:#D97706;padding:2px 7px;border-radius:5px;font-size:11px;font-weight:700;">D-${alert.dDays} 임박</span>`
+  const statusHtml = alert.status !== 'ok'
+    ? alertBadgeHtml(alert)
     : `<span style="background:#F0FFF4;color:#276749;padding:2px 7px;border-radius:5px;font-size:11px;font-weight:700;">정상</span>`;
 
   card.innerHTML = `
