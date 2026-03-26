@@ -367,16 +367,17 @@
     <div class="screen" id="screen-list">
       <div class="page-header">
         <div>
-          <div class="page-title">🔍 SFMA 결과 조회</div>
-          <div class="page-sub">회원 검색 후 측정 이력 및 상세 결과 확인</div>
+          <div class="page-title" id="list-page-title">🔍 SFMA 결과 조회</div>
+          <div class="page-sub" id="list-page-sub">회원 검색 후 측정 이력 및 상세 결과 확인</div>
         </div>
         <div class="page-actions">
+          <button id="list-back-btn" class="btn-secondary" style="display:none;" onclick="backToList()">← 목록으로</button>
           <button class="btn-primary" onclick="showScreen('input', document.querySelectorAll('.nav-btn')[2])">+ 결과 입력</button>
         </div>
       </div>
 
       <!-- 검색 바 -->
-      <div class="card">
+      <div class="card" id="list-filter-card">
         <div class="filter-bar" style="margin-bottom:0;">
           <input class="search-input" id="list-search" type="text" placeholder="🔍  회원명 또는 전화번호 검색" oninput="renderList()" />
           <select class="filter-select" id="list-grade-filter" onchange="renderList()">
@@ -395,8 +396,8 @@
         </div>
       </div>
 
-      <div style="display:grid;grid-template-columns:1fr 420px;gap:14px;align-items:start;">
-        <!-- 목록 -->
+      <!-- 목록 테이블 -->
+      <div id="list-table-area">
         <div class="card" style="margin-bottom:0;padding:0;overflow:hidden;">
           <div class="tbl-wrap">
             <table>
@@ -407,11 +408,34 @@
             </table>
           </div>
         </div>
-        <!-- 상세 패널 -->
-        <div id="detail-panel-wrap">
-          <div style="background:#fff;border-radius:14px;padding:40px 20px;text-align:center;color:#A0AEC0;box-shadow:0 1px 6px rgba(0,0,0,0.06);">
-            <div style="font-size:32px;margin-bottom:10px;">👈</div>
-            <div style="font-size:13px;">왼쪽 목록에서 회원을 선택하면<br>결과 상세가 표시됩니다</div>
+      </div>
+
+      <!-- 상세 조회 영역 (회원 선택 시 표시) -->
+      <div id="list-detail-area" style="display:none;">
+        <div style="display:grid;grid-template-columns:300px 1fr;gap:14px;align-items:start;">
+          <!-- 좌: 회원 정보 + 소견 -->
+          <div>
+            <div class="card" id="vw-member-info"></div>
+            <div class="card" id="vw-opinion-card"></div>
+            <div class="card" id="vw-history-card" style="display:none;"></div>
+            <div id="vw-action-btns" style="display:flex;gap:8px;margin-bottom:14px;"></div>
+          </div>
+          <!-- 우: SFMA 체크시트 (읽기 전용) -->
+          <div class="card" style="padding:20px;">
+            <div class="card-title" style="margin-bottom:14px;">📋 SFMA 체크시트
+              <span style="font-size:11px;font-weight:600;color:#A0AEC0;margin-left:6px;">읽기 전용</span>
+            </div>
+            <div class="sh-tab-bar">
+              <button class="vw-tab-btn sh-tab-btn active" onclick="switchViewTab('top',this)">최고위<br>평가</button>
+              <button class="vw-tab-btn sh-tab-btn" onclick="switchViewTab('cervical',this)">경추</button>
+              <button class="vw-tab-btn sh-tab-btn" onclick="switchViewTab('upper',this)">상지패턴</button>
+              <button class="vw-tab-btn sh-tab-btn" onclick="switchViewTab('msflex',this)">다중분절<br>굴곡</button>
+              <button class="vw-tab-btn sh-tab-btn" onclick="switchViewTab('msext',this)">다중분절<br>신전</button>
+              <button class="vw-tab-btn sh-tab-btn" onclick="switchViewTab('msrot',this)">다중분절<br>회전</button>
+              <button class="vw-tab-btn sh-tab-btn" onclick="switchViewTab('singleleg',this)">한다리<br>자세</button>
+              <button class="vw-tab-btn sh-tab-btn" onclick="switchViewTab('squat',this)">오버헤드<br>스쿼트</button>
+            </div>
+            <div id="vw-sh-content"></div>
           </div>
         </div>
       </div>
@@ -638,6 +662,11 @@ PATTERNS.forEach(p => { inpChecks[p.id] = {}; p.checks.forEach(c => { inpChecks[
 let cmpSelected = [0];
 let listSelectedMember = null;
 
+/* 결과조회 뷰 모드 상태 */
+let vwCurrentTab = 'top';
+let vwChecks = {};
+let vwMemos  = {};
+
 /* ══════════════════════════════════════
    화면 전환
 ══════════════════════════════════════ */
@@ -768,72 +797,182 @@ function renderList() {
 
 function showMemberDetail(name) {
   listSelectedMember = name;
-  renderList();
   const m = MEMBERS.find(mb => mb.name === name);
   if (!m || !m.history.length) return;
 
-  const h = m.history[0]; // 최근 결과
+  const h = m.history[0];
   const gd = GRADE_INFO(h.total);
 
-  document.getElementById('detail-panel-wrap').innerHTML = `
-    <div class="detail-panel">
-      <div class="detail-hero-box">
-        <div style="font-size:12px;opacity:.7;margin-bottom:4px;">${name} · ${h.date} · ${m.trainer}</div>
-        <div style="display:flex;align-items:baseline;gap:8px;margin-bottom:8px;">
-          <span style="font-size:40px;font-weight:900;">${h.total}</span>
-          <span style="font-size:14px;opacity:.7;">/ 100</span>
-          <span style="background:rgba(255,255,255,0.25);border-radius:8px;padding:3px 10px;font-size:13px;font-weight:800;">${gd.label}</span>
-        </div>
-        <div style="background:rgba(255,255,255,0.2);border-radius:99px;height:6px;overflow:hidden;">
-          <div style="width:${h.total}%;height:100%;background:#fff;border-radius:99px;"></div>
-        </div>
-        <div style="margin-top:8px;font-size:11px;opacity:.7;">3차 측정 · 총 ${m.history.length}회 이력</div>
+  // 뷰 상태 세팅
+  vwChecks = h.sheetChecks || {};
+  vwMemos  = h.sheetMemos  || {};
+  vwCurrentTab = 'top';
+
+  // 목록 숨기고 상세 표시
+  document.getElementById('list-table-area').style.display = 'none';
+  document.getElementById('list-detail-area').style.display = 'block';
+  document.getElementById('list-back-btn').style.display = 'inline-block';
+  document.getElementById('list-page-title').textContent = `🔍 ${name} · SFMA 결과`;
+  document.getElementById('list-page-sub').textContent = `${h.date} · ${h.round}차 · ${m.trainer}`;
+
+  // 탭 초기화
+  document.querySelectorAll('.vw-tab-btn').forEach((b,i) => b.classList.toggle('active', i===0));
+
+  // 집계 계산
+  const vals = Object.values(vwChecks);
+  const cnt = {FN:0,FP:0,DP:0,DN:0};
+  vals.forEach(v=>{ if(cnt[v]!==undefined) cnt[v]++; });
+
+  // 좌: 기본 정보
+  document.getElementById('vw-member-info').innerHTML = `
+    <div class="card-title">👤 기본 정보</div>
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;">
+      <div style="width:44px;height:44px;border-radius:50%;background:${m.avatar};display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:900;color:#fff;flex-shrink:0;">${m.name[0]}</div>
+      <div>
+        <div style="font-size:16px;font-weight:900;color:#1A202C;">${m.name}</div>
+        <div style="font-size:11px;color:#A0AEC0;margin-top:2px;">010-${m.phone}-**** · ${m.trainer}</div>
       </div>
-
-      <div style="margin-bottom:14px;">
-        <div style="font-size:11px;font-weight:800;color:#A0AEC0;letter-spacing:1px;margin-bottom:8px;">패턴별 점수</div>
-        ${PATTERNS.map(p => {
-          const sc = h.scores[p.id];
-          const color = SCORE_CLR(sc);
-          return `<div class="detail-pattern-row">
-            <span style="font-size:16px;width:24px;">${p.icon}</span>
-            <span style="flex:1;font-size:12px;font-weight:600;color:#2D3748;">${p.name}</span>
-            <div class="inline-bar">
-              <div class="bar-track"><div class="bar-fill" style="width:${sc*10}%;background:${color};"></div></div>
-            </div>
-            <span style="font-size:15px;font-weight:900;color:${color};width:24px;text-align:right;">${sc}</span>
-          </div>`;
-        }).join('')}
+      <span class="grade-badge ${gd.cls}" style="margin-left:auto;">${gd.label}</span>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;">
+      <div style="background:#F7F9FC;border-radius:8px;padding:10px;">
+        <div style="font-size:10px;color:#A0AEC0;margin-bottom:2px;">측정일</div>
+        <div style="font-size:13px;font-weight:700;">${h.date}</div>
       </div>
-
-      <div style="background:#F5F3FF;border-radius:10px;padding:12px;border-left:3px solid #7B61FF;margin-bottom:12px;">
-        <div style="font-size:11px;font-weight:800;color:#6B46C1;margin-bottom:6px;">📋 트레이너 소견</div>
-        <div style="font-size:12px;color:#44337A;line-height:1.6;">${h.opinion}</div>
-        <div style="font-size:10px;color:#9B84FF;margin-top:6px;">${m.trainer} · ${h.date}</div>
+      <div style="background:#F7F9FC;border-radius:8px;padding:10px;">
+        <div style="font-size:10px;color:#A0AEC0;margin-bottom:2px;">측정 회차</div>
+        <div style="font-size:13px;font-weight:700;">${h.round}차 <span style="font-size:11px;color:#A0AEC0;">(총 ${m.history.length}회)</span></div>
       </div>
-
-      ${m.history.length > 1 ? `<div>
-        <div style="font-size:11px;font-weight:800;color:#A0AEC0;letter-spacing:1px;margin-bottom:8px;">이전 이력</div>
-        ${m.history.slice(1).map(prev => {
-          const pgd = GRADE_INFO(prev.total);
-          const diff = h.total - prev.total;
-          return `<div style="display:flex;align-items:center;gap:10px;padding:8px;background:#F7F9FC;border-radius:8px;margin-bottom:6px;">
-            <div style="flex:1;">
-              <div style="font-size:12px;font-weight:700;color:#1A202C;">${prev.round}차 · ${prev.date}</div>
-              <div style="font-size:11px;color:#A0AEC0;">${prev.trainer}</div>
-            </div>
-            <span style="font-size:18px;font-weight:900;color:#9B84FF;">${prev.total}</span>
-            <span class="grade-badge ${pgd.cls}">${pgd.label}</span>
-            <span style="font-size:11px;font-weight:700;color:${diff>0?'#38A169':'#E53E3E'};">${diff>0?'▲':'▼'}${Math.abs(diff)}</span>
-          </div>`;
-        }).join('')}
-      </div>` : ''}
-
-      <div style="display:flex;gap:8px;margin-top:4px;">
-        <button class="btn-primary" style="flex:1;font-size:12px;padding:9px;" onclick="openInputFor('${name}')">✏️ 결과 수정</button>
-        <button style="flex:1;background:#EDE9FE;color:#6B46C1;border:none;border-radius:10px;padding:9px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Noto Sans KR',sans-serif;" onclick="openCompareFor('${name}')">📈 비교 보기</button>
+    </div>
+    <div style="background:linear-gradient(135deg,#553C9A,#7B61FF);border-radius:10px;padding:12px;color:#fff;">
+      <div style="font-size:11px;opacity:.8;margin-bottom:6px;">📊 체크 집계</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;" id="vw-sum-chips">
+        <div class="sh-sum-chip" style="background:rgba(255,255,255,0.15);">FN <b>${cnt.FN}</b></div>
+        <div class="sh-sum-chip" style="background:rgba(255,255,255,0.15);">FP <b>${cnt.FP}</b></div>
+        <div class="sh-sum-chip" style="background:rgba(255,255,255,0.15);">DP <b>${cnt.DP}</b></div>
+        <div class="sh-sum-chip" style="background:rgba(255,255,255,0.15);">DN <b>${cnt.DN}</b></div>
+        <span style="font-size:11px;opacity:.7;align-self:center;">총 ${vals.length}항목</span>
       </div>
     </div>`;
+
+  // 좌: 소견
+  document.getElementById('vw-opinion-card').innerHTML = `
+    <div class="card-title">📝 트레이너 소견</div>
+    ${h.opinion
+      ? `<div style="font-size:13px;color:#44337A;line-height:1.7;">${h.opinion}</div>
+         <div style="font-size:11px;color:#9B84FF;margin-top:8px;">${m.trainer} · ${h.date}</div>`
+      : `<div style="font-size:12px;color:#A0AEC0;">소견 없음</div>`}`;
+
+  // 좌: 이전 이력
+  if (m.history.length > 1) {
+    document.getElementById('vw-history-card').style.display = 'block';
+    document.getElementById('vw-history-card').innerHTML = `
+      <div class="card-title">📋 이전 측정 이력</div>
+      ${m.history.slice(1).map(prev => {
+        const pgd = GRADE_INFO(prev.total);
+        const diff = h.total - prev.total;
+        return `<div style="display:flex;align-items:center;gap:10px;padding:8px;background:#F7F9FC;border-radius:8px;margin-bottom:6px;">
+          <div style="flex:1;">
+            <div style="font-size:12px;font-weight:700;color:#1A202C;">${prev.round}차 · ${prev.date}</div>
+            <div style="font-size:11px;color:#A0AEC0;">${m.trainer}</div>
+          </div>
+          <span style="font-size:16px;font-weight:900;color:#9B84FF;">${prev.total}</span>
+          <span class="grade-badge ${pgd.cls}">${pgd.label}</span>
+          <span style="font-size:11px;font-weight:700;color:${diff>0?'#38A169':'#E53E3E'};">${diff>0?'▲':'▼'}${Math.abs(diff)}</span>
+        </div>`;
+      }).join('')}`;
+  } else {
+    document.getElementById('vw-history-card').style.display = 'none';
+  }
+
+  // 좌: 액션 버튼
+  document.getElementById('vw-action-btns').innerHTML = `
+    <button class="btn-primary" style="flex:1;font-size:12px;padding:9px;" onclick="openInputFor('${name}')">✏️ 결과 수정</button>
+    <button style="flex:1;background:#EDE9FE;color:#6B46C1;border:none;border-radius:10px;padding:9px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Noto Sans KR',sans-serif;" onclick="openCompareFor('${name}')">📈 비교 보기</button>`;
+
+  // 우: 체크시트 렌더
+  renderViewSheetContent();
+}
+
+function backToList() {
+  document.getElementById('list-table-area').style.display = 'block';
+  document.getElementById('list-detail-area').style.display = 'none';
+  document.getElementById('list-back-btn').style.display = 'none';
+  document.getElementById('list-page-title').textContent = '🔍 SFMA 결과 조회';
+  document.getElementById('list-page-sub').textContent = '회원 검색 후 측정 이력 및 상세 결과 확인';
+  listSelectedMember = null;
+  renderList();
+}
+
+/* ══════════════════════════════════════
+   ② 결과 조회 — 뷰 모드 체크시트
+══════════════════════════════════════ */
+function vwSym(key, stateKey, sz){
+  const cfg = SH_SYM[key];
+  const sel  = vwChecks[stateKey] === key;
+  const fill = sel ? cfg.color : '#FFFFFF';
+  const strk = sel ? cfg.color : '#CBD5E0';
+  const svg  = cfg.shape === 'circle' ? shCircle(fill, strk, sz) : shTri(fill, strk, sz);
+  return `<div class="sym-item" style="cursor:default;" title="${key}">${svg}<span class="sym-lbl ${cfg.lblCls}">${key}</span></div>`;
+}
+
+function vwSymRow(id, side, sz){
+  const k   = side ? `${id}_${side}` : id;
+  const tag = side ? `<span class="lr-tag">${side}</span>` : `<span class="lr-tag"></span>`;
+  return `<div class="sym-row">${tag}<div class="sym-group">${['FN','FP','DP','DN'].map(s=>vwSym(s,k,sz)).join('')}</div></div>`;
+}
+
+function renderViewTopGrid(patterns){
+  return `<div class="top-grid">${patterns.map(p=>`
+    <div class="pat-card" style="display:flex;gap:10px;align-items:flex-start;">
+      ${p.img ? `<img src="${p.img}" alt="${p.name}" style="width:80px;height:80px;object-fit:contain;object-position:center;border-radius:6px;flex-shrink:0;background:#F0F4F8;" onerror="this.style.display='none'"/>` : ''}
+      <div style="flex:1;min-width:0;">
+        <div style="display:flex;align-items:baseline;gap:4px;margin-bottom:8px;">
+          <span class="pat-num" style="margin-bottom:0;">${p.num}.</span>
+          <span class="pat-name" style="margin-bottom:0;">${p.name}</span>
+        </div>
+        ${vwMemos[p.id+'_memo'] ? `<div style="font-size:11px;color:#4A5568;margin-bottom:6px;padding:4px 8px;background:#EDF2F7;border-radius:5px;">${vwMemos[p.id+'_memo']}</div>` : ''}
+        ${p.bilateral ? vwSymRow(p.id,'좌',26)+vwSymRow(p.id,'우',26) : vwSymRow(p.id,null,26)}
+      </div>
+    </div>`).join('')}</div>`;
+}
+
+function renderViewDetailCards(patterns){
+  return patterns.map(p=>{
+    const memo = vwMemos[`${p.id}_memo`] || '';
+    const checks = p.bilateral
+      ? vwSymRow(p.id,'좌',28)+vwSymRow(p.id,'우',28)
+      : vwSymRow(p.id,null,28);
+    return `<div class="sh-detail-card">
+      <div class="sh-detail-inner">
+        ${p.img ? `<img src="${p.img}" alt="${p.name}" style="width:58px;height:48px;object-fit:contain;border-radius:7px;background:#F0F4F8;" onerror="this.parentElement.innerHTML='<div class=\\'sh-photo\\'>${p.icon}</div>'"/>` : `<div class="sh-photo">${p.icon}</div>`}
+        <div class="sh-body">
+          <div class="sh-hdr">
+            <span class="sh-num">${p.num}</span>
+            <span class="sh-name">${p.name}</span>
+          </div>
+          ${memo ? `<div style="font-size:11px;color:#4A5568;margin-bottom:6px;padding:4px 8px;background:#EDF2F7;border-radius:5px;">${memo}</div>` : ''}
+          <div class="sh-sym-rows">${checks}</div>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderViewSheetContent(){
+  const patterns = SHEET_DATA[vwCurrentTab];
+  const el = document.getElementById('vw-sh-content');
+  if (!el) return;
+  el.innerHTML = vwCurrentTab === 'top'
+    ? renderViewTopGrid(patterns)
+    : renderViewDetailCards(patterns);
+}
+
+function switchViewTab(tab, btn){
+  vwCurrentTab = tab;
+  document.querySelectorAll('.vw-tab-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderViewSheetContent();
 }
 
 /* ══════════════════════════════════════
