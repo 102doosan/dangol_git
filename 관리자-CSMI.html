@@ -300,11 +300,11 @@
     .img-thumb-del { position: absolute; top: 3px; right: 3px; background: rgba(0,0,0,0.55); color: #fff; border: none; border-radius: 50%; width: 20px; height: 20px; font-size: 11px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
     .img-thumb-name { font-size: 9px; color: #718096; padding: 3px 5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; background: #F7F9FC; }
     /* 결과 조회 갤러리 */
-    .detail-img-gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; }
+    .detail-img-gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(480px, 1fr)); gap: 14px; }
     .gallery-item { border-radius: 10px; overflow: hidden; border: 1.5px solid #E2E8F0; cursor: pointer; transition: box-shadow .15s; }
     .gallery-item:hover { box-shadow: 0 4px 14px rgba(0,0,0,0.12); }
-    .gallery-item img { width: 100%; height: 180px; object-fit: contain; display: block; background: #F7F9FC; }
-    .gallery-item-name { font-size: 10px; color: #718096; padding: 5px 8px; background: #F0F4F8; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .gallery-item img { width: 100%; height: auto; min-height: 300px; max-height: 700px; object-fit: contain; display: block; background: #F7F9FC; }
+    .gallery-item-name { font-size: 11px; color: #718096; padding: 6px 10px; background: #F0F4F8; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     /* 이미지 모달 */
     .img-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.82); z-index: 9999; align-items: center; justify-content: center; }
     .img-modal.open { display: flex; }
