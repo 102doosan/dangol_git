@@ -300,11 +300,11 @@
     .img-thumb-del { position: absolute; top: 3px; right: 3px; background: rgba(0,0,0,0.55); color: #fff; border: none; border-radius: 50%; width: 20px; height: 20px; font-size: 11px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
     .img-thumb-name { font-size: 9px; color: #718096; padding: 3px 5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; background: #F7F9FC; }
     /* 결과 조회 갤러리 */
-    .detail-img-gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 10px; }
+    .detail-img-gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; }
     .gallery-item { border-radius: 10px; overflow: hidden; border: 1.5px solid #E2E8F0; cursor: pointer; transition: box-shadow .15s; }
     .gallery-item:hover { box-shadow: 0 4px 14px rgba(0,0,0,0.12); }
-    .gallery-item img { width: 100%; height: 110px; object-fit: cover; display: block; }
-    .gallery-item-name { font-size: 10px; color: #718096; padding: 4px 7px; background: #F7F9FC; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .gallery-item img { width: 100%; height: 180px; object-fit: contain; display: block; background: #F7F9FC; }
+    .gallery-item-name { font-size: 10px; color: #718096; padding: 5px 8px; background: #F0F4F8; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     /* 이미지 모달 */
     .img-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.82); z-index: 9999; align-items: center; justify-content: center; }
     .img-modal.open { display: flex; }
@@ -1215,12 +1215,12 @@ function openDetail(mid){
       }).join('');
   }
 
-  // ⑥ 우: 4그룹 측정 결과 카드
+  // ⑥ 우: 4그룹 측정 결과 카드 (항목 2열 그리드)
   document.getElementById('detail-groups').innerHTML = CSMI_GROUPS.map(g=>{
     const gPct=calcGroupPct(m,h,g.id);
     const gGr=gradeByPct(gPct);
     const gColor=GROUP_COLORS[g.id]||'#2C7A7B';
-    const itemsHtml=g.items.map(it=>{
+    const itemCells=g.items.map(it=>{
       const v=h[it.id]; if(!v) return '';
       const std=stdFor(it,m.gender);
       const pct=pctOf(v.value,std);
@@ -1231,20 +1231,20 @@ function openDetail(mid){
         v.stability?'<span class="result-check-chip chip-stability">안정성 ✓</span>':'',
         v.power?'<span class="result-check-chip chip-power">파워 ✓</span>':'',
       ].filter(Boolean).join('');
-      return `<div class="gdh-bar-row">
+      return `<div style="background:#F7F9FC;border-radius:10px;padding:12px 14px;border:1.5px solid #E2E8F0;">
         <div class="gdh-bar-meta">
-          <span class="gdh-label">${it.label}</span>
-          <span class="gdh-val-text" style="color:${color}">${v.value} Nm</span>
+          <span class="gdh-label" style="font-size:11px;">${it.label}</span>
+          <span class="gdh-val-text" style="color:${color};font-size:13px;">${v.value} Nm</span>
         </div>
-        <div class="gdh-bar-bg">
-          <div class="gdh-bar-std" style="width:${Math.min(100,100)}%;"></div>
+        <div class="gdh-bar-bg" style="margin:7px 0 4px;">
+          <div class="gdh-bar-std" style="width:100%;"></div>
           <div class="gdh-bar-fill" style="width:${fillW}%;background:${color};"></div>
         </div>
         <div class="gdh-bar-sub">
-          <span class="gdh-pct-text" style="color:${pctColor}">${pct}% (기준 ${std}Nm)</span>
-          <span class="gdh-std-text">${pct>=100?'✓ 기준치 달성':pct>=70?'양호':'⚠ 강화 필요'}</span>
+          <span class="gdh-pct-text" style="color:${pctColor};font-size:11px;">${pct}% (기준 ${std}Nm)</span>
+          <span class="gdh-std-text" style="font-size:10px;">${pct>=100?'✓ 달성':pct>=70?'양호':'⚠ 강화필요'}</span>
         </div>
-        ${chips?`<div class="gdh-checks">${chips}</div>`:''}
+        ${chips?`<div class="gdh-checks" style="margin-top:6px;">${chips}</div>`:''}
       </div>`;
     }).join('');
     return `<div class="group-detail-card">
@@ -1252,7 +1252,9 @@ function openDetail(mid){
         <span>${g.icon} ${g.name}</span>
         <span>${gPct}% · <span class="grade-badge" style="background:rgba(255,255,255,0.25);color:#fff;font-size:10px;padding:2px 7px;">${gGr.label}</span></span>
       </div>
-      <div class="group-detail-body">${itemsHtml}</div>
+      <div class="group-detail-body">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">${itemCells}</div>
+      </div>
     </div>`;
   }).join('');
 
