@@ -324,20 +324,6 @@
         </div>
       </div>
 
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;">
-        <!-- 패턴별 평균 점수 -->
-        <div class="card">
-          <div class="card-title">🧩 7패턴 평균 점수</div>
-          <div id="pattern-avg-chart"></div>
-        </div>
-        <!-- 등급 분포 -->
-        <div class="card">
-          <div class="card-title">🏅 등급 분포</div>
-          <div id="grade-dist-chart"></div>
-          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:14px;" id="grade-dist-nums"></div>
-        </div>
-      </div>
-
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
         <!-- 최근 측정 목록 -->
         <div class="card" style="margin-bottom:0;">
@@ -694,45 +680,6 @@ function showScreen(id, navBtn, sideBtn) {
    ① 대시보드
 ══════════════════════════════════════ */
 function renderDashboard() {
-  // 7패턴 평균
-  const patternAvg = PATTERNS.map(p => {
-    const scores = MEMBERS.flatMap(m => m.history.map(h => h.scores[p.id]));
-    return { name: p.name, icon: p.icon, avg: (scores.reduce((a,b)=>a+b,0)/scores.length).toFixed(1) };
-  });
-  document.getElementById('pattern-avg-chart').innerHTML = patternAvg.map(pa => `
-    <div style="display:flex;align-items:center;gap:10px;margin-bottom:9px;">
-      <div style="font-size:14px;width:22px;text-align:center;">${pa.icon}</div>
-      <div style="font-size:12px;font-weight:600;color:#4A5568;width:110px;flex-shrink:0;">${pa.name}</div>
-      <div style="flex:1;background:#EDF2F7;border-radius:99px;height:8px;overflow:hidden;">
-        <div style="width:${pa.avg*10}%;height:100%;background:${pa.avg>=8?'#7B61FF':pa.avg>=6?'#B794F4':'#FC8181'};border-radius:99px;"></div>
-      </div>
-      <div style="font-size:12px;font-weight:800;color:#6B46C1;width:28px;text-align:right;">${pa.avg}</div>
-    </div>`).join('');
-
-  // 등급 분포
-  const grades = { '우수':0, '양호':0, '보통':0, '주의':0 };
-  MEMBERS.forEach(m => { if (m.history.length) grades[m.history[0].grade]++; });
-  const total = Object.values(grades).reduce((a,b)=>a+b,0);
-  const gColors = { '우수':'#38A169','양호':'#3182CE','보통':'#D69E2E','주의':'#E53E3E' };
-  const gBg    = { '우수':'#C6F6D5','양호':'#BEE3F8','보통':'#FEFCBF','주의':'#FED7D7' };
-  const gCls   = { '우수':'g-excellent','양호':'g-good','보통':'g-average','주의':'g-poor' };
-
-  // 막대형 등급 분포 차트
-  document.getElementById('grade-dist-chart').innerHTML = Object.entries(grades).map(([g, cnt]) => `
-    <div style="display:flex;align-items:center;gap:8px;margin-bottom:7px;">
-      <span style="font-size:11px;font-weight:700;width:28px;color:${gColors[g]};">${g}</span>
-      <div style="flex:1;background:#EDF2F7;border-radius:99px;height:14px;overflow:hidden;">
-        <div style="width:${total?cnt/total*100:0}%;height:100%;background:${gColors[g]};border-radius:99px;transition:width .6s;"></div>
-      </div>
-      <span style="font-size:12px;font-weight:800;color:${gColors[g]};width:20px;">${cnt}</span>
-    </div>`).join('');
-
-  document.getElementById('grade-dist-nums').innerHTML = Object.entries(grades).map(([g, cnt]) => `
-    <div style="background:${gBg[g]};border-radius:10px;padding:10px;text-align:center;">
-      <div style="font-size:18px;font-weight:900;color:${gColors[g]};">${cnt}</div>
-      <div style="font-size:10px;font-weight:700;color:${gColors[g]};margin-top:2px;">${g}</div>
-    </div>`).join('');
-
   // 최근 측정 테이블
   const recent = MEMBERS.flatMap(m => m.history.map(h => ({ ...h, name:m.name, trainer:m.trainer })))
     .sort((a,b) => b.date.localeCompare(a.date)).slice(0, 10);
