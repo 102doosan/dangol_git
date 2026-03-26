@@ -1,0 +1,1197 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>관리자 검사측정관리 - CSMI</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Noto Sans KR', sans-serif; background: #F0F4F8; color: #1A202C; min-height: 100vh; padding: 24px 20px 48px; }
+
+    /* 상단 탭 */
+    .nav { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 28px; }
+    .nav-btn {
+      padding: 8px 18px; border-radius: 99px; border: 2px solid #E2E8F0;
+      background: #fff; font-size: 13px; font-weight: 700; cursor: pointer;
+      font-family: 'Noto Sans KR', sans-serif; color: #718096; transition: all 0.2s;
+    }
+    .nav-btn.active { background: #2C7A7B; border-color: #2C7A7B; color: #fff; box-shadow: 0 4px 12px rgba(44,122,123,0.35); }
+
+    .admin-wrap { display: flex; gap: 20px; align-items: flex-start; }
+
+    /* 사이드바 */
+    .sidebar { width: 220px; flex-shrink: 0; background: #1E2E2E; border-radius: 16px; padding: 20px 0; color: #fff; min-height: 600px; }
+    .sidebar-logo { padding: 0 20px 16px; border-bottom: 1px solid #2D4646; margin-bottom: 12px; }
+    .sidebar-logo-title { font-size: 15px; font-weight: 900; color: #fff; }
+    .sidebar-logo-sub { font-size: 11px; color: #718096; margin-top: 2px; }
+    .sidebar-section { font-size: 10px; font-weight: 800; color: #3D6060; letter-spacing: 1.5px; padding: 8px 20px 4px; }
+    .sidebar-item {
+      display: flex; align-items: center; gap: 10px; padding: 10px 20px;
+      font-size: 13px; font-weight: 600; color: #A0AEC0; cursor: pointer; transition: all 0.15s;
+    }
+    .sidebar-item:hover { background: #2D4646; color: #fff; }
+    .sidebar-item.active { background: #2C7A7B; color: #fff; border-right: 3px solid #81E6D9; }
+    .sidebar-item-icon { font-size: 16px; width: 20px; text-align: center; }
+
+    .main { flex: 1; min-width: 0; }
+    .screen { display: none; }
+    .screen.active { display: block; }
+
+    /* 공통 */
+    .page-header {
+      background: #fff; border-radius: 16px; padding: 20px 24px;
+      margin-bottom: 16px; box-shadow: 0 1px 6px rgba(0,0,0,0.06);
+      display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;
+    }
+    .page-title { font-size: 18px; font-weight: 900; color: #1A202C; }
+    .page-sub { font-size: 13px; color: #A0AEC0; margin-top: 2px; }
+    .page-actions { display: flex; gap: 8px; }
+    .btn-primary { background: #2C7A7B; color: #fff; border: none; border-radius: 10px; padding: 10px 18px; font-size: 13px; font-weight: 700; cursor: pointer; font-family: 'Noto Sans KR', sans-serif; transition: background .15s; }
+    .btn-primary:hover { background: #285E61; }
+    .btn-secondary { background: #F0F4F8; color: #4A5568; border: none; border-radius: 10px; padding: 10px 18px; font-size: 13px; font-weight: 700; cursor: pointer; font-family: 'Noto Sans KR', sans-serif; }
+    .btn-sm { padding: 5px 12px; border-radius: 8px; border: none; cursor: pointer; font-size: 12px; font-weight: 700; font-family: 'Noto Sans KR', sans-serif; }
+
+    /* 통계 카드 */
+    .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 16px; }
+    .stat-card { background: #fff; border-radius: 14px; padding: 16px 18px; box-shadow: 0 1px 6px rgba(0,0,0,0.06); }
+    .stat-label { font-size: 11px; font-weight: 700; color: #718096; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
+    .stat-value { font-size: 28px; font-weight: 900; color: #1A202C; }
+    .stat-change { font-size: 12px; font-weight: 700; color: #38A169; margin-top: 4px; }
+
+    /* 카드 */
+    .card { background: #fff; border-radius: 14px; padding: 20px; box-shadow: 0 1px 6px rgba(0,0,0,0.06); margin-bottom: 14px; }
+    .card-title { font-size: 14px; font-weight: 800; color: #1A202C; margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
+
+    /* 필터/검색 */
+    .filter-bar { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-bottom: 14px; }
+    .search-input {
+      flex: 1; min-width: 200px; padding: 9px 14px; border: 1.5px solid #E2E8F0; border-radius: 10px;
+      font-size: 13px; font-family: 'Noto Sans KR', sans-serif; outline: none;
+    }
+    .search-input:focus { border-color: #81E6D9; }
+    .filter-select {
+      padding: 9px 12px; border: 1.5px solid #E2E8F0; border-radius: 10px;
+      font-size: 13px; font-family: 'Noto Sans KR', sans-serif; outline: none; background: #fff;
+    }
+
+    /* 테이블 */
+    .tbl-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    th { background: #F7F9FC; padding: 10px 14px; text-align: left; font-weight: 800; color: #718096; font-size: 11px; letter-spacing: 0.5px; border-bottom: 1px solid #E2E8F0; white-space: nowrap; }
+    td { padding: 12px 14px; border-bottom: 1px solid #F0F4F8; color: #2D3748; vertical-align: middle; }
+    tr:hover td { background: #F7F9FC; }
+    tr:last-child td { border-bottom: none; }
+
+    /* 등급 배지 */
+    .grade-badge { font-size: 11px; font-weight: 700; padding: 3px 9px; border-radius: 99px; }
+    .g-excellent { background: #C6F6D5; color: #1A4731; }
+    .g-good      { background: #BEE3F8; color: #1A365D; }
+    .g-average   { background: #FEFCBF; color: #744210; }
+    .g-poor      { background: #FED7D7; color: #742A2A; }
+
+    /* 폼 */
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
+    .form-group { display: flex; flex-direction: column; gap: 5px; }
+    .form-label { font-size: 12px; font-weight: 700; color: #4A5568; }
+    .form-input { padding: 9px 12px; border: 1.5px solid #E2E8F0; border-radius: 10px; font-size: 13px; font-family: 'Noto Sans KR', sans-serif; outline: none; width: 100%; }
+    .form-input:focus { border-color: #81E6D9; }
+    .form-select { padding: 9px 12px; border: 1.5px solid #E2E8F0; border-radius: 10px; font-size: 13px; font-family: 'Noto Sans KR', sans-serif; outline: none; background: #fff; width: 100%; }
+    .form-textarea { padding: 10px 12px; border: 1.5px solid #E2E8F0; border-radius: 10px; font-size: 13px; font-family: 'Noto Sans KR', sans-serif; outline: none; resize: vertical; min-height: 80px; width: 100%; }
+    .required { color: #E53E3E; margin-left: 2px; }
+
+    /* 검사 그룹 탭 */
+    .group-tabs { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
+    .group-tab {
+      padding: 8px 16px; border-radius: 10px; font-size: 13px; font-weight: 700;
+      border: 2px solid #E2E8F0; background: #fff; cursor: pointer;
+      font-family: 'Noto Sans KR', sans-serif; color: #718096; transition: all .15s;
+    }
+    .group-tab.active { background: #2C7A7B; border-color: #2C7A7B; color: #fff; }
+
+    /* CSMI 수평 막대 입력 */
+    .csmi-item-row { background: #F7F9FC; border-radius: 12px; padding: 14px 16px; margin-bottom: 10px; border: 1.5px solid #E2E8F0; }
+    .csmi-item-header { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+    .csmi-item-name { font-size: 14px; font-weight: 700; color: #1A202C; flex: 1; }
+    .csmi-value-display {
+      font-size: 20px; font-weight: 900; color: #2C7A7B;
+      min-width: 60px; text-align: right;
+    }
+    .csmi-unit { font-size: 11px; font-weight: 600; color: #718096; }
+    .csmi-bar-wrap { position: relative; height: 28px; background: #EDF2F7; border-radius: 99px; margin-bottom: 10px; overflow: visible; }
+    .csmi-bar-std { position: absolute; top: 0; height: 100%; background: #BEE3F8; border-radius: 99px; opacity: 0.6; }
+    .csmi-bar-val { position: absolute; top: 0; height: 100%; background: #2C7A7B; border-radius: 99px; transition: width .4s ease; }
+    .csmi-bar-label { position: absolute; right: -4px; top: -18px; font-size: 11px; font-weight: 700; color: #2C7A7B; white-space: nowrap; }
+    .csmi-std-label { position: absolute; right: 0; bottom: -16px; font-size: 10px; color: #718096; white-space: nowrap; }
+    .csmi-input-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+    .csmi-num-input {
+      width: 90px; padding: 8px 10px; border: 1.5px solid #E2E8F0; border-radius: 8px;
+      font-size: 15px; font-weight: 700; text-align: center;
+      font-family: 'Noto Sans KR', sans-serif; outline: none; color: #2C7A7B;
+    }
+    .csmi-num-input:focus { border-color: #81E6D9; }
+    .csmi-checks { display: flex; gap: 8px; flex-wrap: wrap; }
+    .csmi-check-btn {
+      padding: 4px 12px; border-radius: 99px; font-size: 12px; font-weight: 700;
+      border: 1.5px solid #E2E8F0; background: #fff; cursor: pointer;
+      font-family: 'Noto Sans KR', sans-serif; transition: all .15s; color: #718096;
+    }
+    .csmi-check-btn.on-stability { background: #C6F6D5; border-color: #68D391; color: #276749; }
+    .csmi-check-btn.on-power    { background: #BEE3F8; border-color: #63B3ED; color: #1A365D; }
+    .csmi-percent-badge {
+      padding: 3px 10px; border-radius: 99px; font-size: 12px; font-weight: 700; margin-left: auto;
+    }
+    .pct-excellent { background: #C6F6D5; color: #1A4731; }
+    .pct-good      { background: #BEE3F8; color: #1A365D; }
+    .pct-average   { background: #FEFCBF; color: #744210; }
+    .pct-poor      { background: #FED7D7; color: #742A2A; }
+
+    /* 결과 조회 - 회원별 4그룹 뷰 */
+    .member-result-wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .group-result-card { background: #F7F9FC; border-radius: 12px; padding: 14px; border: 1.5px solid #E2E8F0; }
+    .group-result-title { font-size: 13px; font-weight: 800; color: #1A202C; margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
+    .result-bar-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+    .result-bar-label { font-size: 11px; font-weight: 600; color: #4A5568; width: 100px; flex-shrink: 0; }
+    .result-bar-bg { flex: 1; background: #EDF2F7; border-radius: 99px; height: 10px; overflow: hidden; }
+    .result-bar-fill { height: 100%; border-radius: 99px; transition: width .5s ease; }
+    .result-bar-val { font-size: 11px; font-weight: 700; color: #2C7A7B; width: 45px; text-align: right; flex-shrink: 0; }
+    .result-check-chip { display: inline-flex; align-items: center; gap: 4px; font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 99px; }
+    .chip-stability { background: #C6F6D5; color: #276749; }
+    .chip-power     { background: #BEE3F8; color: #1A365D; }
+
+    /* 비교 차트 */
+    .cmp-legend { display: flex; gap: 14px; margin-bottom: 12px; flex-wrap: wrap; }
+    .legend-item { display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; color: #4A5568; }
+    .legend-dot { width: 12px; height: 12px; border-radius: 3px; flex-shrink: 0; }
+    .cmp-row { margin-bottom: 14px; }
+    .cmp-meta { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
+    .cmp-item-name { font-size: 12px; font-weight: 700; color: #4A5568; }
+    .cmp-bar-group { display: flex; flex-direction: column; gap: 3px; }
+    .cmp-bar-line { display: flex; align-items: center; gap: 8px; }
+    .cmp-bar-bg { flex: 1; background: #EDF2F7; border-radius: 99px; height: 10px; overflow: hidden; }
+    .cmp-bar-fill { height: 100%; border-radius: 99px; transition: width .6s ease; }
+    .cmp-score { font-size: 11px; font-weight: 700; width: 45px; color: #4A5568; }
+
+    /* 분석 패널 */
+    .analysis-panel { background: linear-gradient(135deg, #1A4747, #2C7A7B); border-radius: 12px; padding: 16px; color: #fff; margin-bottom: 14px; }
+    .analysis-title { font-size: 13px; font-weight: 700; opacity: .8; margin-bottom: 8px; }
+    .analysis-body { font-size: 13px; line-height: 1.7; }
+
+    /* 알림 설정 */
+    .notify-row { display: flex; align-items: center; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #F0F4F8; }
+    .notify-row:last-child { border-bottom: none; }
+    .notify-label { font-size: 13px; font-weight: 700; color: #2D3748; }
+    .notify-sub { font-size: 11px; color: #A0AEC0; margin-top: 2px; }
+    .toggle-wrap { position: relative; width: 44px; height: 24px; flex-shrink: 0; }
+    .toggle-input { opacity: 0; width: 0; height: 0; }
+    .toggle-slider {
+      position: absolute; inset: 0; background: #CBD5E0; border-radius: 99px; cursor: pointer; transition: .3s;
+    }
+    .toggle-slider::before {
+      content: ''; position: absolute; left: 3px; top: 3px;
+      width: 18px; height: 18px; background: #fff; border-radius: 50%; transition: .3s;
+    }
+    .toggle-input:checked + .toggle-slider { background: #2C7A7B; }
+    .toggle-input:checked + .toggle-slider::before { transform: translateX(20px); }
+
+    /* 회원 검색 자동완성 */
+    .member-search-wrap { position: relative; }
+    .member-search-input {
+      width: 100%; padding: 10px 14px 10px 38px; border: 2px solid #E2E8F0; border-radius: 10px;
+      font-size: 13px; font-family: 'Noto Sans KR', sans-serif; outline: none; box-sizing: border-box;
+      background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23A0AEC0' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'/%3E%3C/svg%3E") no-repeat 11px center;
+    }
+    .member-search-input:focus { border-color: #81E6D9; box-shadow: 0 0 0 3px rgba(44,122,123,0.12); }
+    .member-search-input.selected { background-color: #E6FFFA; border-color: #81E6D9; }
+    .member-dropdown {
+      position: absolute; top: calc(100% + 6px); left: 0; z-index: 500;
+      width: 100%; min-width: 300px;
+      background: #fff; border: 2px solid #81E6D9; border-radius: 12px;
+      box-shadow: 0 8px 28px rgba(44,122,123,0.18); max-height: 280px; overflow-y: auto;
+      display: none;
+    }
+    .member-dropdown.open { display: block; }
+    .member-drop-item {
+      padding: 10px 14px; font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 10px;
+      transition: background .1s; border-bottom: 1px solid #F0FFF4;
+    }
+    .member-drop-item:last-child { border-bottom: none; }
+    .member-drop-item:hover { background: #F0FFF4; }
+    .member-drop-avatar {
+      width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center;
+      justify-content: center; font-size: 13px; font-weight: 900; color: #fff; flex-shrink: 0;
+    }
+    .member-drop-name { font-weight: 700; color: #1A202C; font-size: 13px; min-width: 60px; }
+    .member-drop-phone { font-size: 11px; color: #2C7A7B; }
+    .member-drop-round { margin-left: auto; font-size: 11px; font-weight: 700; background: #E6FFFA; color: #2C7A7B; padding: 2px 7px; border-radius: 99px; }
+
+    /* 토스트 */
+    .toast {
+      position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(20px);
+      background: #1A202C; color: #fff; padding: 12px 24px; border-radius: 12px;
+      font-size: 13px; font-weight: 700; opacity: 0; transition: all .3s; z-index: 999; white-space: nowrap;
+    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    /* 대시보드 최근 측정 */
+    .td-name { font-weight: 700; color: #1A202C; }
+    .status-badge { font-size: 11px; font-weight: 700; padding: 3px 9px; border-radius: 99px; }
+    .s-done    { background: #C6F6D5; color: #1A4731; }
+    .s-pending { background: #FEFCBF; color: #744210; }
+
+    /* 미측정 회원 */
+    .unmeasured-item { display: flex; align-items: center; gap: 12px; padding: 10px 14px; border-bottom: 1px solid #F0F4F8; }
+    .unmeasured-item:last-child { border-bottom: none; }
+    .um-avatar { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 900; color: #fff; flex-shrink: 0; }
+    .um-info { flex: 1; }
+    .um-name { font-size: 13px; font-weight: 700; color: #1A202C; }
+    .um-meta { font-size: 11px; color: #A0AEC0; margin-top: 1px; }
+    .um-last { font-size: 11px; color: #E53E3E; font-weight: 700; }
+  </style>
+</head>
+<body>
+
+<!-- 상단 탭 -->
+<div class="nav">
+  <span style="font-size:18px;font-weight:900;color:#1A202C;margin-right:auto;">💪 관리자 · 검사측정관리 · CSMI</span>
+  <button class="nav-btn active" onclick="showScreen('dashboard', this)">📊 현황 대시보드</button>
+  <button class="nav-btn" onclick="showScreen('list', this)">🔍 결과 조회</button>
+  <button class="nav-btn" onclick="showScreen('input', this)">✏️ 결과 입력</button>
+  <button class="nav-btn" onclick="showScreen('compare', this)">📈 결과 비교</button>
+  <button class="nav-btn" onclick="showScreen('settings', this)">⚙️ 알림 설정</button>
+</div>
+
+<div class="admin-wrap">
+  <!-- 사이드바 -->
+  <div class="sidebar">
+    <div class="sidebar-logo">
+      <div class="sidebar-logo-title">💪 검사측정관리</div>
+      <div class="sidebar-logo-sub">Assessment Management</div>
+    </div>
+    <div class="sidebar-section">검사 종류</div>
+    <div class="sidebar-item" onclick="location.href='관리자-SFMA.html'">
+      <span class="sidebar-item-icon">🧠</span> SFMA
+    </div>
+    <div class="sidebar-item active">
+      <span class="sidebar-item-icon">💪</span> CSMI
+    </div>
+    <div class="sidebar-section" style="margin-top:4px;">CSMI 메뉴</div>
+    <div class="sidebar-item active" id="csmi-dash-menu" onclick="showScreen('dashboard', null, this)">
+      <span class="sidebar-item-icon">📊</span> 현황 대시보드
+    </div>
+    <div class="sidebar-item" onclick="showScreen('list', null, this)">
+      <span class="sidebar-item-icon">🔍</span> 결과 조회
+    </div>
+    <div class="sidebar-item" onclick="showScreen('input', null, this)">
+      <span class="sidebar-item-icon">✏️</span> 결과 입력
+    </div>
+    <div class="sidebar-item" onclick="showScreen('compare', null, this)">
+      <span class="sidebar-item-icon">📈</span> 결과 비교
+    </div>
+    <div class="sidebar-item" onclick="showScreen('settings', null, this)">
+      <span class="sidebar-item-icon">⚙️</span> 알림 설정
+    </div>
+    <div class="sidebar-section" style="margin-top:12px;">빠른 현황</div>
+    <div style="padding:10px 20px;">
+      <div style="font-size:11px;color:#A0AEC0;margin-bottom:6px;">이번 달 측정</div>
+      <div style="font-size:22px;font-weight:900;color:#81E6D9;">9<span style="font-size:12px;font-weight:600;color:#718096;"> / 38명</span></div>
+      <div style="background:#2D4646;border-radius:99px;height:6px;margin-top:6px;overflow:hidden;">
+        <div style="width:24%;height:100%;background:#2C7A7B;border-radius:99px;"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 메인 -->
+  <div class="main">
+
+    <!-- ① 현황 대시보드 -->
+    <div class="screen active" id="screen-dashboard">
+      <div class="page-header">
+        <div>
+          <div class="page-title">📊 CSMI 현황 대시보드</div>
+          <div class="page-sub">근력측정 전체 회원 현황 · 2026년 3월 기준</div>
+        </div>
+        <div class="page-actions">
+          <button class="btn-secondary" onclick="showScreen('input', document.querySelectorAll('.nav-btn')[2])">+ 결과 입력</button>
+        </div>
+      </div>
+
+      <!-- 요약 카드 -->
+      <div class="stats-row">
+        <div class="stat-card">
+          <div class="stat-label">💪 전체 측정 회원</div>
+          <div class="stat-value">38</div>
+          <div class="stat-change">↑ 3명 증가</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">📅 이번 달 측정</div>
+          <div class="stat-value">9</div>
+          <div class="stat-change" style="color:#718096;">/ 38명</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">⚠️ 재측정 필요</div>
+          <div class="stat-value" style="color:#E53E3E;">7</div>
+          <div class="stat-change" style="color:#E53E3E;">30일 이내</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">✅ 정상 범위 비율</div>
+          <div class="stat-value" style="color:#2C7A7B;">68%</div>
+          <div class="stat-change">기준치 이상</div>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+        <!-- 최근 측정 -->
+        <div class="card" style="margin-bottom:0;">
+          <div class="card-title">📋 최근 측정 (10건)
+            <button class="btn-sm" style="background:#E6FFFA;color:#2C7A7B;margin-left:auto;" onclick="showScreen('list', document.querySelectorAll('.nav-btn')[1])">전체 보기</button>
+          </div>
+          <div class="tbl-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>회원명</th>
+                  <th>측정일</th>
+                  <th>회차</th>
+                  <th>어깨</th>
+                  <th>허리</th>
+                  <th>무릎</th>
+                  <th>발목</th>
+                </tr>
+              </thead>
+              <tbody id="dash-recent-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- 미측정 회원 -->
+        <div class="card" style="margin-bottom:0;">
+          <div class="card-title">⚠️ 측정 예정 회원
+            <span style="margin-left:auto;font-size:11px;font-weight:700;background:#FED7D7;color:#742A2A;padding:3px 8px;border-radius:99px;">7명</span>
+          </div>
+          <div id="unmeasured-list"></div>
+        </div>
+      </div>
+
+      <!-- 검사 항목별 현황 -->
+      <div class="card" style="margin-top:14px;">
+        <div class="card-title">📊 검사 그룹별 정상 범위 비율</div>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;" id="group-stats-grid"></div>
+      </div>
+    </div>
+
+    <!-- ② 결과 조회 -->
+    <div class="screen" id="screen-list">
+      <div class="page-header">
+        <div>
+          <div class="page-title">🔍 CSMI 결과 조회</div>
+          <div class="page-sub">회원별 근력측정 결과 조회</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="filter-bar">
+          <input type="text" class="search-input" placeholder="🔍 회원 이름 검색..." oninput="filterList(this.value)" />
+          <select class="filter-select" onchange="filterListGroup(this.value)">
+            <option value="">전체 그룹</option>
+            <option value="shoulder">어깨</option>
+            <option value="lumbar">허리</option>
+            <option value="knee">무릎</option>
+            <option value="ankle">발목</option>
+          </select>
+        </div>
+        <div class="tbl-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>회원명</th>
+                <th>성별</th>
+                <th>최근 측정일</th>
+                <th>회차</th>
+                <th>어깨(좌/우)</th>
+                <th>허리(숙/펴)</th>
+                <th>무릎(굽/펴)</th>
+                <th>발목(들/내)</th>
+                <th>종합</th>
+                <th>관리</th>
+              </tr>
+            </thead>
+            <tbody id="list-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- 회원 상세 패널 -->
+      <div id="detail-panel" style="display:none;">
+        <div class="page-header" style="margin-top:0;">
+          <div>
+            <div class="page-title" id="detail-title">회원 CSMI 결과 상세</div>
+            <div class="page-sub" id="detail-sub"></div>
+          </div>
+          <button class="btn-secondary" onclick="closeDetail()">← 목록으로</button>
+        </div>
+        <div class="member-result-wrap" id="detail-groups"></div>
+        <div class="analysis-panel" id="detail-analysis"></div>
+      </div>
+    </div>
+
+    <!-- ③ 결과 입력 -->
+    <div class="screen" id="screen-input">
+      <div class="page-header">
+        <div>
+          <div class="page-title">✏️ CSMI 결과 입력</div>
+          <div class="page-sub">회원별 근력측정 수치 입력</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">👤 회원 선택</div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">회원 검색 <span class="required">*</span></label>
+            <div class="member-search-wrap">
+              <input type="text" class="member-search-input" id="inp-member-search"
+                placeholder="이름으로 검색..."
+                oninput="memberSearchInput(this.value)"
+                onfocus="memberSearchFocus()"
+                onblur="memberSearchBlur()" />
+              <div class="member-dropdown" id="member-dropdown"></div>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">측정일 <span class="required">*</span></label>
+            <input type="date" class="form-input" id="inp-date" />
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">회차</label>
+            <input type="number" class="form-input" id="inp-round" placeholder="예: 1" min="1" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">메모</label>
+            <input type="text" class="form-input" id="inp-memo" placeholder="특이사항 등" />
+          </div>
+        </div>
+      </div>
+
+      <!-- 검사 그룹 탭 -->
+      <div class="group-tabs" id="input-group-tabs">
+        <button class="group-tab active" onclick="switchInputGroup('shoulder', this)">🦾 어깨</button>
+        <button class="group-tab" onclick="switchInputGroup('lumbar', this)">🏋️ 허리</button>
+        <button class="group-tab" onclick="switchInputGroup('knee', this)">🦵 무릎</button>
+        <button class="group-tab" onclick="switchInputGroup('ankle', this)">🦶 발목</button>
+      </div>
+
+      <div id="input-group-panels"></div>
+
+      <div style="display:flex;gap:10px;margin-top:4px;">
+        <button class="btn-primary" onclick="saveInput()" style="flex:1;">💾 저장</button>
+        <button class="btn-secondary" onclick="resetInput()">초기화</button>
+      </div>
+    </div>
+
+    <!-- ④ 결과 비교 -->
+    <div class="screen" id="screen-compare">
+      <div class="page-header">
+        <div>
+          <div class="page-title">📈 CSMI 결과 비교</div>
+          <div class="page-sub">회원별 회차 간 근력 변화 비교</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">회원 선택</div>
+        <div class="filter-bar">
+          <select class="filter-select" id="cmp-member-sel" onchange="renderCompare()" style="min-width:160px;">
+            <option value="">회원 선택...</option>
+          </select>
+          <select class="filter-select" id="cmp-round1" onchange="renderCompare()">
+            <option value="">비교 회차 1</option>
+          </select>
+          <select class="filter-select" id="cmp-round2" onchange="renderCompare()">
+            <option value="">비교 회차 2</option>
+          </select>
+        </div>
+      </div>
+
+      <div id="compare-result"></div>
+    </div>
+
+    <!-- ⑤ 알림 설정 -->
+    <div class="screen" id="screen-settings">
+      <div class="page-header">
+        <div>
+          <div class="page-title">⚙️ 알림 설정</div>
+          <div class="page-sub">CSMI 재측정 알림 및 기준 설정</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">🔔 알림 설정</div>
+        <div class="notify-row">
+          <div>
+            <div class="notify-label">재측정 알림</div>
+            <div class="notify-sub">마지막 측정 후 일정 기간 경과 시 알림</div>
+          </div>
+          <label class="toggle-wrap"><input type="checkbox" class="toggle-input" checked /><span class="toggle-slider"></span></label>
+        </div>
+        <div class="notify-row">
+          <div>
+            <div class="notify-label">기준치 미달 알림</div>
+            <div class="notify-sub">성별 표준 대비 70% 미달 시 알림</div>
+          </div>
+          <label class="toggle-wrap"><input type="checkbox" class="toggle-input" checked /><span class="toggle-slider"></span></label>
+        </div>
+        <div class="notify-row">
+          <div>
+            <div class="notify-label">신규 입력 알림</div>
+            <div class="notify-sub">결과 저장 시 담당자에게 알림</div>
+          </div>
+          <label class="toggle-wrap"><input type="checkbox" class="toggle-input" /><span class="toggle-slider"></span></label>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">📏 재측정 주기 설정</div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">우수 (기준치 110% 이상)</label>
+            <select class="form-select">
+              <option>180일 (6개월)</option>
+              <option>90일 (3개월)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">양호 (기준치 90~110%)</label>
+            <select class="form-select">
+              <option>90일 (3개월)</option>
+              <option selected>60일 (2개월)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">보통 (기준치 70~90%)</label>
+            <select class="form-select">
+              <option selected>60일 (2개월)</option>
+              <option>30일 (1개월)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">주의 (기준치 70% 미만)</label>
+            <select class="form-select">
+              <option selected>30일 (1개월)</option>
+              <option>14일 (2주)</option>
+            </select>
+          </div>
+        </div>
+        <button class="btn-primary">저장</button>
+      </div>
+    </div>
+
+  </div><!-- .main -->
+</div><!-- .admin-wrap -->
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ── 데이터 ───────────────────────────────────────────────────
+const CSMI_GROUPS = [
+  { id:'shoulder', name:'어깨', icon:'🦾', items:[
+    { id:'shoulder_l', label:'어깨(좌)', std:{m:80,f:50}, unit:'Nm' },
+    { id:'shoulder_r', label:'어깨(우)', std:{m:80,f:50}, unit:'Nm' },
+  ]},
+  { id:'lumbar', name:'허리', icon:'🏋️', items:[
+    { id:'lumbar_flex', label:'허리 숙이기', std:{m:250,f:150}, unit:'Nm' },
+    { id:'lumbar_ext',  label:'허리 펴기',   std:{m:350,f:220}, unit:'Nm' },
+  ]},
+  { id:'knee', name:'무릎', icon:'🦵', items:[
+    { id:'knee_flex_l', label:'무릎 굽히기(좌)', std:{m:120,f:80},  unit:'Nm' },
+    { id:'knee_ext_l',  label:'무릎 펴기(좌)',   std:{m:200,f:130}, unit:'Nm' },
+    { id:'knee_flex_r', label:'무릎 굽히기(우)', std:{m:120,f:80},  unit:'Nm' },
+    { id:'knee_ext_r',  label:'무릎 펴기(우)',   std:{m:200,f:130}, unit:'Nm' },
+  ]},
+  { id:'ankle', name:'발목', icon:'🦶', items:[
+    { id:'ankle_dors_l', label:'발목 들기(좌)',   std:{m:50,f:35},   unit:'Nm' },
+    { id:'ankle_plan_l', label:'발목 내리기(좌)', std:{m:120,f:80},  unit:'Nm' },
+    { id:'ankle_dors_r', label:'발목 들기(우)',   std:{m:50,f:35},   unit:'Nm' },
+    { id:'ankle_plan_r', label:'발목 내리기(우)', std:{m:120,f:80},  unit:'Nm' },
+  ]},
+];
+
+const ALL_ITEMS = CSMI_GROUPS.flatMap(g => g.items.map(it => ({...it, groupId:g.id, groupName:g.name})));
+
+function stdFor(item, gender){ return gender==='여' ? item.std.f : item.std.m; }
+function pctOf(val, std){ return std ? Math.round(val/std*100) : 0; }
+function gradeByPct(pct){
+  if(pct>=110) return {label:'우수', cls:'g-excellent', pctCls:'pct-excellent'};
+  if(pct>=90)  return {label:'양호', cls:'g-good',      pctCls:'pct-good'};
+  if(pct>=70)  return {label:'보통', cls:'g-average',   pctCls:'pct-average'};
+  return             {label:'주의', cls:'g-poor',       pctCls:'pct-poor'};
+}
+function barColor(pct){
+  if(pct>=110) return '#2C7A7B';
+  if(pct>=90)  return '#4299E1';
+  if(pct>=70)  return '#ECC94B';
+  return '#E53E3E';
+}
+
+// 샘플 회원 데이터
+const MEMBERS = [
+  { id:1, name:'김태훈', gender:'남', color:'#4299E1', history:[
+    { round:1, date:'2026-03-10',
+      shoulder_l:{value:85,stability:true,power:true},
+      shoulder_r:{value:88,stability:true,power:true},
+      lumbar_flex:{value:280,stability:true,power:false},
+      lumbar_ext:{value:320,stability:true,power:false},
+      knee_flex_l:{value:125,stability:true,power:true},
+      knee_ext_l:{value:195,stability:true,power:false},
+      knee_flex_r:{value:118,stability:true,power:true},
+      knee_ext_r:{value:188,stability:false,power:false},
+      ankle_dors_l:{value:52,stability:true,power:true},
+      ankle_plan_l:{value:115,stability:true,power:false},
+      ankle_dors_r:{value:48,stability:true,power:true},
+      ankle_plan_r:{value:112,stability:true,power:false},
+    },
+    { round:2, date:'2025-12-05',
+      shoulder_l:{value:78,stability:true,power:false},
+      shoulder_r:{value:82,stability:true,power:false},
+      lumbar_flex:{value:265,stability:true,power:false},
+      lumbar_ext:{value:300,stability:false,power:false},
+      knee_flex_l:{value:110,stability:true,power:false},
+      knee_ext_l:{value:180,stability:false,power:false},
+      knee_flex_r:{value:108,stability:true,power:false},
+      knee_ext_r:{value:175,stability:false,power:false},
+      ankle_dors_l:{value:45,stability:true,power:false},
+      ankle_plan_l:{value:108,stability:true,power:false},
+      ankle_dors_r:{value:43,stability:true,power:false},
+      ankle_plan_r:{value:105,stability:true,power:false},
+    }
+  ]},
+  { id:2, name:'이서연', gender:'여', color:'#ED64A6', history:[
+    { round:1, date:'2026-03-12',
+      shoulder_l:{value:52,stability:true,power:true},
+      shoulder_r:{value:55,stability:true,power:true},
+      lumbar_flex:{value:160,stability:true,power:true},
+      lumbar_ext:{value:230,stability:true,power:true},
+      knee_flex_l:{value:75,stability:false,power:false},
+      knee_ext_l:{value:125,stability:false,power:false},
+      knee_flex_r:{value:72,stability:false,power:false},
+      knee_ext_r:{value:120,stability:false,power:false},
+      ankle_dors_l:{value:38,stability:true,power:true},
+      ankle_plan_l:{value:85,stability:true,power:true},
+      ankle_dors_r:{value:36,stability:true,power:true},
+      ankle_plan_r:{value:82,stability:true,power:false},
+    }
+  ]},
+  { id:3, name:'박민준', gender:'남', color:'#48BB78', history:[
+    { round:1, date:'2026-03-08',
+      shoulder_l:{value:62,stability:false,power:false},
+      shoulder_r:{value:65,stability:false,power:false},
+      lumbar_flex:{value:195,stability:false,power:false},
+      lumbar_ext:{value:270,stability:false,power:false},
+      knee_flex_l:{value:90,stability:false,power:false},
+      knee_ext_l:{value:155,stability:false,power:false},
+      knee_flex_r:{value:92,stability:false,power:false},
+      knee_ext_r:{value:158,stability:false,power:false},
+      ankle_dors_l:{value:38,stability:false,power:false},
+      ankle_plan_l:{value:92,stability:false,power:false},
+      ankle_dors_r:{value:40,stability:false,power:false},
+      ankle_plan_r:{value:88,stability:false,power:false},
+    }
+  ]},
+  { id:4, name:'정유진', gender:'여', color:'#ED8936', history:[
+    { round:1, date:'2026-02-20',
+      shoulder_l:{value:45,stability:true,power:false},
+      shoulder_r:{value:48,stability:true,power:false},
+      lumbar_flex:{value:140,stability:false,power:false},
+      lumbar_ext:{value:205,stability:false,power:false},
+      knee_flex_l:{value:82,stability:true,power:false},
+      knee_ext_l:{value:135,stability:true,power:true},
+      knee_flex_r:{value:80,stability:true,power:false},
+      knee_ext_r:{value:132,stability:true,power:false},
+      ankle_dors_l:{value:32,stability:false,power:false},
+      ankle_plan_l:{value:75,stability:false,power:false},
+      ankle_dors_r:{value:30,stability:false,power:false},
+      ankle_plan_r:{value:72,stability:false,power:false},
+    }
+  ]},
+  { id:5, name:'최준혁', gender:'남', color:'#9F7AEA', history:[
+    { round:1, date:'2026-01-15',
+      shoulder_l:{value:92,stability:true,power:true},
+      shoulder_r:{value:95,stability:true,power:true},
+      lumbar_flex:{value:310,stability:true,power:true},
+      lumbar_ext:{value:400,stability:true,power:true},
+      knee_flex_l:{value:140,stability:true,power:true},
+      knee_ext_l:{value:225,stability:true,power:true},
+      knee_flex_r:{value:138,stability:true,power:true},
+      knee_ext_r:{value:220,stability:true,power:true},
+      ankle_dors_l:{value:58,stability:true,power:true},
+      ankle_plan_l:{value:135,stability:true,power:true},
+      ankle_dors_r:{value:56,stability:true,power:true},
+      ankle_plan_r:{value:130,stability:true,power:true},
+    }
+  ]},
+];
+
+// ── 화면 전환 ─────────────────────────────────────────────────
+function showScreen(id, navBtn, sideItem){
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-' + id).classList.add('active');
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  if(navBtn) navBtn.classList.add('active');
+  else {
+    const idx = {dashboard:0,list:1,input:2,compare:3,settings:4}[id];
+    if(idx!==undefined) document.querySelectorAll('.nav-btn')[idx].classList.add('active');
+  }
+  document.querySelectorAll('.sidebar-item').forEach(i=>{
+    if(!i.id || i.id==='csmi-sfma-link') i.classList.remove('active');
+  });
+  if(sideItem) sideItem.classList.add('active');
+  else document.querySelectorAll('.sidebar-item[onclick*="showScreen"]')[{dashboard:0,list:1,input:2,compare:3,settings:4}[id]]?.classList.add('active');
+  if(id==='list')    renderList();
+  if(id==='compare') initCompare();
+  document.getElementById('detail-panel').style.display='none';
+  document.querySelectorAll('#screen-list .card')[0].style.display='block';
+}
+
+// ── 대시보드 렌더 ──────────────────────────────────────────────
+function memberGrade(m){
+  const h=m.history[0]; if(!h) return {label:'미측정',cls:'g-poor'};
+  let total=0,cnt=0;
+  ALL_ITEMS.forEach(it=>{
+    const v=h[it.id]; if(!v) return;
+    total += pctOf(v.value, stdFor(it, m.gender)); cnt++;
+  });
+  return gradeByPct(cnt?Math.round(total/cnt):0);
+}
+
+function renderDashboard(){
+  // 최근 측정
+  const tbody = document.getElementById('dash-recent-tbody');
+  const rows = MEMBERS.flatMap(m=>m.history.map(h=>({m,h}))).sort((a,b)=>b.h.date.localeCompare(a.h.date)).slice(0,10);
+  tbody.innerHTML = rows.map(({m,h})=>{
+    const shL=h.shoulder_l?.value??'-', shR=h.shoulder_r?.value??'-';
+    const luF=h.lumbar_flex?.value??'-', luE=h.lumbar_ext?.value??'-';
+    const knFL=h.knee_flex_l?.value??'-', knEL=h.knee_ext_l?.value??'-';
+    const anDL=h.ankle_dors_l?.value??'-', anPL=h.ankle_plan_l?.value??'-';
+    const g=memberGrade(m);
+    return `<tr>
+      <td><span class="td-name">${m.name}</span></td>
+      <td>${h.date}</td>
+      <td>${h.round}회차</td>
+      <td>${shL}/${shR}</td>
+      <td>${luF}/${luE}</td>
+      <td>${knFL}/${knEL}</td>
+      <td>${anDL}/${anPL}</td>
+    </tr>`;
+  }).join('');
+
+  // 미측정 목록 (마지막 측정이 60일 이상)
+  const today = new Date('2026-03-26');
+  const ul = document.getElementById('unmeasured-list');
+  const overdue = MEMBERS.filter(m=>{
+    const h=m.history[0]; if(!h) return true;
+    const d=new Date(h.date);
+    return (today-d)/(1000*60*60*24) >= 60;
+  }).slice(0,7);
+  ul.innerHTML = overdue.map(m=>{
+    const h=m.history[0];
+    const days = h ? Math.round((today-new Date(h.date))/(1000*60*60*24)) : null;
+    return `<div class="unmeasured-item">
+      <div class="um-avatar" style="background:${m.color}">${m.name[0]}</div>
+      <div class="um-info">
+        <div class="um-name">${m.name} (${m.gender})</div>
+        <div class="um-meta">${h?`마지막 측정: ${h.date}`:'미측정'}</div>
+      </div>
+      ${h?`<div class="um-last">${days}일 경과</div>`:'<div class="um-last">미측정</div>'}
+    </div>`;
+  }).join('') || '<div style="padding:16px;text-align:center;font-size:12px;color:#A0AEC0;">해당 없음</div>';
+
+  // 그룹별 정상 비율
+  const grid = document.getElementById('group-stats-grid');
+  grid.innerHTML = CSMI_GROUPS.map(g=>{
+    let goodCnt=0, total=0;
+    MEMBERS.forEach(m=>{
+      const h=m.history[0]; if(!h) return;
+      g.items.forEach(it=>{
+        const v=h[it.id]; if(!v) return;
+        total++;
+        if(pctOf(v.value, stdFor(it,m.gender))>=90) goodCnt++;
+      });
+    });
+    const pct = total ? Math.round(goodCnt/total*100) : 0;
+    const color = pct>=80?'#2C7A7B':pct>=60?'#4299E1':pct>=40?'#ECC94B':'#E53E3E';
+    return `<div style="text-align:center;padding:14px;background:#F7F9FC;border-radius:12px;border:1.5px solid #E2E8F0;">
+      <div style="font-size:22px;margin-bottom:6px;">${g.icon}</div>
+      <div style="font-size:13px;font-weight:700;color:#1A202C;margin-bottom:8px;">${g.name}</div>
+      <div style="font-size:28px;font-weight:900;color:${color};">${pct}%</div>
+      <div style="font-size:11px;color:#718096;margin-top:4px;">정상 범위 비율</div>
+      <div style="background:#EDF2F7;border-radius:99px;height:6px;margin-top:8px;overflow:hidden;">
+        <div style="width:${pct}%;height:100%;background:${color};border-radius:99px;transition:width .6s;"></div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ── 결과 조회 ──────────────────────────────────────────────────
+function groupSummary(m, h, gid){
+  const g = CSMI_GROUPS.find(x=>x.id===gid); if(!g) return '-';
+  let vals=[]; g.items.forEach(it=>{
+    const v=h[it.id]; if(!v) return;
+    vals.push(pctOf(v.value, stdFor(it, m.gender)));
+  });
+  if(!vals.length) return '-';
+  const avg = Math.round(vals.reduce((a,b)=>a+b,0)/vals.length);
+  const gr = gradeByPct(avg);
+  return `<span class="grade-badge ${gr.cls}">${gr.label}</span>`;
+}
+
+function renderList(query=''){
+  const tbody = document.getElementById('list-tbody');
+  const filtered = MEMBERS.filter(m=>!query||m.name.includes(query));
+  tbody.innerHTML = filtered.map(m=>{
+    const h=m.history[0];
+    if(!h) return `<tr><td class="td-name">${m.name}</td><td>${m.gender}</td><td colspan="8" style="color:#A0AEC0;">미측정</td></tr>`;
+    return `<tr>
+      <td class="td-name">${m.name}</td>
+      <td>${m.gender}</td>
+      <td>${h.date}</td>
+      <td>${h.round}회차</td>
+      <td>${groupSummary(m,h,'shoulder')}</td>
+      <td>${groupSummary(m,h,'lumbar')}</td>
+      <td>${groupSummary(m,h,'knee')}</td>
+      <td>${groupSummary(m,h,'ankle')}</td>
+      <td>${memberGrade(m).label==='우수'?'<span class="grade-badge g-excellent">우수</span>':
+           memberGrade(m).label==='양호'?'<span class="grade-badge g-good">양호</span>':
+           memberGrade(m).label==='보통'?'<span class="grade-badge g-average">보통</span>':
+           '<span class="grade-badge g-poor">주의</span>'}</td>
+      <td><button class="btn-sm" style="background:#E6FFFA;color:#2C7A7B;" onclick="openDetail(${m.id})">상세</button></td>
+    </tr>`;
+  }).join('');
+}
+
+function filterList(q){ renderList(q); }
+function filterListGroup(){ renderList(); }
+
+function openDetail(mid){
+  const m = MEMBERS.find(x=>x.id===mid); if(!m) return;
+  const h = m.history[0]; if(!h){ showToast('측정 데이터가 없습니다.'); return; }
+  document.getElementById('detail-title').textContent = `${m.name}님 CSMI 결과 상세`;
+  document.getElementById('detail-sub').textContent = `${h.date} · ${h.round}회차`;
+
+  // 4그룹 카드
+  const dg = document.getElementById('detail-groups');
+  dg.innerHTML = CSMI_GROUPS.map(g=>{
+    const items = g.items.map(it=>{
+      const v = h[it.id]; if(!v) return '';
+      const std = stdFor(it, m.gender);
+      const pct = pctOf(v.value, std);
+      const w = Math.min(pct, 150);
+      const color = barColor(pct);
+      const chips = [
+        v.stability ? '<span class="result-check-chip chip-stability">안정성 ✓</span>' : '',
+        v.power     ? '<span class="result-check-chip chip-power">파워 ✓</span>' : '',
+      ].filter(Boolean).join(' ');
+      return `<div class="result-bar-row" style="flex-wrap:wrap;gap:4px;">
+        <div class="result-bar-label">${it.label}</div>
+        <div class="result-bar-bg" style="margin-bottom:2px;"><div class="result-bar-fill" style="width:${Math.min(w,100)}%;background:${color};"></div></div>
+        <div class="result-bar-val">${v.value} Nm</div>
+        <div style="width:100%;padding-left:108px;display:flex;gap:6px;align-items:center;">
+          <span style="font-size:10px;color:#718096;">기준 ${std}Nm · ${pct}%</span>
+          ${chips}
+        </div>
+      </div>`;
+    }).join('');
+    return `<div class="group-result-card">
+      <div class="group-result-title">${g.icon} ${g.name}</div>
+      ${items}
+    </div>`;
+  }).join('');
+
+  // 분석 패널
+  let totalPct=0, cnt=0, weakItems=[];
+  ALL_ITEMS.forEach(it=>{
+    const v=h[it.id]; if(!v) return;
+    const pct=pctOf(v.value, stdFor(it, m.gender));
+    totalPct+=pct; cnt++;
+    if(pct<70) weakItems.push(it.label);
+  });
+  const avgPct = cnt?Math.round(totalPct/cnt):0;
+  const gr = gradeByPct(avgPct);
+  let analysisText = `${m.name}님의 근력측정 종합 결과는 기준치 대비 평균 <strong>${avgPct}%</strong>로 <strong>${gr.label}</strong> 등급입니다. `;
+  if(weakItems.length){
+    analysisText += `특히 ${weakItems.join(', ')} 항목이 기준치 70% 미만으로 집중 강화가 필요합니다.`;
+  } else {
+    analysisText += `모든 항목이 기준치 70% 이상을 유지하고 있어 양호한 상태입니다.`;
+  }
+  document.getElementById('detail-analysis').innerHTML = `
+    <div class="analysis-title">🔍 종합 분석</div>
+    <div class="analysis-body">${analysisText}</div>
+  `;
+
+  document.getElementById('detail-panel').style.display='block';
+  document.querySelectorAll('#screen-list .card')[0].style.display='none';
+  document.getElementById('detail-panel').scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+function closeDetail(){
+  document.getElementById('detail-panel').style.display='none';
+  document.querySelectorAll('#screen-list .card')[0].style.display='block';
+}
+
+// ── 결과 입력 ──────────────────────────────────────────────────
+let _inputState = {};  // { [itemId]: {value, stability, power} }
+let _currentInputGroup = 'shoulder';
+let _selectedMember = null;
+
+function buildInputPanels(){
+  const container = document.getElementById('input-group-panels');
+  container.innerHTML = CSMI_GROUPS.map(g=>{
+    return `<div class="card input-group-panel" id="inp-panel-${g.id}" style="display:${g.id==='shoulder'?'block':'none'};">
+      <div class="card-title">${g.icon} ${g.name} 측정</div>
+      <div style="font-size:11px;color:#718096;margin-bottom:12px;">기준값: 성별에 따라 자동 표시 · Nm(뉴턴미터)</div>
+      ${g.items.map(it=>`
+        <div class="csmi-item-row" id="inp-row-${it.id}">
+          <div class="csmi-item-header">
+            <div class="csmi-item-name">${it.label}</div>
+            <div class="csmi-value-display" id="inp-display-${it.id}">0</div>
+            <div class="csmi-unit">Nm</div>
+          </div>
+          <div style="position:relative;padding-bottom:20px;margin-bottom:10px;">
+            <div class="csmi-bar-wrap">
+              <div class="csmi-bar-std" id="inp-bar-std-${it.id}" style="width:60%;"></div>
+              <div class="csmi-bar-val" id="inp-bar-val-${it.id}" style="width:0%;"></div>
+              <div class="csmi-bar-label" id="inp-bar-label-${it.id}">0%</div>
+            </div>
+            <div class="csmi-std-label" id="inp-std-label-${it.id}">기준: -Nm</div>
+          </div>
+          <div class="csmi-input-row">
+            <span style="font-size:12px;font-weight:700;color:#4A5568;">측정값(Nm)</span>
+            <input type="number" class="csmi-num-input" id="inp-val-${it.id}"
+              placeholder="0" min="0" max="999"
+              oninput="onInputVal('${it.id}', this.value)" />
+          </div>
+          <div class="csmi-checks">
+            <button class="csmi-check-btn" id="inp-stab-${it.id}" onclick="toggleCheck('stability','${it.id}')">안정성</button>
+            <button class="csmi-check-btn" id="inp-pow-${it.id}"  onclick="toggleCheck('power','${it.id}')">파워</button>
+            <span class="csmi-percent-badge" id="inp-pct-${it.id}" style="display:none;"></span>
+          </div>
+        </div>
+      `).join('')}
+    </div>`;
+  }).join('');
+
+  // 날짜 기본값
+  document.getElementById('inp-date').value = '2026-03-26';
+}
+
+function switchInputGroup(gid, btn){
+  _currentInputGroup = gid;
+  document.querySelectorAll('.input-group-panel').forEach(p=>p.style.display='none');
+  document.getElementById('inp-panel-'+gid).style.display='block';
+  document.querySelectorAll('.group-tab').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+function onInputVal(itemId, rawVal){
+  const val = parseFloat(rawVal)||0;
+  if(!_inputState[itemId]) _inputState[itemId]={value:0,stability:false,power:false};
+  _inputState[itemId].value = val;
+
+  const item = ALL_ITEMS.find(x=>x.id===itemId);
+  const gender = _selectedMember?.gender || '남';
+  const std = stdFor(item, gender);
+  const pct = pctOf(val, std);
+  const w = Math.min(pct*0.8, 100);
+  const color = barColor(pct);
+  const gr = gradeByPct(pct);
+
+  document.getElementById('inp-display-'+itemId).textContent = val;
+  document.getElementById('inp-bar-val-'+itemId).style.width = w+'%';
+  document.getElementById('inp-bar-val-'+itemId).style.background = color;
+  document.getElementById('inp-bar-label-'+itemId).textContent = pct+'%';
+  document.getElementById('inp-std-label-'+itemId).textContent = `기준: ${std}Nm`;
+
+  const pctBadge = document.getElementById('inp-pct-'+itemId);
+  pctBadge.textContent = `${pct}% · ${gr.label}`;
+  pctBadge.className = `csmi-percent-badge ${gr.pctCls}`;
+  pctBadge.style.display='inline-flex';
+}
+
+function toggleCheck(type, itemId){
+  if(!_inputState[itemId]) _inputState[itemId]={value:0,stability:false,power:false};
+  _inputState[itemId][type] = !_inputState[itemId][type];
+  const el = document.getElementById(`inp-${type==='stability'?'stab':'pow'}-${itemId}`);
+  el.classList.toggle(`on-${type}`, _inputState[itemId][type]);
+}
+
+function saveInput(){
+  const memberName = document.getElementById('inp-member-search').value;
+  if(!memberName){ showToast('⚠️ 회원을 선택해주세요.'); return; }
+  showToast('✅ 저장되었습니다.');
+  resetInput();
+}
+
+function resetInput(){
+  _inputState = {};
+  _selectedMember = null;
+  document.getElementById('inp-member-search').value='';
+  document.getElementById('inp-member-search').classList.remove('selected');
+  document.getElementById('inp-round').value='';
+  document.getElementById('inp-memo').value='';
+  CSMI_GROUPS.forEach(g=>g.items.forEach(it=>{
+    const el = document.getElementById('inp-val-'+it.id);
+    if(el) el.value='';
+    const disp=document.getElementById('inp-display-'+it.id);
+    if(disp) disp.textContent='0';
+    const barV=document.getElementById('inp-bar-val-'+it.id);
+    if(barV) barV.style.width='0%';
+    const lbl=document.getElementById('inp-bar-label-'+it.id);
+    if(lbl) lbl.textContent='0%';
+    const stab=document.getElementById('inp-stab-'+it.id);
+    if(stab) stab.classList.remove('on-stability');
+    const pow=document.getElementById('inp-pow-'+it.id);
+    if(pow) pow.classList.remove('on-power');
+    const pct=document.getElementById('inp-pct-'+it.id);
+    if(pct) pct.style.display='none';
+  }));
+}
+
+// ── 회원 검색 자동완성 ───────────────────────────────────────────
+function memberSearchInput(q){
+  const dd = document.getElementById('member-dropdown');
+  if(!q){ dd.classList.remove('open'); return; }
+  const found = MEMBERS.filter(m=>m.name.includes(q));
+  if(!found.length){
+    dd.innerHTML='<div class="member-drop-item" style="color:#A0AEC0;">검색 결과 없음</div>';
+  } else {
+    dd.innerHTML = found.map(m=>{
+      const h=m.history[0];
+      return `<div class="member-drop-item" onmousedown="selectMember(${m.id})">
+        <div class="member-drop-avatar" style="background:${m.color}">${m.name[0]}</div>
+        <div>
+          <div class="member-drop-name">${m.name}</div>
+          <div class="member-drop-phone">${m.gender} · ${h?h.date+' 측정':'미측정'}</div>
+        </div>
+        <div class="member-drop-round">${h?h.round+'회차':'0회'}</div>
+      </div>`;
+    }).join('');
+  }
+  dd.classList.add('open');
+}
+function memberSearchFocus(){
+  const q=document.getElementById('inp-member-search').value;
+  if(q) memberSearchInput(q);
+}
+function memberSearchBlur(){
+  setTimeout(()=>document.getElementById('member-dropdown').classList.remove('open'),150);
+}
+function selectMember(mid){
+  _selectedMember = MEMBERS.find(m=>m.id===mid);
+  document.getElementById('inp-member-search').value = _selectedMember.name;
+  document.getElementById('inp-member-search').classList.add('selected');
+  document.getElementById('member-dropdown').classList.remove('open');
+  const h = _selectedMember.history[0];
+  document.getElementById('inp-round').value = h ? h.round+1 : 1;
+  // 기준값 레이블 업데이트
+  ALL_ITEMS.forEach(it=>{
+    const lbl=document.getElementById('inp-std-label-'+it.id);
+    if(lbl) lbl.textContent = `기준: ${stdFor(it,_selectedMember.gender)}Nm`;
+    const stdBar=document.getElementById('inp-bar-std-'+it.id);
+    if(stdBar) stdBar.style.width='60%';
+  });
+}
+
+// ── 결과 비교 ──────────────────────────────────────────────────
+function initCompare(){
+  const sel = document.getElementById('cmp-member-sel');
+  sel.innerHTML = '<option value="">회원 선택...</option>' +
+    MEMBERS.map(m=>`<option value="${m.id}">${m.name}</option>`).join('');
+}
+
+function renderCompare(){
+  const mid = parseInt(document.getElementById('cmp-member-sel').value);
+  const m = MEMBERS.find(x=>x.id===mid);
+  if(!m){ document.getElementById('compare-result').innerHTML=''; return; }
+
+  // 회차 옵션 채우기
+  const r1sel = document.getElementById('cmp-round1');
+  const r2sel = document.getElementById('cmp-round2');
+  const opts = m.history.map(h=>`<option value="${h.round}">${h.round}회차 (${h.date})</option>`).join('');
+  if(!r1sel.dataset.filled || r1sel.dataset.mid!==String(mid)){
+    r1sel.innerHTML='<option value="">비교 회차 1</option>'+opts;
+    r2sel.innerHTML='<option value="">비교 회차 2</option>'+opts;
+    r1sel.dataset.filled='1'; r1sel.dataset.mid=String(mid);
+    r2sel.dataset.filled='1'; r2sel.dataset.mid=String(mid);
+    if(m.history.length>=2){ r1sel.value=m.history[0].round; r2sel.value=m.history[1].round; }
+    else if(m.history.length===1){ r1sel.value=m.history[0].round; }
+  }
+
+  const rv1=parseInt(r1sel.value), rv2=parseInt(r2sel.value);
+  const h1=m.history.find(h=>h.round===rv1);
+  const h2=m.history.find(h=>h.round===rv2);
+
+  if(!h1 && !h2){ document.getElementById('compare-result').innerHTML=''; return; }
+
+  const colors = ['#2C7A7B','#ED8936'];
+  const labels = [h1?`${h1.round}회차 (${h1.date})`:'', h2?`${h2.round}회차 (${h2.date})`:''];
+
+  let html = `<div class="card">
+    <div class="cmp-legend">
+      ${h1?`<div class="legend-item"><div class="legend-dot" style="background:${colors[0]}"></div>${labels[0]}</div>`:''}
+      ${h2?`<div class="legend-item"><div class="legend-dot" style="background:${colors[1]}"></div>${labels[1]}</div>`:''}
+    </div>`;
+
+  CSMI_GROUPS.forEach(g=>{
+    html += `<div style="margin-bottom:18px;"><div style="font-size:13px;font-weight:800;color:#1A202C;margin-bottom:10px;">${g.icon} ${g.name}</div>`;
+    g.items.forEach(it=>{
+      const std=stdFor(it, m.gender);
+      const pct1=h1&&h1[it.id]?pctOf(h1[it.id].value,std):null;
+      const pct2=h2&&h2[it.id]?pctOf(h2[it.id].value,std):null;
+      const diff = (pct1!==null&&pct2!==null)?pct1-pct2:null;
+      html += `<div class="cmp-row">
+        <div class="cmp-meta">
+          <div class="cmp-item-name">${it.label}</div>
+          ${diff!==null?`<span style="font-size:11px;font-weight:700;color:${diff>=0?'#38A169':'#E53E3E'}">${diff>=0?'▲':'▼'}${Math.abs(diff)}%</span>`:''}
+        </div>
+        <div class="cmp-bar-group">
+          ${pct1!==null?`<div class="cmp-bar-line">
+            <div class="cmp-bar-bg"><div class="cmp-bar-fill" style="width:${Math.min(pct1,100)}%;background:${colors[0]};"></div></div>
+            <div class="cmp-score">${h1[it.id].value}Nm</div>
+          </div>`:''}
+          ${pct2!==null?`<div class="cmp-bar-line">
+            <div class="cmp-bar-bg"><div class="cmp-bar-fill" style="width:${Math.min(pct2,100)}%;background:${colors[1]};"></div></div>
+            <div class="cmp-score">${h2[it.id].value}Nm</div>
+          </div>`:''}
+        </div>
+      </div>`;
+    });
+    html += '</div>';
+  });
+  html += '</div>';
+  document.getElementById('compare-result').innerHTML = html;
+}
+
+// ── 토스트 ────────────────────────────────────────────────────
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2200);
+}
+
+// ── 초기화 ────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded',()=>{
+  renderDashboard();
+  renderList();
+  buildInputPanels();
+  initCompare();
+
+  // 사이드바 active 초기화 - CSMI 선택 + 대시보드 선택
+  const sideItems = document.querySelectorAll('.sidebar-item');
+  sideItems.forEach(i=>i.classList.remove('active'));
+  // CSMI 항목 (index 1) 활성
+  if(sideItems[1]) sideItems[1].classList.add('active');
+  // 대시보드 메뉴 (index 2) 활성
+  if(sideItems[2]) sideItems[2].classList.add('active');
+});
+</script>
+</body>
+</html>

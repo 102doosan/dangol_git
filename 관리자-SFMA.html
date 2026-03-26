@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>관리자 SFMA 관리</title>
+  <title>관리자 검사측정관리 - SFMA</title>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet" />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -47,6 +47,8 @@
     .page-title { font-size: 18px; font-weight: 900; color: #1A202C; }
     .page-sub { font-size: 13px; color: #A0AEC0; margin-top: 2px; }
     .page-actions { display: flex; gap: 8px; }
+    .screen-back-btn { display:none;align-items:center;gap:5px;background:#F5F3FF;color:#6B46C1;border:none;border-radius:8px;padding:7px 12px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Noto Sans KR',sans-serif;margin-right:8px;white-space:nowrap;transition:background .15s; }
+    .screen-back-btn:hover { background:#EDE9FE; }
     .btn-primary { background: #6B46C1; color: #fff; border: none; border-radius: 10px; padding: 10px 18px; font-size: 13px; font-weight: 700; cursor: pointer; font-family: 'Noto Sans KR', sans-serif; transition: background .15s; }
     .btn-primary:hover { background: #553C9A; }
     .btn-secondary { background: #F0F4F8; color: #4A5568; border: none; border-radius: 10px; padding: 10px 18px; font-size: 13px; font-weight: 700; cursor: pointer; font-family: 'Noto Sans KR', sans-serif; }
@@ -253,7 +255,7 @@
 
 <!-- 상단 탭 -->
 <div class="nav">
-  <span style="font-size:18px;font-weight:900;color:#1A202C;margin-right:auto;">📊 관리자 · SFMA 관리</span>
+  <span style="font-size:18px;font-weight:900;color:#1A202C;margin-right:auto;">📊 관리자 · 검사측정관리 · SFMA</span>
   <button class="nav-btn active" onclick="showScreen('dashboard', this)">📊 현황 대시보드</button>
   <button class="nav-btn" onclick="showScreen('list', this)">🔍 결과 조회</button>
   <button class="nav-btn" onclick="showScreen('input', this)">✏️ 결과 입력</button>
@@ -265,11 +267,18 @@
   <!-- 사이드바 -->
   <div class="sidebar">
     <div class="sidebar-logo">
-      <div class="sidebar-logo-title">📊 SFMA 관리</div>
-      <div class="sidebar-logo-sub">Selective FMA System</div>
+      <div class="sidebar-logo-title">📊 검사측정관리</div>
+      <div class="sidebar-logo-sub">Assessment Management</div>
     </div>
-    <div class="sidebar-section">메뉴</div>
-    <div class="sidebar-item active" onclick="showScreen('dashboard', null, this)">
+    <div class="sidebar-section">검사 종류</div>
+    <div class="sidebar-item" style="background:#6B46C1;color:#fff;border-right:3px solid #B794F4;cursor:default;">
+      <span class="sidebar-item-icon">🧠</span> SFMA
+    </div>
+    <div class="sidebar-item" onclick="location.href='관리자-CSMI.html'">
+      <span class="sidebar-item-icon">💪</span> CSMI
+    </div>
+    <div class="sidebar-section" style="margin-top:4px;">SFMA 메뉴</div>
+    <div class="sidebar-item active" id="sfma-dash-menu" onclick="showScreen('dashboard', null, this)">
       <span class="sidebar-item-icon">📊</span> 현황 대시보드
     </div>
     <div class="sidebar-item" onclick="showScreen('list', null, this)">
@@ -304,6 +313,7 @@
     <!-- ① 현황 대시보드 -->
     <div class="screen active" id="screen-dashboard">
       <div class="page-header">
+        <button class="screen-back-btn" onclick="goBack()" style="display:none;">← 뒤로</button>
         <div>
           <div class="page-title">📊 SFMA 현황 대시보드</div>
           <div class="page-sub">전체 회원 측정 현황 및 통계 · 2026년 3월 기준</div>
@@ -344,6 +354,7 @@
     <!-- ② 결과 조회 -->
     <div class="screen" id="screen-list">
       <div class="page-header">
+        <button class="screen-back-btn" onclick="goBack()" style="display:none;">← 뒤로</button>
         <div>
           <div class="page-title" id="list-page-title">🔍 SFMA 결과 조회</div>
           <div class="page-sub" id="list-page-sub">회원 검색 후 측정 이력 및 상세 결과 확인</div>
@@ -426,6 +437,7 @@
     <!-- ③ 결과 입력 -->
     <div class="screen" id="screen-input">
       <div class="page-header">
+        <button class="screen-back-btn" onclick="goBack()" style="display:none;">← 뒤로</button>
         <div>
           <div class="page-title">✏️ SFMA 결과 입력 / 수정</div>
           <div class="page-sub">회원 선택 → 측정일 → SFMA 체크시트 입력 → 소견 작성 → 저장</div>
@@ -525,6 +537,7 @@
     <!-- ④ 결과 비교 -->
     <div class="screen" id="screen-compare">
       <div class="page-header">
+        <button class="screen-back-btn" onclick="goBack()" style="display:none;">← 뒤로</button>
         <div>
           <div class="page-title">📈 SFMA 결과 비교</div>
           <div class="page-sub">회원을 선택하고 비교할 회차를 골라 변화 추이를 확인합니다</div>
@@ -566,6 +579,7 @@
     <!-- ⑤ 알림 설정 -->
     <div class="screen" id="screen-settings">
       <div class="page-header">
+        <button class="screen-back-btn" onclick="goBack()" style="display:none;">← 뒤로</button>
         <div>
           <div class="page-title">⚙️ SFMA 재검사 알림 설정</div>
           <div class="page-sub">재검사 권고 기간 및 알림 조건을 설정합니다</div>
@@ -862,7 +876,19 @@ let vwMemos  = {};
 /* ══════════════════════════════════════
    화면 전환
 ══════════════════════════════════════ */
-function showScreen(id, navBtn, sideBtn) {
+let _navHistory = [];
+let _currentScreen = 'dashboard';
+
+function goBack() {
+  if (_navHistory.length === 0) return;
+  const prev = _navHistory.pop();
+  showScreen(prev, document.querySelectorAll('.nav-btn')[{dashboard:0,list:1,input:2,compare:3,settings:4}[prev]], null, true);
+}
+
+function showScreen(id, navBtn, sideBtn, isBack) {
+  if (!isBack && _currentScreen !== id) _navHistory.push(_currentScreen);
+  _currentScreen = id;
+
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById('screen-' + id).classList.add('active');
 
@@ -875,6 +901,11 @@ function showScreen(id, navBtn, sideBtn) {
   const idxMap = { dashboard:0, list:1, input:2, compare:3, settings:4 };
   if (idxMap[id] !== undefined) sideItems[idxMap[id]]?.classList.add('active');
   if (sideBtn) { document.querySelectorAll('.sidebar-item').forEach(b => b.classList.remove('active')); sideBtn.classList.add('active'); }
+
+  // 뒤로가기 버튼 표시/숨김
+  document.querySelectorAll('.screen-back-btn').forEach(btn => {
+    btn.style.display = (!isBack && _navHistory.length > 0) ? 'inline-flex' : 'none';
+  });
 
   if (id === 'dashboard') renderDashboard();
   if (id === 'list')      renderList();
