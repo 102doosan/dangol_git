@@ -152,6 +152,9 @@
     .um-name { font-size: 13px; font-weight: 700; color: #1A202C; }
     .um-meta { font-size: 11px; color: #A0AEC0; margin-top: 1px; }
     .um-last { font-size: 11px; color: #E53E3E; font-weight: 700; }
+    .am-type-btn { padding:5px 10px;border:1.5px solid #E2E8F0;border-radius:7px;background:#fff;font-size:12px;font-weight:600;cursor:pointer;font-family:'Noto Sans KR',sans-serif;color:#4A5568;transition:all .15s; }
+    .am-type-btn.active { background:#6B46C1;border-color:#6B46C1;color:#fff; }
+    #alert-modal { display:none; }
 
     /* 상세 패널 (결과 조회) */
     .detail-panel { background: #fff; border-radius: 14px; padding: 20px; box-shadow: 0 1px 6px rgba(0,0,0,0.06); }
@@ -679,6 +682,65 @@
 
 <div class="toast" id="toast"></div>
 
+<!-- 알림 보내기 모달 -->
+<div id="alert-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;box-sizing:border-box;" onclick="if(event.target===this)closeAlertModal()">
+  <div style="background:#fff;border-radius:16px;width:100%;max-width:480px;box-shadow:0 8px 32px rgba(0,0,0,0.18);overflow:hidden;">
+    <div style="background:linear-gradient(135deg,#553C9A,#7B61FF);padding:18px 20px;display:flex;align-items:center;justify-content:space-between;">
+      <div style="color:#fff;font-size:15px;font-weight:700;">🔔 알림 보내기</div>
+      <button onclick="closeAlertModal()" style="background:none;border:none;color:#fff;font-size:18px;cursor:pointer;line-height:1;">✕</button>
+    </div>
+    <div style="padding:20px;">
+      <!-- 수신자 -->
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;padding:10px 14px;background:#F7F9FC;border-radius:10px;">
+        <div id="am-avatar" style="width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#fff;"></div>
+        <div>
+          <div id="am-name" style="font-size:14px;font-weight:700;color:#2D3748;"></div>
+          <div id="am-meta" style="font-size:11px;color:#A0AEC0;margin-top:2px;"></div>
+        </div>
+        <div id="am-badge" style="margin-left:auto;"></div>
+      </div>
+      <!-- 알림 유형 선택 -->
+      <div style="margin-bottom:12px;">
+        <div style="font-size:12px;font-weight:700;color:#4A5568;margin-bottom:6px;">알림 유형</div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;">
+          <button class="am-type-btn active" onclick="selectAlertType('reexam',this)">📅 재검사 안내</button>
+          <button class="am-type-btn" onclick="selectAlertType('remind',this)">⏰ 측정 리마인드</button>
+          <button class="am-type-btn" onclick="selectAlertType('result',this)">📊 결과 안내</button>
+          <button class="am-type-btn" onclick="selectAlertType('custom',this)">✏️ 직접 작성</button>
+        </div>
+      </div>
+      <!-- 메시지 미리보기/편집 -->
+      <div style="margin-bottom:14px;">
+        <div style="font-size:12px;font-weight:700;color:#4A5568;margin-bottom:6px;">메시지</div>
+        <textarea id="am-message" rows="5"
+          style="width:100%;padding:10px 12px;border:1.5px solid #E2E8F0;border-radius:10px;font-size:13px;font-family:'Noto Sans KR',sans-serif;resize:vertical;box-sizing:border-box;line-height:1.6;"
+          oninput="document.getElementById('am-char').textContent=this.value.length+'자'"></textarea>
+        <div style="text-align:right;font-size:11px;color:#A0AEC0;margin-top:3px;"><span id="am-char">0자</span></div>
+      </div>
+      <!-- 발송 채널 -->
+      <div style="margin-bottom:16px;">
+        <div style="font-size:12px;font-weight:700;color:#4A5568;margin-bottom:6px;">발송 채널</div>
+        <div style="display:flex;gap:10px;">
+          <label style="display:flex;align-items:center;gap:5px;font-size:12px;cursor:pointer;">
+            <input type="checkbox" id="am-ch-sms" checked style="accent-color:#6B46C1;"> SMS
+          </label>
+          <label style="display:flex;align-items:center;gap:5px;font-size:12px;cursor:pointer;">
+            <input type="checkbox" id="am-ch-kakao" style="accent-color:#F6C90E;"> 카카오톡
+          </label>
+          <label style="display:flex;align-items:center;gap:5px;font-size:12px;cursor:pointer;">
+            <input type="checkbox" id="am-ch-app" style="accent-color:#6B46C1;"> 앱 푸시
+          </label>
+        </div>
+      </div>
+      <!-- 버튼 -->
+      <div style="display:flex;gap:8px;">
+        <button onclick="closeAlertModal()" style="flex:1;padding:10px;border:1.5px solid #E2E8F0;border-radius:10px;background:#fff;font-size:13px;font-weight:700;cursor:pointer;color:#718096;font-family:'Noto Sans KR',sans-serif;">취소</button>
+        <button onclick="sendAlert()" style="flex:2;padding:10px;border:none;border-radius:10px;background:linear-gradient(135deg,#553C9A,#7B61FF);color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:'Noto Sans KR',sans-serif;">🔔 알림 발송</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script>
 /* ══════════════════════════════════════
    데이터
@@ -1008,8 +1070,9 @@ function renderSettingsPreview() {
       <td style="padding:8px 6px;font-size:12px;color:#718096;">${a.lastDate || '—'}</td>
       <td style="padding:8px 6px;font-size:12px;color:#6B46C1;font-weight:700;">${getReexamDays(m)}일</td>
       <td style="padding:8px 6px;">${badgeHtml}</td>
-      <td style="padding:8px 6px;">
-        <button class="btn-sm" style="background:#EDE9FE;color:#6B46C1;" onclick="openInputFor('${m.name}')">측정 입력</button>
+      <td style="padding:8px 6px;white-space:nowrap;">
+        <button class="btn-sm" style="background:#EDE9FE;color:#6B46C1;margin-right:4px;" onclick="openInputFor('${m.name}')">측정 입력</button>
+        <button class="btn-sm" style="background:#FFF5F5;color:#C53030;" onclick="openAlertModal('${m.name}')">🔔 알림</button>
       </td>
     </tr>`;
   }).filter(Boolean);
@@ -1091,6 +1154,7 @@ function renderDashboard() {
       </div>
       <div class="um-last">${u.daysAgo}일 경과</div>
       <button class="btn-sm" style="background:#EDE9FE;color:#6B46C1;" onclick="openInputFor('${u.name}')">측정 입력</button>
+      <button class="btn-sm" style="background:#FFF5F5;color:#C53030;" onclick="openAlertModal('${u.name}')">🔔 알림</button>
     </div>`).join('');
 }
 
@@ -1283,7 +1347,8 @@ function showMemberDetail(name) {
   // 좌: 액션 버튼
   document.getElementById('vw-action-btns').innerHTML = `
     <button class="btn-primary" style="flex:1;font-size:12px;padding:9px;" onclick="openInputFor('${name}')">✏️ 결과 수정</button>
-    <button style="flex:1;background:#EDE9FE;color:#6B46C1;border:none;border-radius:10px;padding:9px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Noto Sans KR',sans-serif;" onclick="openCompareFor('${name}')">📈 비교 보기</button>`;
+    <button style="flex:1;background:#EDE9FE;color:#6B46C1;border:none;border-radius:10px;padding:9px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Noto Sans KR',sans-serif;" onclick="openCompareFor('${name}')">📈 비교 보기</button>
+    <button style="flex:1;background:#FFF5F5;color:#C53030;border:none;border-radius:10px;padding:9px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Noto Sans KR',sans-serif;" onclick="openAlertModal('${name}')">🔔 알림 보내기</button>`;
 
   // 우: 체크시트 렌더
   renderViewSheetContent();
@@ -2078,6 +2143,89 @@ function showToast(msg) {
   const t = document.getElementById('toast');
   t.textContent = msg; t.classList.add('show');
   setTimeout(() => t.classList.remove('show'), 2800);
+}
+
+/* ══════════════════════════════════════
+   🔔 알림 보내기
+══════════════════════════════════════ */
+let _amMember = null;
+let _amType   = 'reexam';
+
+const AM_TEMPLATES = {
+  reexam: (m, nextDate) =>
+    `안녕하세요, ${m.name}님 😊\n\n${m.trainer || '트레이너'}입니다.\n\n SFMA 재검사 예정일 안내드립니다.\n\n📅 다음 측정 예정일: ${nextDate}\n\n건강한 몸 만들기를 위해 꼭 참석 부탁드립니다.\n감사합니다 🙏`,
+  remind: (m, nextDate) =>
+    `${m.name}님, 안녕하세요!\n\nSFMA 측정 예약일이 다가왔습니다.\n\n⏰ 예약일: ${nextDate}\n\n일정 변경이 필요하시면 미리 연락 주세요.`,
+  result: (m, nextDate) =>
+    `${m.name}님, SFMA 측정 결과가 등록되었습니다.\n\n결과 확인 및 다음 측정일(${nextDate}) 예약을 진행해 주세요.`,
+  custom: () => '',
+};
+
+function openAlertModal(name) {
+  const m = MEMBERS.find(x => x.name === name)
+         || UNMEASURED.find(x => x.name === name);
+  if (!m) return;
+  _amMember = m;
+  _amType   = 'reexam';
+
+  // 수신자 정보
+  document.getElementById('am-avatar').style.background = m.avatar || '#6B46C1';
+  document.getElementById('am-avatar').textContent = name[0];
+  document.getElementById('am-name').textContent = name;
+
+  const h = m.history?.[0];
+  const nextDate = m.nextDate || (h ? addDays(h.date, getReexamDays(m)) : '미정');
+  const alert = h ? getAlertStatus(m) : { status:'none', dDays:0 };
+  document.getElementById('am-meta').textContent = h
+    ? `마지막 측정: ${h.date} · 예정일: ${nextDate}`
+    : `마지막 측정: ${m.lastDate || '없음'} · ${m.daysAgo || 0}일 경과`;
+  document.getElementById('am-badge').innerHTML = alertBadgeHtml(alert);
+
+  // 유형 버튼 초기화
+  document.querySelectorAll('.am-type-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.am-type-btn')[0].classList.add('active');
+
+  // 메시지 생성
+  buildAlertMessage(name, nextDate);
+
+  document.getElementById('alert-modal').style.display = 'flex';
+}
+
+function closeAlertModal() {
+  document.getElementById('alert-modal').style.display = 'none';
+}
+
+function selectAlertType(type, btn) {
+  _amType = type;
+  document.querySelectorAll('.am-type-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  const m = _amMember;
+  if (!m) return;
+  const h = m.history?.[0];
+  const nextDate = m.nextDate || (h ? addDays(h.date, getReexamDays(m)) : '미정');
+  buildAlertMessage(m.name, nextDate);
+}
+
+function buildAlertMessage(name, nextDate) {
+  const m = _amMember;
+  const fn = AM_TEMPLATES[_amType];
+  const msg = fn ? fn(m, nextDate) : '';
+  const ta = document.getElementById('am-message');
+  ta.value = msg;
+  document.getElementById('am-char').textContent = msg.length + '자';
+  if (_amType === 'custom') ta.focus();
+}
+
+function sendAlert() {
+  const msg = document.getElementById('am-message').value.trim();
+  if (!msg) { showToast('⚠️ 메시지를 입력하세요.'); return; }
+  const channels = [];
+  if (document.getElementById('am-ch-sms').checked)   channels.push('SMS');
+  if (document.getElementById('am-ch-kakao').checked) channels.push('카카오톡');
+  if (document.getElementById('am-ch-app').checked)   channels.push('앱 푸시');
+  if (!channels.length) { showToast('⚠️ 발송 채널을 선택하세요.'); return; }
+  closeAlertModal();
+  showToast(`✅ ${_amMember.name}님께 ${channels.join('·')}으로 알림을 발송했습니다.`);
 }
 
 /* ══════════════════════════════════════
