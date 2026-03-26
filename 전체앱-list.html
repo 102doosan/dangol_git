@@ -450,6 +450,7 @@ const adminData = [
       {id:"as04",name:"SFMA 결과 상세 조회",desc:"특정 회차 결과 상세 · 항목별 점수·코멘트 확인 · 회원이 보는 화면과 동일한 내용",priority:"필수",dev:"FE/BE"},
       {id:"as05",name:"SFMA 결과 비교 조회",desc:"회원의 과거 측정 회차 비교 · 항목별 점수 변화 차트 · 개선·악화 항목 하이라이트",priority:"필수",dev:"FE/BE"},
       {id:"as06",name:"SFMA 전체 현황 통계",desc:"전체·지점별 측정 완료 회원 현황 · 미측정 회원 목록 · 기간별 측정 건수 차트",priority:"권장",dev:"FE/BE"},
+      {id:"as07",name:"SFMA 검사 체크시트",desc:"현장 검사용 FN/FP/DP/DN 체크 입력 시트 · 8개 탭(최고위평가·경추·상지패턴·다중분절 굴곡/신전/회전·한다리자세·오버헤드스쿼트) · 메모 입력·결과 집계·localStorage 저장",priority:"필수",dev:"FE",file:"SFMA체크시트.html"},
     ]
   },
   {
@@ -630,6 +631,7 @@ function renderCats(cats) {
             ${subHtml}
           </div>
           <div class="screen-right">
+            ${s.file ? `<a href="${s.file}" target="_blank" onclick="event.stopPropagation()" style="display:inline-flex;align-items:center;gap:4px;padding:4px 10px;background:#7B61FF;color:#fff;border-radius:8px;font-size:11px;font-weight:700;text-decoration:none;margin-right:6px;">🔗 열기</a>` : ''}
             <span class="dev-badge">${s.dev==='FE'?'🖥️ 화면':s.dev==='BE'?'⚙️ 서버':'🖥️⚙️ 둘다'}</span>
           </div>
         </div>`;
