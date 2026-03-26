@@ -408,6 +408,14 @@ const adminData = [
     ]
   },
   {
+    id:"a-locker", icon:"🔐", title:"락커 관리", color:"#805AD5",
+    screens:[
+      {id:"lk01",name:"락커 현황",desc:"전체 락커 번호 목록 · 사용중/비어있음 상태 표시 · 사용 회원명·배정 기간 확인 · 지점별 필터",priority:"필수",dev:"FE/BE"},
+      {id:"lk02",name:"락커 배정 / 결제",desc:"회원 검색 → 락커 번호 선택 → 기간 설정 → 락커 요금 확인 → 결제 처리 → 배정 완료 · 배정 해제",priority:"필수",dev:"FE/BE"},
+      {id:"lk03",name:"락커 설정",desc:"락커 번호·구역 추가 & 삭제 · 지점별 락커 구성 관리 · 락커 요금 설정",priority:"필수",dev:"FE/BE"},
+    ]
+  },
+  {
     id:"a-myrecord", icon:"📈", title:"나의기록 관리", color:"#4ECDC4",
     screens:[
       {id:"amr01",name:"회원별 신체 기록 조회",desc:"회원 검색 → 신체 기록 이력(몸무게·체지방·근육량) · 날짜별 목록 · 변화 추이 차트",priority:"권장",dev:"FE/BE"},
