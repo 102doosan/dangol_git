@@ -1,0 +1,872 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+  <title>내 SFMA 결과</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Noto Sans KR', sans-serif; background: #F0F4F8; color: #1A202C; min-height: 100vh; }
+
+    /* ── 로그인 선택 화면 ── */
+    #login-screen {
+      min-height: 100vh; display: flex; flex-direction: column;
+      align-items: center; justify-content: center; padding: 24px;
+      background: linear-gradient(160deg, #1E1A2E 0%, #4A2C8A 60%, #7B61FF 100%);
+    }
+    .login-logo { text-align: center; margin-bottom: 36px; }
+    .login-logo-icon { font-size: 48px; margin-bottom: 8px; }
+    .login-logo-title { font-size: 22px; font-weight: 900; color: #fff; }
+    .login-logo-sub { font-size: 13px; color: rgba(255,255,255,0.6); margin-top: 4px; }
+    .login-card {
+      background: #fff; border-radius: 20px; padding: 28px 24px;
+      width: 100%; max-width: 400px; box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    }
+    .login-card-title { font-size: 15px; font-weight: 800; color: #1A202C; margin-bottom: 16px; }
+    .member-btn-list { display: flex; flex-direction: column; gap: 8px; }
+    .member-login-btn {
+      display: flex; align-items: center; gap: 12px; padding: 12px 14px;
+      background: #F7F9FC; border: 1.5px solid #E2E8F0; border-radius: 12px;
+      cursor: pointer; transition: all .15s; text-align: left;
+    }
+    .member-login-btn:hover { border-color: #9B84FF; background: #F5F3FF; }
+    .ml-avatar {
+      width: 40px; height: 40px; border-radius: 50%; display: flex;
+      align-items: center; justify-content: center; font-size: 15px;
+      font-weight: 900; color: #fff; flex-shrink: 0;
+    }
+    .ml-name { font-size: 14px; font-weight: 700; color: #1A202C; }
+    .ml-sub { font-size: 11px; color: #A0AEC0; margin-top: 1px; }
+    .ml-grade { margin-left: auto; }
+
+    /* ── 메인 앱 ── */
+    #app { display: none; max-width: 480px; margin: 0 auto; min-height: 100vh; background: #F0F4F8; }
+
+    /* 상단 헤더 */
+    .app-header {
+      background: linear-gradient(135deg, #4A2C8A, #7B61FF);
+      padding: 48px 20px 28px; color: #fff; position: relative;
+    }
+    .header-back {
+      position: absolute; top: 16px; left: 16px;
+      background: rgba(255,255,255,0.2); border: none; color: #fff;
+      border-radius: 8px; padding: 6px 12px; font-size: 12px; font-weight: 700;
+      cursor: pointer; font-family: 'Noto Sans KR', sans-serif;
+    }
+    .header-profile { display: flex; align-items: center; gap: 14px; margin-bottom: 18px; }
+    .h-avatar {
+      width: 56px; height: 56px; border-radius: 50%; display: flex;
+      align-items: center; justify-content: center; font-size: 22px;
+      font-weight: 900; color: #fff; border: 3px solid rgba(255,255,255,0.5);
+    }
+    .h-name { font-size: 20px; font-weight: 900; }
+    .h-trainer { font-size: 12px; color: rgba(255,255,255,0.7); margin-top: 2px; }
+    .h-grade-badge {
+      display: inline-block; padding: 4px 12px; border-radius: 99px;
+      font-size: 12px; font-weight: 700; margin-top: 4px;
+    }
+    .hb-excellent { background: rgba(198,246,213,0.3); color: #9AE6B4; }
+    .hb-good      { background: rgba(190,227,248,0.3); color: #90CDF4; }
+    .hb-average   { background: rgba(254,252,191,0.3); color: #F6E05E; }
+    .hb-poor      { background: rgba(254,215,215,0.3); color: #FEB2B2; }
+
+    .score-banner {
+      display: flex; align-items: flex-end; gap: 6px;
+    }
+    .score-big { font-size: 52px; font-weight: 900; line-height: 1; }
+    .score-max { font-size: 16px; color: rgba(255,255,255,0.6); padding-bottom: 6px; }
+    .score-change-chip {
+      margin-left: 8px; padding-bottom: 8px;
+      font-size: 13px; font-weight: 700;
+    }
+    .sc-up   { color: #9AE6B4; }
+    .sc-down { color: #FEB2B2; }
+    .sc-same { color: rgba(255,255,255,0.6); }
+
+    /* 탭 */
+    .app-tabs {
+      display: flex; background: #fff; border-bottom: 2px solid #E2E8F0;
+      position: sticky; top: 0; z-index: 100;
+    }
+    .app-tab {
+      flex: 1; padding: 13px 8px; font-size: 12px; font-weight: 700;
+      color: #A0AEC0; text-align: center; cursor: pointer; border: none;
+      background: none; font-family: 'Noto Sans KR', sans-serif;
+      border-bottom: 3px solid transparent; margin-bottom: -2px; transition: all .15s;
+    }
+    .app-tab.active { color: #6B46C1; border-bottom-color: #6B46C1; }
+    .tab-content { display: none; padding: 16px; }
+    .tab-content.active { display: block; }
+
+    /* 카드 공통 */
+    .ucard {
+      background: #fff; border-radius: 16px; padding: 18px;
+      box-shadow: 0 1px 6px rgba(0,0,0,0.07); margin-bottom: 12px;
+    }
+    .ucard-title {
+      font-size: 13px; font-weight: 800; color: #1A202C;
+      margin-bottom: 14px; display: flex; align-items: center; gap: 7px;
+    }
+    .ucard-title-icon { font-size: 16px; }
+
+    /* D-day 카드 */
+    .dday-card {
+      background: linear-gradient(135deg, #553C9A, #805AD5);
+      border-radius: 16px; padding: 18px; color: #fff;
+      margin-bottom: 12px; position: relative; overflow: hidden;
+    }
+    .dday-card::before {
+      content: ''; position: absolute; right: -20px; top: -20px;
+      width: 100px; height: 100px; background: rgba(255,255,255,0.08);
+      border-radius: 50%;
+    }
+    .dday-card::after {
+      content: ''; position: absolute; right: 20px; bottom: -30px;
+      width: 80px; height: 80px; background: rgba(255,255,255,0.05);
+      border-radius: 50%;
+    }
+    .dday-label { font-size: 12px; font-weight: 700; color: rgba(255,255,255,0.7); margin-bottom: 6px; }
+    .dday-date { font-size: 18px; font-weight: 900; margin-bottom: 4px; }
+    .dday-number {
+      font-size: 36px; font-weight: 900; line-height: 1; margin-bottom: 4px;
+    }
+    .dday-sub { font-size: 11px; color: rgba(255,255,255,0.65); }
+    .dday-overdue { color: #FEB2B2; }
+    .dday-soon { color: #F6E05E; }
+    .dday-ok { color: #9AE6B4; }
+
+    /* 패턴 결과 리스트 */
+    .pattern-result-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 11px 0; border-bottom: 1px solid #F0F4F8;
+    }
+    .pattern-result-item:last-child { border-bottom: none; }
+    .pri-icon { font-size: 20px; width: 28px; text-align: center; flex-shrink: 0; }
+    .pri-info { flex: 1; min-width: 0; }
+    .pri-name { font-size: 13px; font-weight: 700; color: #1A202C; }
+    .pri-checks { font-size: 11px; color: #A0AEC0; margin-top: 2px; }
+    .pri-bar-wrap { width: 80px; }
+    .pri-bar-bg { background: #EDF2F7; border-radius: 99px; height: 6px; overflow: hidden; margin-bottom: 3px; }
+    .pri-bar-fill { height: 100%; border-radius: 99px; transition: width .6s ease; }
+    .pri-score { font-size: 14px; font-weight: 900; text-align: right; }
+
+    /* FN/FP/DP/DN 칩 */
+    .chip { font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 99px; display: inline-block; }
+    .chip-fn { background: #EBF8FF; color: #2B6CB0; }
+    .chip-fp { background: #FFFAF0; color: #B7791F; }
+    .chip-dp { background: #FFF5F5; color: #C53030; }
+    .chip-dn { background: #F7FAFC; color: #4A5568; }
+
+    /* 비교 차트 */
+    .compare-round-btn {
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 6px 12px; border-radius: 99px; font-size: 12px; font-weight: 700;
+      border: 1.5px solid #E2E8F0; background: #fff; cursor: pointer;
+      font-family: 'Noto Sans KR', sans-serif; color: #718096; transition: all .15s;
+    }
+    .compare-round-btn.active { background: #6B46C1; border-color: #6B46C1; color: #fff; }
+    .cmp-row-u { margin-bottom: 14px; }
+    .cmp-row-u:last-child { margin-bottom: 0; }
+    .cmp-name-u { font-size: 12px; font-weight: 700; color: #4A5568; margin-bottom: 6px; display: flex; align-items: center; gap: 6px; }
+    .cmp-bars { display: flex; flex-direction: column; gap: 4px; }
+    .cmp-bar-line-u { display: flex; align-items: center; gap: 8px; }
+    .cmp-label-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+    .cmp-bar-bg-u { flex: 1; background: #EDF2F7; border-radius: 99px; height: 10px; overflow: hidden; }
+    .cmp-bar-fill-u { height: 100%; border-radius: 99px; transition: width .6s ease; }
+    .cmp-score-u { font-size: 11px; font-weight: 700; width: 24px; text-align: right; color: #4A5568; }
+    .cmp-date-tag {
+      font-size: 11px; padding: 2px 8px; border-radius: 99px;
+      font-weight: 700; background: #EDE9FE; color: #6B46C1;
+    }
+
+    /* 이력 리스트 */
+    .history-item {
+      display: flex; align-items: flex-start; gap: 12px;
+      padding: 14px 0; border-bottom: 1px solid #F0F4F8; cursor: pointer;
+    }
+    .history-item:last-child { border-bottom: none; }
+    .hi-left { flex: 1; min-width: 0; }
+    .hi-round { font-size: 11px; font-weight: 700; color: #A0AEC0; margin-bottom: 3px; }
+    .hi-date { font-size: 13px; font-weight: 700; color: #1A202C; margin-bottom: 4px; }
+    .hi-opinion { font-size: 11px; color: #718096; line-height: 1.5; }
+    .hi-right { text-align: right; flex-shrink: 0; }
+    .hi-score { font-size: 22px; font-weight: 900; }
+    .hi-grade-badge { font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 99px; margin-top: 3px; display: inline-block; }
+
+    /* 등급 배지 */
+    .g-excellent { background: #C6F6D5; color: #1A4731; }
+    .g-good      { background: #BEE3F8; color: #1A365D; }
+    .g-average   { background: #FEFCBF; color: #744210; }
+    .g-poor      { background: #FED7D7; color: #742A2A; }
+
+    /* 세부 상세 패널 */
+    .detail-overlay {
+      display: none; position: fixed; inset: 0; z-index: 200;
+      background: rgba(0,0,0,0.5); animation: fadeIn .2s ease;
+    }
+    .detail-overlay.open { display: block; }
+    @keyframes fadeIn { from{opacity:0} to{opacity:1} }
+    .detail-sheet {
+      position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
+      width: 100%; max-width: 480px; background: #fff; border-radius: 20px 20px 0 0;
+      padding: 20px; max-height: 88vh; overflow-y: auto;
+      animation: slideUp .25s ease;
+    }
+    @keyframes slideUp { from{transform:translateX(-50%) translateY(40px)} to{transform:translateX(-50%) translateY(0)} }
+    .detail-sheet-handle {
+      width: 36px; height: 4px; background: #E2E8F0; border-radius: 99px;
+      margin: 0 auto 16px;
+    }
+    .detail-sheet-title { font-size: 15px; font-weight: 900; color: #1A202C; margin-bottom: 4px; }
+    .detail-sheet-sub { font-size: 12px; color: #A0AEC0; margin-bottom: 16px; }
+    .ds-pattern-row {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 0; border-bottom: 1px solid #F0F4F8;
+    }
+    .ds-pattern-row:last-child { border-bottom: none; }
+    .ds-icon { font-size: 18px; width: 26px; text-align: center; flex-shrink: 0; }
+    .ds-name { font-size: 12px; font-weight: 700; color: #4A5568; flex: 1; }
+    .ds-chips { display: flex; gap: 3px; flex-wrap: wrap; }
+
+    /* 바 색상 */
+    .bar-excellent { background: #48BB78; }
+    .bar-good      { background: #4299E1; }
+    .bar-average   { background: #ECC94B; }
+    .bar-poor      { background: #FC8181; }
+
+    /* 트렌드 점수 막대그래프 */
+    .trend-wrap { display: flex; align-items: flex-end; gap: 8px; height: 100px; }
+    .trend-col { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+    .trend-bar-wrap { flex: 1; width: 100%; display: flex; align-items: flex-end; }
+    .trend-bar {
+      width: 100%; border-radius: 6px 6px 0 0; transition: height .6s ease;
+      min-height: 4px; position: relative;
+    }
+    .trend-score-label {
+      font-size: 11px; font-weight: 900; color: #fff;
+      position: absolute; top: -18px; left: 50%; transform: translateX(-50%);
+      white-space: nowrap;
+    }
+    .trend-round-label { font-size: 10px; font-weight: 700; color: #A0AEC0; white-space: nowrap; }
+    .trend-date-label { font-size: 9px; color: #CBD5E0; white-space: nowrap; }
+
+    /* 빈 상태 */
+    .empty-state {
+      text-align: center; padding: 32px 16px; color: #A0AEC0;
+    }
+    .empty-icon { font-size: 36px; margin-bottom: 8px; }
+    .empty-text { font-size: 13px; font-weight: 700; }
+
+    /* 비교 라운드 선택 영역 */
+    .round-select-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
+
+    /* 반응형 */
+    @media (max-width: 400px) {
+      .score-big { font-size: 44px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════
+     로그인 (회원 선택) 화면
+══════════════════════════════════ -->
+<div id="login-screen">
+  <div class="login-logo">
+    <div class="login-logo-icon">🏋️</div>
+    <div class="login-logo-title">내 SFMA 결과</div>
+    <div class="login-logo-sub">회원을 선택하세요</div>
+  </div>
+  <div class="login-card">
+    <div class="login-card-title">👤 회원 선택</div>
+    <div class="member-btn-list" id="member-btn-list"></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════
+     메인 앱
+══════════════════════════════════ -->
+<div id="app">
+
+  <!-- 상단 헤더 -->
+  <div class="app-header" id="app-header">
+    <button class="header-back" onclick="logout()">← 목록</button>
+    <div class="header-profile">
+      <div class="h-avatar" id="h-avatar"></div>
+      <div>
+        <div class="h-name" id="h-name"></div>
+        <div class="h-trainer" id="h-trainer"></div>
+        <div class="h-grade-badge" id="h-grade-badge"></div>
+      </div>
+    </div>
+    <div class="score-banner">
+      <div class="score-big" id="h-score"></div>
+      <div class="score-max">/ 100</div>
+      <div class="score-change-chip" id="h-change"></div>
+    </div>
+  </div>
+
+  <!-- 탭 -->
+  <div class="app-tabs">
+    <button class="app-tab active" onclick="switchTab('overview', this)">📊 현황</button>
+    <button class="app-tab" onclick="switchTab('compare', this)">📈 비교</button>
+    <button class="app-tab" onclick="switchTab('history', this)">📋 이력</button>
+  </div>
+
+  <!-- 탭 콘텐츠: 현황 -->
+  <div class="tab-content active" id="tab-overview">
+    <!-- D-day 카드 -->
+    <div id="dday-card-wrap"></div>
+
+    <!-- 최신 측정 결과 -->
+    <div class="ucard">
+      <div class="ucard-title"><span class="ucard-title-icon">📋</span> 최신 SFMA 패턴 결과</div>
+      <div id="latest-patterns"></div>
+    </div>
+
+    <!-- 점수 트렌드 -->
+    <div class="ucard" id="trend-card" style="display:none;">
+      <div class="ucard-title"><span class="ucard-title-icon">📈</span> 점수 변화 추이</div>
+      <div style="position:relative; padding-top:24px;">
+        <div class="trend-wrap" id="trend-bars"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 탭 콘텐츠: 비교 -->
+  <div class="tab-content" id="tab-compare">
+    <div class="ucard" id="compare-card">
+      <div class="ucard-title"><span class="ucard-title-icon">🔀</span> 회차별 비교</div>
+      <div class="round-select-row" id="cmp-round-btns"></div>
+      <div id="cmp-chart"></div>
+    </div>
+  </div>
+
+  <!-- 탭 콘텐츠: 이력 -->
+  <div class="tab-content" id="tab-history">
+    <div class="ucard">
+      <div class="ucard-title"><span class="ucard-title-icon">🗂️</span> 측정 이력 전체</div>
+      <div id="history-list"></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- 측정 상세 시트 (바텀 시트) -->
+<div class="detail-overlay" id="detail-overlay" onclick="closeDetail(event)">
+  <div class="detail-sheet" id="detail-sheet">
+    <div class="detail-sheet-handle"></div>
+    <div class="detail-sheet-title" id="ds-title"></div>
+    <div class="detail-sheet-sub" id="ds-sub"></div>
+    <div class="ucard" style="margin-bottom:12px;" id="ds-score-card"></div>
+    <div class="ucard" style="margin-bottom:0;">
+      <div class="ucard-title"><span class="ucard-title-icon">📋</span> 패턴별 결과</div>
+      <div id="ds-patterns"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ══════════════════════════════
+   데이터 (관리자 화면과 동일)
+══════════════════════════════ */
+const TODAY_DATE = '2026-03-26';
+
+const PATTERNS = [
+  { id:'squat',    icon:'🧍', name:'심층 스쿼트' },
+  { id:'walk',     icon:'🚶', name:'제자리 걷기' },
+  { id:'rotation', icon:'🔄', name:'상체 회전' },
+  { id:'shoulder', icon:'🤸', name:'어깨 가동성' },
+  { id:'slr',      icon:'🦵', name:'능동 하지 거상' },
+  { id:'pushup',   icon:'🏋️', name:'체간 안정화 푸시업' },
+  { id:'rotStab',  icon:'🦶', name:'회전 안정성' },
+];
+
+const MEMBERS = [
+  { name:'김민준', avatar:'#6B46C1', phone:'1234', trainer:'김트레이너', history:[
+    { date:'2026-03-25', round:3, total:76, grade:'양호', opinion:'흉추 회전 제한 지속. 재활운동 병행 권장.',
+      sheetChecks:{top1:'FN',top2:'FN',top3_좌:'FN',top3_우:'FP',top4_좌:'FN',top4_우:'FN',top5_좌:'FN',top5_우:'FP',top6:'FP',top7:'FP',top8_좌:'FN',top8_우:'FN',top9_좌:'FN',top9_우:'FP',top10:'FP'} },
+    { date:'2024-07-22', round:2, total:66, grade:'보통', opinion:'전반적 양호. 상체 회전 개선 필요.',
+      sheetChecks:{top1:'FP',top2:'FN',top3_좌:'FP',top3_우:'DN',top4_좌:'FN',top4_우:'FP',top5_좌:'FP',top5_우:'DN',top6:'DP',top7:'FP',top8_좌:'FP',top8_우:'DN',top9_좌:'FP',top9_우:'DN',top10:'DP'} },
+    { date:'2024-03-10', round:1, total:52, grade:'주의', opinion:'초기 측정. 코어 안정화 운동 시작 권고.',
+      sheetChecks:{top1:'DP',top2:'FP',top3_좌:'DN',top3_우:'DN',top4_좌:'FP',top4_우:'DN',top5_좌:'DP',top5_우:'DN',top6:'DP',top7:'DP',top8_좌:'DN',top8_우:'DN',top9_좌:'DP',top9_우:'DN',top10:'DP'} },
+  ]},
+  { name:'이서연', avatar:'#2B6CB0', phone:'2345', trainer:'이트레이너', history:[
+    { date:'2026-03-20', round:2, total:84, grade:'양호', opinion:'전반적 우수. 체간 안정화 지속 강화 권장.',
+      sheetChecks:{top1:'FN',top2:'FN',top3_좌:'FN',top3_우:'FN',top4_좌:'FN',top4_우:'FP',top5_좌:'FN',top5_우:'FP',top6:'FN',top7:'FP',top8_좌:'FN',top8_우:'FN',top9_좌:'FN',top9_우:'FP',top10:'FN'} },
+    { date:'2025-09-15', round:1, total:72, grade:'보통', opinion:'양호한 기초 수준.',
+      sheetChecks:{top1:'FN',top2:'FP',top3_좌:'FN',top3_우:'FP',top4_좌:'FP',top4_우:'FP',top5_좌:'FN',top5_우:'FP',top6:'FP',top7:'FP',top8_좌:'FN',top8_우:'FP',top9_좌:'FN',top9_우:'FP',top10:'FN'} },
+  ]},
+  { name:'박도현', avatar:'#C05621', phone:'3456', trainer:'김트레이너', history:[
+    { date:'2026-02-14', round:2, total:45, grade:'주의', opinion:'디스크 영향으로 체간 안정성 낮음. 맥킨지 신전 병행.',
+      sheetChecks:{top1:'FP',top2:'DN',top3_좌:'DP',top3_우:'DN',top4_좌:'FP',top4_우:'FP',top5_좌:'DN',top5_우:'DN',top6:'DP',top7:'DP',top8_좌:'FP',top8_우:'DN',top9_좌:'DP',top9_우:'DN',top10:'DP'} },
+    { date:'2025-08-20', round:1, total:32, grade:'주의', opinion:'허리 통증 호소. 재활 프로그램 시작.',
+      sheetChecks:{top1:'DP',top2:'DN',top3_좌:'DP',top3_우:'DN',top4_좌:'DP',top4_우:'DN',top5_좌:'DP',top5_우:'DN',top6:'DP',top7:'DP',top8_좌:'DN',top8_우:'DN',top9_좌:'DP',top9_우:'DN',top10:'DP'} },
+  ]},
+  { name:'최수아', avatar:'#276749', phone:'4567', trainer:'박트레이너', history:[
+    { date:'2026-01-10', round:3, total:94, grade:'우수', opinion:'전 항목 우수. 유지 운동 권장.',
+      sheetChecks:{top1:'FN',top2:'FN',top3_좌:'FN',top3_우:'FN',top4_좌:'FN',top4_우:'FN',top5_좌:'FN',top5_우:'FN',top6:'FN',top7:'FN',top8_좌:'FN',top8_우:'FN',top9_좌:'FN',top9_우:'FP',top10:'FN'} },
+    { date:'2025-07-05', round:2, total:83, grade:'양호', opinion:'꾸준한 향상. 계속 유지.',
+      sheetChecks:{top1:'FN',top2:'FN',top3_좌:'FN',top3_우:'FN',top4_좌:'FN',top4_우:'FP',top5_좌:'FN',top5_우:'FN',top6:'FN',top7:'FP',top8_좌:'FN',top8_우:'FN',top9_좌:'FN',top9_우:'FP',top10:'FN'} },
+    { date:'2025-01-18', round:1, total:71, grade:'보통', opinion:'초기 측정. 전반적 양호.',
+      sheetChecks:{top1:'FN',top2:'FP',top3_좌:'FN',top3_우:'FP',top4_좌:'FN',top4_우:'FP',top5_좌:'FN',top5_우:'FP',top6:'FP',top7:'FP',top8_좌:'FN',top8_우:'FP',top9_좌:'FN',top9_우:'FP',top10:'FP'} },
+  ]},
+  { name:'정우진', avatar:'#744210', phone:'5678', trainer:'이트레이너', history:[
+    { date:'2025-11-30', round:2, total:58, grade:'주의', opinion:'일자목 교정 병행 중. 상체 회전 개선 필요.',
+      sheetChecks:{top1:'FP',top2:'FP',top3_좌:'DN',top3_우:'DN',top4_좌:'FN',top4_우:'FP',top5_좌:'FP',top5_우:'DN',top6:'DP',top7:'FP',top8_좌:'FP',top8_우:'DN',top9_좌:'FP',top9_우:'DN',top10:'DP'} },
+    { date:'2025-04-12', round:1, total:38, grade:'주의', opinion:'초기 측정. 경추 안정화 운동 시작.',
+      sheetChecks:{top1:'DP',top2:'DN',top3_좌:'DN',top3_우:'DN',top4_좌:'FP',top4_우:'DN',top5_좌:'DP',top5_우:'DN',top6:'DP',top7:'DP',top8_좌:'DN',top8_우:'DN',top9_좌:'DP',top9_우:'DN',top10:'DP'} },
+  ]},
+  { name:'강하은', avatar:'#9B2C2C', phone:'6789', trainer:'이트레이너', history:[
+    { date:'2025-10-25', round:1, total:40, grade:'주의', opinion:'고관절 충돌 영향. 가동성 운동 집중 필요.',
+      sheetChecks:{top1:'FP',top2:'DP',top3_좌:'DP',top3_우:'DN',top4_좌:'FP',top4_우:'DN',top5_좌:'DP',top5_우:'DN',top6:'DP',top7:'DP',top8_좌:'FP',top8_우:'DN',top9_좌:'DP',top9_우:'DN',top10:'DP'} },
+  ]},
+  { name:'오태양', avatar:'#2C5282', phone:'7890', trainer:'김트레이너', history:[
+    { date:'2025-09-08', round:1, total:72, grade:'보통', opinion:'전반적 양호. 하지 거상 향상 목표.',
+      sheetChecks:{top1:'FN',top2:'FP',top3_좌:'FN',top3_우:'FP',top4_좌:'FN',top4_우:'FP',top5_좌:'FN',top5_우:'FP',top6:'FP',top7:'FN',top8_좌:'FN',top8_우:'FP',top9_좌:'FN',top9_우:'FP',top10:'FP'} },
+  ]},
+  { name:'한소희', avatar:'#553C9A', phone:'8901', trainer:'박트레이너', history:[
+    { date:'2025-07-22', round:1, total:82, grade:'양호', opinion:'양호. 지속적인 관리 필요.',
+      sheetChecks:{top1:'FN',top2:'FN',top3_좌:'FN',top3_우:'FP',top4_좌:'FN',top4_우:'FN',top5_좌:'FN',top5_우:'FP',top6:'FP',top7:'FN',top8_좌:'FN',top8_우:'FN',top9_좌:'FN',top9_우:'FP',top10:'FN'} },
+  ]},
+];
+
+const SETTINGS = {
+  defaultDays: 90,
+  gradeDays: { excellent:180, good:90, average:60, poor:30 },
+  memberOverride: {}
+};
+
+/* ══════════════════════════════
+   헬퍼 함수
+══════════════════════════════ */
+function gradeInfo(total) {
+  if (total >= 90) return { label:'우수', cls:'g-excellent', barCls:'bar-excellent', hCls:'hb-excellent' };
+  if (total >= 75) return { label:'양호', cls:'g-good',      barCls:'bar-good',      hCls:'hb-good' };
+  if (total >= 60) return { label:'보통', cls:'g-average',   barCls:'bar-average',   hCls:'hb-average' };
+  return               { label:'주의', cls:'g-poor',       barCls:'bar-poor',      hCls:'hb-poor' };
+}
+
+function getReexamDays(member) {
+  if (SETTINGS.memberOverride[member.name] != null) return SETTINGS.memberOverride[member.name];
+  const h = member.history[0];
+  if (!h) return SETTINGS.defaultDays;
+  const g = gradeInfo(h.total).label;
+  if (g === '우수') return SETTINGS.gradeDays.excellent;
+  if (g === '양호') return SETTINGS.gradeDays.good;
+  if (g === '보통') return SETTINGS.gradeDays.average;
+  return SETTINGS.gradeDays.poor;
+}
+
+function addDays(dateStr, days) {
+  const d = new Date(dateStr);
+  d.setDate(d.getDate() + days);
+  return d.toISOString().slice(0, 10);
+}
+
+function daysBetween(from, to) {
+  return Math.round((new Date(to) - new Date(from)) / 86400000);
+}
+
+function fmtDate(d) {
+  const [y,m,day] = d.split('-');
+  return `${y}년 ${parseInt(m)}월 ${parseInt(day)}일`;
+}
+
+function countChecks(checks) {
+  const cnt = {FN:0,FP:0,DP:0,DN:0};
+  if (!checks) return cnt;
+  Object.values(checks).forEach(v => { if (v in cnt) cnt[v]++; });
+  return cnt;
+}
+
+// 패턴별 체크 집계 (top1~top10에서 각 패턴 구간 매핑)
+// SFMA 10개 항목 → 7개 패턴으로 그룹핑
+const PATTERN_CHECK_MAP = {
+  squat:    ['top1'],
+  walk:     ['top2'],
+  rotation: ['top3_좌','top3_우'],
+  shoulder: ['top4_좌','top4_우'],
+  slr:      ['top5_좌','top5_우'],
+  pushup:   ['top6','top7'],
+  rotStab:  ['top8_좌','top8_우','top9_좌','top9_우','top10'],
+};
+
+function patternChecks(checks, patId) {
+  const keys = PATTERN_CHECK_MAP[patId] || [];
+  const result = {};
+  keys.forEach(k => { if (checks[k]) result[k] = checks[k]; });
+  return result;
+}
+
+function patternScore(checks, patId) {
+  const c = countChecks(patternChecks(checks, patId));
+  const tot = c.FN+c.FP+c.DP+c.DN;
+  if (!tot) return null;
+  return Math.round((c.FN*10+c.FP*7+c.DN*5+c.DP*2)/(tot*10)*100);
+}
+
+function chipsHtml(cnt) {
+  let h = '';
+  if (cnt.FN) h += `<span class="chip chip-fn">FN ${cnt.FN}</span>`;
+  if (cnt.FP) h += `<span class="chip chip-fp">FP ${cnt.FP}</span>`;
+  if (cnt.DP) h += `<span class="chip chip-dp">DP ${cnt.DP}</span>`;
+  if (cnt.DN) h += `<span class="chip chip-dn">DN ${cnt.DN}</span>`;
+  return h;
+}
+
+/* ══════════════════════════════
+   상태
+══════════════════════════════ */
+let currentMember = null;
+let cmpSelectedRounds = [];
+
+/* ══════════════════════════════
+   로그인 화면
+══════════════════════════════ */
+function renderLoginScreen() {
+  const list = document.getElementById('member-btn-list');
+  list.innerHTML = MEMBERS.map((m, i) => {
+    const latest = m.history[0];
+    const gi = latest ? gradeInfo(latest.total) : null;
+    return `<div class="member-login-btn" onclick="login(${i})">
+      <div class="ml-avatar" style="background:${m.avatar}">${m.name[0]}</div>
+      <div>
+        <div class="ml-name">${m.name}</div>
+        <div class="ml-sub">${latest ? `${fmtDate(latest.date)} · ${latest.round}회차` : '측정 기록 없음'}</div>
+      </div>
+      ${gi ? `<div class="ml-grade"><span class="chip ${gi.cls}" style="font-size:11px;padding:3px 9px;">${gi.label}</span></div>` : ''}
+    </div>`;
+  }).join('');
+}
+
+function login(idx) {
+  currentMember = MEMBERS[idx];
+  cmpSelectedRounds = currentMember.history.map((_, i) => i);
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
+  renderApp();
+  // 첫 탭 활성화
+  document.querySelectorAll('.app-tab').forEach((t,i) => t.classList.toggle('active', i===0));
+  document.querySelectorAll('.tab-content').forEach((t,i) => t.classList.toggle('active', i===0));
+}
+
+function logout() {
+  document.getElementById('login-screen').style.display = 'flex';
+  document.getElementById('app').style.display = 'none';
+  currentMember = null;
+}
+
+/* ══════════════════════════════
+   앱 렌더
+══════════════════════════════ */
+function renderApp() {
+  renderHeader();
+  renderOverview();
+  renderCompare();
+  renderHistory();
+}
+
+/* ── 헤더 ── */
+function renderHeader() {
+  const m = currentMember;
+  const latest = m.history[0];
+  const prev    = m.history[1];
+  const gi = latest ? gradeInfo(latest.total) : null;
+
+  document.getElementById('h-avatar').style.background = m.avatar;
+  document.getElementById('h-avatar').textContent = m.name[0];
+  document.getElementById('h-name').textContent = m.name;
+  document.getElementById('h-trainer').textContent = `담당: ${m.trainer}`;
+
+  if (gi && latest) {
+    document.getElementById('h-grade-badge').className = `h-grade-badge ${gi.hCls}`;
+    document.getElementById('h-grade-badge').textContent = `${gi.label} 등급`;
+    document.getElementById('h-score').textContent = latest.total;
+
+    let changeHtml = '';
+    if (prev) {
+      const diff = latest.total - prev.total;
+      if (diff > 0) changeHtml = `<span class="sc-up">▲ +${diff}</span>`;
+      else if (diff < 0) changeHtml = `<span class="sc-down">▼ ${diff}</span>`;
+      else changeHtml = `<span class="sc-same">→ 유지</span>`;
+    }
+    document.getElementById('h-change').innerHTML = changeHtml;
+  }
+}
+
+/* ── 현황 탭 ── */
+function renderOverview() {
+  const m = currentMember;
+  const latest = m.history[0];
+
+  // D-day 카드
+  const ddWrap = document.getElementById('dday-card-wrap');
+  if (!latest) {
+    ddWrap.innerHTML = `<div class="ucard"><div class="empty-state"><div class="empty-icon">📅</div><div class="empty-text">측정 기록이 없습니다</div></div></div>`;
+  } else {
+    const period = getReexamDays(m);
+    const nextDate = m.nextDate || addDays(latest.date, period);
+    const daysLeft = daysBetween(TODAY_DATE, nextDate);
+    let ddClass, ddText, ddNum;
+    if (daysLeft < 0) {
+      ddClass = 'dday-overdue';
+      ddNum = `D+${Math.abs(daysLeft)}`;
+      ddText = `재검사가 ${Math.abs(daysLeft)}일 초과되었습니다`;
+    } else if (daysLeft <= 30) {
+      ddClass = 'dday-soon';
+      ddNum = `D-${daysLeft}`;
+      ddText = `곧 재검사가 필요합니다`;
+    } else {
+      ddClass = 'dday-ok';
+      ddNum = `D-${daysLeft}`;
+      ddText = `측정 주기: ${period}일`;
+    }
+    ddWrap.innerHTML = `
+      <div class="dday-card">
+        <div class="dday-label">다음 SFMA 측정 예정일</div>
+        <div class="dday-date">${fmtDate(nextDate)}</div>
+        <div class="dday-number ${ddClass}">${ddNum}</div>
+        <div class="dday-sub ${ddClass}">${ddText}</div>
+      </div>`;
+  }
+
+  // 패턴별 결과
+  const patWrap = document.getElementById('latest-patterns');
+  if (!latest) {
+    patWrap.innerHTML = `<div class="empty-state"><div class="empty-icon">📋</div><div class="empty-text">측정 기록이 없습니다</div></div>`;
+    return;
+  }
+  patWrap.innerHTML = PATTERNS.map(p => {
+    const score = patternScore(latest.sheetChecks, p.id);
+    const pChecks = patternChecks(latest.sheetChecks, p.id);
+    const cnt = countChecks(pChecks);
+    if (score === null) return '';
+    const gi = gradeInfo(score);
+    const barColor = score >= 90 ? '#48BB78' : score >= 75 ? '#4299E1' : score >= 60 ? '#ECC94B' : '#FC8181';
+    const scoreColor = score >= 75 ? '#38A169' : score >= 60 ? '#D69E2E' : '#E53E3E';
+    return `<div class="pattern-result-item">
+      <div class="pri-icon">${p.icon}</div>
+      <div class="pri-info">
+        <div class="pri-name">${p.name}</div>
+        <div class="pri-checks">${chipsHtml(cnt)}</div>
+      </div>
+      <div class="pri-bar-wrap">
+        <div class="pri-bar-bg"><div class="pri-bar-fill" style="width:${score}%;background:${barColor}"></div></div>
+        <div class="pri-score" style="color:${scoreColor}">${score}</div>
+      </div>
+    </div>`;
+  }).join('');
+
+  // 트렌드 바
+  if (m.history.length >= 2) {
+    document.getElementById('trend-card').style.display = 'block';
+    const sorted = [...m.history].reverse(); // 오래된 순
+    const maxScore = 100;
+    const ROUND_COLORS = ['#6B46C1','#4299E1','#48BB78','#ECC94B','#FC8181'];
+    const barsHtml = sorted.map((h, i) => {
+      const pct = (h.total / maxScore) * 100;
+      const color = ROUND_COLORS[i % ROUND_COLORS.length];
+      const dateShort = h.date.slice(2, 7).replace('-', '/');
+      return `<div class="trend-col">
+        <div class="trend-bar-wrap">
+          <div class="trend-bar" style="height:${pct}%;background:${color};">
+            <span class="trend-score-label" style="color:${color}">${h.total}</span>
+          </div>
+        </div>
+        <div class="trend-round-label">${h.round}회차</div>
+        <div class="trend-date-label">${dateShort}</div>
+      </div>`;
+    }).join('');
+    document.getElementById('trend-bars').innerHTML = barsHtml;
+  }
+}
+
+/* ── 비교 탭 ── */
+function renderCompare() {
+  const m = currentMember;
+  const btnWrap = document.getElementById('cmp-round-btns');
+  const chartWrap = document.getElementById('cmp-chart');
+
+  if (!m.history.length) {
+    btnWrap.innerHTML = '';
+    chartWrap.innerHTML = `<div class="empty-state"><div class="empty-icon">📊</div><div class="empty-text">측정 기록이 없습니다</div></div>`;
+    return;
+  }
+
+  // 회차 선택 버튼
+  btnWrap.innerHTML = m.history.map((h, i) => {
+    const isActive = cmpSelectedRounds.includes(i);
+    const dateShort = h.date.slice(2, 7).replace('-', '/');
+    return `<button class="compare-round-btn ${isActive?'active':''}" onclick="toggleCmpRound(${i})">${h.round}회차 <span style="opacity:0.7;font-size:10px;">${dateShort}</span></button>`;
+  }).join('');
+
+  // 차트
+  if (!cmpSelectedRounds.length) {
+    chartWrap.innerHTML = `<div style="text-align:center;color:#A0AEC0;padding:20px;font-size:13px;">회차를 선택하세요</div>`;
+    return;
+  }
+
+  const ROUND_COLORS = ['#6B46C1','#4299E1','#48BB78','#ECC94B','#FC8181'];
+  const selectedHistory = cmpSelectedRounds.map(i => m.history[i]);
+
+  // 범례
+  const legendHtml = selectedHistory.map((h, li) => {
+    const color = ROUND_COLORS[cmpSelectedRounds[li] % ROUND_COLORS.length];
+    return `<span style="display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:700;color:#4A5568;margin-right:10px;">
+      <span style="width:10px;height:10px;border-radius:50%;background:${color};display:inline-block;"></span>
+      ${h.round}회차 (${h.date.slice(0,7)})
+    </span>`;
+  }).join('');
+
+  const rowsHtml = PATTERNS.map(p => {
+    const scores = selectedHistory.map(h => patternScore(h.sheetChecks, p.id));
+    if (scores.every(s => s === null)) return '';
+
+    const barsHtml = scores.map((s, li) => {
+      if (s === null) return '';
+      const color = ROUND_COLORS[cmpSelectedRounds[li] % ROUND_COLORS.length];
+      const scoreColor = s >= 75 ? '#38A169' : s >= 60 ? '#D69E2E' : '#E53E3E';
+      return `<div class="cmp-bar-line-u">
+        <span class="cmp-label-dot" style="background:${color}"></span>
+        <div class="cmp-bar-bg-u"><div class="cmp-bar-fill-u" style="width:${s}%;background:${color}"></div></div>
+        <span class="cmp-score-u" style="color:${scoreColor}">${s}</span>
+      </div>`;
+    }).join('');
+
+    return `<div class="cmp-row-u">
+      <div class="cmp-name-u">${p.icon} ${p.name}</div>
+      <div class="cmp-bars">${barsHtml}</div>
+    </div>`;
+  }).join('');
+
+  chartWrap.innerHTML = `
+    <div style="margin-bottom:12px;">${legendHtml}</div>
+    ${rowsHtml}
+  `;
+}
+
+function toggleCmpRound(idx) {
+  if (cmpSelectedRounds.includes(idx)) {
+    if (cmpSelectedRounds.length === 1) return; // 최소 1개 선택
+    cmpSelectedRounds = cmpSelectedRounds.filter(i => i !== idx);
+  } else {
+    cmpSelectedRounds.push(idx);
+    cmpSelectedRounds.sort((a,b) => a-b);
+  }
+  renderCompare();
+}
+
+/* ── 이력 탭 ── */
+function renderHistory() {
+  const m = currentMember;
+  const wrap = document.getElementById('history-list');
+
+  if (!m.history.length) {
+    wrap.innerHTML = `<div class="empty-state"><div class="empty-icon">🗂️</div><div class="empty-text">측정 이력이 없습니다</div></div>`;
+    return;
+  }
+
+  wrap.innerHTML = m.history.map((h, i) => {
+    const gi = gradeInfo(h.total);
+    const prev = m.history[i + 1];
+    let changeHtml = '';
+    if (prev) {
+      const diff = h.total - prev.total;
+      if (diff > 0) changeHtml = `<div style="font-size:11px;font-weight:700;color:#38A169;">▲ +${diff}</div>`;
+      else if (diff < 0) changeHtml = `<div style="font-size:11px;font-weight:700;color:#E53E3E;">▼ ${diff}</div>`;
+      else changeHtml = `<div style="font-size:11px;color:#A0AEC0;">→ 유지</div>`;
+    }
+    const scoreColor = h.total >= 75 ? '#38A169' : h.total >= 60 ? '#D69E2E' : '#E53E3E';
+
+    return `<div class="history-item" onclick="openDetail(${i})">
+      <div class="hi-left">
+        <div class="hi-round">${h.round}회차</div>
+        <div class="hi-date">${fmtDate(h.date)}</div>
+        <div class="hi-opinion">${h.opinion}</div>
+      </div>
+      <div class="hi-right">
+        <div class="hi-score" style="color:${scoreColor}">${h.total}</div>
+        <div class="hi-grade-badge ${gi.cls}">${gi.label}</div>
+        ${changeHtml}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+/* ══════════════════════════════
+   측정 상세 바텀 시트
+══════════════════════════════ */
+function openDetail(histIdx) {
+  const m = currentMember;
+  const h = m.history[histIdx];
+  const gi = gradeInfo(h.total);
+  const cnt = countChecks(h.sheetChecks);
+  const scoreColor = h.total >= 75 ? '#38A169' : h.total >= 60 ? '#D69E2E' : '#E53E3E';
+
+  document.getElementById('ds-title').textContent = `${h.round}회차 측정 상세`;
+  document.getElementById('ds-sub').textContent = `${fmtDate(h.date)} · 트레이너: ${m.trainer}`;
+
+  document.getElementById('ds-score-card').innerHTML = `
+    <div style="display:flex;align-items:center;gap:14px;">
+      <div style="flex:1;">
+        <div style="font-size:11px;font-weight:700;color:#A0AEC0;margin-bottom:4px;">종합 점수</div>
+        <div style="font-size:36px;font-weight:900;color:${scoreColor}">${h.total}</div>
+        <div style="margin-top:6px;">${chipsHtml(cnt)}</div>
+      </div>
+      <div style="text-align:center;">
+        <span class="chip ${gi.cls}" style="font-size:14px;padding:6px 16px;">${gi.label}</span>
+        <div style="font-size:11px;color:#A0AEC0;margin-top:8px;line-height:1.5;">${h.opinion}</div>
+      </div>
+    </div>
+  `;
+
+  const patternsHtml = PATTERNS.map(p => {
+    const pChecks = patternChecks(h.sheetChecks, p.id);
+    const pCnt = countChecks(pChecks);
+    const score = patternScore(h.sheetChecks, p.id);
+    if (score === null) return '';
+    const barColor = score >= 90 ? '#48BB78' : score >= 75 ? '#4299E1' : score >= 60 ? '#ECC94B' : '#FC8181';
+    return `<div class="ds-pattern-row">
+      <div class="ds-icon">${p.icon}</div>
+      <div style="flex:1;min-width:0;">
+        <div class="ds-name">${p.name}</div>
+        <div style="margin-top:4px;display:flex;gap:4px;flex-wrap:wrap;">${chipsHtml(pCnt)}</div>
+      </div>
+      <div style="text-align:right;flex-shrink:0;">
+        <div style="font-size:16px;font-weight:900;color:${barColor}">${score}</div>
+        <div style="background:#EDF2F7;border-radius:99px;height:5px;width:48px;margin-top:4px;overflow:hidden;">
+          <div style="height:100%;width:${score}%;background:${barColor};border-radius:99px;"></div>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+
+  document.getElementById('ds-patterns').innerHTML = patternsHtml;
+  document.getElementById('detail-overlay').classList.add('open');
+}
+
+function closeDetail(e) {
+  if (e.target === document.getElementById('detail-overlay')) {
+    document.getElementById('detail-overlay').classList.remove('open');
+  }
+}
+
+/* ══════════════════════════════
+   탭 전환
+══════════════════════════════ */
+function switchTab(id, btn) {
+  document.querySelectorAll('.app-tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab-' + id).classList.add('active');
+}
+
+/* ══════════════════════════════
+   초기화
+══════════════════════════════ */
+renderLoginScreen();
+</script>
+</body>
+</html>
