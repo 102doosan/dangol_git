@@ -228,6 +228,20 @@
     .g-average   { background: #FEFCBF; color: #744210; }
     .g-poor      { background: #FED7D7; color: #742A2A; }
 
+    /* ── 폰 내부 모드 토글 바 ── */
+    .phone-mode-bar {
+      display: flex; background: #1A1A2E; padding: 8px 12px; gap: 6px;
+      flex-shrink: 0; z-index: 5;
+    }
+    .phone-mode-btn {
+      flex: 1; padding: 7px 6px; border-radius: 99px; border: 1.5px solid #3A3A5A;
+      background: #2A2A4A; color: #A0AEC0; font-size: 11px; font-weight: 700;
+      cursor: pointer; font-family: 'Noto Sans KR', sans-serif; transition: all 0.2s;
+      white-space: nowrap;
+    }
+    .phone-mode-btn.pm-sfma { background: #553C9A; border-color: #9B84FF; color: #fff; }
+    .phone-mode-btn.pm-csmi { background: #1A5F5F; border-color: #81E6D9; color: #fff; }
+
     /* ── 메모판 ── */
     .memo-panel { flex: 1; background: #16213E; border-radius: 20px; padding: 22px; min-height: 600px; display: flex; flex-direction: column; gap: 12px; }
     .memo-panel h3 { font-size: 13px; font-weight: 800; color: #9B84FF; letter-spacing: 1px; }
@@ -277,7 +291,12 @@
   <!-- 폰 프레임 -->
   <div class="phone">
     <div class="phone-notch"></div>
-    <div class="phone-screen">
+    <!-- 폰 내부 모드 토글 -->
+    <div class="phone-mode-bar" style="margin-top:28px;">
+      <button class="phone-mode-btn pm-sfma" id="pm-btn-sfma" onclick="switchMode('sfma')">📊 SFMA 기능검사</button>
+      <button class="phone-mode-btn" id="pm-btn-csmi" onclick="switchMode('csmi')">💪 CSMI 근력측정</button>
+    </div>
+    <div class="phone-screen" style="margin-top:0;">
 
       <!-- ────── SFMA 화면 ────── -->
 
@@ -750,6 +769,9 @@ function switchMode(mode) {
   document.getElementById('csmi-nav').style.display = mode==='csmi'?'flex':'none';
   document.getElementById('mode-btn-sfma').className = 'mode-btn'+(mode==='sfma'?' active-sfma':'');
   document.getElementById('mode-btn-csmi').className = 'mode-btn'+(mode==='csmi'?' active-csmi':'');
+  // 폰 내부 버튼 스타일 갱신
+  document.getElementById('pm-btn-sfma').className = 'phone-mode-btn'+(mode==='sfma'?' pm-sfma':'');
+  document.getElementById('pm-btn-csmi').className = 'phone-mode-btn'+(mode==='csmi'?' pm-csmi':'');
   document.getElementById('toolbar-title').textContent = mode==='sfma'?'📊 SFMA 결과 화면':'💪 CSMI 근력측정 결과 화면';
   document.getElementById('member-label').style.color = mode==='sfma'?'#9B84FF':'#81E6D9';
   document.getElementById('memo-title').textContent = mode==='sfma'?'📊 SFMA 결과 화면 메모':'💪 CSMI 결과 화면 메모';
