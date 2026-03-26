@@ -396,28 +396,7 @@
       </div>
 
       <!-- 요약 카드 -->
-      <div class="stats-row">
-        <div class="stat-card">
-          <div class="stat-label">💪 전체 측정 회원</div>
-          <div class="stat-value">38</div>
-          <div class="stat-change">↑ 3명 증가</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-label">📅 이번 달 측정</div>
-          <div class="stat-value">9</div>
-          <div class="stat-change" style="color:#718096;">/ 38명</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-label">⚠️ 재측정 필요</div>
-          <div class="stat-value" style="color:#E53E3E;">7</div>
-          <div class="stat-change" style="color:#E53E3E;">30일 이내</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-label">✅ 정상 범위 비율</div>
-          <div class="stat-value" style="color:#2C7A7B;">68%</div>
-          <div class="stat-change">기준치 이상</div>
-        </div>
-      </div>
+      <div class="stats-row" id="dash-stats-row"></div>
 
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
         <!-- 최근 측정 -->
@@ -446,7 +425,7 @@
         <!-- 미측정 회원 -->
         <div class="card" style="margin-bottom:0;">
           <div class="card-title">⚠️ 측정 예정 회원
-            <span style="margin-left:auto;font-size:11px;font-weight:700;background:#FED7D7;color:#742A2A;padding:3px 8px;border-radius:99px;">7명</span>
+            <span id="overdue-count-badge" style="margin-left:auto;font-size:11px;font-weight:700;background:#FED7D7;color:#742A2A;padding:3px 8px;border-radius:99px;"></span>
           </div>
           <div id="unmeasured-list"></div>
         </div>
@@ -937,6 +916,42 @@ function memberGrade(m){
 }
 
 function renderDashboard(){
+  // ── 요약 통계 카드 (동적 렌더) ──────────────────────────────
+  const todayD = new Date('2026-03-26');
+  const thisMonth = '2026-03';
+  const totalMembers = MEMBERS.length;
+  const thisMonthRows = MEMBERS.flatMap(m=>m.history).filter(h=>h.date.startsWith(thisMonth));
+  const overdueCount = MEMBERS.filter(m=>{
+    const h=m.history[0]; if(!h) return true;
+    return (todayD-new Date(h.date))/(1000*60*60*24) >= 30;
+  }).length;
+  // 정상 비율: 전체 회원 최근 측정의 ALL_ITEMS 기준치 90% 이상 항목 비율
+  let goodAll=0, totalAll=0;
+  MEMBERS.forEach(m=>{ const h=m.history[0]; if(!h) return;
+    ALL_ITEMS.forEach(it=>{ const v=h[it.id]; if(!v) return; totalAll++;
+      if(pctOf(v.value,stdFor(it,m.gender))>=90) goodAll++; }); });
+  const normalPct = totalAll ? Math.round(goodAll/totalAll*100) : 0;
+
+  const statCards = [
+    { icon:'💪', label:'전체 측정 회원', value:`${totalMembers}`, sub:'↑ 3명 증가', subColor:'#38A169',
+      action:`showScreen('list',document.querySelectorAll('.nav-btn')[1])`, hint:'결과 조회 →' },
+    { icon:'📅', label:'이번 달 측정', value:`${thisMonthRows.length}`, sub:`/ ${totalMembers}명`, subColor:'#718096',
+      action:`showScreen('list',document.querySelectorAll('.nav-btn')[1])`, hint:'결과 조회 →' },
+    { icon:'⚠️', label:'재측정 필요', value:`${overdueCount}`, sub:'30일 이상 경과', subColor:'#E53E3E', valueColor:'#E53E3E',
+      action:`document.getElementById('unmeasured-list').scrollIntoView({behavior:'smooth'})`, hint:'목록 보기 ↓' },
+    { icon:'✅', label:'정상 범위 비율', value:`${normalPct}%`, sub:'기준치 90% 이상', subColor:'#38A169', valueColor:'#2C7A7B',
+      action:`document.getElementById('group-stats-grid').scrollIntoView({behavior:'smooth'})`, hint:'그룹별 보기 ↓' },
+  ];
+  document.getElementById('dash-stats-row').innerHTML = statCards.map(s=>`
+    <div class="stat-card" onclick="${s.action}" style="cursor:pointer;transition:box-shadow .15s;position:relative;"
+      onmouseover="this.style.boxShadow='0 4px 16px rgba(44,122,123,0.18)'"
+      onmouseout="this.style.boxShadow=''">
+      <div class="stat-label">${s.icon} ${s.label}</div>
+      <div class="stat-value" style="${s.valueColor?'color:'+s.valueColor:''}">${s.value}</div>
+      <div class="stat-change" style="color:${s.subColor||'#38A169'}">${s.sub}</div>
+      <div style="position:absolute;bottom:10px;right:12px;font-size:10px;color:#A0AEC0;font-weight:600;">${s.hint}</div>
+    </div>`).join('');
+
   // 최근 측정
   const tbody = document.getElementById('dash-recent-tbody');
   const rows = MEMBERS.flatMap(m=>m.history.map(h=>({m,h}))).sort((a,b)=>b.h.date.localeCompare(a.h.date)).slice(0,10);
@@ -947,8 +962,8 @@ function renderDashboard(){
     const knFL=h.knee_flex_l?.value??'-', knEL=h.knee_ext_l?.value??'-';
     const anFL=h.ankle_l_flex?.value??'-', anEL=h.ankle_l_ext?.value??'-';
     const g=memberGrade(m);
-    return `<tr>
-      <td><span class="td-name">${m.name}</span></td>
+    return `<tr style="cursor:pointer;" onclick="dashGoDetail(${m.id})" title="${m.name}님 상세 보기">
+      <td><span class="td-name" style="color:#2C7A7B;text-decoration:underline dotted;">${m.name}</span></td>
       <td>${h.date}</td>
       <td>${h.round}회차</td>
       <td>${shL}/${shR}</td>
@@ -966,16 +981,23 @@ function renderDashboard(){
     const d=new Date(h.date);
     return (today-d)/(1000*60*60*24) >= 60;
   }).slice(0,7);
+  const badge = document.getElementById('overdue-count-badge');
+  if(badge) badge.textContent = overdue.length + '명';
   ul.innerHTML = overdue.map(m=>{
     const h=m.history[0];
     const days = h ? Math.round((today-new Date(h.date))/(1000*60*60*24)) : null;
+    const urgency = !h ? '#E53E3E' : days>90 ? '#E53E3E' : days>60 ? '#D69E2E' : '#718096';
     return `<div class="unmeasured-item">
       <div class="um-avatar" style="background:${m.color}">${m.name[0]}</div>
       <div class="um-info">
-        <div class="um-name">${m.name} (${m.gender})</div>
+        <div class="um-name">${m.name} <span style="font-size:11px;color:#718096;">(${m.gender})</span></div>
         <div class="um-meta">${h?`마지막 측정: ${h.date}`:'미측정'}</div>
       </div>
-      ${h?`<div class="um-last">${days}일 경과</div>`:'<div class="um-last">미측정</div>'}
+      <div style="display:flex;align-items:center;gap:6px;margin-left:auto;">
+        ${h?`<div style="font-size:11px;font-weight:700;color:${urgency};">${days}일 경과</div>`:'<div style="font-size:11px;font-weight:700;color:#E53E3E;">미측정</div>'}
+        <button class="btn-sm" style="background:#EBF8FF;color:#2B6CB0;white-space:nowrap;" onclick="sendAlert(${m.id})">📩 알림</button>
+        <button class="btn-sm" style="background:#E6FFFA;color:#2C7A7B;white-space:nowrap;" onclick="dashGoInput(${m.id})">✏️ 입력</button>
+      </div>
     </div>`;
   }).join('') || '<div style="padding:16px;text-align:center;font-size:12px;color:#A0AEC0;">해당 없음</div>';
 
@@ -1003,6 +1025,32 @@ function renderDashboard(){
       </div>
     </div>`;
   }).join('');
+}
+
+// ── 대시보드 액션 ─────────────────────────────────────────────
+function dashGoDetail(mid){
+  showScreen('list', document.querySelectorAll('.nav-btn')[1]);
+  setTimeout(()=>openDetail(mid), 80);
+}
+function dashGoInput(mid){
+  const m = MEMBERS.find(x=>x.id===mid); if(!m) return;
+  showScreen('input', document.querySelectorAll('.nav-btn')[2]);
+  setTimeout(()=>{
+    document.getElementById('inp-member-search').value = m.name;
+    document.getElementById('inp-member-search').classList.add('selected');
+    _selectedMember = m;
+    const h = m.history[0];
+    document.getElementById('inp-round').value = h ? h.round+1 : 1;
+    ALL_ITEMS.forEach(it=>{
+      const lbl=document.getElementById('inp-std-label-'+it.id);
+      if(lbl) lbl.textContent=`기준: ${stdFor(it,m.gender)}Nm`;
+    });
+    buildInputPanels();
+  }, 80);
+}
+function sendAlert(mid){
+  const m = MEMBERS.find(x=>x.id===mid); if(!m) return;
+  showToast(`📩 ${m.name}님께 재측정 알림을 발송했습니다.`);
 }
 
 // ── 결과 조회 ──────────────────────────────────────────────────
