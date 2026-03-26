@@ -2132,7 +2132,18 @@ function showToast(msg) {
 /* ══════════════════════════════════════
    🔔 알림 발송 + 이력 관리
 ══════════════════════════════════════ */
-let ALERT_HISTORY = []; // { id, name, avatar, date, time, status, note }
+let ALERT_HISTORY = [
+  { id:1001, name:'강하은', avatar:'#9B2C2C', date:'2026-03-26', time:'09:12', status:'발송완료', note:'D+122 초과' },
+  { id:1002, name:'정우진', avatar:'#744210', date:'2026-03-26', time:'09:12', status:'발송완료', note:'D+86 초과' },
+  { id:1003, name:'오태양', avatar:'#2C5282', date:'2026-03-26', time:'09:12', status:'발송완료', note:'D+139 초과' },
+  { id:1004, name:'박도현', avatar:'#C05621', date:'2026-03-20', time:'14:35', status:'발송완료', note:'D+10 초과' },
+  { id:1005, name:'한소희', avatar:'#553C9A', date:'2026-03-20', time:'14:35', status:'발송완료', note:'D+157 초과' },
+  { id:1006, name:'강하은', avatar:'#9B2C2C', date:'2026-03-15', time:'10:00', status:'발송완료', note:'재검사 안내' },
+  { id:1007, name:'정우진', avatar:'#744210', date:'2026-03-10', time:'11:22', status:'실패',     note:'수신 거부' },
+  { id:1008, name:'박도현', avatar:'#C05621', date:'2026-03-05', time:'16:08', status:'발송완료', note:'재검사 안내' },
+  { id:1009, name:'오태양', avatar:'#2C5282', date:'2026-02-28', time:'09:45', status:'발송완료', note:'D+109 초과' },
+  { id:1010, name:'한소희', avatar:'#553C9A', date:'2026-02-20', time:'13:30', status:'실패',     note:'번호 오류' },
+]; // { id, name, avatar, date, time, status, note }
 
 function sendCheckedAlerts() {
   const checked = [...document.querySelectorAll('.sp-chk:checked')].map(c => c.dataset.name);
