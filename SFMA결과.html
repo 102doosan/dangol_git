@@ -293,8 +293,8 @@
     <div class="phone-notch"></div>
     <!-- 폰 내부 모드 토글 -->
     <div class="phone-mode-bar" style="margin-top:28px;">
-      <button class="phone-mode-btn pm-sfma" id="pm-btn-sfma" onclick="switchMode('sfma')">📊 SFMA 기능검사</button>
-      <button class="phone-mode-btn" id="pm-btn-csmi" onclick="switchMode('csmi')">💪 CSMI 근력측정</button>
+      <button class="phone-mode-btn" id="pm-btn-sfma" onclick="switchMode('sfma')" style="background:#7B61FF;border-color:#9B84FF;color:#fff;">📊 SFMA 기능검사</button>
+      <button class="phone-mode-btn" id="pm-btn-csmi" onclick="switchMode('csmi')" style="background:#2A2A4A;border-color:#3A3A5A;color:#A0AEC0;">💪 CSMI 근력측정</button>
     </div>
     <div class="phone-screen" style="margin-top:0;">
 
@@ -769,9 +769,16 @@ function switchMode(mode) {
   document.getElementById('csmi-nav').style.display = mode==='csmi'?'flex':'none';
   document.getElementById('mode-btn-sfma').className = 'mode-btn'+(mode==='sfma'?' active-sfma':'');
   document.getElementById('mode-btn-csmi').className = 'mode-btn'+(mode==='csmi'?' active-csmi':'');
-  // 폰 내부 버튼 스타일 갱신
-  document.getElementById('pm-btn-sfma').className = 'phone-mode-btn'+(mode==='sfma'?' pm-sfma':'');
-  document.getElementById('pm-btn-csmi').className = 'phone-mode-btn'+(mode==='csmi'?' pm-csmi':'');
+  // 폰 내부 버튼 스타일 갱신 (inline style로 강제 적용)
+  const pmS = document.getElementById('pm-btn-sfma');
+  const pmC = document.getElementById('pm-btn-csmi');
+  if(mode==='sfma'){
+    pmS.style.cssText='background:#7B61FF;border-color:#9B84FF;color:#fff;';
+    pmC.style.cssText='background:#2A2A4A;border-color:#3A3A5A;color:#A0AEC0;';
+  } else {
+    pmS.style.cssText='background:#2A2A4A;border-color:#3A3A5A;color:#A0AEC0;';
+    pmC.style.cssText='background:#2C7A7B;border-color:#81E6D9;color:#fff;';
+  }
   document.getElementById('toolbar-title').textContent = mode==='sfma'?'📊 SFMA 결과 화면':'💪 CSMI 근력측정 결과 화면';
   document.getElementById('member-label').style.color = mode==='sfma'?'#9B84FF':'#81E6D9';
   document.getElementById('memo-title').textContent = mode==='sfma'?'📊 SFMA 결과 화면 메모':'💪 CSMI 결과 화면 메모';
