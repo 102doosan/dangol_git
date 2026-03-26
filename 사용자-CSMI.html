@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+  <title>CSMI 결과</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Noto Sans KR', sans-serif; background: #F0F4F8; color: #1A202C; min-height: 100vh; }
+
+    /* ─ 로그인 ─ */
+    #login-screen {
+      min-height: 100vh; display: flex; flex-direction: column;
+      align-items: center; justify-content: center; padding: 24px;
+      background: linear-gradient(160deg, #1A3333 0%, #1A5252 60%, #2C7A7B 100%);
+    }
+    .login-logo { text-align: center; margin-bottom: 32px; }
+    .login-logo-icon { font-size: 44px; margin-bottom: 8px; }
+    .login-logo-title { font-size: 21px; font-weight: 900; color: #fff; }
+    .login-logo-sub { font-size: 13px; color: rgba(255,255,255,0.6); margin-top: 4px; }
+    .login-card { background: #fff; border-radius: 20px; padding: 24px; width: 100%; max-width: 400px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+    .login-card-title { font-size: 14px; font-weight: 800; color: #1A202C; margin-bottom: 14px; }
+    .member-btn-list { display: flex; flex-direction: column; gap: 8px; }
+    .member-login-btn { display: flex; align-items: center; gap: 12px; padding: 11px 14px; background: #F7F9FC; border: 1.5px solid #E2E8F0; border-radius: 12px; cursor: pointer; transition: all .15s; }
+    .member-login-btn:hover { border-color: #81E6D9; background: #E6FFFA; }
+    .ml-avatar { width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 900; color: #fff; flex-shrink: 0; }
+    .ml-name { font-size: 14px; font-weight: 700; color: #1A202C; }
+    .ml-sub { font-size: 11px; color: #A0AEC0; margin-top: 1px; }
+    .ml-grade { margin-left: auto; }
+
+    /* ─ 앱 ─ */
+    #app { display: none; max-width: 520px; margin: 0 auto; min-height: 100vh; background: #F0F4F8; }
+
+    /* 헤더 */
+    .app-header { background: linear-gradient(135deg, #1A3333, #2C7A7B); padding: 44px 18px 20px; color: #fff; position: relative; }
+    .header-back { position: absolute; top: 12px; left: 14px; background: rgba(255,255,255,0.15); border: none; color: #fff; border-radius: 8px; padding: 5px 11px; font-size: 12px; font-weight: 700; cursor: pointer; font-family: 'Noto Sans KR', sans-serif; }
+    .header-row { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+    .h-avatar { width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 900; color: #fff; border: 3px solid rgba(255,255,255,0.35); flex-shrink: 0; }
+    .h-name { font-size: 18px; font-weight: 900; }
+    .h-trainer { font-size: 11px; color: rgba(255,255,255,0.6); margin-top: 2px; }
+    .h-grade-row { display: flex; align-items: center; gap: 7px; margin-top: 4px; }
+    .h-grade-badge { display: inline-block; padding: 2px 9px; border-radius: 99px; font-size: 11px; font-weight: 700; }
+    .hb-excellent { background: rgba(154,230,180,0.25); color: #9AE6B4; }
+    .hb-good      { background: rgba(144,205,244,0.25); color: #90CDF4; }
+    .hb-average   { background: rgba(246,224,94,0.25);  color: #F6E05E; }
+    .hb-poor      { background: rgba(254,178,178,0.25); color: #FEB2B2; }
+    .h-round-tag  { font-size: 11px; color: rgba(255,255,255,0.5); }
+    .score-row { display: flex; align-items: flex-end; gap: 5px; }
+    .score-big { font-size: 46px; font-weight: 900; line-height: 1; }
+    .score-unit { font-size: 14px; color: rgba(255,255,255,0.5); padding-bottom: 5px; }
+    .score-change { font-size: 13px; font-weight: 700; padding-bottom: 5px; margin-left: 4px; }
+    .sc-up   { color: #9AE6B4; }
+    .sc-down { color: #FEB2B2; }
+    .sc-same { color: rgba(255,255,255,0.5); }
+
+    /* 탭 */
+    .app-tabs { display: flex; background: #fff; border-bottom: 2px solid #E2E8F0; position: sticky; top: 0; z-index: 100; }
+    .app-tab { flex: 1; padding: 12px 6px; font-size: 12px; font-weight: 700; color: #A0AEC0; text-align: center; cursor: pointer; border: none; background: none; font-family: 'Noto Sans KR', sans-serif; border-bottom: 3px solid transparent; margin-bottom: -2px; transition: all .15s; }
+    .app-tab.active { color: #2C7A7B; border-bottom-color: #2C7A7B; }
+    .tab-content { display: none; padding: 14px; }
+    .tab-content.active { display: block; }
+
+    /* 카드 */
+    .ucard { background: #fff; border-radius: 14px; padding: 16px; box-shadow: 0 1px 6px rgba(0,0,0,0.07); margin-bottom: 10px; }
+    .ucard-title { font-size: 13px; font-weight: 800; color: #1A202C; margin-bottom: 12px; display: flex; align-items: center; gap: 6px; }
+
+    /* D-day */
+    .dday-card { border-radius: 12px; padding: 13px 16px; margin-bottom: 10px; display: flex; align-items: center; gap: 12px; }
+    .dday-ok      { background: linear-gradient(135deg,#1A4731,#276749); }
+    .dday-soon    { background: linear-gradient(135deg,#744210,#B7791F); }
+    .dday-overdue { background: linear-gradient(135deg,#742A2A,#C53030); }
+    .dday-num { font-size: 26px; font-weight: 900; color: #fff; flex-shrink: 0; }
+    .dday-info { flex: 1; }
+    .dday-top { font-size: 10px; font-weight: 700; color: rgba(255,255,255,0.6); margin-bottom: 2px; }
+    .dday-date-str { font-size: 13px; font-weight: 900; color: #fff; }
+    .dday-sub-str { font-size: 11px; color: rgba(255,255,255,0.65); margin-top: 1px; }
+
+    /* 그룹 결과 섹션 */
+    .group-result-section { background: #fff; border-radius: 14px; box-shadow: 0 1px 6px rgba(0,0,0,0.07); margin-bottom: 10px; overflow: visible; }
+    .group-result-header { padding: 10px 16px; font-size: 13px; font-weight: 800; color: #fff; border-radius: 14px 14px 0 0; display: flex; align-items: center; justify-content: space-between; }
+    .group-result-body { padding: 14px 16px; }
+
+    /* 수평 막대 */
+    .hbar-row { margin-bottom: 12px; }
+    .hbar-meta { display: flex; align-items: center; justify-content: space-between; margin-bottom: 5px; }
+    .hbar-label { font-size: 12px; font-weight: 700; color: #2D3748; }
+    .hbar-val-text { font-size: 12px; font-weight: 900; }
+    .hbar-bg { background: #EDF2F7; border-radius: 99px; height: 12px; position: relative; overflow: visible; }
+    .hbar-std-mark { position: absolute; top: -3px; height: 18px; width: 2px; background: #4299E1; border-radius: 99px; z-index: 1; }
+    .hbar-fill { height: 100%; border-radius: 99px; transition: width .6s ease; }
+    .hbar-pct { font-size: 10px; font-weight: 700; color: #718096; margin-top: 3px; }
+    .hbar-chips { display: flex; gap: 5px; margin-top: 4px; }
+    .chip-stab { font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 99px; background: #C6F6D5; color: #276749; }
+    .chip-pow  { font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 99px; background: #BEE3F8; color: #1A365D; }
+
+    /* 분석 카드 */
+    .analysis-card { background: linear-gradient(135deg,#1A3A3A,#2C7A7B); border-radius: 12px; padding: 14px 16px; margin-bottom: 10px; }
+    .analysis-card-title { font-size: 12px; font-weight: 700; color: rgba(255,255,255,0.7); margin-bottom: 6px; }
+    .analysis-card-body { font-size: 12px; color: #fff; line-height: 1.75; }
+
+    /* 등급 배지 */
+    .g-excellent { background: #C6F6D5; color: #1A4731; }
+    .g-good      { background: #BEE3F8; color: #1A365D; }
+    .g-average   { background: #FEFCBF; color: #744210; }
+    .g-poor      { background: #FED7D7; color: #742A2A; }
+    .grade-badge { font-size: 11px; font-weight: 700; padding: 3px 9px; border-radius: 99px; }
+
+    /* 비교 */
+    .round-select-row { display: flex; gap: 7px; flex-wrap: wrap; margin-bottom: 14px; }
+    .cmp-round-btn { display: inline-flex; align-items: center; gap: 4px; padding: 5px 12px; border-radius: 99px; font-size: 12px; font-weight: 700; border: 1.5px solid #E2E8F0; background: #fff; cursor: pointer; font-family: 'Noto Sans KR', sans-serif; color: #718096; transition: all .15s; }
+    .cmp-round-btn.active { background: #2C7A7B; border-color: #2C7A7B; color: #fff; }
+    .cmp-bar-row { margin-bottom: 10px; }
+    .cmp-bar-meta { display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px; }
+    .cmp-bar-name { font-size: 11px; font-weight: 700; color: #4A5568; }
+    .cmp-bar-group { display: flex; flex-direction: column; gap: 3px; }
+    .cmp-bar-line { display: flex; align-items: center; gap: 8px; }
+    .cmp-bar-bg { flex: 1; background: #EDF2F7; border-radius: 99px; height: 9px; overflow: hidden; }
+    .cmp-bar-fill { height: 100%; border-radius: 99px; transition: width .5s; }
+    .cmp-bar-score { font-size: 10px; font-weight: 700; color: #4A5568; width: 50px; text-align: right; flex-shrink: 0; }
+
+    /* 이력 */
+    .history-item { display: flex; align-items: flex-start; gap: 12px; padding: 13px 0; border-bottom: 1px solid #F0F4F8; cursor: pointer; }
+    .history-item:last-child { border-bottom: none; }
+    .hi-left { flex: 1; min-width: 0; }
+    .hi-round { font-size: 11px; font-weight: 700; color: #A0AEC0; margin-bottom: 2px; }
+    .hi-date { font-size: 13px; font-weight: 700; color: #1A202C; margin-bottom: 4px; }
+    .hi-groups { display: flex; gap: 4px; flex-wrap: wrap; margin-bottom: 4px; }
+    .hi-group-chip { font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 99px; background: #E6FFFA; color: #2C7A7B; }
+    .hi-right { text-align: right; flex-shrink: 0; }
+    .hi-score { font-size: 22px; font-weight: 900; color: #2C7A7B; }
+    .hi-grade-badge { font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 99px; margin-top: 3px; display: inline-block; }
+    .hi-sub { font-size: 11px; color: #A0AEC0; margin-top: 2px; }
+
+    .empty-state { text-align: center; padding: 28px 16px; color: #A0AEC0; }
+    .empty-icon { font-size: 30px; margin-bottom: 8px; }
+    .empty-text { font-size: 13px; font-weight: 700; }
+  </style>
+</head>
+<body>
+
+<!-- 로그인 -->
+<div id="login-screen">
+  <div class="login-logo">
+    <div class="login-logo-icon">💪</div>
+    <div class="login-logo-title">CSMI 결과</div>
+    <div class="login-logo-sub">근력측정검사 · 회원을 선택하세요</div>
+  </div>
+  <div class="login-card">
+    <div class="login-card-title">👤 회원 선택</div>
+    <div class="member-btn-list" id="member-btn-list"></div>
+    <div style="margin-top:14px;padding-top:14px;border-top:1px solid #E2E8F0;text-align:center;">
+      <div style="font-size:11px;color:#A0AEC0;margin-bottom:8px;">다른 검사 결과 보기</div>
+      <a href="사용자-SFMA.html" style="display:inline-flex;align-items:center;gap:6px;padding:8px 18px;background:#F5F3FF;color:#6B46C1;border-radius:10px;font-size:13px;font-weight:700;text-decoration:none;">🧠 SFMA 결과 →</a>
+    </div>
+  </div>
+</div>
+
+<!-- 메인 앱 -->
+<div id="app">
+  <div class="app-header">
+    <button class="header-back" onclick="logout()">← 목록</button>
+    <div class="header-row">
+      <div class="h-avatar" id="h-avatar"></div>
+      <div>
+        <div class="h-name" id="h-name"></div>
+        <div class="h-trainer" id="h-trainer">근력측정검사 (CSMI)</div>
+        <div class="h-grade-row">
+          <span class="h-grade-badge" id="h-grade-badge"></span>
+          <span class="h-round-tag" id="h-round-tag"></span>
+        </div>
+      </div>
+    </div>
+    <div class="score-row">
+      <div class="score-big" id="h-score">-</div>
+      <div class="score-unit">% 달성</div>
+      <div class="score-change" id="h-change"></div>
+    </div>
+  </div>
+
+  <div class="app-tabs">
+    <button class="app-tab active" onclick="switchTab('overview',this)">💪 현황</button>
+    <button class="app-tab" onclick="switchTab('compare',this)">📈 비교</button>
+    <button class="app-tab" onclick="switchTab('history',this)">📋 이력</button>
+  </div>
+
+  <!-- 현황 탭 -->
+  <div class="tab-content active" id="tab-overview">
+    <div id="dday-wrap"></div>
+    <div id="group-sections"></div>
+    <div id="analysis-wrap"></div>
+  </div>
+
+  <!-- 비교 탭 -->
+  <div class="tab-content" id="tab-compare">
+    <div class="ucard">
+      <div class="ucard-title">📈 회차별 비교</div>
+      <div class="round-select-row" id="cmp-rounds"></div>
+    </div>
+    <div id="cmp-charts"></div>
+  </div>
+
+  <!-- 이력 탭 -->
+  <div class="tab-content" id="tab-history">
+    <div class="ucard">
+      <div class="ucard-title">📋 측정 이력</div>
+      <div id="history-list"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── 데이터 ─────────────────────────────────────────────────────
+const CSMI_GROUPS = [
+  { id:'shoulder', name:'어깨', icon:'🦾', color:'#2C7A7B', items:[
+    { id:'shoulder_l', label:'어깨(좌)', std:{m:80,f:50}, unit:'Nm' },
+    { id:'shoulder_r', label:'어깨(우)', std:{m:80,f:50}, unit:'Nm' },
+  ]},
+  { id:'lumbar', name:'허리', icon:'🏋️', color:'#4299E1', items:[
+    { id:'lumbar_flex', label:'허리 숙이기', std:{m:250,f:150}, unit:'Nm' },
+    { id:'lumbar_ext',  label:'허리 펴기',   std:{m:350,f:220}, unit:'Nm' },
+  ]},
+  { id:'knee', name:'무릎', icon:'🦵', color:'#805AD5', items:[
+    { id:'knee_flex_l', label:'무릎 굽히기(좌)', std:{m:120,f:80},  unit:'Nm' },
+    { id:'knee_ext_l',  label:'무릎 펴기(좌)',   std:{m:200,f:130}, unit:'Nm' },
+    { id:'knee_flex_r', label:'무릎 굽히기(우)', std:{m:120,f:80},  unit:'Nm' },
+    { id:'knee_ext_r',  label:'무릎 펴기(우)',   std:{m:200,f:130}, unit:'Nm' },
+  ]},
+  { id:'ankle', name:'발목', icon:'🦶', color:'#D69E2E', items:[
+    { id:'ankle_dors_l', label:'발목 들기(좌)',   std:{m:50,f:35},   unit:'Nm' },
+    { id:'ankle_plan_l', label:'발목 내리기(좌)', std:{m:120,f:80},  unit:'Nm' },
+    { id:'ankle_dors_r', label:'발목 들기(우)',   std:{m:50,f:35},   unit:'Nm' },
+    { id:'ankle_plan_r', label:'발목 내리기(우)', std:{m:120,f:80},  unit:'Nm' },
+  ]},
+];
+const ALL_ITEMS = CSMI_GROUPS.flatMap(g=>g.items.map(it=>({...it,groupId:g.id,groupName:g.name,groupColor:g.color})));
+
+const MEMBERS = [
+  { id:1, name:'김태훈', gender:'남', color:'#4299E1', history:[
+    { round:1, date:'2026-03-10',
+      shoulder_l:{value:85,stability:true,power:true},
+      shoulder_r:{value:88,stability:true,power:true},
+      lumbar_flex:{value:280,stability:true,power:false},
+      lumbar_ext:{value:320,stability:true,power:false},
+      knee_flex_l:{value:125,stability:true,power:true},
+      knee_ext_l:{value:195,stability:true,power:false},
+      knee_flex_r:{value:118,stability:true,power:true},
+      knee_ext_r:{value:188,stability:false,power:false},
+      ankle_dors_l:{value:52,stability:true,power:true},
+      ankle_plan_l:{value:115,stability:true,power:false},
+      ankle_dors_r:{value:48,stability:true,power:true},
+      ankle_plan_r:{value:112,stability:true,power:false},
+    },
+    { round:2, date:'2025-12-05',
+      shoulder_l:{value:78,stability:true,power:false},
+      shoulder_r:{value:82,stability:true,power:false},
+      lumbar_flex:{value:265,stability:true,power:false},
+      lumbar_ext:{value:300,stability:false,power:false},
+      knee_flex_l:{value:110,stability:true,power:false},
+      knee_ext_l:{value:180,stability:false,power:false},
+      knee_flex_r:{value:108,stability:true,power:false},
+      knee_ext_r:{value:175,stability:false,power:false},
+      ankle_dors_l:{value:45,stability:true,power:false},
+      ankle_plan_l:{value:108,stability:true,power:false},
+      ankle_dors_r:{value:43,stability:true,power:false},
+      ankle_plan_r:{value:105,stability:true,power:false},
+    }
+  ]},
+  { id:2, name:'이서연', gender:'여', color:'#ED64A6', history:[
+    { round:1, date:'2026-03-12',
+      shoulder_l:{value:52,stability:true,power:true},
+      shoulder_r:{value:55,stability:true,power:true},
+      lumbar_flex:{value:160,stability:true,power:true},
+      lumbar_ext:{value:230,stability:true,power:true},
+      knee_flex_l:{value:75,stability:false,power:false},
+      knee_ext_l:{value:125,stability:false,power:false},
+      knee_flex_r:{value:72,stability:false,power:false},
+      knee_ext_r:{value:120,stability:false,power:false},
+      ankle_dors_l:{value:38,stability:true,power:true},
+      ankle_plan_l:{value:85,stability:true,power:true},
+      ankle_dors_r:{value:36,stability:true,power:true},
+      ankle_plan_r:{value:82,stability:true,power:false},
+    }
+  ]},
+  { id:3, name:'박민준', gender:'남', color:'#48BB78', history:[
+    { round:1, date:'2026-03-08',
+      shoulder_l:{value:62,stability:false,power:false},
+      shoulder_r:{value:65,stability:false,power:false},
+      lumbar_flex:{value:195,stability:false,power:false},
+      lumbar_ext:{value:270,stability:false,power:false},
+      knee_flex_l:{value:90,stability:false,power:false},
+      knee_ext_l:{value:155,stability:false,power:false},
+      knee_flex_r:{value:92,stability:false,power:false},
+      knee_ext_r:{value:158,stability:false,power:false},
+      ankle_dors_l:{value:38,stability:false,power:false},
+      ankle_plan_l:{value:92,stability:false,power:false},
+      ankle_dors_r:{value:40,stability:false,power:false},
+      ankle_plan_r:{value:88,stability:false,power:false},
+    }
+  ]},
+  { id:4, name:'정유진', gender:'여', color:'#ED8936', history:[
+    { round:1, date:'2026-02-20',
+      shoulder_l:{value:45,stability:true,power:false},
+      shoulder_r:{value:48,stability:true,power:false},
+      lumbar_flex:{value:140,stability:false,power:false},
+      lumbar_ext:{value:205,stability:false,power:false},
+      knee_flex_l:{value:82,stability:true,power:false},
+      knee_ext_l:{value:135,stability:true,power:true},
+      knee_flex_r:{value:80,stability:true,power:false},
+      knee_ext_r:{value:132,stability:true,power:false},
+      ankle_dors_l:{value:32,stability:false,power:false},
+      ankle_plan_l:{value:75,stability:false,power:false},
+      ankle_dors_r:{value:30,stability:false,power:false},
+      ankle_plan_r:{value:72,stability:false,power:false},
+    }
+  ]},
+  { id:5, name:'최준혁', gender:'남', color:'#9F7AEA', history:[
+    { round:1, date:'2026-01-15',
+      shoulder_l:{value:92,stability:true,power:true},
+      shoulder_r:{value:95,stability:true,power:true},
+      lumbar_flex:{value:310,stability:true,power:true},
+      lumbar_ext:{value:400,stability:true,power:true},
+      knee_flex_l:{value:140,stability:true,power:true},
+      knee_ext_l:{value:225,stability:true,power:true},
+      knee_flex_r:{value:138,stability:true,power:true},
+      knee_ext_r:{value:220,stability:true,power:true},
+      ankle_dors_l:{value:58,stability:true,power:true},
+      ankle_plan_l:{value:135,stability:true,power:true},
+      ankle_dors_r:{value:56,stability:true,power:true},
+      ankle_plan_r:{value:130,stability:true,power:true},
+    }
+  ]},
+];
+
+const GRADE_DAYS = {우수:180, 양호:90, 보통:60, 주의:30};
+const TODAY = '2026-03-26';
+
+// ── 유틸 ────────────────────────────────────────────────────────
+function stdFor(item, gender){ return gender==='여' ? item.std.f : item.std.m; }
+function pctOf(val, std){ return std ? Math.round(val/std*100) : 0; }
+function gradeByPct(pct){
+  if(pct>=110) return {label:'우수', cls:'g-excellent', hbCls:'hb-excellent', color:'#2C7A7B'};
+  if(pct>=90)  return {label:'양호', cls:'g-good',      hbCls:'hb-good',      color:'#4299E1'};
+  if(pct>=70)  return {label:'보통', cls:'g-average',   hbCls:'hb-average',   color:'#ECC94B'};
+  return             {label:'주의', cls:'g-poor',       hbCls:'hb-poor',      color:'#E53E3E'};
+}
+function avgPct(m, h){
+  let total=0, cnt=0;
+  ALL_ITEMS.forEach(it=>{
+    const v=h[it.id]; if(!v) return;
+    total+=pctOf(v.value, stdFor(it,m.gender)); cnt++;
+  });
+  return cnt ? Math.round(total/cnt) : 0;
+}
+function groupAvgPct(m, h, gid){
+  const g=CSMI_GROUPS.find(x=>x.id===gid);
+  let total=0,cnt=0;
+  g.items.forEach(it=>{ const v=h[it.id]; if(!v) return; total+=pctOf(v.value,stdFor(it,m.gender)); cnt++; });
+  return cnt?Math.round(total/cnt):0;
+}
+function addDays(dateStr, days){
+  const d=new Date(dateStr); d.setDate(d.getDate()+days); return d.toISOString().slice(0,10);
+}
+function daysBetween(a, b){
+  return Math.round((new Date(b)-new Date(a))/(1000*60*60*24));
+}
+function barColor(pct){
+  if(pct>=110) return '#2C7A7B';
+  if(pct>=90)  return '#4299E1';
+  if(pct>=70)  return '#ECC94B';
+  return '#E53E3E';
+}
+
+// ── 로그인 ──────────────────────────────────────────────────────
+let _member = null;
+let _cmpSelected = new Set();
+
+function renderLogin(){
+  const list = document.getElementById('member-btn-list');
+  list.innerHTML = MEMBERS.map(m=>{
+    const h=m.history[0];
+    const pct = h ? avgPct(m,h) : null;
+    const gr  = pct!==null ? gradeByPct(pct) : null;
+    return `<div class="member-login-btn" onclick="login(${m.id})">
+      <div class="ml-avatar" style="background:${m.color}">${m.name[0]}</div>
+      <div>
+        <div class="ml-name">${m.name}</div>
+        <div class="ml-sub">${m.gender} · ${h?h.round+'회차':'미측정'}</div>
+      </div>
+      <div class="ml-grade">
+        ${gr?`<span class="grade-badge ${gr.cls}">${gr.label}</span>`:
+             '<span style="font-size:11px;color:#A0AEC0;">미측정</span>'}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function login(mid){
+  _member = MEMBERS.find(m=>m.id===mid);
+  document.getElementById('login-screen').style.display='none';
+  document.getElementById('app').style.display='block';
+  renderApp();
+}
+
+function logout(){
+  _member = null;
+  document.getElementById('app').style.display='none';
+  document.getElementById('login-screen').style.display='flex';
+}
+
+// ── 앱 헤더 렌더 ─────────────────────────────────────────────────
+function renderApp(){
+  const m=_member;
+  const h=m.history[0];
+  document.getElementById('h-avatar').textContent = m.name[0];
+  document.getElementById('h-avatar').style.background = m.color;
+  document.getElementById('h-name').textContent = m.name + '님';
+
+  if(!h){
+    document.getElementById('h-score').textContent = '-';
+    document.getElementById('h-grade-badge').textContent = '미측정';
+    document.getElementById('h-round-tag').textContent = '';
+    document.getElementById('h-change').textContent = '';
+    renderOverview();
+    return;
+  }
+
+  const pct = avgPct(m,h);
+  const gr  = gradeByPct(pct);
+  document.getElementById('h-score').textContent = pct;
+  document.getElementById('h-grade-badge').textContent = gr.label;
+  document.getElementById('h-grade-badge').className = 'h-grade-badge ' + gr.hbCls;
+  document.getElementById('h-round-tag').textContent = h.round + '회차 · ' + h.date;
+
+  if(m.history.length>=2){
+    const prev = avgPct(m, m.history[1]);
+    const diff = pct - prev;
+    const el = document.getElementById('h-change');
+    if(diff>0){ el.textContent='▲'+diff+'%'; el.className='score-change sc-up'; }
+    else if(diff<0){ el.textContent='▼'+Math.abs(diff)+'%'; el.className='score-change sc-down'; }
+    else { el.textContent='→ 동일'; el.className='score-change sc-same'; }
+  }
+
+  renderOverview();
+  renderCompare();
+  renderHistory();
+}
+
+// ── 현황 탭 ──────────────────────────────────────────────────────
+function renderOverview(){
+  const m=_member; const h=m.history[0];
+
+  // D-day
+  let ddayHtml='';
+  if(h){
+    const pct=avgPct(m,h);
+    const gr=gradeByPct(pct);
+    const period=GRADE_DAYS[gr.label]||90;
+    const nextDate=addDays(h.date,period);
+    const left=daysBetween(TODAY,nextDate);
+    const cls=left>30?'dday-ok':left>0?'dday-soon':'dday-overdue';
+    const label=left>0?`D-${left}`:'D+'+Math.abs(left);
+    ddayHtml=`<div class="dday-card ${cls}">
+      <div class="dday-num">${label}</div>
+      <div class="dday-info">
+        <div class="dday-top">다음 측정 예정일 (${h.round+1}회차)</div>
+        <div class="dday-date-str">${nextDate}</div>
+        <div class="dday-sub-str">${period}일 주기 · ${gr.label} 등급 기준</div>
+      </div>
+    </div>`;
+  }
+  document.getElementById('dday-wrap').innerHTML = ddayHtml;
+
+  if(!h){ document.getElementById('group-sections').innerHTML='<div class="empty-state"><div class="empty-icon">💪</div><div class="empty-text">측정 데이터가 없습니다</div></div>'; return; }
+
+  // 4개 그룹 섹션
+  const groupsHtml = CSMI_GROUPS.map(g=>{
+    const gPct = groupAvgPct(m,h,g.id);
+    const gGr  = gradeByPct(gPct);
+    const itemsHtml = g.items.map(it=>{
+      const v=h[it.id]; if(!v) return '';
+      const std=stdFor(it,m.gender);
+      const pct=pctOf(v.value,std);
+      const fillW=Math.min(pct,150);
+      const stdW=Math.min(100,100); // std = 100%
+      const color=barColor(pct);
+      const chips=[
+        v.stability?'<span class="chip-stab">안정성 ✓</span>':'',
+        v.power?'<span class="chip-pow">파워 ✓</span>':'',
+      ].filter(Boolean).join('');
+      return `<div class="hbar-row">
+        <div class="hbar-meta">
+          <div class="hbar-label">${it.label}</div>
+          <div class="hbar-val-text" style="color:${color}">${v.value} Nm</div>
+        </div>
+        <div style="position:relative;padding-bottom:16px;">
+          <div class="hbar-bg">
+            <div class="hbar-std-mark" style="left:${Math.min(100/(fillW||100)*100,98)}%;display:${pct>0?'block':'none'};"></div>
+            <div class="hbar-fill" style="width:${Math.min(fillW,100)}%;background:${color};"></div>
+          </div>
+          <div class="hbar-pct">기준 ${std}Nm 대비 ${pct}% ${pct>=100?'✓':''}</div>
+        </div>
+        ${chips?`<div class="hbar-chips">${chips}</div>`:''}
+      </div>`;
+    }).join('');
+    return `<div class="group-result-section">
+      <div class="group-result-header" style="background:${g.color};">
+        <span>${g.icon} ${g.name}</span>
+        <span style="font-size:12px;font-weight:800;opacity:.9;">${gPct}% · <span class="grade-badge" style="background:rgba(255,255,255,0.25);color:#fff;padding:2px 7px;">${gGr.label}</span></span>
+      </div>
+      <div class="group-result-body">${itemsHtml}</div>
+    </div>`;
+  }).join('');
+  document.getElementById('group-sections').innerHTML = groupsHtml;
+
+  // 분석
+  const totalPct=avgPct(m,h);
+  const gr=gradeByPct(totalPct);
+  let weak=[], good=[];
+  CSMI_GROUPS.forEach(g=>{
+    const p=groupAvgPct(m,h,g.id);
+    if(p<70) weak.push(g.name);
+    else if(p>=90) good.push(g.name);
+  });
+  let analysis=`${m.name}님의 근력측정 종합 결과는 기준치 대비 평균 <strong>${totalPct}%</strong>로 <strong>${gr.label}</strong> 등급입니다. `;
+  if(weak.length) analysis+=`특히 <strong>${weak.join(', ')}</strong> 부위가 기준치 70% 미만으로 집중 강화가 필요합니다.`;
+  else if(good.length) analysis+=`<strong>${good.join(', ')}</strong> 부위가 기준치 이상으로 우수한 상태입니다.`;
+  else analysis+=`전반적으로 기준치의 70~90% 수준을 유지하고 있어 꾸준한 운동이 필요합니다.`;
+
+  document.getElementById('analysis-wrap').innerHTML=`<div class="analysis-card">
+    <div class="analysis-card-title">🔍 종합 분석</div>
+    <div class="analysis-card-body">${analysis}</div>
+  </div>`;
+}
+
+// ── 비교 탭 ──────────────────────────────────────────────────────
+function renderCompare(){
+  const m=_member;
+  if(m.history.length<2){
+    document.getElementById('cmp-rounds').innerHTML='<div style="font-size:12px;color:#A0AEC0;">비교할 회차가 부족합니다.</div>';
+    document.getElementById('cmp-charts').innerHTML='';
+    return;
+  }
+  _cmpSelected = new Set([m.history[0].round, m.history[1]?.round].filter(Boolean).slice(0,2));
+  renderCmpRoundBtns();
+  renderCmpCharts();
+}
+
+function renderCmpRoundBtns(){
+  const m=_member;
+  document.getElementById('cmp-rounds').innerHTML = m.history.map(h=>`
+    <button class="cmp-round-btn ${_cmpSelected.has(h.round)?'active':''}" onclick="toggleCmpRound(${h.round})">
+      ${h.round}회차<br><span style="font-size:10px;font-weight:600;">${h.date}</span>
+    </button>`).join('');
+}
+
+function toggleCmpRound(round){
+  if(_cmpSelected.has(round)){
+    if(_cmpSelected.size>1) _cmpSelected.delete(round);
+  } else {
+    if(_cmpSelected.size>=3) _cmpSelected.delete([..._cmpSelected][0]);
+    _cmpSelected.add(round);
+  }
+  renderCmpRoundBtns();
+  renderCmpCharts();
+}
+
+function renderCmpCharts(){
+  const m=_member;
+  const selH=m.history.filter(h=>_cmpSelected.has(h.round)).sort((a,b)=>b.round-a.round);
+  const colors=['#2C7A7B','#ED8936','#805AD5'];
+  let html='';
+  CSMI_GROUPS.forEach(g=>{
+    html+=`<div class="ucard"><div class="ucard-title">${g.icon} ${g.name}</div>`;
+    g.items.forEach(it=>{
+      html+=`<div class="cmp-bar-row">
+        <div class="cmp-bar-meta"><span class="cmp-bar-name">${it.label}</span>
+          ${selH.length>=2&&selH[0][it.id]&&selH[1][it.id]?
+            `<span style="font-size:10px;font-weight:700;color:${selH[0][it.id].value>=selH[1][it.id].value?'#38A169':'#E53E3E'}">
+              ${selH[0][it.id].value>=selH[1][it.id].value?'▲':'▼'}${Math.abs(selH[0][it.id].value-selH[1][it.id].value)}Nm
+            </span>`:''}</div>
+        <div class="cmp-bar-group">`;
+      selH.forEach((h,i)=>{
+        const v=h[it.id]; if(!v) return;
+        const std=stdFor(it,m.gender);
+        const pct=pctOf(v.value,std);
+        html+=`<div class="cmp-bar-line">
+          <div class="cmp-bar-bg"><div class="cmp-bar-fill" style="width:${Math.min(pct,100)}%;background:${colors[i]};"></div></div>
+          <div class="cmp-bar-score">${h.round}회차 · ${v.value}Nm</div>
+        </div>`;
+      });
+      html+=`</div></div>`;
+    });
+    html+='</div>';
+  });
+  document.getElementById('cmp-charts').innerHTML = html;
+}
+
+// ── 이력 탭 ──────────────────────────────────────────────────────
+function renderHistory(){
+  const m=_member;
+  const el=document.getElementById('history-list');
+  if(!m.history.length){ el.innerHTML='<div class="empty-state"><div class="empty-icon">📋</div><div class="empty-text">이력 없음</div></div>'; return; }
+  el.innerHTML=m.history.map(h=>{
+    const pct=avgPct(m,h);
+    const gr=gradeByPct(pct);
+    // 그룹별 요약 칩
+    const groupChips=CSMI_GROUPS.map(g=>{
+      const gPct=groupAvgPct(m,h,g.id);
+      const gGr=gradeByPct(gPct);
+      return `<span class="hi-group-chip" style="background:${gGr.cls==='g-excellent'?'#C6F6D5':gGr.cls==='g-good'?'#BEE3F8':gGr.cls==='g-average'?'#FEFCBF':'#FED7D7'};color:${gGr.color||'#2C7A7B'}">${g.icon}${g.name} ${gPct}%</span>`;
+    }).join('');
+    return `<div class="history-item">
+      <div class="hi-left">
+        <div class="hi-round">${h.round}회차</div>
+        <div class="hi-date">${h.date}</div>
+        <div class="hi-groups">${groupChips}</div>
+      </div>
+      <div class="hi-right">
+        <div class="hi-score">${pct}%</div>
+        <div class="hi-grade-badge ${gr.cls}">${gr.label}</div>
+        <div class="hi-sub">종합 평균</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ── 탭 전환 ──────────────────────────────────────────────────────
+function switchTab(id, btn){
+  document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.app-tab').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tab-'+id).classList.add('active');
+  btn.classList.add('active');
+}
+
+// ── 초기화 ────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', renderLogin);
+</script>
+</body>
+</html>

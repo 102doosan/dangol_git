@@ -225,6 +225,57 @@
     .member-drop-phone { font-size: 11px; color: #2C7A7B; }
     .member-drop-round { margin-left: auto; font-size: 11px; font-weight: 700; background: #E6FFFA; color: #2C7A7B; padding: 2px 7px; border-radius: 99px; }
 
+    /* 상세 히어로 */
+    .detail-hero-box {
+      background: linear-gradient(135deg, #1A3A3A, #2C7A7B);
+      border-radius: 16px; padding: 20px 24px; color: #fff;
+      display: flex; align-items: center; gap: 18px;
+    }
+    .dh-avatar { width: 56px; height: 56px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 22px; font-weight: 900; color: #fff; border: 3px solid rgba(255,255,255,0.3); flex-shrink: 0; }
+    .dh-info { flex: 1; }
+    .dh-name { font-size: 20px; font-weight: 900; }
+    .dh-sub  { font-size: 12px; color: rgba(255,255,255,0.65); margin-top: 2px; }
+    .dh-chips { display: flex; gap: 7px; margin-top: 8px; flex-wrap: wrap; }
+    .dh-chip { padding: 3px 10px; border-radius: 99px; font-size: 11px; font-weight: 700; background: rgba(255,255,255,0.18); color: #fff; }
+    .dh-score-col { text-align: right; flex-shrink: 0; }
+    .dh-score-val { font-size: 42px; font-weight: 900; line-height: 1; }
+    .dh-score-unit { font-size: 12px; color: rgba(255,255,255,0.6); margin-top: 2px; }
+    .dh-grade { font-size: 13px; font-weight: 700; margin-top: 4px; }
+    .dh-grade-ex { color: #9AE6B4; }
+    .dh-grade-go { color: #90CDF4; }
+    .dh-grade-av { color: #F6E05E; }
+    .dh-grade-po { color: #FEB2B2; }
+
+    /* 그룹 결과 카드 (상세) */
+    .group-detail-card { background: #fff; border-radius: 14px; box-shadow: 0 1px 6px rgba(0,0,0,0.06); margin-bottom: 12px; overflow: visible; }
+    .group-detail-header { padding: 11px 16px; font-size: 13px; font-weight: 800; color: #fff; border-radius: 14px 14px 0 0; display: flex; align-items: center; justify-content: space-between; }
+    .group-detail-body { padding: 14px 16px; }
+    .gdh-bar-row { margin-bottom: 14px; }
+    .gdh-bar-meta { display: flex; align-items: center; justify-content: space-between; margin-bottom: 5px; }
+    .gdh-label { font-size: 12px; font-weight: 700; color: #2D3748; }
+    .gdh-val-text { font-size: 13px; font-weight: 900; }
+    .gdh-bar-bg { background: #EDF2F7; border-radius: 99px; height: 14px; position: relative; overflow: hidden; }
+    .gdh-bar-std { position: absolute; top: 0; height: 100%; background: rgba(66,153,225,0.2); }
+    .gdh-bar-fill { position: absolute; top: 0; height: 100%; border-radius: 99px; transition: width .5s ease; }
+    .gdh-bar-sub { display: flex; align-items: center; justify-content: space-between; margin-top: 4px; }
+    .gdh-pct-text { font-size: 11px; font-weight: 700; }
+    .gdh-std-text { font-size: 10px; color: #A0AEC0; }
+    .gdh-checks { display: flex; gap: 5px; margin-top: 4px; }
+
+    /* 다음 측정일 카드 */
+    .next-date-card { border-radius: 12px; padding: 14px 16px; margin-bottom: 14px; }
+    .nd-title { font-size: 11px; font-weight: 700; color: rgba(255,255,255,0.7); margin-bottom: 4px; }
+    .nd-date  { font-size: 16px; font-weight: 900; color: #fff; }
+    .nd-sub   { font-size: 11px; color: rgba(255,255,255,0.65); margin-top: 3px; }
+
+    /* 이력 간단 리스트 */
+    .hist-mini-item { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid #F0F4F8; }
+    .hist-mini-item:last-child { border-bottom: none; }
+    .hmi-round { font-size: 11px; font-weight: 700; color: #A0AEC0; width: 36px; }
+    .hmi-date  { font-size: 12px; font-weight: 600; color: #2D3748; flex: 1; }
+    .hmi-pct   { font-size: 13px; font-weight: 900; color: #2C7A7B; }
+    .hmi-badge { margin-left: 4px; }
+
     /* 토스트 */
     .toast {
       position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(20px);
@@ -428,10 +479,27 @@
             <div class="page-title" id="detail-title">회원 CSMI 결과 상세</div>
             <div class="page-sub" id="detail-sub"></div>
           </div>
-          <button class="btn-secondary" onclick="closeDetail()">← 목록으로</button>
+          <div style="display:flex;gap:8px;">
+            <button class="btn-primary" id="detail-edit-btn" onclick="">✏️ 수정</button>
+            <button class="btn-secondary" onclick="closeDetail()">← 목록으로</button>
+          </div>
         </div>
-        <div class="member-result-wrap" id="detail-groups"></div>
-        <div class="analysis-panel" id="detail-analysis"></div>
+
+        <!-- 히어로 카드 -->
+        <div id="detail-hero" style="margin-bottom:14px;"></div>
+
+        <!-- 2열: 회원정보 + 측정결과 -->
+        <div style="display:grid;grid-template-columns:280px 1fr;gap:14px;align-items:start;">
+          <!-- 좌: 회원정보 + 다음측정일 + 이력 -->
+          <div>
+            <div class="card" id="detail-member-card"></div>
+            <div id="detail-next-card"></div>
+            <div class="card" id="detail-history-card" style="display:none;"></div>
+            <div class="analysis-panel" id="detail-analysis" style="margin-bottom:14px;"></div>
+          </div>
+          <!-- 우: 그룹별 측정 결과 -->
+          <div id="detail-groups"></div>
+        </div>
       </div>
     </div>
 
@@ -871,61 +939,168 @@ function renderList(query=''){
 function filterList(q){ renderList(q); }
 function filterListGroup(){ renderList(); }
 
+const GROUP_COLORS = {shoulder:'#2C7A7B', lumbar:'#4299E1', knee:'#805AD5', ankle:'#D69E2E'};
+const GRADE_DAYS_CSMI = {우수:180, 양호:90, 보통:60, 주의:30};
+
+function calcAvgPct(m, h){
+  let t=0,c=0;
+  ALL_ITEMS.forEach(it=>{ const v=h[it.id]; if(!v) return; t+=pctOf(v.value,stdFor(it,m.gender)); c++; });
+  return c?Math.round(t/c):0;
+}
+function calcGroupPct(m, h, gid){
+  const g=CSMI_GROUPS.find(x=>x.id===gid); let t=0,c=0;
+  g.items.forEach(it=>{ const v=h[it.id]; if(!v) return; t+=pctOf(v.value,stdFor(it,m.gender)); c++; });
+  return c?Math.round(t/c):0;
+}
+function addDaysStr(dateStr, days){
+  const d=new Date(dateStr); d.setDate(d.getDate()+days); return d.toISOString().slice(0,10);
+}
+function daysBetweenStr(a,b){ return Math.round((new Date(b)-new Date(a))/(1000*60*60*24)); }
+
 function openDetail(mid){
   const m = MEMBERS.find(x=>x.id===mid); if(!m) return;
   const h = m.history[0]; if(!h){ showToast('측정 데이터가 없습니다.'); return; }
-  document.getElementById('detail-title').textContent = `${m.name}님 CSMI 결과 상세`;
-  document.getElementById('detail-sub').textContent = `${h.date} · ${h.round}회차`;
 
-  // 4그룹 카드
-  const dg = document.getElementById('detail-groups');
-  dg.innerHTML = CSMI_GROUPS.map(g=>{
-    const items = g.items.map(it=>{
-      const v = h[it.id]; if(!v) return '';
-      const std = stdFor(it, m.gender);
-      const pct = pctOf(v.value, std);
-      const w = Math.min(pct, 150);
-      const color = barColor(pct);
-      const chips = [
-        v.stability ? '<span class="result-check-chip chip-stability">안정성 ✓</span>' : '',
-        v.power     ? '<span class="result-check-chip chip-power">파워 ✓</span>' : '',
-      ].filter(Boolean).join(' ');
-      return `<div class="result-bar-row" style="flex-wrap:wrap;gap:4px;">
-        <div class="result-bar-label">${it.label}</div>
-        <div class="result-bar-bg" style="margin-bottom:2px;"><div class="result-bar-fill" style="width:${Math.min(w,100)}%;background:${color};"></div></div>
-        <div class="result-bar-val">${v.value} Nm</div>
-        <div style="width:100%;padding-left:108px;display:flex;gap:6px;align-items:center;">
-          <span style="font-size:10px;color:#718096;">기준 ${std}Nm · ${pct}%</span>
-          ${chips}
+  document.getElementById('detail-title').textContent = `${m.name}님 CSMI 결과 상세`;
+  document.getElementById('detail-sub').textContent = `${h.date} · ${h.round}회차 · ${m.gender}`;
+  document.getElementById('detail-edit-btn').onclick = ()=>{ showToast('수정 기능은 결과 입력 탭에서 이용하세요.'); };
+
+  // 전체 평균
+  const totalPct = calcAvgPct(m,h);
+  const gr = gradeByPct(totalPct);
+  const gradeColorClass = {우수:'dh-grade-ex',양호:'dh-grade-go',보통:'dh-grade-av',주의:'dh-grade-po'}[gr.label]||'';
+
+  // ① 히어로 카드
+  const groupChips = CSMI_GROUPS.map(g=>{
+    const gPct=calcGroupPct(m,h,g.id);
+    const gGr=gradeByPct(gPct);
+    return `<span class="dh-chip">${g.icon} ${g.name} ${gPct}%</span>`;
+  }).join('');
+  document.getElementById('detail-hero').innerHTML=`
+    <div class="detail-hero-box">
+      <div class="dh-avatar" style="background:${m.color}">${m.name[0]}</div>
+      <div class="dh-info">
+        <div class="dh-name">${m.name}님</div>
+        <div class="dh-sub">${m.gender} · ${h.round}회차 · ${h.date} · 근력측정(CSMI)</div>
+        <div class="dh-chips">${groupChips}</div>
+      </div>
+      <div class="dh-score-col">
+        <div class="dh-score-val">${totalPct}<span style="font-size:20px;">%</span></div>
+        <div class="dh-score-unit">기준치 대비</div>
+        <div class="dh-grade ${gradeColorClass}">${gr.label} 등급</div>
+      </div>
+    </div>`;
+
+  // ② 좌: 회원 정보 카드
+  document.getElementById('detail-member-card').innerHTML=`
+    <div class="card-title">👤 회원 정보</div>
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
+      <div style="width:44px;height:44px;border-radius:50%;background:${m.color};display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:900;color:#fff;flex-shrink:0;">${m.name[0]}</div>
+      <div>
+        <div style="font-size:15px;font-weight:800;">${m.name}</div>
+        <div style="font-size:12px;color:#718096;">${m.gender} · CSMI ${h.round}회차</div>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:7px;">
+      ${CSMI_GROUPS.map(g=>{
+        const gPct=calcGroupPct(m,h,g.id);
+        const gGr=gradeByPct(gPct);
+        return `<div style="display:flex;align-items:center;gap:8px;">
+          <span style="font-size:12px;font-weight:600;color:#4A5568;width:50px;">${g.icon} ${g.name}</span>
+          <div style="flex:1;background:#EDF2F7;border-radius:99px;height:8px;overflow:hidden;">
+            <div style="width:${Math.min(gPct,100)}%;height:100%;background:${barColor(gPct)};border-radius:99px;transition:width .5s;"></div>
+          </div>
+          <span class="grade-badge ${gGr.cls}" style="font-size:10px;">${gGr.label}</span>
+        </div>`;
+      }).join('')}
+    </div>`;
+
+  // ③ 다음 측정일 카드
+  const period=GRADE_DAYS_CSMI[gr.label]||90;
+  const nextDate=addDaysStr(h.date,period);
+  const left=daysBetweenStr('2026-03-26',nextDate);
+  const ndColor=left>30?'#1A4731':left>0?'#744210':'#742A2A';
+  const ndBg=left>30?'linear-gradient(135deg,#1A4731,#2C7A7B)':left>0?'linear-gradient(135deg,#744210,#B7791F)':'linear-gradient(135deg,#742A2A,#C53030)';
+  document.getElementById('detail-next-card').innerHTML=`
+    <div class="next-date-card" style="background:${ndBg};">
+      <div class="nd-title">📅 다음 측정 예정일 (${h.round+1}회차)</div>
+      <div class="nd-date">${nextDate}</div>
+      <div class="nd-sub">${left>0?`D-${left} · ${period}일 주기 (${gr.label} 등급 기준)`:'측정 기간 초과 · 즉시 측정 권장'}</div>
+    </div>`;
+
+  // ④ 분석 텍스트
+  let weakItems=[], weakGroups=[];
+  ALL_ITEMS.forEach(it=>{ const v=h[it.id]; if(!v) return; if(pctOf(v.value,stdFor(it,m.gender))<70) weakItems.push(it.label); });
+  CSMI_GROUPS.forEach(g=>{ if(calcGroupPct(m,h,g.id)<70) weakGroups.push(g.name); });
+  let analysisText=`${m.name}님의 CSMI 종합 결과는 기준치 대비 평균 <strong>${totalPct}%</strong>로 <strong>${gr.label}</strong> 등급입니다. `;
+  if(weakGroups.length) analysisText+=`<strong>${weakGroups.join(', ')}</strong> 부위가 기준치 70% 미만으로 우선 강화 프로그램이 필요합니다.`;
+  else analysisText+=`모든 부위가 기준치 70% 이상을 유지하고 있어 전반적으로 양호한 상태입니다.`;
+  if(m.history.length>=2){
+    const prevPct=calcAvgPct(m,m.history[1]);
+    const diff=totalPct-prevPct;
+    analysisText+=` 직전 측정 대비 <strong>${diff>=0?'▲':'▼'}${Math.abs(diff)}%p</strong> ${diff>=0?'향상':'감소'}하였습니다.`;
+  }
+  document.getElementById('detail-analysis').innerHTML=`
+    <div class="analysis-title">🔍 종합 분석</div>
+    <div class="analysis-body">${analysisText}</div>`;
+
+  // ⑤ 이력 요약
+  if(m.history.length>1){
+    const histCard=document.getElementById('detail-history-card');
+    histCard.style.display='block';
+    histCard.innerHTML=`<div class="card-title">📋 측정 이력</div>`+
+      m.history.map(hh=>{
+        const p=calcAvgPct(m,hh); const g2=gradeByPct(p);
+        const isCurrent=hh.round===h.round;
+        return `<div class="hist-mini-item" style="${isCurrent?'background:#F0FFF4;margin:0 -20px;padding:8px 20px;':''}">
+          <div class="hmi-round">${hh.round}회</div>
+          <div class="hmi-date">${hh.date}${isCurrent?' <span style="font-size:10px;color:#2C7A7B;font-weight:700;">현재</span>':''}</div>
+          <div class="hmi-pct">${p}%</div>
+          <span class="grade-badge ${g2.cls} hmi-badge" style="font-size:10px;">${g2.label}</span>
+        </div>`;
+      }).join('');
+  }
+
+  // ⑥ 우: 4그룹 측정 결과 카드
+  document.getElementById('detail-groups').innerHTML = CSMI_GROUPS.map(g=>{
+    const gPct=calcGroupPct(m,h,g.id);
+    const gGr=gradeByPct(gPct);
+    const gColor=GROUP_COLORS[g.id]||'#2C7A7B';
+    const itemsHtml=g.items.map(it=>{
+      const v=h[it.id]; if(!v) return '';
+      const std=stdFor(it,m.gender);
+      const pct=pctOf(v.value,std);
+      const fillW=Math.min(pct,100);
+      const color=barColor(pct);
+      const pctColor=pct>=90?'#2C7A7B':pct>=70?'#ECC94B':'#E53E3E';
+      const chips=[
+        v.stability?'<span class="result-check-chip chip-stability">안정성 ✓</span>':'',
+        v.power?'<span class="result-check-chip chip-power">파워 ✓</span>':'',
+      ].filter(Boolean).join('');
+      return `<div class="gdh-bar-row">
+        <div class="gdh-bar-meta">
+          <span class="gdh-label">${it.label}</span>
+          <span class="gdh-val-text" style="color:${color}">${v.value} Nm</span>
         </div>
+        <div class="gdh-bar-bg">
+          <div class="gdh-bar-std" style="width:${Math.min(100,100)}%;"></div>
+          <div class="gdh-bar-fill" style="width:${fillW}%;background:${color};"></div>
+        </div>
+        <div class="gdh-bar-sub">
+          <span class="gdh-pct-text" style="color:${pctColor}">${pct}% (기준 ${std}Nm)</span>
+          <span class="gdh-std-text">${pct>=100?'✓ 기준치 달성':pct>=70?'양호':'⚠ 강화 필요'}</span>
+        </div>
+        ${chips?`<div class="gdh-checks">${chips}</div>`:''}
       </div>`;
     }).join('');
-    return `<div class="group-result-card">
-      <div class="group-result-title">${g.icon} ${g.name}</div>
-      ${items}
+    return `<div class="group-detail-card">
+      <div class="group-detail-header" style="background:${gColor};">
+        <span>${g.icon} ${g.name}</span>
+        <span>${gPct}% · <span class="grade-badge" style="background:rgba(255,255,255,0.25);color:#fff;font-size:10px;padding:2px 7px;">${gGr.label}</span></span>
+      </div>
+      <div class="group-detail-body">${itemsHtml}</div>
     </div>`;
   }).join('');
-
-  // 분석 패널
-  let totalPct=0, cnt=0, weakItems=[];
-  ALL_ITEMS.forEach(it=>{
-    const v=h[it.id]; if(!v) return;
-    const pct=pctOf(v.value, stdFor(it, m.gender));
-    totalPct+=pct; cnt++;
-    if(pct<70) weakItems.push(it.label);
-  });
-  const avgPct = cnt?Math.round(totalPct/cnt):0;
-  const gr = gradeByPct(avgPct);
-  let analysisText = `${m.name}님의 근력측정 종합 결과는 기준치 대비 평균 <strong>${avgPct}%</strong>로 <strong>${gr.label}</strong> 등급입니다. `;
-  if(weakItems.length){
-    analysisText += `특히 ${weakItems.join(', ')} 항목이 기준치 70% 미만으로 집중 강화가 필요합니다.`;
-  } else {
-    analysisText += `모든 항목이 기준치 70% 이상을 유지하고 있어 양호한 상태입니다.`;
-  }
-  document.getElementById('detail-analysis').innerHTML = `
-    <div class="analysis-title">🔍 종합 분석</div>
-    <div class="analysis-body">${analysisText}</div>
-  `;
 
   document.getElementById('detail-panel').style.display='block';
   document.querySelectorAll('#screen-list .card')[0].style.display='none';
