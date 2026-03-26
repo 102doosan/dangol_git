@@ -600,7 +600,7 @@ function renderDetail() {
   const m = MEMBERS[curMemberIdx], h = m.history[0];
   if (!h) return;
   const gi = gradeInfo(h.total);
-  document.getElementById('d-name').textContent = m.name + ' 결과 상세';
+  document.getElementById('d-name').textContent = m.name + '님 결과 상세';
   document.getElementById('d-date').textContent = fmtDate(h.date) + ' · 담당: ' + m.trainer;
   document.getElementById('d-score').textContent = h.total;
   const dg = document.getElementById('d-grade');

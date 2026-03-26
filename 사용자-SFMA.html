@@ -462,7 +462,7 @@ function renderHeader() {
   const m = currentMember, h = m.history[0], prev = m.history[1];
   document.getElementById('h-avatar').style.background = m.avatar;
   document.getElementById('h-avatar').textContent = m.name[0];
-  document.getElementById('h-name').textContent = m.name;
+  document.getElementById('h-name').textContent = m.name + '님';
   document.getElementById('h-trainer').textContent = `담당: ${m.trainer}`;
   if (!h) { document.getElementById('h-score').textContent = '-'; return; }
   const gi = gradeInfo(h.total);
