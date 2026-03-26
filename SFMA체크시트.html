@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>SFMA 검사 체크시트</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet"/>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:'Noto Sans KR',sans-serif;background:#EEF2F7;color:#1A202C;min-height:100vh;}
+
+    /* ── Header ── */
+    .app-header{
+      background:#1A365D;color:#fff;padding:13px 20px;
+      display:flex;align-items:center;justify-content:space-between;
+      position:sticky;top:0;z-index:200;box-shadow:0 2px 8px rgba(0,0,0,.3);
+    }
+    .header-left{display:flex;align-items:center;gap:10px;}
+    .header-title{font-size:17px;font-weight:900;letter-spacing:-.3px;}
+    .save-btn{
+      background:#3182CE;color:#fff;border:none;border-radius:10px;
+      padding:9px 20px;font-size:14px;font-weight:700;cursor:pointer;
+      font-family:'Noto Sans KR',sans-serif;transition:background .15s;
+    }
+    .save-btn:hover{background:#2B6CB0;}
+
+    /* ── Tab bar ── */
+    .tab-bar{
+      background:#fff;border-bottom:2px solid #CBD5E0;
+      display:flex;overflow-x:auto;scrollbar-width:none;
+      position:sticky;top:48px;z-index:100;
+    }
+    .tab-bar::-webkit-scrollbar{display:none;}
+    .tab-btn{
+      flex-shrink:0;padding:10px 15px;font-size:11.5px;font-weight:700;
+      color:#718096;cursor:pointer;border:none;border-bottom:3px solid transparent;
+      background:none;font-family:'Noto Sans KR',sans-serif;transition:all .15s;
+      white-space:nowrap;line-height:1.3;text-align:center;
+    }
+    .tab-btn.active{color:#1A365D;border-bottom-color:#1A365D;background:#F7FAFF;}
+    .tab-btn:hover:not(.active){color:#2D3748;background:#F7F9FC;}
+
+    /* ── Subbar ── */
+    .subbar{
+      background:#F7F9FC;border-bottom:1.5px solid #E2E8F0;
+      padding:9px 20px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+    }
+    .memo-btn{
+      background:#fff;border:1.5px solid #CBD5E0;border-radius:8px;
+      padding:5px 12px;font-size:12px;font-weight:700;cursor:pointer;
+      color:#4A5568;font-family:'Noto Sans KR',sans-serif;transition:all .15s;
+    }
+    .memo-btn.on{background:#EBF8FF;border-color:#90CDF4;color:#2B6CB0;}
+    .trainer-wrap{margin-left:auto;display:flex;align-items:center;gap:8px;}
+    .trainer-label{font-size:12px;font-weight:700;color:#718096;}
+    .trainer-select{
+      padding:5px 10px;border:1.5px solid #CBD5E0;border-radius:8px;
+      font-size:12px;font-family:'Noto Sans KR',sans-serif;background:#fff;color:#1A202C;
+    }
+
+    /* ── Content ── */
+    .content{padding:16px 20px 60px;}
+
+    /* ── Top grid (최고위평가) ── */
+    .top-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+    .pat-card{
+      background:#fff;border-radius:14px;padding:14px 12px;
+      box-shadow:0 1px 6px rgba(0,0,0,.07);border:1.5px solid #E2E8F0;
+    }
+    .pat-num{font-size:10px;font-weight:700;color:#A0AEC0;margin-bottom:1px;}
+    .pat-name{font-size:12.5px;font-weight:800;color:#1A202C;margin-bottom:10px;line-height:1.4;}
+
+    /* ── Symbols ── */
+    .sym-row{display:flex;align-items:center;gap:2px;margin-bottom:3px;}
+    .sym-row:last-child{margin-bottom:0;}
+    .lr-tag{font-size:11px;font-weight:800;color:#718096;width:14px;flex-shrink:0;margin-right:3px;}
+    .sym-group{display:flex;gap:5px;}
+    .sym-item{
+      display:flex;flex-direction:column;align-items:center;cursor:pointer;
+      padding:3px 4px;border-radius:7px;transition:background .1s;user-select:none;
+    }
+    .sym-item:hover{background:#F0F4F8;}
+    .sym-item svg{display:block;}
+    .sym-lbl{font-size:9px;font-weight:700;margin-top:1px;letter-spacing:.2px;}
+    .lbl-fn{color:#2B6CB0;} .lbl-fp{color:#B7791F;} .lbl-dp{color:#C53030;} .lbl-dn{color:#718096;}
+
+    /* ── Detail cards ── */
+    .detail-card{
+      background:#fff;border-radius:14px;padding:15px 16px;
+      box-shadow:0 1px 6px rgba(0,0,0,.07);border:1.5px solid #E2E8F0;margin-bottom:12px;
+    }
+    .detail-card-inner{display:flex;gap:12px;align-items:flex-start;}
+    .photo-box{
+      width:72px;height:60px;background:#F0F4F8;border-radius:8px;flex-shrink:0;
+      display:flex;align-items:center;justify-content:center;font-size:22px;color:#A0AEC0;
+    }
+    .detail-body{flex:1;min-width:0;}
+    .detail-hdr{display:flex;align-items:center;gap:8px;margin-bottom:7px;}
+    .detail-num-badge{
+      background:#EBF8FF;color:#2B6CB0;font-size:11px;font-weight:900;
+      padding:3px 8px;border-radius:6px;flex-shrink:0;
+    }
+    .detail-name{font-size:13px;font-weight:700;color:#1A202C;line-height:1.4;}
+    .memo-input{
+      width:100%;padding:6px 10px;border:1.5px solid #E2E8F0;border-radius:8px;
+      font-size:12px;font-family:'Noto Sans KR',sans-serif;color:#4A5568;
+      margin-bottom:9px;outline:none;
+    }
+    .memo-input:focus{border-color:#90CDF4;}
+    .sym-rows{display:flex;flex-direction:column;gap:3px;}
+
+    /* Sym sizes: compact for top grid */
+    .sz-sm svg{width:26px;height:26px;}
+    .sz-md svg{width:30px;height:30px;}
+
+    /* ── Summary bar ── */
+    .summary-bar{
+      position:fixed;bottom:0;left:0;right:0;
+      background:#fff;border-top:1.5px solid #E2E8F0;
+      padding:10px 20px;display:flex;align-items:center;gap:12px;
+      box-shadow:0 -2px 10px rgba(0,0,0,.07);z-index:100;
+    }
+    .sum-chip{
+      display:flex;align-items:center;gap:5px;padding:4px 10px;
+      border-radius:99px;font-size:11px;font-weight:700;
+    }
+    .sum-dot{width:10px;height:10px;border-radius:50%;}
+    .sum-total{margin-left:auto;font-size:12px;font-weight:700;color:#718096;}
+
+    /* ── Toast ── */
+    .toast{
+      position:fixed;bottom:60px;left:50%;transform:translateX(-50%) translateY(20px);
+      background:#1A202C;color:#fff;padding:11px 24px;border-radius:12px;
+      font-size:13px;font-weight:700;opacity:0;transition:all .3s;z-index:999;
+      white-space:nowrap;pointer-events:none;
+    }
+    .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+    @media(max-width:540px){
+      .top-grid{grid-template-columns:1fr;}
+      .content{padding:12px 12px 60px;}
+    }
+  </style>
+</head>
+<body>
+
+<!-- Header -->
+<div class="app-header">
+  <div class="header-left">
+    <span style="font-size:20px;">📋</span>
+    <span class="header-title">SFMA 검사 체크시트</span>
+  </div>
+  <button class="save-btn" onclick="saveData()">저장하기</button>
+</div>
+
+<!-- Tab bar -->
+<div class="tab-bar">
+  <button class="tab-btn active" onclick="switchTab('top',this)">최고위<br>평가</button>
+  <button class="tab-btn" onclick="switchTab('cervical',this)">경추</button>
+  <button class="tab-btn" onclick="switchTab('upper',this)">상지패턴</button>
+  <button class="tab-btn" onclick="switchTab('msflex',this)">다중분절<br>굴곡</button>
+  <button class="tab-btn" onclick="switchTab('msext',this)">다중분절<br>신전</button>
+  <button class="tab-btn" onclick="switchTab('msrot',this)">다중분절<br>회전</button>
+  <button class="tab-btn" onclick="switchTab('singleleg',this)">한다리<br>자세</button>
+  <button class="tab-btn" onclick="switchTab('squat',this)">오버헤드<br>스쿼트</button>
+</div>
+
+<!-- Subbar -->
+<div class="subbar">
+  <button class="memo-btn on" id="memoBtn" onclick="toggleMemo()">📝 메모 보기</button>
+  <div class="trainer-wrap">
+    <span class="trainer-label">검사 트레이너</span>
+    <select class="trainer-select" id="trainerSel">
+      <option>김세연</option>
+      <option>박지훈</option>
+      <option>이민정</option>
+      <option>최재영</option>
+      <option>홍길동</option>
+    </select>
+  </div>
+</div>
+
+<div class="content" id="content"></div>
+
+<!-- Summary bar -->
+<div class="summary-bar">
+  <div class="sum-chip" style="background:#EBF8FF;">
+    <div class="sum-dot" style="background:#3182CE;"></div>
+    <span style="color:#2B6CB0;">FN <span id="cnt-fn">0</span></span>
+  </div>
+  <div class="sum-chip" style="background:#FFFFF0;">
+    <div class="sum-dot" style="background:#D69E2E;"></div>
+    <span style="color:#B7791F;">FP <span id="cnt-fp">0</span></span>
+  </div>
+  <div class="sum-chip" style="background:#FFF5F5;">
+    <div class="sum-dot" style="background:#E53E3E;"></div>
+    <span style="color:#C53030;">DP <span id="cnt-dp">0</span></span>
+  </div>
+  <div class="sum-chip" style="background:#F7F9FC;">
+    <div class="sum-dot" style="background:#718096;"></div>
+    <span style="color:#718096;">DN <span id="cnt-dn">0</span></span>
+  </div>
+  <div class="sum-total">총 <span id="cnt-total">0</span>항목 입력됨</div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ============ DATA ============ */
+const DATA = {
+  top: [
+    { id:'top1',  num:'01', name:'경추 패턴1',            bilateral:false, icon:'🧘' },
+    { id:'top2',  num:'02', name:'경추 패턴2',            bilateral:false, icon:'🧘' },
+    { id:'top3',  num:'03', name:'경추 패턴3',            bilateral:true,  icon:'🔄' },
+    { id:'top4',  num:'04', name:'상지 패턴1',            bilateral:true,  icon:'💪' },
+    { id:'top5',  num:'05', name:'상지 패턴2',            bilateral:true,  icon:'💪' },
+    { id:'top6',  num:'06', name:'다중 분절 굴곡',        bilateral:false, icon:'🫁' },
+    { id:'top7',  num:'07', name:'다중 분절 신전',        bilateral:false, icon:'📐' },
+    { id:'top8',  num:'08', name:'다중 분절 회전',        bilateral:true,  icon:'🌀' },
+    { id:'top9',  num:'09', name:'한 다리로 선 자세',     bilateral:true,  icon:'🦵' },
+    { id:'top10', num:'10', name:'팔을 머리 위로 든 스쿼트', bilateral:false, icon:'🏋️' },
+  ],
+  cervical: [
+    { id:'c1', num:'01', name:'누운 상태의 경추 굴곡 (턱→가슴으로 당기기)', bilateral:false, icon:'🤕' },
+    { id:'c2', num:'02', name:'누운 상태의 수동적인 경추 굴곡',              bilateral:false, icon:'🤕' },
+    { id:'c3', num:'03', name:'누운 상태의 OA 경추 굴곡 (20°)',             bilateral:true,  icon:'🤕' },
+    { id:'c4', num:'04', name:'누운 상태의 능동적인 경추 회전 (80°)',        bilateral:true,  icon:'🤕' },
+    { id:'c5', num:'05', name:'수동적인 경추 외전',                          bilateral:true,  icon:'🤕' },
+    { id:'c6', num:'06', name:'C1-C2 경추 네스트',                          bilateral:true,  icon:'🤕' },
+    { id:'c7', num:'07', name:'누운 상태의 경추 신전',                       bilateral:true,  icon:'🤕' },
+  ],
+  upper: [
+    { id:'u1', num:'01', name:'앉드린 상태의 능동적인 상지 패턴', bilateral:true, icon:'💪' },
+    { id:'u2', num:'02', name:'앉드린 상태의 수동적인 상지 패턴', bilateral:true, icon:'💪' },
+    { id:'u3', num:'03', name:'누운 상태의 상호적인 상지 패턴',   bilateral:true, icon:'💪' },
+  ],
+  msflex: [
+    { id:'mf1', num:'01', name:'한 다리 전굴',                               bilateral:true,  icon:'🦵' },
+    { id:'mf2', num:'02', name:'다리폐고 않은 상태에서 발끝 당기기',         bilateral:false, icon:'🦵' },
+    { id:'mf3', num:'03', name:'구르기',                                      bilateral:false, icon:'🔄' },
+    { id:'mf4', num:'04', name:'능동적인 스트레이트 레그 레이즈',            bilateral:true,  icon:'🦵' },
+    { id:'mf5', num:'05', name:'수동적인 스트레이트 레그 레이즈',            bilateral:true,  icon:'🦵' },
+    { id:'mf6', num:'06', name:'구르기',                                      bilateral:false, icon:'🔄' },
+    { id:'mf7', num:'07', name:'누운 상태에서 무릎 가슴으로 당기기',         bilateral:true,  icon:'🦵' },
+    { id:'mf8', num:'08', name:'아귄이 자세',                                 bilateral:false, icon:'🧘' },
+  ],
+  msext: [
+    { id:'me1',  num:'01', name:'엎드려 누워 고개들기',                               bilateral:false, icon:'🏃' },
+    { id:'me2',  num:'02', name:'앉아서 고관절 굴곡 없이 신전',                       bilateral:true,  icon:'🏃' },
+    { id:'me3',  num:'03', name:'앉드린 상태에서 무릎 들기',                          bilateral:true,  icon:'🏃' },
+    { id:'me4',  num:'04', name:'앉아서 고관절 굴곡을 하면서 능동 신전',              bilateral:true,  icon:'🏃' },
+    { id:'me5',  num:'05', name:'앉아서 고관절 굴곡을 수동적으로 신전',               bilateral:true,  icon:'🏃' },
+    { id:'me6',  num:'06', name:'앉드린 상태에서 통증을 느끼며 신전',                 bilateral:true,  icon:'🏃' },
+    { id:'me7',  num:'07', name:'완다리를 든 신전 고관절 신전',                       bilateral:true,  icon:'🏃' },
+    { id:'me8',  num:'08', name:'앉드린 상태의 능동적인 고관절 신전',                 bilateral:true,  icon:'🏃' },
+    { id:'me9',  num:'09', name:'한다리 수동적인 고관절 신전',                        bilateral:true,  icon:'🏃' },
+    { id:'me10', num:'10', name:'구르기',                                              bilateral:false, icon:'🔄' },
+    { id:'me11', num:'11', name:'파워브리지',                                          bilateral:false, icon:'🏃' },
+    { id:'me12', num:'12', name:'수동적인 토마스(Thomas) 테스트',                     bilateral:true,  icon:'🏃' },
+    { id:'me13', num:'13', name:'전면 다리 굴곡',                                      bilateral:false, icon:'🏃' },
+    { id:'me14', num:'14', name:'누운 상태에서 한쪽 고관절 굴곡 브리지',              bilateral:true,  icon:'🏃' },
+    { id:'me15', num:'15', name:'게이츠',                                              bilateral:false, icon:'🏃' },
+    { id:'me16', num:'16', name:'누운 상태에서 한쪽 고관절 굴곡 신전',               bilateral:true,  icon:'🏃' },
+    { id:'me17', num:'17', name:'고관절 굴곡을 신전',                                  bilateral:true,  icon:'🏃' },
+    { id:'me18', num:'18', name:'고관절 굴곡을 신전 (45°)',                           bilateral:true,  icon:'🏃' },
+    { id:'me19', num:'19', name:'고관절 굴곡을 신전 (30°)',                           bilateral:true,  icon:'🏃' },
+  ],
+  msrot: [
+    { id:'mr1',  num:'01', name:'앉아서 능동적 고관절 회전 신전',                    bilateral:true,  icon:'🌀' },
+    { id:'mr2',  num:'02', name:'앉아서 고관절 굴곡 없이 회전 신전',                 bilateral:true,  icon:'🌀' },
+    { id:'mr3',  num:'03', name:'능동적인 스트레이트 레그 레이즈 (회전)',             bilateral:true,  icon:'🌀' },
+    { id:'mr4',  num:'04', name:'구르기',                                              bilateral:false, icon:'🔄' },
+    { id:'mr5',  num:'05', name:'누운 상태에서 폭발적 회전',                          bilateral:true,  icon:'🌀' },
+    { id:'mr6',  num:'06', name:'구르기',                                              bilateral:false, icon:'🔄' },
+    { id:'mr7',  num:'07', name:'앉 상태의 능동적인 회전 신전',                       bilateral:true,  icon:'🌀' },
+    { id:'mr8',  num:'08', name:'앉드린 상태의 능동적인 고관절 회전 신전',            bilateral:true,  icon:'🌀' },
+    { id:'mr9',  num:'09', name:'앉드린 상태의 수동적인 고관절 회전 신전',            bilateral:true,  icon:'🌀' },
+    { id:'mr10', num:'10', name:'구르기',                                              bilateral:false, icon:'🔄' },
+    { id:'mr11', num:'11', name:'게이트',                                              bilateral:false, icon:'🌀' },
+    { id:'mr12', num:'12', name:'앉 상태에서 고관절 신전 SP',                         bilateral:true,  icon:'🌀' },
+    { id:'mr13', num:'13', name:'앉 상태에서 고관절 신전 사선형',                     bilateral:true,  icon:'🌀' },
+    { id:'mr14', num:'14', name:'앉드린 상태에서 고관절 신전 4P',                     bilateral:true,  icon:'🌀' },
+    { id:'mr15', num:'15', name:'앉드린 상태에서 고관절 수동적 신전',                 bilateral:true,  icon:'🌀' },
+    { id:'mr16', num:'16', name:'구르기',                                              bilateral:false, icon:'🔄' },
+    { id:'mr17', num:'17', name:'앉 상태에서 고관절 신전 SP (회전)',                  bilateral:true,  icon:'🌀' },
+    { id:'mr18', num:'18', name:'능동적 스트레이트 레그 레이즈 사선형',               bilateral:true,  icon:'🌀' },
+    { id:'mr19', num:'19', name:'앉 상태에서 고관절 신전 사선형 4P',                  bilateral:true,  icon:'🌀' },
+    { id:'mr20', num:'20', name:'앉 상태에서 고관절 신전 사선형 수동',                bilateral:true,  icon:'🌀' },
+  ],
+  singleleg: [
+    { id:'sl1', num:'01', name:'한 다리로 서기 (눈 뜨고)',               bilateral:true, icon:'🦵' },
+    { id:'sl2', num:'02', name:'한 다리로 서기 (눈 감고)',               bilateral:true, icon:'🦵' },
+    { id:'sl3', num:'03', name:'한 다리 능동적 발 들기',                  bilateral:true, icon:'🦵' },
+    { id:'sl4', num:'04', name:'한 다리 스쿼트 (무릎 굽히기)',           bilateral:true, icon:'🦵' },
+    { id:'sl5', num:'05', name:'한 다리 루마니안 데드리프트',             bilateral:true, icon:'🦵' },
+    { id:'sl6', num:'06', name:'한 다리 점프 착지',                       bilateral:true, icon:'🦵' },
+    { id:'sl7', num:'07', name:'고관절 외전 근력 테스트',                 bilateral:true, icon:'🦵' },
+    { id:'sl8', num:'08', name:'트렌델렌버그 징후 검사',                  bilateral:true, icon:'🦵' },
+  ],
+  squat: [
+    { id:'sq1', num:'01', name:'목뒤에서 꽉지 끼고 스쿼트',                              bilateral:false, icon:'🏋️' },
+    { id:'sq2', num:'02', name:'보조받는 딥 스쿼트',                                      bilateral:false, icon:'🏋️' },
+    { id:'sq3', num:'03', name:'반 무릎 서기 복측굴곡',                                   bilateral:true,  icon:'🏋️' },
+    { id:'sq4', num:'04', name:'누운 상태에서 종아리 잡고 무릎 가슴으로 당기기',          bilateral:true,  icon:'🏋️' },
+    { id:'sq5', num:'05', name:'누운 상태에서 허벅지 잡고 무릎을 가슴으로 당기기',       bilateral:true,  icon:'🏋️' },
+  ],
+};
+
+/* ============ STATE ============ */
+let sfmaData  = {};   // { 'top1': 'FN', 'c3_좌': 'DN', ... }
+let memoData  = {};   // { 'c1_memo': '메모 내용', ... }
+let showMemo  = true;
+let currentTab = 'top';
+
+/* ============ SYMBOLS ============ */
+const SYM = {
+  FN: { shape:'circle',   color:'#3182CE', unsel:'#A0AEC0', lblCls:'lbl-fn' },
+  FP: { shape:'triangle', color:'#D69E2E', unsel:'#A0AEC0', lblCls:'lbl-fp' },
+  DP: { shape:'triangle', color:'#E53E3E', unsel:'#A0AEC0', lblCls:'lbl-dp' },
+  DN: { shape:'circle',   color:'#718096', unsel:'#A0AEC0', lblCls:'lbl-dn' },
+};
+
+function circleSVG(fill, stroke, size){
+  return `<svg viewBox="0 0 38 38" width="${size}" height="${size}"><circle cx="19" cy="19" r="15" fill="${fill}" stroke="${stroke}" stroke-width="2.5"/></svg>`;
+}
+function triSVG(fill, stroke, size){
+  return `<svg viewBox="0 0 38 38" width="${size}" height="${size}"><polygon points="19,32 3,8 35,8" fill="${fill}" stroke="${stroke}" stroke-width="2.5" stroke-linejoin="round"/></svg>`;
+}
+
+function makeSym(key, stateKey, size){
+  const cfg = SYM[key];
+  const sel  = sfmaData[stateKey] === key;
+  const fill = sel ? cfg.color : '#FFFFFF';
+  const strk = sel ? cfg.color : '#CBD5E0';
+  const svg  = cfg.shape === 'circle' ? circleSVG(fill, strk, size) : triSVG(fill, strk, size);
+  return `<div class="sym-item" onclick="toggleCheck('${stateKey}','${key}')" title="${key}">
+    ${svg}
+    <span class="sym-lbl ${cfg.lblCls}">${key}</span>
+  </div>`;
+}
+
+function makeSymRow(id, side, size){
+  const k    = side ? `${id}_${side}` : id;
+  const tag  = side ? `<span class="lr-tag">${side}</span>` : `<span class="lr-tag"></span>`;
+  return `<div class="sym-row">
+    ${tag}
+    <div class="sym-group">${['FN','FP','DP','DN'].map(s=>makeSym(s,k,size)).join('')}</div>
+  </div>`;
+}
+
+/* ============ TOGGLE ============ */
+function toggleCheck(stateKey, val){
+  if(sfmaData[stateKey] === val) delete sfmaData[stateKey];
+  else sfmaData[stateKey] = val;
+  renderContent();
+  updateSummary();
+}
+
+/* ============ RENDER: TOP GRID ============ */
+function renderTopGrid(patterns){
+  return `<div class="top-grid">${patterns.map(p=>`
+    <div class="pat-card">
+      <div class="pat-num">${p.num}.</div>
+      <div class="pat-name">${p.name}</div>
+      ${p.bilateral
+        ? makeSymRow(p.id,'좌',26) + makeSymRow(p.id,'우',26)
+        : makeSymRow(p.id,null,26)
+      }
+    </div>`).join('')}</div>`;
+}
+
+/* ============ RENDER: DETAIL CARDS ============ */
+function renderDetailCards(patterns){
+  return patterns.map(p=>{
+    const memoKey = `${p.id}_memo`;
+    const memoVal = memoData[memoKey] || '';
+    const memoHtml = showMemo
+      ? `<input class="memo-input" placeholder="메모" value="${memoVal}"
+           onchange="memoData['${memoKey}']=this.value" />`
+      : '';
+    const checks = p.bilateral
+      ? makeSymRow(p.id,'좌',30) + makeSymRow(p.id,'우',30)
+      : makeSymRow(p.id,null,30);
+    return `<div class="detail-card">
+      <div class="detail-card-inner">
+        <div class="photo-box">${p.icon||'🏃'}</div>
+        <div class="detail-body">
+          <div class="detail-hdr">
+            <span class="detail-num-badge">${p.num}</span>
+            <span class="detail-name">${p.name}</span>
+          </div>
+          ${memoHtml}
+          <div class="sym-rows">${checks}</div>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+/* ============ RENDER CONTENT ============ */
+function renderContent(){
+  const patterns = DATA[currentTab];
+  document.getElementById('content').innerHTML =
+    currentTab === 'top'
+      ? renderTopGrid(patterns)
+      : renderDetailCards(patterns);
+}
+
+/* ============ SWITCH TAB ============ */
+function switchTab(tab, btn){
+  currentTab = tab;
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderContent();
+}
+
+/* ============ MEMO TOGGLE ============ */
+function toggleMemo(){
+  showMemo = !showMemo;
+  const btn = document.getElementById('memoBtn');
+  btn.classList.toggle('on', showMemo);
+  btn.textContent = showMemo ? '📝 메모 보기' : '📝 메모 숨기기';
+  renderContent();
+}
+
+/* ============ SUMMARY ============ */
+function updateSummary(){
+  const vals = Object.values(sfmaData);
+  const cnt = { FN:0, FP:0, DP:0, DN:0 };
+  vals.forEach(v=>{ if(cnt[v]!==undefined) cnt[v]++; });
+  document.getElementById('cnt-fn').textContent = cnt.FN;
+  document.getElementById('cnt-fp').textContent = cnt.FP;
+  document.getElementById('cnt-dp').textContent = cnt.DP;
+  document.getElementById('cnt-dn').textContent = cnt.DN;
+  document.getElementById('cnt-total').textContent = vals.length;
+}
+
+/* ============ SAVE ============ */
+function saveData(){
+  const trainer = document.getElementById('trainerSel').value;
+  const date    = new Date().toLocaleDateString('ko-KR',{year:'numeric',month:'2-digit',day:'2-digit'});
+  const total   = Object.keys(sfmaData).length;
+  const fn      = Object.values(sfmaData).filter(v=>v==='FN').length;
+  const fp      = Object.values(sfmaData).filter(v=>v==='FP').length;
+  const dp      = Object.values(sfmaData).filter(v=>v==='DP').length;
+  const dn      = Object.values(sfmaData).filter(v=>v==='DN').length;
+
+  // LocalStorage 저장
+  try {
+    const saveObj = { trainer, date, sfmaData: { ...sfmaData }, memoData: { ...memoData } };
+    localStorage.setItem('sfma_sheet', JSON.stringify(saveObj));
+    showToast(`✅ 저장 완료 · ${trainer} · ${date} · FN:${fn} FP:${fp} DP:${dp} DN:${dn} (총 ${total}항목)`);
+  } catch(e) {
+    showToast('저장 중 오류가 발생했습니다.');
+  }
+}
+
+/* ============ LOAD ============ */
+function loadSavedData(){
+  try {
+    const raw = localStorage.getItem('sfma_sheet');
+    if(!raw) return;
+    const saved = JSON.parse(raw);
+    if(saved.sfmaData) Object.assign(sfmaData, saved.sfmaData);
+    if(saved.memoData) Object.assign(memoData, saved.memoData);
+    if(saved.trainer){
+      const sel = document.getElementById('trainerSel');
+      for(let opt of sel.options){ if(opt.value===saved.trainer){ sel.value=saved.trainer; break; } }
+    }
+  } catch(e){}
+}
+
+/* ============ TOAST ============ */
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 3500);
+}
+
+/* ============ INIT ============ */
+loadSavedData();
+renderContent();
+updateSummary();
+</script>
+</body>
+</html>
