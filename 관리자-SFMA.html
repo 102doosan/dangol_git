@@ -983,11 +983,13 @@ function shToggle(stateKey, val){
 
 function renderSheetTopGrid(patterns){
   return `<div class="top-grid">${patterns.map(p=>`
-    <div class="pat-card">
-      <div class="pat-num">${p.num}.</div>
-      <div class="pat-name">${p.name}</div>
-      ${p.img ? `<img src="${p.img}" alt="${p.name}" style="width:100%;height:90px;object-fit:contain;object-position:center;border-radius:6px;margin-bottom:8px;background:#F0F4F8;" onerror="this.style.display='none'"/>` : ''}
-      ${p.bilateral ? shSymRow(p.id,'좌',26)+shSymRow(p.id,'우',26) : shSymRow(p.id,null,26)}
+    <div class="pat-card" style="display:flex;gap:10px;align-items:center;">
+      ${p.img ? `<img src="${p.img}" alt="${p.name}" style="width:80px;height:80px;object-fit:contain;object-position:center;border-radius:6px;flex-shrink:0;background:#F0F4F8;" onerror="this.style.display='none'"/>` : ''}
+      <div style="flex:1;min-width:0;">
+        <div class="pat-num">${p.num}.</div>
+        <div class="pat-name">${p.name}</div>
+        ${p.bilateral ? shSymRow(p.id,'좌',26)+shSymRow(p.id,'우',26) : shSymRow(p.id,null,26)}
+      </div>
     </div>`).join('')}</div>`;
 }
 
