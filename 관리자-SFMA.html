@@ -814,7 +814,7 @@ function showMemberDetail(name) {
 ══════════════════════════════════════ */
 const SHEET_DATA = {
   top: [
-    { id:'top1',  num:'01', name:'경추 패턴1',                bilateral:false, icon:'🧘' },
+    { id:'top1',  num:'01', name:'경추 패턴1',                bilateral:false, icon:'🧘', img:'images/sfma/top1.jpg' },
     { id:'top2',  num:'02', name:'경추 패턴2',                bilateral:false, icon:'🧘' },
     { id:'top3',  num:'03', name:'경추 패턴3',                bilateral:true,  icon:'🔄' },
     { id:'top4',  num:'04', name:'상지 패턴1',                bilateral:true,  icon:'💪' },
@@ -959,6 +959,7 @@ function renderSheetTopGrid(patterns){
     <div class="pat-card">
       <div class="pat-num">${p.num}.</div>
       <div class="pat-name">${p.name}</div>
+      ${p.img ? `<img src="${p.img}" alt="${p.name}" style="width:100%;height:90px;object-fit:contain;object-position:center;border-radius:6px;margin-bottom:8px;background:#F0F4F8;" onerror="this.style.display='none'"/>` : ''}
       ${p.bilateral ? shSymRow(p.id,'좌',26)+shSymRow(p.id,'우',26) : shSymRow(p.id,null,26)}
     </div>`).join('')}</div>`;
 }
