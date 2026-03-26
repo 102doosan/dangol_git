@@ -518,9 +518,13 @@
         <div>
           <div class="card">
             <div class="card-title">👤 회원 선택</div>
-            <select class="form-select" id="cmp-member" onchange="renderCompare()" style="width:100%;margin-bottom:10px;">
-              <option value="">회원 선택</option>
-            </select>
+            <div style="position:relative;margin-bottom:10px;">
+              <input type="text" id="cmp-member-search" class="form-input" placeholder="회원명 검색..."
+                autocomplete="off" oninput="filterCmpMembers()" onfocus="showCmpDropdown()"
+                style="width:100%;padding:8px 12px;border:1px solid #E2E8F0;border-radius:8px;font-size:13px;box-sizing:border-box;">
+              <div id="cmp-member-dropdown" style="display:none;position:absolute;top:100%;left:0;right:0;background:#fff;border:1px solid #E2E8F0;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,0.1);z-index:100;max-height:200px;overflow-y:auto;"></div>
+            </div>
+            <input type="hidden" id="cmp-member" value="">
             <div class="card-title" style="margin-top:8px;">📅 비교 회차 선택 <span style="font-size:11px;font-weight:600;color:#A0AEC0;">(최대 3회)</span></div>
             <div id="cmp-round-chips" style="display:flex;flex-direction:column;gap:6px;"></div>
           </div>
@@ -1318,11 +1322,43 @@ function resetForm() {
    ④ 결과 비교
 ══════════════════════════════════════ */
 function buildCmpMemberOptions() {
-  const sel = document.getElementById('cmp-member');
-  const cur = sel.value;
-  sel.innerHTML = '<option value="">회원 선택</option>' +
-    MEMBERS.map((m,i) => `<option value="${i}" ${cur==i?'selected':''}>${m.name} (${m.history.length}회)</option>`).join('');
+  // no-op: dropdown is now search-based
 }
+
+function showCmpDropdown() {
+  filterCmpMembers(true);
+}
+
+function filterCmpMembers(showAll) {
+  const q = document.getElementById('cmp-member-search').value.trim();
+  const dd = document.getElementById('cmp-member-dropdown');
+  const filtered = MEMBERS.map((m,i) => ({m,i}))
+    .filter(({m}) => showAll || !q || m.name.includes(q));
+  if (!filtered.length) { dd.style.display = 'none'; return; }
+  dd.innerHTML = filtered.map(({m,i}) =>
+    `<div style="padding:8px 12px;cursor:pointer;font-size:13px;border-bottom:1px solid #F7F8FA;"
+      onmousedown="selectCmpMember(${i})"
+      onmouseover="this.style.background='#F5F3FF'" onmouseout="this.style.background=''">
+      ${m.name} <span style="color:#A0AEC0;font-size:11px;">(${m.history.length}회)</span>
+    </div>`).join('');
+  dd.style.display = 'block';
+}
+
+function selectCmpMember(idx) {
+  const m = MEMBERS[idx];
+  document.getElementById('cmp-member-search').value = m.name + ' (' + m.history.length + '회)';
+  document.getElementById('cmp-member').value = idx;
+  document.getElementById('cmp-member-dropdown').style.display = 'none';
+  renderCompare();
+}
+
+document.addEventListener('click', function(e) {
+  const search = document.getElementById('cmp-member-search');
+  const dd = document.getElementById('cmp-member-dropdown');
+  if (search && dd && !search.contains(e.target) && !dd.contains(e.target)) {
+    dd.style.display = 'none';
+  }
+});
 
 function renderCompare() {
   const memberIdx = document.getElementById('cmp-member').value;
