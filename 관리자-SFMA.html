@@ -1361,67 +1361,143 @@ function renderCmpChart(m) {
   if (!m || !cmpSelected.length) return;
   document.getElementById('cmp-member-info').style.display = 'block';
 
-  // 오름차순(구→신) 정렬
-  const sel = [...cmpSelected].sort((a,b) => b-a);
-  const COL_COLORS = ['#CBD5E0','#9B84FF','#7B61FF']; // 1차→최신
+  const sel = [...cmpSelected].sort((a,b) => b-a); // 최신→구 순
+  const TOTAL_TOP = 15; // 최고위평가 최대 체크 수 (단측5 + 양측10)
+  const BAR_CLR  = {DP:'#E53E3E', DN:'#FC8181', FP:'#90CDF4', FN:'#2B6CB0'};
+  const BAR_LBL  = {DP:'DP (매우나쁨)', DN:'DN (나쁨)', FP:'FP (좋음+통증)', FN:'FN (아주좋음)'};
+  const SYM_BG   = {FN:'#EBF8FF', FP:'#FFFAF0', DP:'#FFF5F5', DN:'#F7FAFC'};
+  const SYM_TC   = {FN:'#2B6CB0', FP:'#B7791F', DP:'#C53030', DN:'#718096'};
+  const COL_HDR  = ['#2D3748','#4A5568','#718096'];
 
-  // ── 집계 요약 카드
-  const summaryHtml = `<div style="display:flex;gap:8px;margin-bottom:4px;">
-    ${sel.map((si,ci) => {
-      const h = m.history[si];
-      const cnt = countChecks(h.sheetChecks);
-      const tot = cnt.FN+cnt.FP+cnt.DP+cnt.DN;
-      return `<div style="flex:1;background:${COL_COLORS[ci]}18;border:2px solid ${COL_COLORS[ci]}55;border-radius:10px;padding:10px;text-align:center;">
-        <div style="font-size:10px;color:#888;margin-bottom:4px;">${h.round}차 · ${h.date}</div>
-        <div style="display:flex;justify-content:center;gap:4px;flex-wrap:wrap;">
-          <span style="font-size:11px;background:#EBF8FF;color:#2B6CB0;padding:2px 7px;border-radius:99px;font-weight:700;">FN ${cnt.FN}</span>
-          <span style="font-size:11px;background:#FFFAF0;color:#B7791F;padding:2px 7px;border-radius:99px;font-weight:700;">FP ${cnt.FP}</span>
-          <span style="font-size:11px;background:#FFF5F5;color:#C53030;padding:2px 7px;border-radius:99px;font-weight:700;">DP ${cnt.DP}</span>
-          <span style="font-size:11px;background:#F7FAFC;color:#4A5568;padding:2px 7px;border-radius:99px;font-weight:700;">DN ${cnt.DN}</span>
-        </div>
-        <div style="font-size:10px;color:#A0AEC0;margin-top:4px;">총 ${tot}항목</div>
-      </div>`;
-    }).join('')}
-  </div>`;
+  // 최신 회차 집계 (막대그래프용)
+  const latestH   = m.history[sel[0]];
+  const latestCnt = countChecks(latestH.sheetChecks);
+  const latestTot = latestCnt.FN+latestCnt.FP+latestCnt.DP+latestCnt.DN;
+  const maxBar    = Math.max(latestCnt.DP, latestCnt.DN, latestCnt.FP, latestCnt.FN, 1);
+  const MAX_H     = 100; // px
 
-  // ── FN 비율 변화 (최신 vs 최구)
-  let trendHtml = '';
-  if (sel.length > 1) {
-    const newest = m.history[sel[0]];
-    const oldest = m.history[sel[sel.length-1]];
-    const cntN = countChecks(newest.sheetChecks);
-    const cntO = countChecks(oldest.sheetChecks);
-    const totN = cntN.FN+cntN.FP+cntN.DP+cntN.DN;
-    const totO = cntO.FN+cntO.FP+cntO.DP+cntO.DN;
-    const fnRateN = totN ? Math.round(cntN.FN/totN*100) : 0;
-    const fnRateO = totO ? Math.round(cntO.FN/totO*100) : 0;
-    const dpRateN = totN ? Math.round(cntN.DP/totN*100) : 0;
-    const dpRateO = totO ? Math.round(cntO.DP/totO*100) : 0;
-    const fnDiff = fnRateN - fnRateO;
-    const dpDiff = dpRateN - dpRateO;
-    trendHtml = `<div style="display:flex;gap:8px;margin-top:6px;">
-      <div style="flex:1;background:${fnDiff>=0?'#F0FFF4':'#FFF5F5'};border-radius:8px;padding:8px;text-align:center;">
-        <div style="font-size:10px;color:#718096;">FN율 변화</div>
-        <div style="font-size:16px;font-weight:900;color:${fnDiff>=0?'#38A169':'#E53E3E'};">${fnDiff>=0?'▲ +':'▼ '}${Math.abs(fnDiff)}%</div>
-      </div>
-      <div style="flex:1;background:${dpDiff<=0?'#F0FFF4':'#FFF5F5'};border-radius:8px;padding:8px;text-align:center;">
-        <div style="font-size:10px;color:#718096;">DP율 변화</div>
-        <div style="font-size:16px;font-weight:900;color:${dpDiff<=0?'#38A169':'#E53E3E'};">${dpDiff<=0?'▼ ':'▲ +'}${Math.abs(dpDiff)}%</div>
-      </div>
+  // ── ① 막대그래프 + 분석결과
+  const barCols = ['DP','DN','FP','FN'].map(key => {
+    const v = latestCnt[key];
+    const h = Math.round(v / maxBar * MAX_H);
+    return `<div style="display:flex;flex-direction:column;align-items:center;gap:4px;flex:1;">
+      <div style="font-size:14px;font-weight:900;color:#2D3748;">${v}</div>
+      <div style="width:100%;max-width:48px;height:${Math.max(h,4)}px;background:${BAR_CLR[key]};border-radius:4px 4px 0 0;"></div>
+      <div style="font-size:11px;font-weight:800;color:${BAR_CLR[key]};">${key}</div>
     </div>`;
+  }).join('');
+
+  const legendRows = ['DP','DN','FP','FN'].map(key =>
+    `<div style="display:flex;align-items:center;gap:8px;margin-bottom:5px;">
+      <div style="width:16px;height:16px;border-radius:3px;background:${BAR_CLR[key]};flex-shrink:0;"></div>
+      <span style="font-size:12px;color:#4A5568;">${BAR_LBL[key]}</span>
+    </div>`).join('');
+
+  // 분석 텍스트 자동 생성
+  const fnRate = latestTot ? Math.round(latestCnt.FN/latestTot*100) : 0;
+  const dpRate = latestTot ? Math.round(latestCnt.DP/latestTot*100) : 0;
+  const fnN = latestCnt.FN, fpN = latestCnt.FP, dpN = latestCnt.DP, dnN = latestCnt.DN;
+  let analysis;
+  if (fnRate >= 70)
+    analysis = `전반적으로 기능적 움직임이 우수합니다 (FN ${fnRate}%). 현재 운동 프로그램을 유지하고 주기적인 모니터링을 권장합니다.`;
+  else if (fnRate >= 50)
+    analysis = `대부분의 동작에서 기능적 움직임을 보입니다 (FN ${fnRate}%). ${fpN>0?`통증 동반 항목(FP ${fpN})에 집중 관리가 필요합니다.`:'지속적인 운동으로 FN 비율을 높이세요.'}`;
+  else if (dpRate >= 40)
+    analysis = `통증 동반 기능장애(DP ${dpN}) 항목이 ${dpRate}%로 높습니다. 즉각적인 통증 관리 및 재활 중재가 필요합니다. DN(${dnN}) 항목도 교정 운동 우선 적용을 권장합니다.`;
+  else
+    analysis = `기능장애 항목이 다수 관찰됩니다 (DN ${dnN} / DP ${dpN}). 체계적인 교정 운동 및 재활 프로그램이 권장됩니다. 개선 우선순위: DP → DN 순으로 목표를 설정하세요.`;
+
+  // 다회차 변화 분석 추가
+  if (sel.length > 1) {
+    const oldest = m.history[sel[sel.length-1]];
+    const oldCnt = countChecks(oldest.sheetChecks);
+    const oldTot = oldCnt.FN+oldCnt.FP+oldCnt.DP+oldCnt.DN;
+    const fnDiff = latestCnt.FN - oldCnt.FN;
+    const dpDiff = latestCnt.DP - oldCnt.DP;
+    analysis += ` ${m.history[sel[0]].round}차 대비 ${oldest.round}차: FN ${fnDiff>=0?'+':''}${fnDiff}, DP ${dpDiff>=0?'+':''}${dpDiff}.`;
   }
 
-  document.getElementById('cmp-summary').innerHTML = summaryHtml + trendHtml;
+  const statSection = `
+    <div style="border:1px solid #E2E8F0;border-radius:10px;overflow:hidden;margin-bottom:14px;">
+      <div style="display:grid;grid-template-columns:1fr 1fr;">
+        <!-- 결과 -->
+        <div style="border-right:1px solid #E2E8F0;">
+          <div style="background:#2B4C8C;color:#fff;padding:8px 14px;font-size:12px;font-weight:800;">결과 · ${latestH.round}차 (${latestH.date})</div>
+          <div style="padding:16px;background:#EBF2FF;">
+            <div style="display:flex;align-items:flex-end;gap:8px;height:${MAX_H+36}px;padding:0 10px;">
+              ${barCols}
+            </div>
+            <div style="border-top:2px solid #A0AEC0;margin-top:4px;"></div>
+            <div style="margin-top:12px;">${legendRows}</div>
+          </div>
+        </div>
+        <!-- 분석결과 -->
+        <div>
+          <div style="background:#2B4C8C;color:#fff;padding:8px 14px;font-size:12px;font-weight:800;">분석결과</div>
+          <div style="padding:16px;background:#EBF2FF;min-height:${MAX_H+100}px;">
+            <div style="font-size:13px;color:#2D3748;line-height:1.8;">${analysis}</div>
+            <div style="margin-top:12px;display:flex;gap:6px;flex-wrap:wrap;">
+              <span style="font-size:11px;background:#EBF8FF;color:#2B6CB0;padding:3px 10px;border-radius:99px;font-weight:700;">FN ${fnN}</span>
+              <span style="font-size:11px;background:#FFFAF0;color:#B7791F;padding:3px 10px;border-radius:99px;font-weight:700;">FP ${fpN}</span>
+              <span style="font-size:11px;background:#FFF5F5;color:#C53030;padding:3px 10px;border-radius:99px;font-weight:700;">DP ${dpN}</span>
+              <span style="font-size:11px;background:#F7FAFC;color:#4A5568;padding:3px 10px;border-radius:99px;font-weight:700;">DN ${dnN}</span>
+              <span style="font-size:11px;color:#A0AEC0;align-self:center;">/ 총 ${TOTAL_TOP}항목</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>`;
 
-  // ── 최고위평가 패턴별 비교 테이블
-  const SYM_BG  = {FN:'#EBF8FF',FP:'#FFFAF0',DP:'#FFF5F5',DN:'#F7FAFC'};
-  const SYM_TC  = {FN:'#2B6CB0',FP:'#B7791F',DP:'#C53030',DN:'#4A5568'};
+  // ── ② SFMA 비교표 (FN/FP/DN/DP × 회차)
+  const cmpTblHeaders = sel.map((si,ci) => {
+    const h = m.history[si];
+    return `<th style="padding:10px 16px;text-align:center;font-weight:800;font-size:13px;background:#F7F9FC;color:${COL_HDR[ci]};border-bottom:2px solid #E2E8F0;">${h.round}차<br><span style="font-size:10px;font-weight:400;color:#A0AEC0;">${h.date}</span></th>`;
+  }).join('') +
+  `<th style="padding:10px 16px;text-align:center;font-weight:800;font-size:13px;background:#F7F9FC;color:#A0AEC0;border-bottom:2px solid #E2E8F0;">미측정</th>`;
 
-  const headerCols = sel.map((si,ci) =>
-    `<th style="padding:8px 10px;text-align:center;background:#F7F9FC;font-weight:800;color:${COL_COLORS[ci]};font-size:11px;border-bottom:2px solid #E2E8F0;white-space:nowrap;">${m.history[si].round}차<br><span style="font-size:9px;color:#A0AEC0;">${m.history[si].date}</span></th>`
+  const cmpTblRows = ['FN','FP','DN','DP'].map(key => {
+    const cells = sel.map(si => {
+      const cnt = countChecks(m.history[si].sheetChecks);
+      const tot = cnt.FN+cnt.FP+cnt.DP+cnt.DN;
+      // 변화 색상 (이전 회차 대비)
+      const siIdx = sel.indexOf(si);
+      const prev = siIdx < sel.length-1 ? countChecks(m.history[sel[siIdx+1]].sheetChecks) : null;
+      const diff = prev ? cnt[key] - prev[key] : 0;
+      const diffColor = key==='FN'||key==='FP' ? (diff>0?'#38A169':diff<0?'#E53E3E':'') : (diff<0?'#38A169':diff>0?'#E53E3E':'');
+      const diffBadge = prev && diff!==0 ? `<span style="font-size:9px;color:${diffColor};font-weight:700;margin-left:3px;">${diff>0?'+':''}${diff}</span>` : '';
+      return `<td style="padding:10px 16px;text-align:center;border-bottom:1px solid #F0F4F8;font-size:14px;font-weight:700;color:#4A5568;">${cnt[key]}${diffBadge}</td>`;
+    }).join('');
+    const unmeasured = TOTAL_TOP - latestTot;
+    return `<tr>
+      <td style="padding:10px 16px;border-bottom:1px solid #F0F4F8;width:60px;">
+        <span style="font-size:13px;font-weight:900;color:${BAR_CLR[key]};">${key}</span>
+      </td>
+      ${cells}
+      <td style="padding:10px 16px;text-align:center;border-bottom:1px solid #F0F4F8;font-size:14px;font-weight:700;color:#A0AEC0;">${unmeasured > 0 ? unmeasured : 0}</td>
+    </tr>`;
+  }).join('');
+
+  const cmpTableSection = `
+    <div style="border:1px solid #E2E8F0;border-radius:10px;overflow:hidden;margin-bottom:14px;">
+      <div style="background:#2B4C8C;color:#fff;padding:8px 14px;font-size:12px;font-weight:800;">SFMA 비교표</div>
+      <div style="overflow-x:auto;">
+        <table style="width:100%;border-collapse:collapse;font-size:13px;">
+          <thead><tr>
+            <th style="padding:10px 16px;text-align:left;background:#F7F9FC;font-weight:800;font-size:11px;color:#718096;border-bottom:2px solid #E2E8F0;"></th>
+            ${cmpTblHeaders}
+          </tr></thead>
+          <tbody>${cmpTblRows}</tbody>
+        </table>
+      </div>
+    </div>`;
+
+  // ── ③ 최고위평가 패턴 상세 비교
+  const detailHeaders = sel.map((si,ci) =>
+    `<th style="padding:7px 10px;text-align:center;background:#F7F9FC;font-weight:800;color:${COL_HDR[ci]};font-size:11px;border-bottom:2px solid #E2E8F0;white-space:nowrap;">${m.history[si].round}차<br><span style="font-size:9px;color:#A0AEC0;">${m.history[si].date}</span></th>`
   ).join('');
 
-  const rows = SHEET_DATA.top.flatMap(p => {
+  const rank = {FN:4,FP:3,DN:2,DP:1};
+  const detailRows = SHEET_DATA.top.flatMap(p => {
     const keys = p.bilateral
       ? [{key:`${p.id}_좌`,label:`${p.num}. ${p.name} 좌`},{key:`${p.id}_우`,label:`${p.num}. ${p.name} 우`}]
       : [{key:p.id, label:`${p.num}. ${p.name}`}];
@@ -1430,34 +1506,54 @@ function renderCmpChart(m) {
         const v = (m.history[si].sheetChecks||{})[key];
         return v
           ? `<td style="padding:6px 10px;text-align:center;border-bottom:1px solid #F0F4F8;"><span style="display:inline-block;background:${SYM_BG[v]};color:${SYM_TC[v]};font-size:11px;font-weight:800;padding:2px 10px;border-radius:99px;">${v}</span></td>`
-          : `<td style="padding:6px 10px;text-align:center;border-bottom:1px solid #F0F4F8;color:#E2E8F0;font-size:11px;">—</td>`;
+          : `<td style="padding:6px 10px;text-align:center;border-bottom:1px solid #F0F4F8;color:#E2E8F0;">—</td>`;
       }).join('');
-      // 변화 화살표 (최구→최신)
       let arrow = '';
       if (sel.length > 1) {
         const vNew = (m.history[sel[0]].sheetChecks||{})[key];
         const vOld = (m.history[sel[sel.length-1]].sheetChecks||{})[key];
-        const rank = {FN:4,FP:3,DN:2,DP:1};
         if (vNew && vOld && vNew!==vOld) {
           const imp = rank[vNew] > rank[vOld];
-          arrow = `<span style="font-size:10px;color:${imp?'#38A169':'#E53E3E'};">${imp?'▲':'▼'}</span>`;
+          arrow = `<span style="font-size:10px;color:${imp?'#38A169':'#E53E3E'};font-weight:700;"> ${imp?'▲':'▼'}</span>`;
         }
       }
-      return `<tr><td style="padding:6px 10px;border-bottom:1px solid #F0F4F8;font-size:11px;font-weight:600;color:#4A5568;white-space:nowrap;">${label} ${arrow}</td>${cells}</tr>`;
+      return `<tr><td style="padding:6px 10px;border-bottom:1px solid #F0F4F8;font-size:11px;font-weight:600;color:#4A5568;white-space:nowrap;">${label}${arrow}</td>${cells}</tr>`;
     });
   }).join('');
 
-  document.getElementById('cmp-content').innerHTML = `
-    <div class="card-title" style="margin-bottom:14px;">📊 ${m.name} · 최고위평가 회차별 비교</div>
-    <div style="overflow-x:auto;">
-      <table style="width:100%;border-collapse:collapse;font-size:12px;">
-        <thead><tr>
-          <th style="padding:8px 10px;text-align:left;background:#F7F9FC;font-weight:800;color:#718096;font-size:11px;border-bottom:2px solid #E2E8F0;">패턴</th>
-          ${headerCols}
-        </tr></thead>
-        <tbody>${rows}</tbody>
-      </table>
+  const detailSection = `
+    <div style="border:1px solid #E2E8F0;border-radius:10px;overflow:hidden;">
+      <div style="background:#2B4C8C;color:#fff;padding:8px 14px;font-size:12px;font-weight:800;">최고위평가 패턴별 상세 비교</div>
+      <div style="overflow-x:auto;">
+        <table style="width:100%;border-collapse:collapse;font-size:12px;">
+          <thead><tr>
+            <th style="padding:7px 10px;text-align:left;background:#F7F9FC;font-weight:800;color:#718096;font-size:11px;border-bottom:2px solid #E2E8F0;">패턴</th>
+            ${detailHeaders}
+          </tr></thead>
+          <tbody>${detailRows}</tbody>
+        </table>
+      </div>
     </div>`;
+
+  // 좌측 요약 업데이트
+  document.getElementById('cmp-summary').innerHTML = `
+    <div style="font-size:12px;font-weight:700;color:#4A5568;margin-bottom:6px;">${m.name} · 선택 회차</div>
+    ${sel.map((si,ci) => {
+      const h = m.history[si]; const cnt = countChecks(h.sheetChecks);
+      const tot = cnt.FN+cnt.FP+cnt.DP+cnt.DN;
+      return `<div style="background:#F7F9FC;border-radius:8px;padding:8px 10px;margin-bottom:6px;border-left:3px solid ${COL_HDR[ci]};">
+        <div style="font-size:11px;font-weight:700;color:#4A5568;margin-bottom:4px;">${h.round}차 · ${h.date}</div>
+        <div style="display:flex;gap:4px;flex-wrap:wrap;">
+          <span style="font-size:10px;background:#EBF8FF;color:#2B6CB0;padding:1px 6px;border-radius:99px;font-weight:700;">FN${cnt.FN}</span>
+          <span style="font-size:10px;background:#FFFAF0;color:#B7791F;padding:1px 6px;border-radius:99px;font-weight:700;">FP${cnt.FP}</span>
+          <span style="font-size:10px;background:#FFF5F5;color:#C53030;padding:1px 6px;border-radius:99px;font-weight:700;">DP${cnt.DP}</span>
+          <span style="font-size:10px;background:#F7FAFC;color:#4A5568;padding:1px 6px;border-radius:99px;font-weight:700;">DN${cnt.DN}</span>
+          <span style="font-size:9px;color:#A0AEC0;align-self:center;">/${tot}</span>
+        </div>
+      </div>`;
+    }).join('')}`;
+
+  document.getElementById('cmp-content').innerHTML = statSection + cmpTableSection + detailSection;
 }
 
 function openCompareFor(name) {
