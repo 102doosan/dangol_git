@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>SFMA 결과 화면 디자인</title>
+  <title>SFMA / CSMI 결과 화면</title>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet" />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -11,7 +11,7 @@
       font-family: 'Noto Sans KR', sans-serif;
       background: #1A1A2E; min-height: 100vh;
       display: flex; flex-direction: column; align-items: center;
-      padding: 20px 16px 48px; gap: 20px;
+      padding: 20px 16px 48px; gap: 16px;
     }
 
     /* ── 툴바 ── */
@@ -24,6 +24,18 @@
     }
     .screen-btn.active { background: #7B61FF; color: #fff; }
     .screen-btn:hover:not(.active) { background: #3A3A5A; color: #fff; }
+
+    /* ── 모드 토글 ── */
+    .mode-toggle { display: flex; gap: 6px; }
+    .mode-btn {
+      padding: 8px 18px; border-radius: 99px; border: 2px solid #3A3A5A;
+      background: #2A2A4A; color: #A0AEC0; font-size: 13px; font-weight: 700;
+      cursor: pointer; font-family: 'Noto Sans KR', sans-serif; transition: all 0.2s;
+    }
+    .mode-btn.active-sfma { background: #553C9A; border-color: #9B84FF; color: #fff; box-shadow: 0 0 16px rgba(155,132,255,0.4); }
+    .mode-btn.active-csmi { background: #1A5F5F; border-color: #81E6D9; color: #fff; box-shadow: 0 0 16px rgba(129,230,217,0.4); }
+
+    /* ── 회원 선택 ── */
     .member-select-bar { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
     .member-select-label { font-size: 12px; color: #9B84FF; font-weight: 700; }
     .member-chip {
@@ -32,6 +44,7 @@
       cursor: pointer; transition: all .15s; font-family: 'Noto Sans KR', sans-serif;
     }
     .member-chip.active { background: #553C9A; border-color: #9B84FF; color: #fff; }
+    .member-chip.active-csmi { background: #1A5F5F; border-color: #81E6D9; color: #fff; }
 
     /* ── 워크스페이스 ── */
     .workspace { width: 100%; max-width: 1100px; display: flex; gap: 28px; align-items: flex-start; }
@@ -47,13 +60,17 @@
     .phone-screen { flex: 1; overflow: hidden; position: relative; margin-top: 28px; }
     .screen-frame { position: absolute; inset: 0; display: none; flex-direction: column; background: #F5F3FF; overflow-y: auto; }
     .screen-frame.active { display: flex; }
+    .screen-frame.csmi-bg { background: #F0FFFE; }
 
-    /* 공통 앱 헤더 */
+    /* ── 공통 앱 헤더 ── */
     .app-header { background: #6B46C1; color: #fff; padding: 12px 18px; display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+    .app-header.csmi-header { background: #2C7A7B; }
     .app-header .back { font-size: 17px; cursor: pointer; }
     .app-header .title { font-size: 16px; font-weight: 700; flex: 1; }
 
-    /* ── ① 결과 메인 ── */
+    /* ──────────────────────────────────────────── */
+    /* ── SFMA 스타일 ── */
+    /* ──────────────────────────────────────────── */
     .main-top { background: linear-gradient(135deg, #553C9A 0%, #7B61FF 100%); padding: 18px 18px 28px; color: #fff; flex-shrink: 0; }
     .main-top .sub { font-size: 12px; opacity: 0.8; margin-bottom: 3px; }
     .main-top .heading { font-size: 20px; font-weight: 900; }
@@ -75,15 +92,10 @@
     .dday-soon    { background: #FEFCBF; color: #744210; }
     .dday-overdue { background: #FED7D7; color: #742A2A; }
 
-    /* 결과 섹션 (차트+분석) */
     .result-section { margin: 12px 14px 0; background: #fff; border-radius: 14px; overflow: visible; box-shadow: 0 1px 6px rgba(0,0,0,0.07); }
     .rs-header { background: #2C3E6B; color: #fff; padding: 9px 14px; font-size: 12px; font-weight: 800; display: flex; justify-content: space-between; align-items: center; border-radius: 14px 14px 0 0; }
     .rs-round-tag { font-size: 10px; color: rgba(255,255,255,0.65); }
-    .rs-body { display: flex; flex-direction: column; }
-    .rs-chart { padding: 12px 14px; border-bottom: 1px solid #F0F4F8; }
-    .rs-analysis { padding: 12px 14px; }
 
-    /* 막대 차트 */
     .bar-chart { display: flex; align-items: flex-end; gap: 14px; height: 90px; padding-bottom: 2px; padding-top: 22px; }
     .bc-col { display: flex; flex-direction: column; align-items: center; gap: 3px; flex: 1; }
     .bc-bar-wrap { flex: 1; width: 100%; display: flex; align-items: flex-end; }
@@ -98,7 +110,6 @@
     .bc-leg { display: flex; align-items: center; gap: 4px; font-size: 10px; color: #4A5568; }
     .bc-leg-dot { width: 8px; height: 8px; border-radius: 2px; flex-shrink: 0; }
 
-    /* 분석결과 */
     .an-text { font-size: 11px; color: #2D3748; line-height: 1.7; margin-bottom: 10px; }
     .an-chips { display: flex; flex-wrap: wrap; gap: 4px; }
     .an-chip { font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 99px; }
@@ -108,7 +119,6 @@
     .an-dn { background: #F7FAFC; color: #4A5568; }
     .an-tot { font-size: 10px; color: #A0AEC0; }
 
-    /* 15항목 테이블 */
     .detail-table-wrap { margin: 10px 14px 0; background: #fff; border-radius: 14px; overflow: hidden; box-shadow: 0 1px 6px rgba(0,0,0,0.07); }
     .dt-header { background: #2C3E6B; color: #fff; padding: 9px 14px; font-size: 12px; font-weight: 800; display: flex; justify-content: space-between; }
     .dt-round-tag { font-size: 10px; color: rgba(255,255,255,0.65); }
@@ -125,12 +135,10 @@
     .rb-dp { background: #FFF5F5; color: #C53030; }
     .rb-dn { background: #F7FAFC; color: #4A5568; }
 
-    /* 버튼 행 */
     .btn-row { padding: 12px 14px; display: flex; flex-direction: column; gap: 8px; }
     .btn-primary { background: #7B61FF; color: #fff; border: none; border-radius: 12px; padding: 12px; font-size: 13px; font-weight: 700; cursor: pointer; font-family: 'Noto Sans KR', sans-serif; }
     .btn-secondary { background: #fff; color: #7B61FF; border: 2px solid #7B61FF; border-radius: 12px; padding: 10px; font-size: 13px; font-weight: 700; cursor: pointer; font-family: 'Noto Sans KR', sans-serif; }
 
-    /* ── ② 결과 상세 ── */
     .detail-hero { background: linear-gradient(135deg,#553C9A,#7B61FF); padding: 18px 18px 24px; color: #fff; flex-shrink: 0; }
     .detail-hero .d-back { font-size: 16px; cursor: pointer; margin-bottom: 10px; display: block; }
     .d-name { font-size: 18px; font-weight: 900; }
@@ -147,6 +155,9 @@
     .di-score { font-size: 16px; font-weight: 900; }
     .di-bar-bg { background: #EDF2F7; border-radius: 99px; height: 7px; overflow: hidden; margin-bottom: 8px; }
     .di-bar { height: 100%; border-radius: 99px; }
+    .bar-good { background: linear-gradient(90deg,#38A169,#68D391); }
+    .bar-warn { background: linear-gradient(90deg,#D69E2E,#F6E05E); }
+    .bar-bad  { background: linear-gradient(90deg,#E53E3E,#FC8181); }
     .check-row { display: flex; flex-wrap: wrap; gap: 5px; }
     .ck { padding: 3px 9px; border-radius: 99px; font-size: 10px; font-weight: 700; }
     .ck-fn { background: #EBF8FF; color: #2B6CB0; }
@@ -157,7 +168,6 @@
     .op-title { font-size: 11px; font-weight: 800; color: #6B46C1; margin-bottom: 5px; }
     .op-text { font-size: 12px; color: #44337A; line-height: 1.7; }
 
-    /* ── ③ 결과 비교 ── */
     .compare-sel { background: #fff; padding: 12px 14px; flex-shrink: 0; border-bottom: 1px solid #E2E8F0; }
     .csel-label { font-size: 10px; font-weight: 800; color: #7B61FF; margin-bottom: 7px; }
     .round-chips { display: flex; gap: 6px; flex-wrap: wrap; }
@@ -165,7 +175,6 @@
     .round-chip.on { background: #7B61FF; color: #fff; border-color: #7B61FF; }
     .compare-body { padding: 12px 14px; display: flex; flex-direction: column; gap: 0; overflow-y: auto; flex: 1; }
 
-    /* ── ④ 이력 목록 ── */
     .app-body { flex: 1; overflow-y: auto; padding: 12px 14px; display: flex; flex-direction: column; gap: 8px; }
     .history-item { background: #fff; border-radius: 14px; padding: 13px 14px; box-shadow: 0 1px 6px rgba(0,0,0,0.06); cursor: pointer; display: flex; align-items: center; gap: 12px; }
     .history-num { width: 34px; height: 34px; border-radius: 50%; flex-shrink: 0; background: #EDE9FE; color: #6B46C1; font-size: 12px; font-weight: 800; display: flex; align-items: center; justify-content: center; }
@@ -179,7 +188,41 @@
     .history-grade { font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 99px; background: #EDE9FE; color: #6B46C1; }
     .history-change { font-size: 10px; font-weight: 700; }
 
-    /* 등급 */
+    /* ──────────────────────────────────────────── */
+    /* ── CSMI 스타일 ── */
+    /* ──────────────────────────────────────────── */
+    .csmi-main-top { background: linear-gradient(135deg, #1A5F5F 0%, #2C7A7B 100%); padding: 18px 18px 28px; color: #fff; flex-shrink: 0; }
+    .csmi-score-card { margin: -18px 14px 0; background: #fff; border-radius: 18px; padding: 16px; box-shadow: 0 4px 20px rgba(44,122,123,0.25); flex-shrink: 0; }
+    .csmi-sc-total { font-size: 32px; font-weight: 900; color: #2C7A7B; }
+    .csmi-sc-bar { height: 100%; border-radius: 99px; background: linear-gradient(90deg, #2C7A7B, #4FD1C5); }
+
+    .csmi-group-card { margin: 10px 14px 0; background: #fff; border-radius: 14px; padding: 14px; box-shadow: 0 1px 6px rgba(0,0,0,0.07); }
+    .csmi-group-title { font-size: 13px; font-weight: 800; color: #1A202C; margin-bottom: 12px; display: flex; align-items: center; gap: 6px; }
+    .csmi-group-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+    .csmi-group-label { font-size: 11px; font-weight: 700; color: #4A5568; width: 64px; flex-shrink: 0; }
+    .csmi-bar-bg { flex: 1; background: #EDF2F7; border-radius: 99px; height: 8px; overflow: hidden; }
+    .csmi-bar-fill { height: 100%; border-radius: 99px; transition: width .5s; }
+    .csmi-pct-text { font-size: 11px; font-weight: 700; width: 36px; text-align: right; flex-shrink: 0; }
+
+    /* CSMI 이력 */
+    .csmi-history-num { width: 34px; height: 34px; border-radius: 50%; flex-shrink: 0; background: #E6FFFA; color: #2C7A7B; font-size: 12px; font-weight: 800; display: flex; align-items: center; justify-content: center; }
+    .csmi-history-num.latest { background: #2C7A7B; color: #fff; }
+    .csmi-history-score { font-size: 20px; font-weight: 900; color: #2C7A7B; }
+    .csmi-history-grade { font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 99px; background: #E6FFFA; color: #2C7A7B; }
+
+    /* CSMI 비교 */
+    .csmi-csel-label { font-size: 10px; font-weight: 800; color: #2C7A7B; margin-bottom: 7px; }
+    .csmi-round-chip { padding: 5px 12px; border-radius: 99px; font-size: 11px; font-weight: 700; border: 1.5px solid #E2E8F0; cursor: pointer; transition: all .15s; background: #fff; color: #718096; font-family: 'Noto Sans KR', sans-serif; }
+    .csmi-round-chip.on { background: #2C7A7B; color: #fff; border-color: #2C7A7B; }
+
+    /* CSMI 세부 항목 카드 */
+    .csmi-item-row { background: #F7FFFE; border-radius: 10px; padding: 10px 12px; margin-bottom: 7px; border: 1px solid #E6FFFA; }
+    .csmi-item-label { font-size: 11px; font-weight: 700; color: #4A5568; margin-bottom: 5px; }
+    .csmi-item-val { font-size: 13px; font-weight: 900; }
+    .csmi-item-bar-bg { background: #EDF2F7; border-radius: 99px; height: 6px; overflow: hidden; margin: 4px 0; }
+    .csmi-item-bar { height: 100%; border-radius: 99px; }
+
+    /* 공통 등급 */
     .g-excellent { background: #C6F6D5; color: #1A4731; }
     .g-good      { background: #BEE3F8; color: #1A365D; }
     .g-average   { background: #FEFCBF; color: #744210; }
@@ -197,18 +240,35 @@
 </head>
 <body>
 
+<!-- 상단 모드 토글 -->
 <div class="toolbar">
-  <span class="toolbar-title">📊 SFMA 결과 화면 디자인</span>
+  <span class="toolbar-title" id="toolbar-title">📊 SFMA 결과 화면</span>
+  <div class="mode-toggle">
+    <button class="mode-btn active-sfma" id="mode-btn-sfma" onclick="switchMode('sfma')">📊 SFMA 기능검사</button>
+    <button class="mode-btn" id="mode-btn-csmi" onclick="switchMode('csmi')">💪 CSMI 근력측정</button>
+  </div>
+</div>
+
+<!-- SFMA 화면 탭 -->
+<div class="toolbar" id="sfma-nav">
   <button class="screen-btn active" onclick="go('main')">① 결과 메인</button>
   <button class="screen-btn" onclick="go('detail')">② 결과 상세</button>
   <button class="screen-btn" onclick="go('compare')">③ 결과 비교</button>
   <button class="screen-btn" onclick="go('history')">④ 이력 목록</button>
 </div>
 
+<!-- CSMI 화면 탭 -->
+<div class="toolbar" id="csmi-nav" style="display:none;">
+  <button class="screen-btn active" onclick="goC('csmi-main')" id="cnav-main">① 결과 메인</button>
+  <button class="screen-btn" onclick="goC('csmi-detail')" id="cnav-detail">② 세부 항목</button>
+  <button class="screen-btn" onclick="goC('csmi-compare')" id="cnav-compare">③ 회차 비교</button>
+  <button class="screen-btn" onclick="goC('csmi-history')" id="cnav-history">④ 이력 목록</button>
+</div>
+
 <!-- 회원 선택 -->
 <div class="toolbar">
   <div class="member-select-bar">
-    <span class="member-select-label">👤 회원 선택:</span>
+    <span class="member-select-label" id="member-label">👤 회원 선택:</span>
     <div id="member-chips"></div>
   </div>
 </div>
@@ -219,7 +279,9 @@
     <div class="phone-notch"></div>
     <div class="phone-screen">
 
-      <!-- ① 결과 메인 -->
+      <!-- ────── SFMA 화면 ────── -->
+
+      <!-- ① SFMA 결과 메인 -->
       <div class="screen-frame active" id="screen-main">
         <div class="main-top">
           <div class="sub">📊 SFMA 결과</div>
@@ -238,8 +300,6 @@
           <div class="sc-bar-bg"><div class="sc-bar" id="main-score-bar"></div></div>
           <div id="next-date-row"></div>
         </div>
-
-        <!-- 차트 -->
         <div class="result-section">
           <div class="rs-header">
             <span id="rs-header-text"></span>
@@ -247,29 +307,24 @@
           </div>
           <div id="rs-chart" style="padding:12px 14px;"></div>
         </div>
-
-        <!-- 분석결과 -->
         <div class="result-section" style="margin-top:8px;">
           <div class="rs-header">분석결과</div>
           <div id="rs-analysis" style="padding:12px 14px;"></div>
         </div>
-
-        <!-- 15항목 테이블 -->
         <div class="detail-table-wrap">
           <div class="dt-header">
-            <span>최고위평가 패턴별 상세 비교</span>
+            <span>최고위평가 패턴별 상세</span>
             <span class="dt-round-tag" id="dt-round-tag"></span>
           </div>
           <div id="detail-table-body"></div>
         </div>
-
         <div class="btn-row">
           <button class="btn-primary" onclick="go('compare')">📈 과거 결과와 비교하기</button>
           <button class="btn-secondary" onclick="go('history')">📋 전체 이력 보기</button>
         </div>
       </div>
 
-      <!-- ② 결과 상세 -->
+      <!-- ② SFMA 결과 상세 -->
       <div class="screen-frame" id="screen-detail">
         <div class="detail-hero">
           <span class="d-back" onclick="go('main')">←</span>
@@ -288,7 +343,7 @@
         </div>
       </div>
 
-      <!-- ③ 결과 비교 -->
+      <!-- ③ SFMA 결과 비교 -->
       <div class="screen-frame" id="screen-compare">
         <div class="app-header">
           <span class="back" onclick="go('main')">←</span>
@@ -301,7 +356,7 @@
         <div class="compare-body" id="compare-body"></div>
       </div>
 
-      <!-- ④ 이력 목록 -->
+      <!-- ④ SFMA 이력 목록 -->
       <div class="screen-frame" id="screen-history">
         <div class="app-header">
           <span class="back" onclick="go('main')">←</span>
@@ -313,15 +368,81 @@
         </div>
       </div>
 
+      <!-- ────── CSMI 화면 ────── -->
+
+      <!-- ① CSMI 결과 메인 -->
+      <div class="screen-frame csmi-bg" id="screen-csmi-main">
+        <div class="csmi-main-top">
+          <div class="sub" style="font-size:12px;opacity:0.8;margin-bottom:3px;">💪 CSMI 근력측정 결과</div>
+          <div class="heading" style="font-size:20px;font-weight:900;color:#fff;">최근 측정 결과</div>
+          <div class="date-badge" id="csmi-date-badge" style="display:inline-block;margin-top:7px;background:rgba(255,255,255,0.2);border-radius:99px;padding:3px 13px;font-size:11px;font-weight:700;color:#fff;"></div>
+        </div>
+        <div class="csmi-score-card">
+          <div class="sc-row">
+            <div class="sc-label">기준치 대비 종합</div>
+            <span class="sc-grade" id="csmi-grade-badge"></span>
+          </div>
+          <div style="display:flex;align-items:baseline;gap:5px;margin-bottom:8px;">
+            <span class="csmi-sc-total" id="csmi-score"></span>
+            <span class="sc-max">%</span>
+          </div>
+          <div class="sc-bar-bg"><div class="csmi-sc-bar" id="csmi-score-bar"></div></div>
+          <div id="csmi-next-date-row"></div>
+        </div>
+        <div class="csmi-group-card">
+          <div class="csmi-group-title">📊 부위별 근력 현황</div>
+          <div id="csmi-group-bars"></div>
+        </div>
+        <div style="padding:0 14px;margin-top:4px;" id="csmi-analysis-box"></div>
+        <div class="btn-row">
+          <button style="background:#2C7A7B;color:#fff;border:none;border-radius:12px;padding:12px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;" onclick="goC('csmi-compare')">📈 과거 결과와 비교하기</button>
+          <button style="background:#fff;color:#2C7A7B;border:2px solid #2C7A7B;border-radius:12px;padding:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;" onclick="goC('csmi-history')">📋 전체 이력 보기</button>
+        </div>
+      </div>
+
+      <!-- ② CSMI 세부 항목 -->
+      <div class="screen-frame csmi-bg" id="screen-csmi-detail">
+        <div class="app-header csmi-header">
+          <span class="back" onclick="goC('csmi-main')">←</span>
+          <span class="title">세부 측정 항목</span>
+        </div>
+        <div style="flex:1;overflow-y:auto;padding:12px 14px;" id="csmi-detail-body"></div>
+      </div>
+
+      <!-- ③ CSMI 회차 비교 -->
+      <div class="screen-frame csmi-bg" id="screen-csmi-compare">
+        <div class="app-header csmi-header">
+          <span class="back" onclick="goC('csmi-main')">←</span>
+          <span class="title">근력 회차 비교</span>
+        </div>
+        <div class="compare-sel">
+          <div class="csmi-csel-label">비교할 회차 선택</div>
+          <div class="round-chips" id="csmi-round-chips"></div>
+        </div>
+        <div class="compare-body" id="csmi-compare-body"></div>
+      </div>
+
+      <!-- ④ CSMI 이력 목록 -->
+      <div class="screen-frame csmi-bg" id="screen-csmi-history">
+        <div class="app-header csmi-header">
+          <span class="back" onclick="goC('csmi-main')">←</span>
+          <span class="title">CSMI 근력 이력</span>
+        </div>
+        <div class="app-body" id="csmi-history-body"></div>
+        <div style="padding:0 14px 14px;flex-shrink:0;">
+          <button style="background:#2C7A7B;color:#fff;border:none;border-radius:12px;padding:12px;width:100%;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;" onclick="goC('csmi-compare')">📈 회차 비교하기</button>
+        </div>
+      </div>
+
     </div>
   </div>
 
   <!-- 메모판 -->
   <div class="memo-panel">
-    <h3>📊 SFMA 결과 화면 메모</h3>
+    <h3 id="memo-title">📊 SFMA 결과 화면 메모</h3>
     <div class="memo-field">
       <label>현재 화면</label>
-      <input type="text" id="memo-screen-name" value="① 결과 메인" readonly />
+      <input type="text" id="memo-screen-name" value="① SFMA 결과 메인" readonly />
     </div>
     <div class="memo-divider"></div>
     <div class="memo-field">
@@ -336,52 +457,43 @@
       <label>UX 고려사항</label>
       <textarea placeholder="사용자 흐름, 예외 처리, 피드백..."></textarea>
     </div>
-    <div class="memo-field">
-      <label>개발 메모</label>
-      <textarea placeholder="API, 차트 라이브러리, 데이터 구조..."></textarea>
-    </div>
     <div class="memo-divider"></div>
     <div class="memo-field">
       <label>화면 흐름</label>
-      <textarea readonly style="color:#9B84FF;font-size:11px;">① 결과 메인
-  · FN/FP/DP/DN 막대차트 + 분석결과
-  · 15항목 패턴별 상세 테이블
-  · [과거 비교] → ③  [전체 이력] → ④
+      <textarea readonly style="color:#9B84FF;font-size:11px;">[ SFMA 기능검사 ]
+① 결과 메인 · FN/FP/DP/DN 차트
+② 결과 상세 · 패턴별 체크 결과
+③ 결과 비교 · 회차 선택 비교 테이블
+④ 이력 목록 · 전체 회차 목록
 
-② 결과 상세
-  · 선택 패턴 항목별 체크 결과
-  · 트레이너 소견
-
-③ 결과 비교
-  · 회차 선택 → 15항목 결과 비교 테이블
-
-④ 이력 목록
-  · 전체 회차별 목록 + FN/FP/DP/DN 칩
-  · [회차 비교] → ③</textarea>
+[ CSMI 근력측정 ]
+① 결과 메인 · 종합% + 부위별 바
+② 세부 항목 · 그룹별 측정값 카드
+③ 회차 비교 · 회차 선택 바 비교
+④ 이력 목록 · 전체 회차 목록</textarea>
     </div>
   </div>
 </div>
 
 <script>
-/* ══ 데이터 ══ */
+/* ══ SFMA 데이터 ══ */
 const SFMA_ITEMS = [
-  { key:'top1',    num:'01', name:'경추 패턴1',           pat:'cervical' },
-  { key:'top2',    num:'02', name:'경추 패턴2',           pat:'cervical' },
-  { key:'top3_좌', num:'03', name:'경추 패턴3 좌',        pat:'cervical' },
-  { key:'top3_우', num:'03', name:'경추 패턴3 우',        pat:'cervical' },
-  { key:'top4_좌', num:'04', name:'상지 패턴1 좌',        pat:'upper' },
-  { key:'top4_우', num:'04', name:'상지 패턴1 우',        pat:'upper' },
-  { key:'top5_좌', num:'05', name:'상지 패턴2 좌',        pat:'upper' },
-  { key:'top5_우', num:'05', name:'상지 패턴2 우',        pat:'upper' },
-  { key:'top6',    num:'06', name:'다중 분절 굴곡',       pat:'multi' },
-  { key:'top7',    num:'07', name:'다중 분절 신전',       pat:'multi' },
-  { key:'top8_좌', num:'08', name:'다중 분절 회전 좌',    pat:'multi' },
-  { key:'top8_우', num:'08', name:'다중 분절 회전 우',    pat:'multi' },
-  { key:'top9_좌', num:'09', name:'한 다리로 선 자세 좌', pat:'single' },
-  { key:'top9_우', num:'09', name:'한 다리로 선 자세 우', pat:'single' },
+  { key:'top1',    num:'01', name:'경추 패턴1',               pat:'cervical' },
+  { key:'top2',    num:'02', name:'경추 패턴2',               pat:'cervical' },
+  { key:'top3_좌', num:'03', name:'경추 패턴3 좌',            pat:'cervical' },
+  { key:'top3_우', num:'03', name:'경추 패턴3 우',            pat:'cervical' },
+  { key:'top4_좌', num:'04', name:'상지 패턴1 좌',            pat:'upper' },
+  { key:'top4_우', num:'04', name:'상지 패턴1 우',            pat:'upper' },
+  { key:'top5_좌', num:'05', name:'상지 패턴2 좌',            pat:'upper' },
+  { key:'top5_우', num:'05', name:'상지 패턴2 우',            pat:'upper' },
+  { key:'top6',    num:'06', name:'다중 분절 굴곡',           pat:'multi' },
+  { key:'top7',    num:'07', name:'다중 분절 신전',           pat:'multi' },
+  { key:'top8_좌', num:'08', name:'다중 분절 회전 좌',        pat:'multi' },
+  { key:'top8_우', num:'08', name:'다중 분절 회전 우',        pat:'multi' },
+  { key:'top9_좌', num:'09', name:'한 다리로 선 자세 좌',     pat:'single' },
+  { key:'top9_우', num:'09', name:'한 다리로 선 자세 우',     pat:'single' },
   { key:'top10',   num:'10', name:'팔을 머리 위로 든 스쿼트', pat:'single' },
 ];
-
 const PAT_GROUPS = [
   { id:'cervical', icon:'🔵', name:'경추 패턴 (01~03)', keys:['top1','top2','top3_좌','top3_우'] },
   { id:'upper',    icon:'🟠', name:'상지 패턴 (04~05)', keys:['top4_좌','top4_우','top5_좌','top5_우'] },
@@ -389,44 +501,193 @@ const PAT_GROUPS = [
   { id:'single',   icon:'🟢', name:'한 다리/스쿼트 (09~10)', keys:['top9_좌','top9_우','top10'] },
 ];
 
-const MEMBERS = [
-  { name:'김민준', avatar:'#6B46C1', trainer:'김트레이너', history:[
-    { date:'2026-03-25', round:3, total:76, grade:'양호', opinion:'흉추 회전 제한 지속. 재활운동 병행 권장.',
-      sheetChecks:{top1:'FN',top2:'FN',top3_좌:'FN',top3_우:'FP',top4_좌:'FN',top4_우:'FN',top5_좌:'FN',top5_우:'FP',top6:'FP',top7:'FP',top8_좌:'FN',top8_우:'FN',top9_좌:'FN',top9_우:'FP',top10:'FP'} },
-    { date:'2024-07-22', round:2, total:66, grade:'보통', opinion:'전반적 양호. 상체 회전 개선 필요.',
-      sheetChecks:{top1:'FP',top2:'FN',top3_좌:'FP',top3_우:'DN',top4_좌:'FN',top4_우:'FP',top5_좌:'FP',top5_우:'DN',top6:'DP',top7:'FP',top8_좌:'FP',top8_우:'DN',top9_좌:'FP',top9_우:'DN',top10:'DP'} },
-    { date:'2024-03-10', round:1, total:52, grade:'주의', opinion:'초기 측정. 코어 안정화 운동 시작 권고.',
-      sheetChecks:{top1:'DP',top2:'FP',top3_좌:'DN',top3_우:'DN',top4_좌:'FP',top4_우:'DN',top5_좌:'DP',top5_우:'DN',top6:'DP',top7:'DP',top8_좌:'DN',top8_우:'DN',top9_좌:'DP',top9_우:'DN',top10:'DP'} },
+/* ══ CSMI 상수 ══ */
+const CSMI_GROUPS = [
+  { id:'shoulder', name:'어깨', icon:'🦾', color:'#2C7A7B', items:[
+    { id:'shoulder_l_add', label:'어깨(좌) 내전', std:{m:100,f:65} },
+    { id:'shoulder_l_abd', label:'어깨(좌) 외전', std:{m:80,f:50} },
+    { id:'shoulder_r_add', label:'어깨(우) 내전', std:{m:100,f:65} },
+    { id:'shoulder_r_abd', label:'어깨(우) 외전', std:{m:80,f:50} },
   ]},
-  { name:'이서연', avatar:'#2B6CB0', trainer:'이트레이너', history:[
-    { date:'2026-03-20', round:2, total:84, grade:'양호', opinion:'전반적 우수. 체간 안정화 지속 강화 권장.',
-      sheetChecks:{top1:'FN',top2:'FN',top3_좌:'FN',top3_우:'FN',top4_좌:'FN',top4_우:'FP',top5_좌:'FN',top5_우:'FP',top6:'FN',top7:'FP',top8_좌:'FN',top8_우:'FN',top9_좌:'FN',top9_우:'FP',top10:'FN'} },
-    { date:'2025-09-15', round:1, total:72, grade:'보통', opinion:'양호한 기초 수준.',
-      sheetChecks:{top1:'FN',top2:'FP',top3_좌:'FN',top3_우:'FP',top4_좌:'FP',top4_우:'FP',top5_좌:'FN',top5_우:'FP',top6:'FP',top7:'FP',top8_좌:'FN',top8_우:'FP',top9_좌:'FN',top9_우:'FP',top10:'FN'} },
+  { id:'lumbar', name:'허리', icon:'🏋️', color:'#4299E1', items:[
+    { id:'lumbar_flex', label:'허리 숙이기', std:{m:250,f:150} },
+    { id:'lumbar_ext',  label:'허리 펴기',   std:{m:350,f:220} },
   ]},
-  { name:'박도현', avatar:'#C05621', trainer:'김트레이너', history:[
-    { date:'2026-02-14', round:2, total:45, grade:'주의', opinion:'디스크 영향으로 체간 안정성 낮음. 맥킨지 신전 병행.',
-      sheetChecks:{top1:'FP',top2:'DN',top3_좌:'DP',top3_우:'DN',top4_좌:'FP',top4_우:'FP',top5_좌:'DN',top5_우:'DN',top6:'DP',top7:'DP',top8_좌:'FP',top8_우:'DN',top9_좌:'DP',top9_우:'DN',top10:'DP'} },
-    { date:'2025-08-20', round:1, total:32, grade:'주의', opinion:'허리 통증 호소. 재활 프로그램 시작.',
-      sheetChecks:{top1:'DP',top2:'DN',top3_좌:'DP',top3_우:'DN',top4_좌:'DP',top4_우:'DN',top5_좌:'DP',top5_우:'DN',top6:'DP',top7:'DP',top8_좌:'DN',top8_우:'DN',top9_좌:'DP',top9_우:'DN',top10:'DP'} },
+  { id:'knee', name:'무릎', icon:'🦵', color:'#805AD5', items:[
+    { id:'knee_flex_l', label:'무릎 굽히기(좌)', std:{m:120,f:80} },
+    { id:'knee_ext_l',  label:'무릎 펴기(좌)',   std:{m:200,f:130} },
+    { id:'knee_flex_r', label:'무릎 굽히기(우)', std:{m:120,f:80} },
+    { id:'knee_ext_r',  label:'무릎 펴기(우)',   std:{m:200,f:130} },
   ]},
-  { name:'최수아', avatar:'#276749', trainer:'박트레이너', history:[
-    { date:'2026-01-10', round:3, total:94, grade:'우수', opinion:'전 항목 우수. 유지 운동 권장.',
-      sheetChecks:{top1:'FN',top2:'FN',top3_좌:'FN',top3_우:'FN',top4_좌:'FN',top4_우:'FN',top5_좌:'FN',top5_우:'FN',top6:'FN',top7:'FN',top8_좌:'FN',top8_우:'FN',top9_좌:'FN',top9_우:'FP',top10:'FN'} },
-    { date:'2025-07-05', round:2, total:83, grade:'양호', opinion:'꾸준한 향상. 계속 유지.',
-      sheetChecks:{top1:'FN',top2:'FN',top3_좌:'FN',top3_우:'FN',top4_좌:'FN',top4_우:'FP',top5_좌:'FN',top5_우:'FN',top6:'FN',top7:'FP',top8_좌:'FN',top8_우:'FN',top9_좌:'FN',top9_우:'FP',top10:'FN'} },
-    { date:'2025-01-18', round:1, total:71, grade:'보통', opinion:'초기 측정. 전반적 양호.',
-      sheetChecks:{top1:'FN',top2:'FP',top3_좌:'FN',top3_우:'FP',top4_좌:'FN',top4_우:'FP',top5_좌:'FN',top5_우:'FP',top6:'FP',top7:'FP',top8_좌:'FN',top8_우:'FP',top9_좌:'FN',top9_우:'FP',top10:'FP'} },
-  ]},
-  { name:'정우진', avatar:'#744210', trainer:'이트레이너', history:[
-    { date:'2025-11-30', round:2, total:58, grade:'주의', opinion:'일자목 교정 병행 중. 상체 회전 개선 필요.',
-      sheetChecks:{top1:'FP',top2:'FP',top3_좌:'DN',top3_우:'DN',top4_좌:'FN',top4_우:'FP',top5_좌:'FP',top5_우:'DN',top6:'DP',top7:'FP',top8_좌:'FP',top8_우:'DN',top9_좌:'FP',top9_우:'DN',top10:'DP'} },
-    { date:'2025-04-12', round:1, total:38, grade:'주의', opinion:'초기 측정. 경추 안정화 운동 시작.',
-      sheetChecks:{top1:'DP',top2:'DN',top3_좌:'DN',top3_우:'DN',top4_좌:'FP',top4_우:'DN',top5_좌:'DP',top5_우:'DN',top6:'DP',top7:'DP',top8_좌:'DN',top8_우:'DN',top9_좌:'DP',top9_우:'DN',top10:'DP'} },
+  { id:'ankle', name:'발목', icon:'🦶', color:'#D69E2E', items:[
+    { id:'ankle_l_flex', label:'발목(좌) 굽히기', std:{m:35,f:25} },
+    { id:'ankle_l_ext',  label:'발목(좌) 펴기',   std:{m:120,f:80} },
+    { id:'ankle_l_inv',  label:'발목(좌) 내회전', std:{m:30,f:20} },
+    { id:'ankle_l_ev',   label:'발목(좌) 외회전', std:{m:25,f:18} },
+    { id:'ankle_r_flex', label:'발목(우) 굽히기', std:{m:35,f:25} },
+    { id:'ankle_r_ext',  label:'발목(우) 펴기',   std:{m:120,f:80} },
+    { id:'ankle_r_inv',  label:'발목(우) 내회전', std:{m:30,f:20} },
+    { id:'ankle_r_ev',   label:'발목(우) 외회전', std:{m:25,f:18} },
   ]},
 ];
+const CSMI_ALL = CSMI_GROUPS.flatMap(g=>g.items.map(it=>({...it,gid:g.id})));
+function cStd(it,gender){ return gender==='여'?it.std.f:it.std.m; }
+function cPct(val,std){ return std?Math.round(val/std*100):0; }
+function cGrade(pct){
+  if(pct>=110) return {label:'우수',cls:'g-excellent',color:'#38A169'};
+  if(pct>=90)  return {label:'양호',cls:'g-good',     color:'#4299E1'};
+  if(pct>=70)  return {label:'보통',cls:'g-average',  color:'#D69E2E'};
+  return             {label:'주의',cls:'g-poor',      color:'#E53E3E'};
+}
+function cBarColor(pct){ return pct>=110?'#2C7A7B':pct>=90?'#4299E1':pct>=70?'#ECC94B':'#E53E3E'; }
+function cGroupAvg(h,g,gender){
+  let t=0,n=0;
+  g.items.forEach(it=>{ const v=h[it.id]; if(!v) return; t+=cPct(v.value,cStd(it,gender)); n++; });
+  return n?Math.round(t/n):0;
+}
+function cTotalAvg(h,gender){
+  let t=0,n=0;
+  CSMI_ALL.forEach(it=>{ const v=h[it.id]; if(!v) return; t+=cPct(v.value,cStd(it,gender)); n++; });
+  return n?Math.round(t/n):0;
+}
+const CSMI_GRADE_DAYS = {우수:180, 양호:90, 보통:60, 주의:30};
 
-/* ══ 헬퍼 ══ */
+/* ══ 회원 데이터 (SFMA + CSMI 통합) ══ */
+const MEMBERS = [
+  { name:'김민준', gender:'남', avatar:'#6B46C1', trainer:'김트레이너',
+    history:[
+      { date:'2026-03-25', round:3, total:76, grade:'양호', opinion:'흉추 회전 제한 지속. 재활운동 병행 권장.',
+        sheetChecks:{top1:'FN',top2:'FN',top3_좌:'FN',top3_우:'FP',top4_좌:'FN',top4_우:'FN',top5_좌:'FN',top5_우:'FP',top6:'FP',top7:'FP',top8_좌:'FN',top8_우:'FN',top9_좌:'FN',top9_우:'FP',top10:'FP'} },
+      { date:'2024-07-22', round:2, total:66, grade:'보통', opinion:'전반적 양호. 상체 회전 개선 필요.',
+        sheetChecks:{top1:'FP',top2:'FN',top3_좌:'FP',top3_우:'DN',top4_좌:'FN',top4_우:'FP',top5_좌:'FP',top5_우:'DN',top6:'DP',top7:'FP',top8_좌:'FP',top8_우:'DN',top9_좌:'FP',top9_우:'DN',top10:'DP'} },
+      { date:'2024-03-10', round:1, total:52, grade:'주의', opinion:'초기 측정. 코어 안정화 운동 시작 권고.',
+        sheetChecks:{top1:'DP',top2:'FP',top3_좌:'DN',top3_우:'DN',top4_좌:'FP',top4_우:'DN',top5_좌:'DP',top5_우:'DN',top6:'DP',top7:'DP',top8_좌:'DN',top8_우:'DN',top9_좌:'DP',top9_우:'DN',top10:'DP'} },
+    ],
+    csmiHistory:[
+      { round:2, date:'2026-03-20',
+        shoulder_l_add:{value:88,stability:true,power:false}, shoulder_l_abd:{value:72,stability:true,power:false},
+        shoulder_r_add:{value:92,stability:true,power:true},  shoulder_r_abd:{value:78,stability:true,power:false},
+        lumbar_flex:{value:230,stability:true,power:false},   lumbar_ext:{value:310,stability:true,power:false},
+        knee_flex_l:{value:105,stability:true,power:true},    knee_ext_l:{value:178,stability:true,power:false},
+        knee_flex_r:{value:110,stability:true,power:true},    knee_ext_r:{value:182,stability:false,power:false},
+        ankle_l_flex:{value:33,stability:true,power:true},    ankle_l_ext:{value:105,stability:true,power:false},
+        ankle_l_inv:{value:28,stability:true,power:false},    ankle_l_ev:{value:24,stability:true,power:false},
+        ankle_r_flex:{value:31,stability:true,power:true},    ankle_r_ext:{value:102,stability:true,power:false},
+        ankle_r_inv:{value:27,stability:true,power:false},    ankle_r_ev:{value:23,stability:true,power:false},
+      },
+      { round:1, date:'2025-09-10',
+        shoulder_l_add:{value:75,stability:false,power:false}, shoulder_l_abd:{value:60,stability:false,power:false},
+        shoulder_r_add:{value:80,stability:false,power:false}, shoulder_r_abd:{value:65,stability:false,power:false},
+        lumbar_flex:{value:200,stability:false,power:false},   lumbar_ext:{value:275,stability:false,power:false},
+        knee_flex_l:{value:95,stability:false,power:false},    knee_ext_l:{value:158,stability:false,power:false},
+        knee_flex_r:{value:98,stability:false,power:false},    knee_ext_r:{value:162,stability:false,power:false},
+        ankle_l_flex:{value:28,stability:false,power:false},   ankle_l_ext:{value:92,stability:false,power:false},
+        ankle_l_inv:{value:22,stability:false,power:false},    ankle_l_ev:{value:19,stability:false,power:false},
+        ankle_r_flex:{value:26,stability:false,power:false},   ankle_r_ext:{value:89,stability:false,power:false},
+        ankle_r_inv:{value:20,stability:false,power:false},    ankle_r_ev:{value:17,stability:false,power:false},
+      },
+    ]
+  },
+  { name:'이서연', gender:'여', avatar:'#2B6CB0', trainer:'이트레이너',
+    history:[
+      { date:'2026-03-20', round:2, total:84, grade:'양호', opinion:'전반적 우수. 체간 안정화 지속 강화 권장.',
+        sheetChecks:{top1:'FN',top2:'FN',top3_좌:'FN',top3_우:'FN',top4_좌:'FN',top4_우:'FP',top5_좌:'FN',top5_우:'FP',top6:'FN',top7:'FP',top8_좌:'FN',top8_우:'FN',top9_좌:'FN',top9_우:'FP',top10:'FN'} },
+      { date:'2025-09-15', round:1, total:72, grade:'보통', opinion:'양호한 기초 수준.',
+        sheetChecks:{top1:'FN',top2:'FP',top3_좌:'FN',top3_우:'FP',top4_좌:'FP',top4_우:'FP',top5_좌:'FN',top5_우:'FP',top6:'FP',top7:'FP',top8_좌:'FN',top8_우:'FP',top9_좌:'FN',top9_우:'FP',top10:'FN'} },
+    ],
+    csmiHistory:[
+      { round:1, date:'2026-03-12',
+        shoulder_l_add:{value:68,stability:true,power:true},  shoulder_l_abd:{value:52,stability:true,power:true},
+        shoulder_r_add:{value:70,stability:true,power:true},  shoulder_r_abd:{value:55,stability:true,power:true},
+        lumbar_flex:{value:160,stability:true,power:true},    lumbar_ext:{value:230,stability:true,power:true},
+        knee_flex_l:{value:75,stability:false,power:false},   knee_ext_l:{value:125,stability:false,power:false},
+        knee_flex_r:{value:72,stability:false,power:false},   knee_ext_r:{value:120,stability:false,power:false},
+        ankle_l_flex:{value:28,stability:true,power:true},    ankle_l_ext:{value:85,stability:true,power:true},
+        ankle_l_inv:{value:22,stability:true,power:false},    ankle_l_ev:{value:20,stability:true,power:false},
+        ankle_r_flex:{value:26,stability:true,power:true},    ankle_r_ext:{value:82,stability:true,power:false},
+        ankle_r_inv:{value:20,stability:true,power:false},    ankle_r_ev:{value:19,stability:true,power:false},
+      },
+    ]
+  },
+  { name:'박도현', gender:'남', avatar:'#C05621', trainer:'김트레이너',
+    history:[
+      { date:'2026-02-14', round:2, total:45, grade:'주의', opinion:'디스크 영향으로 체간 안정성 낮음. 맥킨지 신전 병행.',
+        sheetChecks:{top1:'FP',top2:'DN',top3_좌:'DP',top3_우:'DN',top4_좌:'FP',top4_우:'FP',top5_좌:'DN',top5_우:'DN',top6:'DP',top7:'DP',top8_좌:'FP',top8_우:'DN',top9_좌:'DP',top9_우:'DN',top10:'DP'} },
+      { date:'2025-08-20', round:1, total:32, grade:'주의', opinion:'허리 통증 호소. 재활 프로그램 시작.',
+        sheetChecks:{top1:'DP',top2:'DN',top3_좌:'DP',top3_우:'DN',top4_좌:'DP',top4_우:'DN',top5_좌:'DP',top5_우:'DN',top6:'DP',top7:'DP',top8_좌:'DN',top8_우:'DN',top9_좌:'DP',top9_우:'DN',top10:'DP'} },
+    ],
+    csmiHistory:[
+      { round:1, date:'2026-03-08',
+        shoulder_l_add:{value:72,stability:false,power:false}, shoulder_l_abd:{value:62,stability:false,power:false},
+        shoulder_r_add:{value:75,stability:false,power:false}, shoulder_r_abd:{value:65,stability:false,power:false},
+        lumbar_flex:{value:195,stability:false,power:false},   lumbar_ext:{value:270,stability:false,power:false},
+        knee_flex_l:{value:90,stability:false,power:false},    knee_ext_l:{value:155,stability:false,power:false},
+        knee_flex_r:{value:92,stability:false,power:false},    knee_ext_r:{value:158,stability:false,power:false},
+        ankle_l_flex:{value:30,stability:false,power:false},   ankle_l_ext:{value:92,stability:false,power:false},
+        ankle_l_inv:{value:22,stability:false,power:false},    ankle_l_ev:{value:18,stability:false,power:false},
+        ankle_r_flex:{value:32,stability:false,power:false},   ankle_r_ext:{value:95,stability:false,power:false},
+        ankle_r_inv:{value:24,stability:false,power:false},    ankle_r_ev:{value:20,stability:false,power:false},
+      },
+    ]
+  },
+  { name:'최수아', gender:'여', avatar:'#276749', trainer:'박트레이너',
+    history:[
+      { date:'2026-01-10', round:3, total:94, grade:'우수', opinion:'전 항목 우수. 유지 운동 권장.',
+        sheetChecks:{top1:'FN',top2:'FN',top3_좌:'FN',top3_우:'FN',top4_좌:'FN',top4_우:'FN',top5_좌:'FN',top5_우:'FN',top6:'FN',top7:'FN',top8_좌:'FN',top8_우:'FN',top9_좌:'FN',top9_우:'FP',top10:'FN'} },
+      { date:'2025-07-05', round:2, total:83, grade:'양호', opinion:'꾸준한 향상. 계속 유지.',
+        sheetChecks:{top1:'FN',top2:'FN',top3_좌:'FN',top3_우:'FN',top4_좌:'FN',top4_우:'FP',top5_좌:'FN',top5_우:'FN',top6:'FN',top7:'FP',top8_좌:'FN',top8_우:'FN',top9_좌:'FN',top9_우:'FP',top10:'FN'} },
+      { date:'2025-01-18', round:1, total:71, grade:'보통', opinion:'초기 측정. 전반적 양호.',
+        sheetChecks:{top1:'FN',top2:'FP',top3_좌:'FN',top3_우:'FP',top4_좌:'FN',top4_우:'FP',top5_좌:'FN',top5_우:'FP',top6:'FP',top7:'FP',top8_좌:'FN',top8_우:'FP',top9_좌:'FN',top9_우:'FP',top10:'FP'} },
+    ],
+    csmiHistory:[
+      { round:2, date:'2026-01-05',
+        shoulder_l_add:{value:72,stability:true,power:true},  shoulder_l_abd:{value:56,stability:true,power:true},
+        shoulder_r_add:{value:75,stability:true,power:true},  shoulder_r_abd:{value:58,stability:true,power:true},
+        lumbar_flex:{value:175,stability:true,power:true},    lumbar_ext:{value:255,stability:true,power:true},
+        knee_flex_l:{value:92,stability:true,power:true},     knee_ext_l:{value:148,stability:true,power:true},
+        knee_flex_r:{value:90,stability:true,power:true},     knee_ext_r:{value:145,stability:true,power:true},
+        ankle_l_flex:{value:30,stability:true,power:true},    ankle_l_ext:{value:95,stability:true,power:true},
+        ankle_l_inv:{value:24,stability:true,power:false},    ankle_l_ev:{value:22,stability:true,power:false},
+        ankle_r_flex:{value:29,stability:true,power:true},    ankle_r_ext:{value:93,stability:true,power:false},
+        ankle_r_inv:{value:23,stability:true,power:false},    ankle_r_ev:{value:21,stability:true,power:false},
+      },
+      { round:1, date:'2025-06-20',
+        shoulder_l_add:{value:60,stability:true,power:false},  shoulder_l_abd:{value:46,stability:true,power:false},
+        shoulder_r_add:{value:63,stability:true,power:false},  shoulder_r_abd:{value:50,stability:true,power:false},
+        lumbar_flex:{value:148,stability:false,power:false},   lumbar_ext:{value:218,stability:false,power:false},
+        knee_flex_l:{value:78,stability:true,power:false},     knee_ext_l:{value:128,stability:true,power:false},
+        knee_flex_r:{value:76,stability:true,power:false},     knee_ext_r:{value:125,stability:true,power:false},
+        ankle_l_flex:{value:25,stability:true,power:false},    ankle_l_ext:{value:82,stability:true,power:false},
+        ankle_l_inv:{value:18,stability:true,power:false},     ankle_l_ev:{value:16,stability:true,power:false},
+        ankle_r_flex:{value:24,stability:true,power:false},    ankle_r_ext:{value:80,stability:true,power:false},
+        ankle_r_inv:{value:17,stability:true,power:false},     ankle_r_ev:{value:15,stability:true,power:false},
+      },
+    ]
+  },
+  { name:'정우진', gender:'남', avatar:'#744210', trainer:'이트레이너',
+    history:[
+      { date:'2025-11-30', round:2, total:58, grade:'주의', opinion:'일자목 교정 병행 중. 상체 회전 개선 필요.',
+        sheetChecks:{top1:'FP',top2:'FP',top3_좌:'DN',top3_우:'DN',top4_좌:'FN',top4_우:'FP',top5_좌:'FP',top5_우:'DN',top6:'DP',top7:'FP',top8_좌:'FP',top8_우:'DN',top9_좌:'FP',top9_우:'DN',top10:'DP'} },
+      { date:'2025-04-12', round:1, total:38, grade:'주의', opinion:'초기 측정. 경추 안정화 운동 시작.',
+        sheetChecks:{top1:'DP',top2:'DN',top3_좌:'DN',top3_우:'DN',top4_좌:'FP',top4_우:'DN',top5_좌:'DP',top5_우:'DN',top6:'DP',top7:'DP',top8_좌:'DN',top8_우:'DN',top9_좌:'DP',top9_우:'DN',top10:'DP'} },
+    ],
+    csmiHistory:[
+      { round:1, date:'2025-11-25',
+        shoulder_l_add:{value:82,stability:true,power:false},  shoulder_l_abd:{value:68,stability:true,power:false},
+        shoulder_r_add:{value:85,stability:true,power:false},  shoulder_r_abd:{value:72,stability:true,power:false},
+        lumbar_flex:{value:215,stability:false,power:false},   lumbar_ext:{value:295,stability:false,power:false},
+        knee_flex_l:{value:100,stability:true,power:false},    knee_ext_l:{value:168,stability:false,power:false},
+        knee_flex_r:{value:105,stability:true,power:false},    knee_ext_r:{value:172,stability:false,power:false},
+        ankle_l_flex:{value:32,stability:true,power:false},    ankle_l_ext:{value:98,stability:true,power:false},
+        ankle_l_inv:{value:26,stability:true,power:false},     ankle_l_ev:{value:22,stability:true,power:false},
+        ankle_r_flex:{value:30,stability:true,power:false},    ankle_r_ext:{value:95,stability:true,power:false},
+        ankle_r_inv:{value:24,stability:true,power:false},     ankle_r_ev:{value:20,stability:true,power:false},
+      },
+    ]
+  },
+];
+
+/* ══ SFMA 헬퍼 ══ */
 function gradeInfo(t) {
   if (t>=90) return {label:'우수',cls:'g-excellent'};
   if (t>=75) return {label:'양호',cls:'g-good'};
@@ -475,37 +736,73 @@ const ckMap = {FN:'ck-fn',FP:'ck-fp',DP:'ck-dp',DN:'ck-dn'};
 /* ══ 상태 ══ */
 let curMemberIdx = 0;
 let cmpRounds = [];
-const SCREEN_NAMES = {main:'① 결과 메인',detail:'② 결과 상세',compare:'③ 결과 비교',history:'④ 이력 목록'};
+let csmiCmpRounds = [];
+let curMode = 'sfma';
+const SCREEN_NAMES = {
+  'main':'① SFMA 결과 메인','detail':'② SFMA 결과 상세','compare':'③ SFMA 결과 비교','history':'④ SFMA 이력 목록',
+  'csmi-main':'① CSMI 결과 메인','csmi-detail':'② CSMI 세부 항목','csmi-compare':'③ CSMI 회차 비교','csmi-history':'④ CSMI 이력 목록',
+};
+
+/* ══ 모드 전환 ══ */
+function switchMode(mode) {
+  curMode = mode;
+  document.getElementById('sfma-nav').style.display = mode==='sfma'?'flex':'none';
+  document.getElementById('csmi-nav').style.display = mode==='csmi'?'flex':'none';
+  document.getElementById('mode-btn-sfma').className = 'mode-btn'+(mode==='sfma'?' active-sfma':'');
+  document.getElementById('mode-btn-csmi').className = 'mode-btn'+(mode==='csmi'?' active-csmi':'');
+  document.getElementById('toolbar-title').textContent = mode==='sfma'?'📊 SFMA 결과 화면':'💪 CSMI 근력측정 결과 화면';
+  document.getElementById('member-label').style.color = mode==='sfma'?'#9B84FF':'#81E6D9';
+  document.getElementById('memo-title').textContent = mode==='sfma'?'📊 SFMA 결과 화면 메모':'💪 CSMI 결과 화면 메모';
+  // 회원 칩 스타일 갱신
+  renderMemberChips();
+  if(mode==='sfma') go('main');
+  else goC('csmi-main');
+}
 
 /* ══ 회원 선택 칩 ══ */
 function renderMemberChips() {
   const wrap = document.getElementById('member-chips');
-  wrap.innerHTML = MEMBERS.map((m,i) =>
-    `<button class="member-chip ${i===curMemberIdx?'active':''}" onclick="selectMember(${i})"
-      style="border-color:${i===curMemberIdx?m.avatar:'#3A3A5A'}">${m.name}</button>`
-  ).join('');
+  wrap.innerHTML = MEMBERS.map((m,i) => {
+    const isCur = i===curMemberIdx;
+    const cls = isCur ? (curMode==='csmi'?'member-chip active-csmi':'member-chip active') : 'member-chip';
+    const bc = isCur ? m.avatar : '#3A3A5A';
+    return `<button class="${cls}" onclick="selectMember(${i})" style="border-color:${bc}">${m.name}</button>`;
+  }).join('');
 }
 function selectMember(idx) {
   curMemberIdx = idx;
   cmpRounds = MEMBERS[idx].history.map((_,i)=>i);
+  csmiCmpRounds = MEMBERS[idx].csmiHistory.map((_,i)=>i);
   renderMemberChips();
   renderAll();
 }
 
-/* ══ 화면 전환 ══ */
+/* ══ 화면 전환 (SFMA) ══ */
 function go(id) {
   document.querySelectorAll('.screen-frame').forEach(s=>s.classList.remove('active'));
   document.getElementById('screen-'+id).classList.add('active');
-  document.querySelectorAll('.screen-btn').forEach((b,i)=>{
+  document.querySelectorAll('#sfma-nav .screen-btn').forEach((b,i)=>{
     b.classList.toggle('active', ['main','detail','compare','history'][i]===id);
   });
   document.getElementById('memo-screen-name').value = SCREEN_NAMES[id]||id;
 }
+/* ══ 화면 전환 (CSMI) ══ */
+function goC(id) {
+  document.querySelectorAll('.screen-frame').forEach(s=>s.classList.remove('active'));
+  document.getElementById('screen-'+id).classList.add('active');
+  document.querySelectorAll('#csmi-nav .screen-btn').forEach((b,i)=>{
+    b.classList.toggle('active', ['csmi-main','csmi-detail','csmi-compare','csmi-history'][i]===id);
+  });
+  document.getElementById('memo-screen-name').value = SCREEN_NAMES[id]||id;
+}
 
-/* ══ 렌더 전체 ══ */
-function renderAll() { renderMain(); renderDetail(); renderCompare(); renderHistory(); }
+/* ══ 전체 렌더 ══ */
+function renderAll() {
+  renderMain(); renderDetail(); renderCompare(); renderHistory();
+  renderCsmiMain(); renderCsmiDetail(); renderCsmiCompare(); renderCsmiHistory();
+}
 
-/* ── ① 결과 메인 ── */
+/* ─── ① SFMA 결과 메인 ─── */
 function renderMain() {
   const m = MEMBERS[curMemberIdx], h = m.history[0];
   if (!h) return;
@@ -520,26 +817,20 @@ function renderMain() {
   const gb = document.getElementById('main-grade-badge');
   gb.textContent = gi.label; gb.className = `sc-grade ${gi.cls}`;
 
-  /* 다음 측정 예정일 */
   const nd = getNextDate(m);
   if (nd) {
     const cls = nd.left < 0 ? 'dday-overdue' : nd.left <= 30 ? 'dday-soon' : 'dday-ok';
     const dday = nd.left < 0 ? `D+${Math.abs(nd.left)}` : `D-${nd.left}`;
     document.getElementById('next-date-row').innerHTML = `
       <div class="next-date-row">
-        <div>
-          <div class="next-date-label">${nd.round}차 측정 예정일</div>
-          <div class="next-date-val">${fmtDate(nd.next)}</div>
-        </div>
+        <div><div class="next-date-label">${nd.round}차 측정 예정일</div><div class="next-date-val">${fmtDate(nd.next)}</div></div>
         <span class="next-date-dday ${cls}">${dday}</span>
       </div>`;
   }
-
   document.getElementById('rs-header-text').textContent = `결과 · ${h.round}차 (${h.date})`;
   document.getElementById('rs-round-tag').textContent = `${h.round}차`;
   document.getElementById('dt-round-tag').textContent = `${h.round}차  ${h.date}`;
 
-  /* 막대 차트 */
   const maxC = Math.max(cnt.DP,cnt.DN,cnt.FP,cnt.FN,1);
   const MAX_H = 72;
   const bars = [
@@ -556,21 +847,19 @@ function renderMain() {
           <div class="bc-bar-wrap">
             ${b.cnt>0
               ? `<div class="bc-bar ${b.bc}" style="height:${bh}px;"><span class="bc-bar-val ${b.vc}">${b.cnt}</span></div>`
-              : `<div style="height:2px;width:100%;background:#E2E8F0;border-radius:2px;margin-bottom:0;"></div>`
-            }
+              : `<div style="height:2px;width:100%;background:#E2E8F0;border-radius:2px;"></div>`}
           </div>
           <div class="bc-lbl ${b.lc}">${b.key}</div>
         </div>`;
       }).join('')}
     </div>
     <div class="bc-legend">
-      <div class="bc-leg"><div class="bc-leg-dot" style="background:#E53E3E"></div>DP (매우나쁨)</div>
-      <div class="bc-leg"><div class="bc-leg-dot" style="background:#FC8181"></div>DN (나쁨)</div>
-      <div class="bc-leg"><div class="bc-leg-dot" style="background:#90CDF4"></div>FP (좋음+통증)</div>
-      <div class="bc-leg"><div class="bc-leg-dot" style="background:#2B6CB0"></div>FN (아주좋음)</div>
+      <div class="bc-leg"><div class="bc-leg-dot" style="background:#E53E3E"></div>DP</div>
+      <div class="bc-leg"><div class="bc-leg-dot" style="background:#FC8181"></div>DN</div>
+      <div class="bc-leg"><div class="bc-leg-dot" style="background:#90CDF4"></div>FP</div>
+      <div class="bc-leg"><div class="bc-leg-dot" style="background:#2B6CB0"></div>FN</div>
     </div>`;
 
-  /* 분석결과 */
   let an = '';
   if (cnt.DP>0) an = `통증 동반 항목(DP ${cnt.DP})이 있어 전문 상담이 필요합니다. 기능 정상 ${fnPct}%.`;
   else if (cnt.FP>0&&cnt.FN>=cnt.FP) an = `대부분의 동작에서 기능적 움직임을 보입니다 (FN ${fnPct}%). 통증 동반 항목(FP ${cnt.FP})에 집중 관리가 필요합니다.`;
@@ -578,12 +867,8 @@ function renderMain() {
   else an = `모든 동작에서 정상적인 기능을 보입니다 (FN 100%). 현재 수준 유지를 권장합니다.`;
   document.getElementById('rs-analysis').innerHTML = `
     <div class="an-text">${an}</div>
-    <div class="an-chips">
-      ${chipsHtml(cnt)}
-      <span class="an-tot">· 총 ${tot}항목</span>
-    </div>`;
+    <div class="an-chips">${chipsHtml(cnt)}<span class="an-tot">· 총 ${tot}항목</span></div>`;
 
-  /* 15항목 테이블 */
   const rows = SFMA_ITEMS.map(item => {
     const val = h.sheetChecks[item.key]; if (!val) return '';
     return `<tr><td><span style="font-size:10px;color:#A0AEC0;margin-right:6px;">${item.num}.</span>${item.name}</td><td class="tr"><span class="rb ${rbMap[val]||''}">${val}</span></td></tr>`;
@@ -595,7 +880,7 @@ function renderMain() {
     </table>`;
 }
 
-/* ── ② 결과 상세 ── */
+/* ─── ② SFMA 결과 상세 ─── */
 function renderDetail() {
   const m = MEMBERS[curMemberIdx], h = m.history[0];
   if (!h) return;
@@ -605,7 +890,6 @@ function renderDetail() {
   document.getElementById('d-score').textContent = h.total;
   const dg = document.getElementById('d-grade');
   dg.textContent = gi.label; dg.className = 'd-grade';
-
   const sec = document.getElementById('detail-section');
   sec.innerHTML = PAT_GROUPS.map(pg => {
     const cnt = patCnt(h.sheetChecks, pg.keys);
@@ -626,26 +910,21 @@ function renderDetail() {
       <div class="check-row">${items}</div>
     </div>`;
   }).join('');
-
   if (h.opinion) {
     document.getElementById('opinion-box').style.display = 'block';
     document.getElementById('op-text').textContent = h.opinion;
   }
 }
 
-/* ── ③ 결과 비교 ── */
+/* ─── ③ SFMA 결과 비교 ─── */
 function renderCompare() {
   const m = MEMBERS[curMemberIdx];
-  // 회차 칩
   document.getElementById('round-chips').innerHTML = m.history.map((h,i) =>
     `<button class="round-chip ${cmpRounds.includes(i)?'on':''}" onclick="toggleRound(${i})">${h.round}차 (${h.date.slice(2,7).replace('-','/')})</button>`
   ).join('');
-
   if (!cmpRounds.length) { document.getElementById('compare-body').innerHTML='<div style="text-align:center;color:#A0AEC0;padding:20px;font-size:12px;">회차를 선택하세요</div>'; return; }
-
   const selHist = cmpRounds.map(i=>m.history[i]);
   const COLS = ['#6B46C1','#4299E1','#48BB78','#ECC94B','#FC8181'];
-
   const thCols = selHist.map((h,li) => {
     const col = COLS[cmpRounds[li]%COLS.length];
     return `<th class="tr" style="color:${col}">${h.round}차<br><span style="font-weight:400;font-size:9px;">${h.date.slice(0,7)}</span></th>`;
@@ -658,7 +937,6 @@ function renderCompare() {
     ).join('');
     return `<tr><td><span style="font-size:10px;color:#A0AEC0;margin-right:5px;">${item.num}.</span>${item.name}</td>${tdCols}</tr>`;
   }).join('');
-
   document.getElementById('compare-body').innerHTML = `
     <table class="dtbl" style="font-size:11px;">
       <thead><tr><th>패턴</th>${thCols}</tr></thead>
@@ -671,7 +949,7 @@ function toggleRound(idx) {
   renderCompare();
 }
 
-/* ── ④ 이력 목록 ── */
+/* ─── ④ SFMA 이력 목록 ─── */
 function renderHistory() {
   const m = MEMBERS[curMemberIdx];
   if (!m.history.length) { document.getElementById('history-body').innerHTML='<div style="text-align:center;color:#A0AEC0;padding:20px;font-size:12px;">측정 이력 없음</div>'; return; }
@@ -700,8 +978,202 @@ function renderHistory() {
   }).join('') + `<div style="padding:12px 4px;text-align:center;color:#A0AEC0;font-size:11px;font-weight:600;">총 ${m.history.length}회 측정 · ${diff>=0?`+${diff}점 향상`:`${diff}점 변화`}</div>`;
 }
 
+/* ══════════════════════════════════════════ */
+/* ─── ① CSMI 결과 메인 ─── */
+function renderCsmiMain() {
+  const m = MEMBERS[curMemberIdx];
+  const ch = m.csmiHistory;
+  if(!ch||!ch.length){
+    document.getElementById('csmi-score').textContent='--';
+    document.getElementById('csmi-group-bars').innerHTML='<div style="text-align:center;color:#A0AEC0;padding:20px;font-size:12px;">측정 이력 없음</div>';
+    return;
+  }
+  const h = ch[0]; // 최신 회차
+  const totalPct = cTotalAvg(h, m.gender);
+  const gr = cGrade(totalPct);
+
+  document.getElementById('csmi-date-badge').textContent = `${fmtDate(h.date)} 측정 · ${h.round}회차`;
+  document.getElementById('csmi-score').textContent = totalPct;
+  document.getElementById('csmi-score-bar').style.width = Math.min(totalPct,100)+'%';
+  const gb = document.getElementById('csmi-grade-badge');
+  gb.textContent = gr.label; gb.className = `sc-grade ${gr.cls}`;
+
+  // 다음 측정 예정일
+  const period = CSMI_GRADE_DAYS[gr.label]||90;
+  const next = addDays(h.date, period);
+  const left = daysBetween(TODAY, next);
+  const ddCls = left<0?'dday-overdue':left<=30?'dday-soon':'dday-ok';
+  const dday = left<0?`D+${Math.abs(left)}`:`D-${left}`;
+  document.getElementById('csmi-next-date-row').innerHTML = `
+    <div class="next-date-row">
+      <div><div class="next-date-label">${h.round+1}회차 측정 예정일</div><div class="next-date-val">${fmtDate(next)}</div></div>
+      <span class="next-date-dday ${ddCls}">${dday}</span>
+    </div>`;
+
+  // 부위별 바
+  document.getElementById('csmi-group-bars').innerHTML = CSMI_GROUPS.map(g=>{
+    const avg = cGroupAvg(h, g, m.gender);
+    const gr2 = cGrade(avg);
+    const color = cBarColor(avg);
+    return `<div class="csmi-group-row">
+      <div class="csmi-group-label">${g.icon} ${g.name}</div>
+      <div class="csmi-bar-bg"><div class="csmi-bar-fill" style="width:${Math.min(avg,100)}%;background:${color};"></div></div>
+      <div class="csmi-pct-text" style="color:${color};">${avg}%</div>
+      <span class="grade-badge ${gr2.cls}" style="font-size:10px;margin-left:4px;flex-shrink:0;">${gr2.label}</span>
+    </div>`;
+  }).join('');
+
+  // 분석 텍스트
+  const weakGroups = CSMI_GROUPS.filter(g=>cGroupAvg(h,g,m.gender)<70).map(g=>g.name);
+  let an = `${m.name}님의 최근 CSMI 결과는 기준치 대비 평균 <strong>${totalPct}%</strong>(${gr.label})입니다. `;
+  if(weakGroups.length) an += `<strong>${weakGroups.join(', ')}</strong> 부위 집중 강화 프로그램이 필요합니다.`;
+  else an += `모든 부위가 기준치 70% 이상으로 전반적으로 양호한 상태입니다.`;
+  if(ch.length>=2){
+    const prev = cTotalAvg(ch[1], m.gender);
+    const diff = totalPct - prev;
+    an += ` 직전 대비 <strong>${diff>=0?'▲':'▼'}${Math.abs(diff)}%p</strong> ${diff>=0?'향상':'감소'}.`;
+  }
+  document.getElementById('csmi-analysis-box').innerHTML = `
+    <div style="background:#E6FFFA;border-radius:12px;padding:12px 14px;border-left:3px solid #2C7A7B;margin-bottom:4px;">
+      <div style="font-size:11px;font-weight:800;color:#2C7A7B;margin-bottom:5px;">🔍 종합 분석</div>
+      <div style="font-size:12px;color:#1A4040;line-height:1.7;">${an}</div>
+    </div>`;
+}
+
+/* ─── ② CSMI 세부 항목 ─── */
+function renderCsmiDetail() {
+  const m = MEMBERS[curMemberIdx];
+  const ch = m.csmiHistory;
+  if(!ch||!ch.length){ document.getElementById('csmi-detail-body').innerHTML='<div style="text-align:center;color:#A0AEC0;padding:20px;font-size:12px;">측정 이력 없음</div>'; return; }
+  const h = ch[0];
+  document.getElementById('csmi-detail-body').innerHTML = CSMI_GROUPS.map(g=>{
+    const avg = cGroupAvg(h,g,m.gender);
+    const gGr = cGrade(avg);
+    const itemsHtml = g.items.map(it=>{
+      const v = h[it.id]; if(!v) return '';
+      const std = cStd(it,m.gender);
+      const pct = cPct(v.value, std);
+      const color = cBarColor(pct);
+      const chips = [
+        v.stability?`<span style="font-size:9px;padding:2px 6px;border-radius:99px;background:#E6FFFA;color:#2C7A7B;font-weight:700;">안정성✓</span>`:'',
+        v.power?`<span style="font-size:9px;padding:2px 6px;border-radius:99px;background:#EBF8FF;color:#2B6CB0;font-weight:700;">파워✓</span>`:'',
+      ].filter(Boolean).join('');
+      return `<div class="csmi-item-row">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+          <div class="csmi-item-label">${it.label}</div>
+          <div class="csmi-item-val" style="color:${color};">${v.value}<span style="font-size:10px;font-weight:400;"> Nm</span></div>
+        </div>
+        <div class="csmi-item-bar-bg">
+          <div class="csmi-item-bar" style="width:${Math.min(pct,100)}%;background:${color};"></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:3px;">
+          <div style="font-size:10px;color:#718096;">${pct}% (기준 ${std}Nm)</div>
+          <div style="display:flex;gap:3px;">${chips}</div>
+        </div>
+      </div>`;
+    }).join('');
+    return `<div style="background:#fff;border-radius:14px;margin-bottom:10px;overflow:hidden;box-shadow:0 1px 6px rgba(0,0,0,0.07);">
+      <div style="background:${g.color};color:#fff;padding:10px 14px;font-size:13px;font-weight:800;display:flex;justify-content:space-between;align-items:center;">
+        <span>${g.icon} ${g.name}</span>
+        <span style="font-size:12px;">${avg}% · <span class="grade-badge" style="background:rgba(255,255,255,0.25);color:#fff;font-size:10px;">${gGr.label}</span></span>
+      </div>
+      <div style="padding:12px 14px;">${itemsHtml}</div>
+    </div>`;
+  }).join('');
+}
+
+/* ─── ③ CSMI 회차 비교 ─── */
+function renderCsmiCompare() {
+  const m = MEMBERS[curMemberIdx];
+  const ch = m.csmiHistory;
+  if(!ch||!ch.length){ document.getElementById('csmi-compare-body').innerHTML='<div style="text-align:center;color:#A0AEC0;padding:20px;font-size:12px;">측정 이력 없음</div>'; return; }
+
+  document.getElementById('csmi-round-chips').innerHTML = ch.map((h,i)=>
+    `<button class="csmi-round-chip ${csmiCmpRounds.includes(i)?'on':''}" onclick="toggleCsmiRound(${i})">${h.round}회차 (${h.date.slice(2,7).replace('-','/')})</button>`
+  ).join('');
+
+  if(!csmiCmpRounds.length){ document.getElementById('csmi-compare-body').innerHTML='<div style="text-align:center;color:#A0AEC0;padding:20px;font-size:12px;">회차를 선택하세요</div>'; return; }
+  const selHist = csmiCmpRounds.map(i=>ch[i]);
+  const COLS = ['#2C7A7B','#ED8936','#805AD5','#4299E1'];
+
+  let html = '';
+  CSMI_GROUPS.forEach(g=>{
+    html += `<div style="margin-bottom:14px;"><div style="font-size:12px;font-weight:800;color:#1A202C;margin-bottom:8px;">${g.icon} ${g.name}</div>`;
+    g.items.forEach(it=>{
+      const std = cStd(it, m.gender);
+      const rows = selHist.map((h,li)=>{
+        if(!h||!h[it.id]) return '';
+        const pct = cPct(h[it.id].value, std);
+        const col = COLS[csmiCmpRounds[li]%COLS.length];
+        return `<div style="display:flex;align-items:center;gap:6px;margin-bottom:3px;">
+          <div style="font-size:10px;font-weight:700;color:${col};width:22px;">${h.round}회</div>
+          <div style="flex:1;background:#EDF2F7;border-radius:99px;height:7px;overflow:hidden;">
+            <div style="width:${Math.min(pct,100)}%;height:100%;background:${col};border-radius:99px;"></div>
+          </div>
+          <div style="font-size:11px;font-weight:700;color:${col};width:40px;text-align:right;">${h[it.id].value}Nm</div>
+          <div style="font-size:10px;color:#718096;width:32px;">${pct}%</div>
+        </div>`;
+      }).join('');
+      if(!rows.trim()) return;
+      // diff between first two selected
+      let diffHtml = '';
+      if(selHist.length>=2 && selHist[0]&&selHist[0][it.id] && selHist[1]&&selHist[1][it.id]){
+        const d = cPct(selHist[0][it.id].value,std) - cPct(selHist[1][it.id].value,std);
+        diffHtml = `<span style="font-size:10px;font-weight:700;color:${d>=0?'#38A169':'#E53E3E'};margin-left:4px;">${d>=0?'▲':'▼'}${Math.abs(d)}%</span>`;
+      }
+      html += `<div style="background:#fff;border-radius:10px;padding:10px 12px;margin-bottom:6px;box-shadow:0 1px 4px rgba(0,0,0,0.06);">
+        <div style="font-size:11px;font-weight:700;color:#4A5568;margin-bottom:6px;">${it.label}${diffHtml}</div>
+        ${rows}
+      </div>`;
+    });
+    html += '</div>';
+  });
+  document.getElementById('csmi-compare-body').innerHTML = html || '<div style="text-align:center;color:#A0AEC0;padding:20px;font-size:12px;">데이터 없음</div>';
+}
+function toggleCsmiRound(idx) {
+  if(csmiCmpRounds.includes(idx)){ if(csmiCmpRounds.length===1) return; csmiCmpRounds=csmiCmpRounds.filter(i=>i!==idx); }
+  else { csmiCmpRounds.push(idx); csmiCmpRounds.sort((a,b)=>a-b); }
+  renderCsmiCompare();
+}
+
+/* ─── ④ CSMI 이력 목록 ─── */
+function renderCsmiHistory() {
+  const m = MEMBERS[curMemberIdx];
+  const ch = m.csmiHistory;
+  if(!ch||!ch.length){ document.getElementById('csmi-history-body').innerHTML='<div style="text-align:center;color:#A0AEC0;padding:20px;font-size:12px;">측정 이력 없음</div>'; return; }
+  const firstPct = cTotalAvg(ch[ch.length-1], m.gender);
+  const lastPct  = cTotalAvg(ch[0], m.gender);
+  const diff = lastPct - firstPct;
+  document.getElementById('csmi-history-body').innerHTML = ch.map((h,i)=>{
+    const pct = cTotalAvg(h, m.gender);
+    const gr = cGrade(pct);
+    const prev = ch[i+1];
+    let chgHtml = '';
+    if(prev){ const d=pct-cTotalAvg(prev,m.gender); chgHtml=d>0?`<span style="color:#38A169;">▲+${d}%</span>`:d<0?`<span style="color:#E53E3E;">▼${d}%</span>`:`<span style="color:#A0AEC0;">→유지</span>`; }
+    const groupBars = CSMI_GROUPS.map(g=>{
+      const avg=cGroupAvg(h,g,m.gender);
+      const gc=cGrade(avg);
+      return `<span class="an-chip" style="background:${cBarColor(avg)+'22'};color:${cBarColor(avg)};font-size:9px;">${g.icon} ${avg}%</span>`;
+    }).join('');
+    return `<div class="history-item" onclick="goC('csmi-detail')">
+      <div class="csmi-history-num ${i===0?'latest':''}">${h.round}</div>
+      <div class="history-info">
+        <div class="history-round">${h.round}회차 측정 ${i===0?`<span style="font-size:10px;background:#E6FFFA;color:#2C7A7B;border-radius:99px;padding:2px 7px;font-weight:700;margin-left:4px;">최근</span>`:''}</div>
+        <div class="history-date">${h.date.replace(/-/g,'. ')}</div>
+        <div class="history-chips" style="margin-top:4px;">${groupBars}</div>
+      </div>
+      <div class="history-right">
+        <span class="csmi-history-score">${pct}%</span>
+        <span class="csmi-history-grade ${gr.cls}">${gr.label}</span>
+        <span class="history-change">${chgHtml}</span>
+      </div>
+    </div>`;
+  }).join('') + `<div style="padding:12px 4px;text-align:center;color:#A0AEC0;font-size:11px;font-weight:600;">총 ${ch.length}회 측정 · ${diff>=0?`+${diff}%p 향상`:`${diff}%p 변화`}</div>`;
+}
+
 /* ══ 초기화 ══ */
 cmpRounds = MEMBERS[0].history.map((_,i)=>i);
+csmiCmpRounds = MEMBERS[0].csmiHistory.map((_,i)=>i);
 renderMemberChips();
 renderAll();
 </script>
