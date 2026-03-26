@@ -1117,7 +1117,7 @@ function openDetail(mid){
 
   document.getElementById('detail-title').textContent = `${m.name}님 CSMI 결과 상세`;
   document.getElementById('detail-sub').textContent = `${h.date} · ${h.round}회차 · ${m.gender}`;
-  document.getElementById('detail-edit-btn').onclick = ()=>{ showToast('수정 기능은 결과 입력 탭에서 이용하세요.'); };
+  document.getElementById('detail-edit-btn').onclick = ()=>{ dashGoInput(m.id); };
 
   // 전체 평균
   const totalPct = calcAvgPct(m,h);
