@@ -495,6 +495,9 @@
         <!-- 히어로 카드 -->
         <div id="detail-hero" style="margin-bottom:14px;"></div>
 
+        <!-- 회차 선택 -->
+        <div id="detail-round-selector" style="margin-bottom:14px;"></div>
+
         <!-- 2열: 회원정보 + 측정결과 -->
         <div style="display:grid;grid-template-columns:280px 1fr;gap:14px;align-items:start;">
           <!-- 좌: 회원정보 + 다음측정일 + 이력 -->
@@ -1032,20 +1035,46 @@ function dashGoDetail(mid){
   showScreen('list', document.querySelectorAll('.nav-btn')[1]);
   setTimeout(()=>openDetail(mid), 80);
 }
-function dashGoInput(mid){
+function dashGoInput(mid, editRound=null){
   const m = MEMBERS.find(x=>x.id===mid); if(!m) return;
   showScreen('input', document.querySelectorAll('.nav-btn')[2]);
   setTimeout(()=>{
+    _editingRound = editRound;
     document.getElementById('inp-member-search').value = m.name;
     document.getElementById('inp-member-search').classList.add('selected');
     _selectedMember = m;
-    const h = m.history[0];
-    document.getElementById('inp-round').value = h ? h.round+1 : 1;
     ALL_ITEMS.forEach(it=>{
       const lbl=document.getElementById('inp-std-label-'+it.id);
       if(lbl) lbl.textContent=`기준: ${stdFor(it,m.gender)}Nm`;
     });
     buildInputPanels();
+    if(editRound !== null){
+      // 수정 모드: 기존 회차 값 불러오기
+      const h = m.history.find(x=>x.round===editRound);
+      if(h){
+        document.getElementById('inp-date').value = h.date;
+        document.getElementById('inp-round').value = h.round;
+        document.getElementById('inp-memo').value = h.memo||'';
+        ALL_ITEMS.forEach(it=>{
+          const v=h[it.id]; if(!v) return;
+          _inputState[it.id]={value:v.value,stability:v.stability,power:v.power};
+          const el=document.getElementById('inp-val-'+it.id);
+          if(el) el.value=v.value;
+          onInputVal(it.id, v.value);
+          const stab=document.getElementById('inp-stab-'+it.id);
+          if(stab) stab.classList.toggle('on-stability',v.stability);
+          const pow=document.getElementById('inp-pow-'+it.id);
+          if(pow) pow.classList.toggle('on-power',v.power);
+        });
+        const pt=document.querySelector('#screen-input .page-title');
+        if(pt) pt.textContent=`✏️ CSMI 결과 수정 — ${m.name} ${editRound}회차`;
+        const ps=document.querySelector('#screen-input .page-sub');
+        if(ps) ps.textContent=`${h.date} 측정 데이터 수정`;
+      }
+    } else {
+      const h = m.history[0];
+      document.getElementById('inp-round').value = h ? h.round+1 : 1;
+    }
   }, 80);
 }
 function sendAlert(mid){
@@ -1111,13 +1140,37 @@ function addDaysStr(dateStr, days){
 }
 function daysBetweenStr(a,b){ return Math.round((new Date(b)-new Date(a))/(1000*60*60*24)); }
 
-function openDetail(mid){
+function openDetail(mid, targetRound=null){
   const m = MEMBERS.find(x=>x.id===mid); if(!m) return;
-  const h = m.history[0]; if(!h){ showToast('측정 데이터가 없습니다.'); return; }
+  if(!m.history.length){ showToast('측정 데이터가 없습니다.'); return; }
+  _detailMid = mid;
+  // targetRound가 없으면 최신 회차(history[0])
+  const h = targetRound!==null ? m.history.find(x=>x.round===targetRound)||m.history[0] : m.history[0];
 
   document.getElementById('detail-title').textContent = `${m.name}님 CSMI 결과 상세`;
   document.getElementById('detail-sub').textContent = `${h.date} · ${h.round}회차 · ${m.gender}`;
-  document.getElementById('detail-edit-btn').onclick = ()=>{ dashGoInput(m.id); };
+  document.getElementById('detail-edit-btn').onclick = ()=>{ dashGoInput(m.id, h.round); };
+
+  // 회차 선택 칩
+  const chipHtml = m.history.map(hh=>{
+    const p=calcAvgPct(m,hh); const g2=gradeByPct(p);
+    const sel=hh.round===h.round;
+    return `<button onclick="openDetail(${m.id},${hh.round})" style="
+      padding:7px 14px;border-radius:99px;cursor:pointer;font-family:inherit;font-size:12px;font-weight:700;
+      border:2px solid ${sel?'#2C7A7B':'#E2E8F0'};
+      background:${sel?'#2C7A7B':'#fff'};color:${sel?'#fff':'#4A5568'};
+      display:inline-flex;align-items:center;gap:6px;transition:all .15s;">
+      ${hh.round}회차
+      <span style="font-size:11px;opacity:0.85;">${hh.date}</span>
+      <span class="grade-badge ${g2.cls}" style="font-size:10px;">${g2.label}</span>
+    </button>`;
+  }).join('');
+  document.getElementById('detail-round-selector').innerHTML = m.history.length>1
+    ? `<div class="card" style="padding:14px 20px;">
+        <div style="font-size:12px;font-weight:700;color:#718096;margin-bottom:10px;">📅 회차 선택</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">${chipHtml}</div>
+      </div>`
+    : '';
 
   // 전체 평균
   const totalPct = calcAvgPct(m,h);
@@ -1206,7 +1259,7 @@ function openDetail(mid){
       m.history.map(hh=>{
         const p=calcAvgPct(m,hh); const g2=gradeByPct(p);
         const isCurrent=hh.round===h.round;
-        return `<div class="hist-mini-item" style="${isCurrent?'background:#F0FFF4;margin:0 -20px;padding:8px 20px;':''}">
+        return `<div class="hist-mini-item" onclick="openDetail(${m.id},${hh.round})" style="cursor:pointer;${isCurrent?'background:#F0FFF4;margin:0 -20px;padding:8px 20px;border-left:3px solid #2C7A7B;':''}">
           <div class="hmi-round">${hh.round}회</div>
           <div class="hmi-date">${hh.date}${isCurrent?' <span style="font-size:10px;color:#2C7A7B;font-weight:700;">현재</span>':''}</div>
           <div class="hmi-pct">${p}%</div>
@@ -1287,6 +1340,8 @@ let _inputState = {};  // { [itemId]: {value, stability, power} }
 let _currentInputGroup = 'shoulder';
 let _selectedMember = null;
 let _attachedImages = []; // [{name, dataUrl}]
+let _editingRound = null; // null = 신규, 숫자 = 해당 회차 수정
+let _detailMid = null;    // 현재 상세 보기 회원 id
 
 // ── 이미지 첨부 ──────────────────────────────────────────────
 function handleImageUpload(files){
@@ -1431,13 +1486,45 @@ function toggleCheck(type, itemId){
 }
 
 function saveInput(){
-  const memberName = document.getElementById('inp-member-search').value;
-  if(!memberName){ showToast('⚠️ 회원을 선택해주세요.'); return; }
-  if(_selectedMember && _selectedMember.history[0] && _attachedImages.length > 0){
-    if(!_selectedMember.history[0].images) _selectedMember.history[0].images = [];
-    _selectedMember.history[0].images.push(..._attachedImages);
+  if(!_selectedMember){ showToast('⚠️ 회원을 선택해주세요.'); return; }
+  const date = document.getElementById('inp-date').value;
+  if(!date){ showToast('⚠️ 측정일을 입력해주세요.'); return; }
+  const memo = document.getElementById('inp-memo').value;
+  const m = _selectedMember;
+
+  if(_editingRound !== null){
+    // 수정 모드: 기존 회차 업데이트
+    const existH = m.history.find(h => h.round === _editingRound);
+    if(existH){
+      existH.date = date;
+      existH.memo = memo;
+      ALL_ITEMS.forEach(it=>{
+        const s=_inputState[it.id]||{value:0,stability:false,power:false};
+        existH[it.id]={value:s.value,stability:s.stability,power:s.power};
+      });
+      if(_attachedImages.length){
+        if(!existH.images) existH.images=[];
+        existH.images.push(..._attachedImages);
+      }
+      showToast(`✅ ${m.name}님 ${_editingRound}회차 수정 완료`);
+    }
+  } else {
+    // 신규 회차 추가
+    const newSession = { date, memo };
+    ALL_ITEMS.forEach(it=>{
+      const s=_inputState[it.id]||{value:0,stability:false,power:false};
+      newSession[it.id]={value:s.value,stability:s.stability,power:s.power};
+    });
+    if(_attachedImages.length) newSession.images=[..._attachedImages];
+    const nextRound = m.history.length + 1;
+    newSession.round = nextRound;
+    m.history.unshift(newSession);
+    // 회차 번호 재정렬 (최신=최고 번호)
+    m.history.forEach((h,i)=>{ h.round = m.history.length - i; });
+    showToast(`✅ ${m.name}님 ${nextRound}회차 저장 완료`);
   }
-  showToast(`✅ 저장되었습니다.${_attachedImages.length?` (이미지 ${_attachedImages.length}장 포함)`:''}`);
+  renderList();
+  renderDashboard();
   resetInput();
 }
 
@@ -1465,7 +1552,13 @@ function resetInput(){
     if(pct) pct.style.display='none';
   }));
   _attachedImages = [];
+  _editingRound = null;
   renderImagePreviews();
+  // 입력 헤더 원복
+  const pt = document.querySelector('#screen-input .page-title');
+  if(pt) pt.textContent = '✏️ CSMI 결과 입력';
+  const ps = document.querySelector('#screen-input .page-sub');
+  if(ps) ps.textContent = '회원별 근력측정 수치 입력';
 }
 
 // ── 회원 검색 자동완성 ───────────────────────────────────────────
