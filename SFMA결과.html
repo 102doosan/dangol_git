@@ -67,6 +67,13 @@
     .sc-max { font-size: 15px; color: #A0AEC0; font-weight: 600; }
     .sc-bar-bg { background: #EDF2F7; border-radius: 99px; height: 8px; overflow: hidden; margin-top: 3px; }
     .sc-bar { height: 100%; border-radius: 99px; background: linear-gradient(90deg, #7B61FF, #9B84FF); }
+    .next-date-row { display: flex; align-items: center; justify-content: space-between; margin-top: 12px; padding-top: 10px; border-top: 1px solid #F0F4F8; }
+    .next-date-label { font-size: 11px; font-weight: 700; color: #A0AEC0; }
+    .next-date-val { font-size: 12px; font-weight: 800; color: #1A202C; }
+    .next-date-dday { font-size: 11px; font-weight: 800; padding: 2px 9px; border-radius: 99px; }
+    .dday-ok      { background: #C6F6D5; color: #276749; }
+    .dday-soon    { background: #FEFCBF; color: #744210; }
+    .dday-overdue { background: #FED7D7; color: #742A2A; }
 
     /* 결과 섹션 (차트+분석) */
     .result-section { margin: 12px 14px 0; background: #fff; border-radius: 14px; overflow: hidden; box-shadow: 0 1px 6px rgba(0,0,0,0.07); }
@@ -229,6 +236,7 @@
             <span class="sc-max">/ 100</span>
           </div>
           <div class="sc-bar-bg"><div class="sc-bar" id="main-score-bar"></div></div>
+          <div id="next-date-row"></div>
         </div>
 
         <!-- 차트 + 분석 -->
@@ -423,6 +431,17 @@ function gradeInfo(t) {
   return {label:'주의',cls:'g-poor'};
 }
 function scoreColor(s) { return s>=75?'#38A169':s>=60?'#D69E2E':'#E53E3E'; }
+const TODAY = '2026-03-26';
+const GRADE_DAYS = {우수:180, 양호:90, 보통:60, 주의:30};
+function addDays(d,n){const dt=new Date(d);dt.setDate(dt.getDate()+n);return dt.toISOString().slice(0,10);}
+function daysBetween(a,b){return Math.round((new Date(b)-new Date(a))/86400000);}
+function getNextDate(m){
+  const h=m.history[0]; if(!h) return null;
+  const period=GRADE_DAYS[gradeInfo(h.total).label]||90;
+  const next=addDays(h.date, period);
+  const left=daysBetween(TODAY, next);
+  return {next, period, left, round: h.round+1};
+}
 function countChecks(checks) {
   const c={FN:0,FP:0,DP:0,DN:0};
   if (!checks) return c;
@@ -497,6 +516,21 @@ function renderMain() {
   document.getElementById('main-score-bar').style.width = h.total + '%';
   const gb = document.getElementById('main-grade-badge');
   gb.textContent = gi.label; gb.className = `sc-grade ${gi.cls}`;
+
+  /* 다음 측정 예정일 */
+  const nd = getNextDate(m);
+  if (nd) {
+    const cls = nd.left < 0 ? 'dday-overdue' : nd.left <= 30 ? 'dday-soon' : 'dday-ok';
+    const dday = nd.left < 0 ? `D+${Math.abs(nd.left)}` : `D-${nd.left}`;
+    document.getElementById('next-date-row').innerHTML = `
+      <div class="next-date-row">
+        <div>
+          <div class="next-date-label">${nd.round}차 측정 예정일</div>
+          <div class="next-date-val">${fmtDate(nd.next)}</div>
+        </div>
+        <span class="next-date-dday ${cls}">${dday}</span>
+      </div>`;
+  }
 
   document.getElementById('rs-header-text').textContent = `결과 · ${h.round}차 (${h.date})`;
   document.getElementById('rs-round-tag').textContent = `${h.round}차`;
