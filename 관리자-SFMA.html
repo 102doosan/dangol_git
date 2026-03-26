@@ -983,13 +983,14 @@ function shToggle(stateKey, val){
 
 function renderSheetTopGrid(patterns){
   return `<div class="top-grid">${patterns.map(p=>`
-    <div class="pat-card" style="display:flex;gap:10px;align-items:center;">
+    <div class="pat-card" style="display:flex;gap:10px;align-items:flex-start;">
       ${p.img ? `<img src="${p.img}" alt="${p.name}" style="width:80px;height:80px;object-fit:contain;object-position:center;border-radius:6px;flex-shrink:0;background:#F0F4F8;" onerror="this.style.display='none'"/>` : ''}
       <div style="flex:1;min-width:0;">
         <div style="display:flex;align-items:baseline;gap:4px;margin-bottom:8px;">
           <span class="pat-num" style="margin-bottom:0;">${p.num}.</span>
           <span class="pat-name" style="margin-bottom:0;">${p.name}</span>
         </div>
+        ${shShowMemo ? `<input class="sh-memo" placeholder="메모" value="${sheetMemos[p.id+'_memo']||''}" onchange="sheetMemos['${p.id}_memo']=this.value" style="margin-bottom:6px;"/>` : ''}
         ${p.bilateral ? shSymRow(p.id,'좌',26)+shSymRow(p.id,'우',26) : shSymRow(p.id,null,26)}
       </div>
     </div>`).join('')}</div>`;
