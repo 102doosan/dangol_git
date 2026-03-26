@@ -231,13 +231,16 @@
   <div class="tab-content active" id="tab-overview">
     <div id="dday-wrap"></div>
 
-    <!-- 결과 차트 + 분석 -->
+    <!-- 결과 차트 -->
     <div class="result-section" id="result-section">
       <div class="result-header" id="result-header"></div>
-      <div class="result-body">
-        <div class="result-chart-col" id="result-chart"></div>
-        <div class="result-analysis-col" id="result-analysis"></div>
-      </div>
+      <div id="result-chart" style="padding:12px 14px;"></div>
+    </div>
+
+    <!-- 분석결과 -->
+    <div class="result-section" id="result-analysis-section" style="margin-top:0;">
+      <div class="result-header">분석결과</div>
+      <div id="result-analysis" style="padding:12px 14px;"></div>
     </div>
 
     <!-- 패턴별 상세 테이블 -->
@@ -503,6 +506,7 @@ function renderOverview() {
 
   if (!latest) {
     document.getElementById('result-section').style.display = 'none';
+    document.getElementById('result-analysis-section').style.display = 'none';
     document.getElementById('detail-table-wrap').style.display = 'none';
     return;
   }
