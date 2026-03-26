@@ -685,6 +685,26 @@
         <div id="settings-preview"></div>
       </div>
 
+      <!-- 알림 발송 이력 -->
+      <div class="card">
+        <div class="card-title">📋 알림 발송 이력
+          <div style="display:flex;gap:8px;margin-left:auto;align-items:center;">
+            <select id="hist-filter-status" onchange="renderAlertHistory()"
+              style="font-size:11px;padding:4px 8px;border:1px solid #E2E8F0;border-radius:6px;color:#4A5568;font-family:'Noto Sans KR',sans-serif;">
+              <option value="">전체 상태</option>
+              <option value="발송완료">발송완료</option>
+              <option value="실패">실패</option>
+            </select>
+            <select id="hist-filter-name" onchange="renderAlertHistory()"
+              style="font-size:11px;padding:4px 8px;border:1px solid #E2E8F0;border-radius:6px;color:#4A5568;font-family:'Noto Sans KR',sans-serif;">
+              <option value="">전체 회원</option>
+            </select>
+            <button class="btn-sm" style="background:#FFF5F5;color:#C53030;" onclick="clearAlertHistory()">전체 삭제</button>
+          </div>
+        </div>
+        <div id="alert-history-wrap"></div>
+      </div>
+
     </div>
 
   </div><!-- .main -->
@@ -859,7 +879,7 @@ function showScreen(id, navBtn, sideBtn) {
   if (id === 'list')      renderList();
   if (id === 'input')     { renderSheetContent(); onMemberChange(); }
   if (id === 'compare')   renderCompare();
-  if (id === 'settings')  renderSettingsScreen();
+  if (id === 'settings')  { renderSettingsScreen(); renderAlertHistory(); updateHistFilterNames(); }
 }
 
 /* ══════════════════════════════════════
@@ -2109,15 +2129,103 @@ function showToast(msg) {
 }
 
 /* ══════════════════════════════════════
-   🔔 알림 발송 (미리보기 체크박스)
+   🔔 알림 발송 + 이력 관리
 ══════════════════════════════════════ */
+let ALERT_HISTORY = []; // { id, name, avatar, date, time, status, note }
+
 function sendCheckedAlerts() {
   const checked = [...document.querySelectorAll('.sp-chk:checked')].map(c => c.dataset.name);
   if (!checked.length) { showToast('⚠️ 알림을 보낼 회원을 선택하세요.'); return; }
+
+  const now = new Date();
+  const dateStr = now.toISOString().slice(0, 10);
+  const timeStr = now.toTimeString().slice(0, 5);
+
+  checked.forEach(name => {
+    const m = MEMBERS.find(x => x.name === name) || UNMEASURED.find(x => x.name === name);
+    const a = m && m.history?.[0] ? getAlertStatus(m) : { status:'none', dDays:0 };
+    const note = a.status === 'overdue' ? `D+${Math.abs(a.dDays)} 초과` : a.status === 'soon' ? `D-${a.dDays} 임박` : '재검사 안내';
+    ALERT_HISTORY.unshift({
+      id: Date.now() + Math.random(),
+      name,
+      avatar: m?.avatar || '#6B46C1',
+      date: dateStr,
+      time: timeStr,
+      status: '발송완료',
+      note,
+    });
+  });
+
   showToast(`✅ ${checked.join(', ')}님께 알림을 발송했습니다.`);
   document.querySelectorAll('.sp-chk').forEach(c => c.checked = false);
   document.getElementById('sp-chk-all').checked = false;
   updateSendBtn();
+  renderAlertHistory();
+  updateHistFilterNames();
+}
+
+function renderAlertHistory() {
+  const statusF = document.getElementById('hist-filter-status')?.value || '';
+  const nameF   = document.getElementById('hist-filter-name')?.value || '';
+  const wrap = document.getElementById('alert-history-wrap');
+  if (!wrap) return;
+
+  const filtered = ALERT_HISTORY.filter(h =>
+    (!statusF || h.status === statusF) &&
+    (!nameF   || h.name === nameF)
+  );
+
+  if (!filtered.length) {
+    wrap.innerHTML = `<div style="text-align:center;padding:28px;color:#A0AEC0;font-size:13px;">발송 이력이 없습니다.</div>`;
+    return;
+  }
+
+  // 날짜별 그룹
+  const groups = {};
+  filtered.forEach(h => { (groups[h.date] = groups[h.date] || []).push(h); });
+
+  wrap.innerHTML = Object.entries(groups).sort((a,b) => b[0].localeCompare(a[0])).map(([date, items]) => `
+    <div style="margin-bottom:6px;">
+      <div style="font-size:11px;font-weight:700;color:#9B84FF;padding:8px 4px 4px;border-bottom:1px solid #EDE9FE;">${date}</div>
+      ${items.map(h => `
+        <div style="display:flex;align-items:center;gap:10px;padding:9px 4px;border-bottom:1px solid #F7F9FC;">
+          <div style="width:30px;height:30px;border-radius:50%;background:${h.avatar};color:#fff;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;">${h.name[0]}</div>
+          <div style="flex:1;min-width:0;">
+            <div style="font-size:13px;font-weight:700;color:#2D3748;">${h.name}</div>
+            <div style="font-size:11px;color:#A0AEC0;margin-top:1px;">${h.note}</div>
+          </div>
+          <div style="font-size:11px;color:#718096;">${h.time}</div>
+          <span style="font-size:11px;padding:2px 8px;border-radius:99px;font-weight:700;
+            ${h.status==='발송완료' ? 'background:#F0FFF4;color:#276749;' : 'background:#FFF5F5;color:#C53030;'}">
+            ${h.status}
+          </span>
+          <button onclick="deleteAlertHistory('${h.id}')"
+            style="background:none;border:none;color:#CBD5E0;font-size:14px;cursor:pointer;padding:2px 4px;line-height:1;" title="삭제">✕</button>
+        </div>`).join('')}
+    </div>`).join('');
+}
+
+function deleteAlertHistory(id) {
+  ALERT_HISTORY = ALERT_HISTORY.filter(h => String(h.id) !== String(id));
+  renderAlertHistory();
+  updateHistFilterNames();
+}
+
+function clearAlertHistory() {
+  if (!ALERT_HISTORY.length) { showToast('삭제할 이력이 없습니다.'); return; }
+  ALERT_HISTORY = [];
+  renderAlertHistory();
+  updateHistFilterNames();
+  showToast('✅ 알림 이력을 전체 삭제했습니다.');
+}
+
+function updateHistFilterNames() {
+  const sel = document.getElementById('hist-filter-name');
+  if (!sel) return;
+  const cur = sel.value;
+  const names = [...new Set(ALERT_HISTORY.map(h => h.name))];
+  sel.innerHTML = '<option value="">전체 회원</option>' +
+    names.map(n => `<option value="${n}" ${cur===n?'selected':''}>${n}</option>`).join('');
 }
 
 function updateSendBtn() {
