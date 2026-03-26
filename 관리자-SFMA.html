@@ -341,10 +341,13 @@
         </div>
       </div>
 
+      <!-- 필터 배너 -->
+      <div id="list-filter-banner" style="display:none;background:#EDE9FE;color:#6B46C1;font-size:12px;font-weight:600;padding:8px 14px;border-radius:8px;margin-bottom:8px;"></div>
+
       <!-- 검색 바 -->
       <div class="card" id="list-filter-card">
         <div class="filter-bar" style="margin-bottom:0;">
-          <input class="search-input" id="list-search" type="text" placeholder="🔍  회원명 또는 전화번호 검색" oninput="renderList()" />
+          <input class="search-input" id="list-search" type="text" placeholder="🔍  회원명 또는 전화번호 검색" oninput="listDashFilter=null;document.getElementById('list-filter-banner').style.display='none';renderList()" />
           <select class="filter-select" id="list-grade-filter" onchange="renderList()">
             <option value="">전체 등급</option>
             <option value="우수">우수 (90+)</option>
@@ -676,6 +679,7 @@ PATTERNS.forEach(p => { inpChecks[p.id] = {}; p.checks.forEach(c => { inpChecks[
 
 let cmpSelected = [0];
 let listSelectedMember = null;
+let listDashFilter = null; // 'all' | 'thisMonth' | null
 
 /* 결과조회 뷰 모드 상태 */
 let vwCurrentTab = 'top';
@@ -719,13 +723,17 @@ function renderDashboard() {
     : 0;
 
   const statCards = [
-    { icon:'👥', label:'전체 회원', value:totalMembers, sub:'이번 달 신규 +3명', subCls:'', screen:'list' },
-    { icon:'✅', label:'이번 달 측정', value:thisMonth, sub:'최근 30일 기준', subCls:'', screen:'list', valColor:'#6B46C1' },
-    { icon:'⚠️', label:'미측정 (3개월+)', value:unmeasuredCnt, sub:'재측정 권고 대상', subCls:'down', screen:'list' , valColor:'#E53E3E' },
-    { icon:'📊', label:'평균 FN 비율', value:avgFn+'%', sub:'측정 완료 회원 기준', subCls:'', screen:'compare' },
+    { icon:'👥', label:'전체 회원', value:totalMembers, sub:'이번 달 신규 +3명', subCls:'', valColor:'',
+      onclick:`showListFiltered('all')` },
+    { icon:'✅', label:'이번 달 측정', value:thisMonth, sub:'최근 30일 기준', subCls:'', valColor:'#6B46C1',
+      onclick:`showListFiltered('thisMonth')` },
+    { icon:'⚠️', label:'미측정 (3개월+)', value:unmeasuredCnt, sub:'재측정 권고 대상', subCls:'down', valColor:'#E53E3E',
+      onclick:`highlightUnmeasured()` },
+    { icon:'📊', label:'평균 FN 비율', value:avgFn+'%', sub:'측정 완료 회원 기준', subCls:'', valColor:'',
+      onclick:`showScreen('compare',document.querySelectorAll('.nav-btn')[3])` },
   ];
   document.getElementById('dash-stats-row').innerHTML = statCards.map(c => `
-    <div class="stat-card" style="cursor:pointer;transition:box-shadow .15s;" onclick="showScreen('${c.screen}',document.querySelectorAll('.nav-btn')[${c.screen==='list'?1:3}])"
+    <div class="stat-card" style="cursor:pointer;transition:box-shadow .15s;" onclick="${c.onclick}"
       onmouseover="this.style.boxShadow='0 4px 16px rgba(107,70,193,0.15)'" onmouseout="this.style.boxShadow=''">
       <div class="stat-label"><span>${c.icon}</span> ${c.label}</div>
       <div class="stat-value" style="${c.valColor?'color:'+c.valColor:''}">${c.value}</div>
@@ -763,6 +771,52 @@ function renderDashboard() {
 }
 
 /* ══════════════════════════════════════
+   대시보드 카드 → 결과조회 필터 이동
+══════════════════════════════════════ */
+function showListFiltered(type) {
+  listDashFilter = type;
+  // 검색/필터 초기화
+  const s = document.getElementById('list-search');
+  const g = document.getElementById('list-grade-filter');
+  const t = document.getElementById('list-trainer-filter');
+  if (s) s.value = '';
+  if (g) g.value = '';
+  if (t) t.value = '';
+  showScreen('list', document.querySelectorAll('.nav-btn')[1]);
+  renderList();
+  // 필터 배너 표시
+  const banner = document.getElementById('list-filter-banner');
+  if (banner) {
+    if (type === 'thisMonth') {
+      banner.innerHTML = `✅ 이번 달 측정 회원만 표시 중 &nbsp;<button onclick="clearListFilter()" style="font-size:11px;background:none;border:none;cursor:pointer;color:#6B46C1;font-weight:700;">✕ 전체 보기</button>`;
+      banner.style.display = 'block';
+    } else {
+      banner.style.display = 'none';
+    }
+  }
+}
+
+function clearListFilter() {
+  listDashFilter = null;
+  const banner = document.getElementById('list-filter-banner');
+  if (banner) banner.style.display = 'none';
+  renderList();
+}
+
+function highlightUnmeasured() {
+  // 대시보드에 있으면 스크롤, 아니면 대시보드로 이동 후 스크롤
+  showScreen('dashboard', document.querySelectorAll('.nav-btn')[0]);
+  setTimeout(() => {
+    const card = document.getElementById('unmeasured-list')?.closest('.card');
+    if (!card) return;
+    card.scrollIntoView({ behavior:'smooth', block:'center' });
+    card.style.transition = 'box-shadow .2s';
+    card.style.boxShadow = '0 0 0 3px #E53E3E88';
+    setTimeout(() => { card.style.boxShadow = ''; }, 2000);
+  }, 150);
+}
+
+/* ══════════════════════════════════════
    ② 결과 조회
 ══════════════════════════════════════ */
 function renderList() {
@@ -770,7 +824,14 @@ function renderList() {
   const gf = document.getElementById('list-grade-filter')?.value || '';
   const tf = document.getElementById('list-trainer-filter')?.value || '';
 
-  const filtered = MEMBERS.filter(m => {
+  // 대시보드 카드 필터
+  const TODAY = '2026-03';
+  let baseMembers = MEMBERS;
+  if (listDashFilter === 'thisMonth') {
+    baseMembers = MEMBERS.filter(m => m.history.some(h => h.date.startsWith(TODAY)));
+  }
+
+  const filtered = baseMembers.filter(m => {
     if (q && !m.name.includes(q)) return false;
     if (gf && m.history.length && m.history[0].grade !== gf) return false;
     if (tf && m.trainer !== tf) return false;
