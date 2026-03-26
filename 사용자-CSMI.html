@@ -571,9 +571,15 @@
       <div class="card">
         <div class="card-title">회원 선택</div>
         <div class="filter-bar">
-          <select class="filter-select" id="cmp-member-sel" onchange="renderCompare()" style="min-width:160px;">
-            <option value="">회원 선택...</option>
-          </select>
+          <div class="member-search-wrap" style="min-width:240px;">
+            <input type="text" class="member-search-input" id="cmp-member-search"
+              placeholder="이름 또는 전화번호 검색..."
+              oninput="cmpMemberSearchInput(this.value)"
+              onfocus="cmpMemberSearchFocus()"
+              onblur="cmpMemberSearchBlur()"
+              autocomplete="off" />
+            <div class="member-dropdown" id="cmp-dropdown"></div>
+          </div>
           <select class="filter-select" id="cmp-round1" onchange="renderCompare()">
             <option value="">비교 회차 1</option>
           </select>
@@ -709,7 +715,7 @@ function barColor(pct){
 
 // 샘플 회원 데이터
 const MEMBERS = [
-  { id:1, name:'김태훈', gender:'남', color:'#4299E1', history:[
+  { id:1, name:'김태훈', gender:'남', color:'#4299E1', phone:'010-1234-5678', history:[
     { round:1, date:'2026-03-10',
       shoulder_l_add:{value:105,stability:true,power:true},
       shoulder_l_abd:{value:85,stability:true,power:true},
@@ -751,7 +757,7 @@ const MEMBERS = [
       ankle_r_ev:{value:20,stability:true,power:false},
     }
   ]},
-  { id:2, name:'이서연', gender:'여', color:'#ED64A6', history:[
+  { id:2, name:'이서연', gender:'여', color:'#ED64A6', phone:'010-2345-6789', history:[
     { round:1, date:'2026-03-12',
       shoulder_l_add:{value:68,stability:true,power:true},
       shoulder_l_abd:{value:52,stability:true,power:true},
@@ -773,7 +779,7 @@ const MEMBERS = [
       ankle_r_ev:{value:19,stability:true,power:false},
     }
   ]},
-  { id:3, name:'박민준', gender:'남', color:'#48BB78', history:[
+  { id:3, name:'박민준', gender:'남', color:'#48BB78', phone:'010-3456-7890', history:[
     { round:1, date:'2026-03-08',
       shoulder_l_add:{value:72,stability:false,power:false},
       shoulder_l_abd:{value:62,stability:false,power:false},
@@ -795,7 +801,7 @@ const MEMBERS = [
       ankle_r_ev:{value:20,stability:false,power:false},
     }
   ]},
-  { id:4, name:'정유진', gender:'여', color:'#ED8936', history:[
+  { id:4, name:'정유진', gender:'여', color:'#ED8936', phone:'010-4567-8901', history:[
     { round:1, date:'2026-02-20',
       shoulder_l_add:{value:58,stability:true,power:false},
       shoulder_l_abd:{value:45,stability:true,power:false},
@@ -817,7 +823,7 @@ const MEMBERS = [
       ankle_r_ev:{value:11,stability:false,power:false},
     }
   ]},
-  { id:5, name:'최준혁', gender:'남', color:'#9F7AEA', history:[
+  { id:5, name:'최준혁', gender:'남', color:'#9F7AEA', phone:'010-5678-9012', history:[
     { round:1, date:'2026-01-15',
       shoulder_l_add:{value:118,stability:true,power:true},
       shoulder_l_abd:{value:92,stability:true,power:true},
@@ -1298,7 +1304,7 @@ function resetInput(){
 function memberSearchInput(q){
   const dd = document.getElementById('member-dropdown');
   if(!q){ dd.classList.remove('open'); return; }
-  const found = MEMBERS.filter(m=>m.name.includes(q));
+  const found = MEMBERS.filter(m=>m.name.includes(q)||(m.phone||'').includes(q));
   if(!found.length){
     dd.innerHTML='<div class="member-drop-item" style="color:#A0AEC0;">검색 결과 없음</div>';
   } else {
@@ -1308,7 +1314,7 @@ function memberSearchInput(q){
         <div class="member-drop-avatar" style="background:${m.color}">${m.name[0]}</div>
         <div>
           <div class="member-drop-name">${m.name}</div>
-          <div class="member-drop-phone">${m.gender} · ${h?h.date+' 측정':'미측정'}</div>
+          <div class="member-drop-phone">${m.phone||m.gender} · ${h?h.date+' 측정':'미측정'}</div>
         </div>
         <div class="member-drop-round">${h?h.round+'회차':'0회'}</div>
       </div>`;
@@ -1340,30 +1346,58 @@ function selectMember(mid){
 }
 
 // ── 결과 비교 ──────────────────────────────────────────────────
-function initCompare(){
-  const sel = document.getElementById('cmp-member-sel');
-  sel.innerHTML = '<option value="">회원 선택...</option>' +
-    MEMBERS.map(m=>`<option value="${m.id}">${m.name}</option>`).join('');
+let _cmpMember = null;
+
+function initCompare(){ /* 검색창 방식으로 전환 — 초기화 불필요 */ }
+
+function cmpMemberSearchInput(q){
+  const dd = document.getElementById('cmp-dropdown');
+  const found = q ? MEMBERS.filter(m=>m.name.includes(q)||(m.phone||'').includes(q)) : MEMBERS;
+  if(!found.length){
+    dd.innerHTML='<div class="member-drop-item" style="color:#A0AEC0;">검색 결과 없음</div>';
+  } else {
+    dd.innerHTML = found.map(m=>{
+      const h=m.history[0];
+      return `<div class="member-drop-item" onmousedown="selectCmpMember(${m.id})">
+        <div class="member-drop-avatar" style="background:${m.color}">${m.name[0]}</div>
+        <div>
+          <div class="member-drop-name">${m.name}</div>
+          <div class="member-drop-phone">${m.phone||m.gender} · ${h?h.date+' 측정':'미측정'}</div>
+        </div>
+        <div class="member-drop-round">${h?h.round+'회차':'0회'}</div>
+      </div>`;
+    }).join('');
+  }
+  dd.classList.add('open');
+}
+function cmpMemberSearchFocus(){
+  cmpMemberSearchInput(document.getElementById('cmp-member-search').value);
+}
+function cmpMemberSearchBlur(){
+  setTimeout(()=>document.getElementById('cmp-dropdown').classList.remove('open'),150);
+}
+function selectCmpMember(mid){
+  _cmpMember = MEMBERS.find(m=>m.id===mid);
+  document.getElementById('cmp-member-search').value = _cmpMember.name;
+  document.getElementById('cmp-member-search').classList.add('selected');
+  document.getElementById('cmp-dropdown').classList.remove('open');
+  // 회차 셀렉트 채우기
+  const r1sel=document.getElementById('cmp-round1');
+  const r2sel=document.getElementById('cmp-round2');
+  const opts=_cmpMember.history.map(h=>`<option value="${h.round}">${h.round}회차 (${h.date})</option>`).join('');
+  r1sel.innerHTML='<option value="">비교 회차 1</option>'+opts;
+  r2sel.innerHTML='<option value="">비교 회차 2</option>'+opts;
+  if(_cmpMember.history.length>=2){ r1sel.value=_cmpMember.history[0].round; r2sel.value=_cmpMember.history[1].round; }
+  else if(_cmpMember.history.length===1){ r1sel.value=_cmpMember.history[0].round; }
+  renderCompare();
 }
 
 function renderCompare(){
-  const mid = parseInt(document.getElementById('cmp-member-sel').value);
-  const m = MEMBERS.find(x=>x.id===mid);
+  const m = _cmpMember;
   if(!m){ document.getElementById('compare-result').innerHTML=''; return; }
 
-  // 회차 옵션 채우기
   const r1sel = document.getElementById('cmp-round1');
   const r2sel = document.getElementById('cmp-round2');
-  const opts = m.history.map(h=>`<option value="${h.round}">${h.round}회차 (${h.date})</option>`).join('');
-  if(!r1sel.dataset.filled || r1sel.dataset.mid!==String(mid)){
-    r1sel.innerHTML='<option value="">비교 회차 1</option>'+opts;
-    r2sel.innerHTML='<option value="">비교 회차 2</option>'+opts;
-    r1sel.dataset.filled='1'; r1sel.dataset.mid=String(mid);
-    r2sel.dataset.filled='1'; r2sel.dataset.mid=String(mid);
-    if(m.history.length>=2){ r1sel.value=m.history[0].round; r2sel.value=m.history[1].round; }
-    else if(m.history.length===1){ r1sel.value=m.history[0].round; }
-  }
-
   const rv1=parseInt(r1sel.value), rv2=parseInt(r2sel.value);
   const h1=m.history.find(h=>h.round===rv1);
   const h2=m.history.find(h=>h.round===rv2);
