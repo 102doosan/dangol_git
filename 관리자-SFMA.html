@@ -390,6 +390,7 @@
             <div class="card" id="vw-member-info"></div>
             <div class="card" id="vw-opinion-card"></div>
             <div class="card" id="vw-history-card" style="display:none;"></div>
+            <div class="card" id="vw-next-date-card"></div>
             <div id="vw-action-btns" style="display:flex;gap:8px;margin-bottom:14px;"></div>
           </div>
           <!-- 우: SFMA 체크시트 (읽기 전용) -->
@@ -1241,6 +1242,9 @@ function showMemberDetail(name) {
     document.getElementById('vw-history-card').style.display = 'none';
   }
 
+  // 좌: 다음 측정 예정일
+  renderNextDateCard(m);
+
   // 좌: 액션 버튼
   document.getElementById('vw-action-btns').innerHTML = `
     <button class="btn-primary" style="flex:1;font-size:12px;padding:9px;" onclick="openInputFor('${name}')">✏️ 결과 수정</button>
@@ -1248,6 +1252,64 @@ function showMemberDetail(name) {
 
   // 우: 체크시트 렌더
   renderViewSheetContent();
+}
+
+function addDays(dateStr, days) {
+  const d = new Date(dateStr);
+  d.setDate(d.getDate() + days);
+  return d.toISOString().slice(0, 10);
+}
+
+function renderNextDateCard(m) {
+  const card = document.getElementById('vw-next-date-card');
+  if (!card) return;
+  const h = m.history[0];
+  if (!h) { card.innerHTML = ''; return; }
+
+  const period = getReexamDays(m);
+  const autoDate = addDays(h.date, period);
+  const savedDate = m.nextDate || autoDate;
+  const alert = getAlertStatus(m);
+
+  const statusHtml = alert.status === 'overdue'
+    ? `<span style="background:#FFF5F5;color:#C53030;padding:2px 7px;border-radius:5px;font-size:11px;font-weight:700;">D+${Math.abs(alert.dDays)} 초과</span>`
+    : alert.status === 'soon'
+    ? `<span style="background:#FFF9E6;color:#D97706;padding:2px 7px;border-radius:5px;font-size:11px;font-weight:700;">D-${alert.dDays} 임박</span>`
+    : `<span style="background:#F0FFF4;color:#276749;padding:2px 7px;border-radius:5px;font-size:11px;font-weight:700;">정상</span>`;
+
+  card.innerHTML = `
+    <div class="card-title">📅 다음 측정 예정일 ${statusHtml}</div>
+    <div style="font-size:11px;color:#A0AEC0;margin-bottom:10px;">기본 주기 <b style="color:#6B46C1;">${period}일</b> 기준 · 마지막 측정 ${h.date}</div>
+    <div style="display:flex;gap:8px;align-items:center;">
+      <input type="date" id="vw-next-date-input" value="${savedDate}"
+        style="flex:1;padding:8px 10px;border:1.5px solid #E2E8F0;border-radius:8px;font-size:13px;box-sizing:border-box;font-family:'Noto Sans KR',sans-serif;">
+      <button onclick="saveNextDate('${m.name}')"
+        style="background:#6B46C1;color:#fff;border:none;border-radius:8px;padding:8px 14px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;font-family:'Noto Sans KR',sans-serif;">저장</button>
+      <button onclick="resetNextDate('${m.name}','${autoDate}')" title="기본값으로 초기화"
+        style="background:#EDE9FE;color:#6B46C1;border:none;border-radius:8px;padding:8px 10px;font-size:12px;cursor:pointer;font-family:'Noto Sans KR',sans-serif;">↺</button>
+    </div>
+    ${m.nextDate && m.nextDate !== autoDate
+      ? `<div style="font-size:11px;color:#9B84FF;margin-top:6px;">※ 개별 지정일 (자동: ${autoDate})</div>`
+      : `<div style="font-size:11px;color:#A0AEC0;margin-top:6px;">자동 계산값 적용 중</div>`}`;
+}
+
+function saveNextDate(name) {
+  const m = MEMBERS.find(x => x.name === name);
+  if (!m) return;
+  const val = document.getElementById('vw-next-date-input').value;
+  if (!val) return;
+  m.nextDate = val;
+  renderNextDateCard(m);
+  showToast('✅ 다음 측정 예정일이 저장되었습니다.');
+}
+
+function resetNextDate(name, autoDate) {
+  const m = MEMBERS.find(x => x.name === name);
+  if (!m) return;
+  m.nextDate = null;
+  document.getElementById('vw-next-date-input').value = autoDate;
+  renderNextDateCard(m);
+  showToast('↺ 기본값으로 초기화했습니다.');
 }
 
 function goToMemberDetail(name) {
