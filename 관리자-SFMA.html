@@ -249,6 +249,7 @@
   <button class="nav-btn" onclick="showScreen('list', this)">🔍 결과 조회</button>
   <button class="nav-btn" onclick="showScreen('input', this)">✏️ 결과 입력</button>
   <button class="nav-btn" onclick="showScreen('compare', this)">📈 결과 비교</button>
+  <button class="nav-btn" onclick="showScreen('settings', this)">⚙️ 알림 설정</button>
 </div>
 
 <div class="admin-wrap">
@@ -270,6 +271,9 @@
     </div>
     <div class="sidebar-item" onclick="showScreen('compare', null, this)">
       <span class="sidebar-item-icon">📈</span> 결과 비교
+    </div>
+    <div class="sidebar-item" onclick="showScreen('settings', null, this)">
+      <span class="sidebar-item-icon">⚙️</span> 알림 설정
     </div>
     <div class="sidebar-section" style="margin-top:12px;">빠른 현황</div>
     <div style="padding:10px 20px;">
@@ -548,6 +552,113 @@
       </div>
     </div>
 
+    <!-- ⑤ 알림 설정 -->
+    <div class="screen" id="screen-settings">
+      <div class="page-header">
+        <div>
+          <div class="page-title">⚙️ SFMA 재검사 알림 설정</div>
+          <div class="page-sub">재검사 권고 기간 및 알림 조건을 설정합니다</div>
+        </div>
+        <div class="page-actions">
+          <button class="btn-primary" onclick="saveSettings()">💾 설정 저장</button>
+        </div>
+      </div>
+
+      <!-- 기본 설정 -->
+      <div class="card">
+        <div class="card-title">🔔 기본 재검사 주기 설정</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-top:4px;">
+          <div class="form-group" style="margin:0;">
+            <label class="form-label">기본 재검사 주기</label>
+            <div style="display:flex;align-items:center;gap:8px;">
+              <input class="form-input" id="set-default-days" type="number" min="30" max="365" value="90" style="width:80px;text-align:center;" oninput="previewDefaultPeriod()">
+              <span style="font-size:13px;color:#718096;">일</span>
+              <span id="set-default-preview" style="font-size:12px;color:#6B46C1;font-weight:600;background:#EDE9FE;padding:3px 8px;border-radius:6px;">3개월</span>
+            </div>
+            <div style="font-size:11px;color:#A0AEC0;margin-top:4px;">모든 회원에게 적용되는 기본값</div>
+          </div>
+          <div class="form-group" style="margin:0;">
+            <label class="form-label">사전 알림 (D-)</label>
+            <div style="display:flex;align-items:center;gap:8px;">
+              <input class="form-input" id="set-notify-before" type="number" min="1" max="30" value="7" style="width:80px;text-align:center;">
+              <span style="font-size:13px;color:#718096;">일 전부터</span>
+            </div>
+            <div style="font-size:11px;color:#A0AEC0;margin-top:4px;">재검사일 D-7부터 알림 표시</div>
+          </div>
+          <div class="form-group" style="margin:0;">
+            <label class="form-label">알림 표시 조건</label>
+            <div style="display:flex;flex-direction:column;gap:6px;margin-top:4px;">
+              <label style="font-size:12px;color:#4A5568;display:flex;align-items:center;gap:6px;cursor:pointer;">
+                <input type="checkbox" id="set-notify-dashboard" checked style="accent-color:#6B46C1;"> 대시보드 알림 표시
+              </label>
+              <label style="font-size:12px;color:#4A5568;display:flex;align-items:center;gap:6px;cursor:pointer;">
+                <input type="checkbox" id="set-notify-badge" checked style="accent-color:#6B46C1;"> 메뉴 배지 표시
+              </label>
+              <label style="font-size:12px;color:#4A5568;display:flex;align-items:center;gap:6px;cursor:pointer;">
+                <input type="checkbox" id="set-notify-list" checked style="accent-color:#6B46C1;"> 결과조회 목록 강조
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 등급별 자동 주기 -->
+      <div class="card">
+        <div class="card-title">🎯 등급별 재검사 주기 <span style="font-size:11px;font-weight:400;color:#A0AEC0;margin-left:6px;">개별 설정 없으면 기본값 적용</span></div>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:4px;">
+          <div style="background:#F0FFF4;border-radius:10px;padding:14px;border:1px solid #C6F6D5;">
+            <div style="font-size:12px;font-weight:700;color:#276749;margin-bottom:8px;">🏆 우수 (90+)</div>
+            <div style="display:flex;align-items:center;gap:6px;">
+              <input class="form-input" id="set-grade-excellent" type="number" min="30" max="365" value="180" style="width:70px;text-align:center;padding:6px;">
+              <span style="font-size:12px;color:#718096;">일</span>
+            </div>
+            <div style="font-size:11px;color:#A0AEC0;margin-top:4px;">약 6개월</div>
+          </div>
+          <div style="background:#EBF8FF;border-radius:10px;padding:14px;border:1px solid #BEE3F8;">
+            <div style="font-size:12px;font-weight:700;color:#2B6CB0;margin-bottom:8px;">✅ 양호 (75~89)</div>
+            <div style="display:flex;align-items:center;gap:6px;">
+              <input class="form-input" id="set-grade-good" type="number" min="30" max="365" value="90" style="width:70px;text-align:center;padding:6px;">
+              <span style="font-size:12px;color:#718096;">일</span>
+            </div>
+            <div style="font-size:11px;color:#A0AEC0;margin-top:4px;">약 3개월</div>
+          </div>
+          <div style="background:#FFFBEB;border-radius:10px;padding:14px;border:1px solid #FEFCBF;">
+            <div style="font-size:12px;font-weight:700;color:#D97706;margin-bottom:8px;">⚡ 보통 (60~74)</div>
+            <div style="display:flex;align-items:center;gap:6px;">
+              <input class="form-input" id="set-grade-average" type="number" min="30" max="365" value="60" style="width:70px;text-align:center;padding:6px;">
+              <span style="font-size:12px;color:#718096;">일</span>
+            </div>
+            <div style="font-size:11px;color:#A0AEC0;margin-top:4px;">약 2개월</div>
+          </div>
+          <div style="background:#FFF5F5;border-radius:10px;padding:14px;border:1px solid #FED7D7;">
+            <div style="font-size:12px;font-weight:700;color:#C53030;margin-bottom:8px;">⚠️ 주의 (~59)</div>
+            <div style="display:flex;align-items:center;gap:6px;">
+              <input class="form-input" id="set-grade-poor" type="number" min="30" max="365" value="30" style="width:70px;text-align:center;padding:6px;">
+              <span style="font-size:12px;color:#718096;">일</span>
+            </div>
+            <div style="font-size:11px;color:#A0AEC0;margin-top:4px;">약 1개월</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 회원별 개별 설정 -->
+      <div class="card">
+        <div class="card-title">👤 회원별 개별 재검사 주기
+          <span style="font-size:11px;font-weight:400;color:#A0AEC0;margin-left:6px;">비워두면 등급별/기본 주기 적용</span>
+        </div>
+        <div id="settings-member-list" style="margin-top:4px;"></div>
+      </div>
+
+      <!-- 현재 알림 대상 미리보기 -->
+      <div class="card">
+        <div class="card-title">🔔 현재 알림 대상 미리보기
+          <button class="btn-sm" style="background:#EDE9FE;color:#6B46C1;margin-left:auto;" onclick="renderSettingsPreview()">새로고침</button>
+        </div>
+        <div id="settings-preview"></div>
+      </div>
+
+    </div>
+
   </div><!-- .main -->
 </div><!-- .admin-wrap -->
 
@@ -649,6 +760,17 @@ const GRADE_INFO = total => {
 const SCORE_CLR = s => s >= 8 ? '#38A169' : s >= 6 ? '#D69E2E' : '#E53E3E';
 const SCORE_BAR = s => s >= 8 ? 'bar-good' : s >= 6 ? 'bar-warn' : 'bar-bad';
 
+/* ── 재검사 알림 설정 데이터 ── */
+let SETTINGS = {
+  defaultDays: 90,
+  notifyBefore: 7,
+  notifyDashboard: true,
+  notifyBadge: true,
+  notifyList: true,
+  gradeDays: { excellent:180, good:90, average:60, poor:30 },
+  memberOverride: {}   // { 회원명: 일수(숫자) | null }
+};
+
 /* FN/FP/DP/DN 집계 헬퍼 */
 function countChecks(checks) {
   const cnt = {FN:0,FP:0,DP:0,DN:0};
@@ -699,7 +821,7 @@ function showScreen(id, navBtn, sideBtn) {
   }
   document.querySelectorAll('.sidebar-item').forEach(b => b.classList.remove('active'));
   const sideItems = document.querySelectorAll('.sidebar-item');
-  const idxMap = { dashboard:0, list:1, input:2, compare:3 };
+  const idxMap = { dashboard:0, list:1, input:2, compare:3, settings:4 };
   if (idxMap[id] !== undefined) sideItems[idxMap[id]]?.classList.add('active');
   if (sideBtn) { document.querySelectorAll('.sidebar-item').forEach(b => b.classList.remove('active')); sideBtn.classList.add('active'); }
 
@@ -707,6 +829,168 @@ function showScreen(id, navBtn, sideBtn) {
   if (id === 'list')      renderList();
   if (id === 'input')     renderSheetContent();
   if (id === 'compare')   renderCompare();
+  if (id === 'settings')  renderSettingsScreen();
+}
+
+/* ══════════════════════════════════════
+   ⑤ 알림 설정
+══════════════════════════════════════ */
+const TODAY_DATE = '2026-03-26';
+
+function daysBetween(from, to) {
+  return Math.round((new Date(to) - new Date(from)) / 86400000);
+}
+
+function getReexamDays(member) {
+  if (SETTINGS.memberOverride[member.name] != null) return SETTINGS.memberOverride[member.name];
+  const h = member.history[0];
+  if (!h) return SETTINGS.defaultDays;
+  const grade = GRADE_INFO(h.total).label;
+  if (grade === '우수') return SETTINGS.gradeDays.excellent;
+  if (grade === '양호') return SETTINGS.gradeDays.good;
+  if (grade === '보통') return SETTINGS.gradeDays.average;
+  return SETTINGS.gradeDays.poor;
+}
+
+function getAlertStatus(member) {
+  const h = member.history[0];
+  if (!h) return { status:'none', daysAgo:0, dDays:0, period:SETTINGS.defaultDays };
+  const period = getReexamDays(member);
+  const daysAgo = daysBetween(h.date, TODAY_DATE);
+  const dDays = period - daysAgo; // 양수=D-남은일, 음수=초과
+  let status = 'ok';
+  if (dDays < 0) status = 'overdue';
+  else if (dDays <= SETTINGS.notifyBefore) status = 'soon';
+  return { status, daysAgo, dDays, period, lastDate:h.date };
+}
+
+function previewDefaultPeriod() {
+  const d = parseInt(document.getElementById('set-default-days').value) || 90;
+  const el = document.getElementById('set-default-preview');
+  if (!el) return;
+  if (d >= 365) el.textContent = '약 1년';
+  else if (d >= 180) el.textContent = '약 6개월';
+  else if (d >= 90) el.textContent = '약 3개월';
+  else if (d >= 60) el.textContent = '약 2개월';
+  else if (d >= 30) el.textContent = '약 1개월';
+  else el.textContent = d + '일';
+}
+
+function renderSettingsScreen() {
+  // 폼에 현재 설정값 반영
+  document.getElementById('set-default-days').value = SETTINGS.defaultDays;
+  document.getElementById('set-notify-before').value = SETTINGS.notifyBefore;
+  document.getElementById('set-notify-dashboard').checked = SETTINGS.notifyDashboard;
+  document.getElementById('set-notify-badge').checked = SETTINGS.notifyBadge;
+  document.getElementById('set-notify-list').checked = SETTINGS.notifyList;
+  document.getElementById('set-grade-excellent').value = SETTINGS.gradeDays.excellent;
+  document.getElementById('set-grade-good').value = SETTINGS.gradeDays.good;
+  document.getElementById('set-grade-average').value = SETTINGS.gradeDays.average;
+  document.getElementById('set-grade-poor').value = SETTINGS.gradeDays.poor;
+  previewDefaultPeriod();
+
+  // 회원별 개별 설정
+  document.getElementById('settings-member-list').innerHTML =
+    `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px;">` +
+    MEMBERS.map(m => {
+      const h = m.history[0];
+      const grade = h ? GRADE_INFO(h.total) : null;
+      const override = SETTINGS.memberOverride[m.name];
+      const autoDay = (() => {
+        if (!h) return SETTINGS.defaultDays;
+        const g = GRADE_INFO(h.total).label;
+        if (g==='우수') return SETTINGS.gradeDays.excellent;
+        if (g==='양호') return SETTINGS.gradeDays.good;
+        if (g==='보통') return SETTINGS.gradeDays.average;
+        return SETTINGS.gradeDays.poor;
+      })();
+      return `<div style="border:1px solid #E2E8F0;border-radius:10px;padding:12px;background:#FAFAFA;">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+          <div style="width:28px;height:28px;border-radius:50%;background:${m.avatar};color:#fff;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;">${m.name[0]}</div>
+          <div>
+            <div style="font-size:13px;font-weight:700;color:#2D3748;">${m.name}</div>
+            ${grade ? `<span class="grade-badge ${grade.cls}" style="font-size:10px;padding:1px 5px;">${grade.label}</span>` : '<span style="font-size:10px;color:#A0AEC0;">미측정</span>'}
+          </div>
+        </div>
+        <div style="font-size:11px;color:#A0AEC0;margin-bottom:4px;">자동 주기: <b style="color:#6B46C1;">${autoDay}일</b></div>
+        <div style="display:flex;align-items:center;gap:6px;">
+          <input type="number" min="7" max="365" placeholder="개별 설정"
+            value="${override != null ? override : ''}"
+            id="override-${m.name}"
+            style="width:80px;padding:5px 8px;border:1px solid #E2E8F0;border-radius:6px;font-size:12px;text-align:center;">
+          <span style="font-size:11px;color:#718096;">일</span>
+          <button onclick="clearOverride('${m.name}')" style="font-size:10px;background:none;border:none;cursor:pointer;color:#A0AEC0;" title="초기화">✕</button>
+        </div>
+      </div>`;
+    }).join('') + `</div>`;
+
+  renderSettingsPreview();
+}
+
+function clearOverride(name) {
+  document.getElementById('override-' + name).value = '';
+}
+
+function saveSettings() {
+  SETTINGS.defaultDays = parseInt(document.getElementById('set-default-days').value) || 90;
+  SETTINGS.notifyBefore = parseInt(document.getElementById('set-notify-before').value) || 7;
+  SETTINGS.notifyDashboard = document.getElementById('set-notify-dashboard').checked;
+  SETTINGS.notifyBadge = document.getElementById('set-notify-badge').checked;
+  SETTINGS.notifyList = document.getElementById('set-notify-list').checked;
+  SETTINGS.gradeDays.excellent = parseInt(document.getElementById('set-grade-excellent').value) || 180;
+  SETTINGS.gradeDays.good = parseInt(document.getElementById('set-grade-good').value) || 90;
+  SETTINGS.gradeDays.average = parseInt(document.getElementById('set-grade-average').value) || 60;
+  SETTINGS.gradeDays.poor = parseInt(document.getElementById('set-grade-poor').value) || 30;
+  MEMBERS.forEach(m => {
+    const v = document.getElementById('override-' + m.name)?.value;
+    SETTINGS.memberOverride[m.name] = (v && parseInt(v) > 0) ? parseInt(v) : null;
+  });
+  renderSettingsPreview();
+  showToast('✅ 설정이 저장되었습니다.');
+}
+
+function renderSettingsPreview() {
+  const rows = MEMBERS.map(m => {
+    const a = getAlertStatus(m);
+    if (a.status === 'ok') return null;
+    const badgeHtml = a.status === 'overdue'
+      ? `<span style="background:#FFF5F5;color:#C53030;padding:2px 7px;border-radius:5px;font-size:11px;font-weight:700;">D+${Math.abs(a.dDays)} 초과</span>`
+      : `<span style="background:#FFF9E6;color:#D97706;padding:2px 7px;border-radius:5px;font-size:11px;font-weight:700;">D-${a.dDays} 임박</span>`;
+    const h = m.history[0];
+    const grade = h ? GRADE_INFO(h.total) : null;
+    return `<tr>
+      <td style="padding:8px 6px;">
+        <div style="display:flex;align-items:center;gap:8px;">
+          <div style="width:26px;height:26px;border-radius:50%;background:${m.avatar};color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;">${m.name[0]}</div>
+          <span style="font-size:13px;font-weight:700;">${m.name}</span>
+        </div>
+      </td>
+      <td style="padding:8px 6px;">${grade ? `<span class="grade-badge ${grade.cls}">${grade.label}</span>` : '—'}</td>
+      <td style="padding:8px 6px;font-size:12px;color:#718096;">${a.lastDate || '—'}</td>
+      <td style="padding:8px 6px;font-size:12px;color:#6B46C1;font-weight:700;">${getReexamDays(m)}일</td>
+      <td style="padding:8px 6px;">${badgeHtml}</td>
+      <td style="padding:8px 6px;">
+        <button class="btn-sm" style="background:#EDE9FE;color:#6B46C1;" onclick="openInputFor('${m.name}')">측정 입력</button>
+      </td>
+    </tr>`;
+  }).filter(Boolean);
+
+  const el = document.getElementById('settings-preview');
+  if (!rows.length) {
+    el.innerHTML = '<div style="text-align:center;padding:24px;color:#A0AEC0;font-size:13px;">🎉 현재 알림 대상 회원이 없습니다.</div>';
+    return;
+  }
+  el.innerHTML = `<table style="width:100%;border-collapse:collapse;">
+    <thead><tr style="border-bottom:1px solid #E2E8F0;">
+      <th style="text-align:left;padding:6px;font-size:11px;color:#A0AEC0;">회원</th>
+      <th style="text-align:left;padding:6px;font-size:11px;color:#A0AEC0;">등급</th>
+      <th style="text-align:left;padding:6px;font-size:11px;color:#A0AEC0;">마지막 측정</th>
+      <th style="text-align:left;padding:6px;font-size:11px;color:#A0AEC0;">설정 주기</th>
+      <th style="text-align:left;padding:6px;font-size:11px;color:#A0AEC0;">상태</th>
+      <th style="padding:6px;"></th>
+    </tr></thead>
+    <tbody>${rows.join('')}</tbody>
+  </table>`;
 }
 
 /* ══════════════════════════════════════
@@ -717,7 +1001,8 @@ function renderDashboard() {
   const allHistory = MEMBERS.flatMap(m => m.history);
   const thisMonth  = allHistory.filter(h => h.date.startsWith('2026-03')).length;
   const totalMembers = MEMBERS.length + UNMEASURED.length;
-  const unmeasuredCnt = UNMEASURED.length;
+  // 알림 대상 (설정 주기 기준 초과+임박 회원수)
+  const alertCnt = MEMBERS.filter(m => { const a = getAlertStatus(m); return a.status !== 'ok'; }).length + UNMEASURED.length;
   const avgFn = allHistory.length
     ? Math.round(allHistory.reduce((s,h) => { const c=countChecks(h.sheetChecks); const t=c.FN+c.FP+c.DP+c.DN; return s+(t?c.FN/t*100:0); },0) / allHistory.length)
     : 0;
@@ -727,7 +1012,7 @@ function renderDashboard() {
       onclick:`showListFiltered('all')` },
     { icon:'✅', label:'이번 달 측정', value:thisMonth, sub:'최근 30일 기준', subCls:'', valColor:'#6B46C1',
       onclick:`showListFiltered('thisMonth')` },
-    { icon:'⚠️', label:'미측정 (3개월+)', value:unmeasuredCnt, sub:'재측정 권고 대상', subCls:'down', valColor:'#E53E3E',
+    { icon:'⚠️', label:'재검사 알림', value:alertCnt, sub:`주기 ${SETTINGS.defaultDays}일 기준`, subCls:'down', valColor:'#E53E3E',
       onclick:`highlightUnmeasured()` },
     { icon:'📊', label:'평균 FN 비율', value:avgFn+'%', sub:'측정 완료 회원 기준', subCls:'', valColor:'',
       onclick:`showScreen('compare',document.querySelectorAll('.nav-btn')[3])` },
@@ -843,8 +1128,16 @@ function renderList() {
     if (!h) return `<tr><td class="td-name">${m.name}</td><td colspan="5" style="color:#A0AEC0;">측정 이력 없음</td><td><button class="btn-sm" style="background:#EDE9FE;color:#6B46C1;" onclick="openInputFor('${m.name}')">입력</button></td></tr>`;
     const gd = GRADE_INFO(h.total);
     const isSelected = listSelectedMember === m.name;
-    return `<tr style="${isSelected?'background:#F5F3FF;':''}" onclick="showMemberDetail('${m.name}')">
-      <td class="td-name" style="cursor:pointer;">${m.name}</td>
+    const alert = SETTINGS.notifyList ? getAlertStatus(m) : { status:'ok' };
+    const alertBadge = alert.status === 'overdue'
+      ? `<span style="background:#FFF5F5;color:#C53030;padding:1px 5px;border-radius:4px;font-size:10px;font-weight:700;margin-left:4px;">D+${Math.abs(alert.dDays)}</span>`
+      : alert.status === 'soon'
+      ? `<span style="background:#FFF9E6;color:#D97706;padding:1px 5px;border-radius:4px;font-size:10px;font-weight:700;margin-left:4px;">D-${alert.dDays}</span>`
+      : '';
+    const rowBg = isSelected ? 'background:#F5F3FF;' : alert.status === 'overdue' ? 'background:#FFF5F5;' : alert.status === 'soon' ? 'background:#FFFBEB;' : '';
+    return `<tr style="${rowBg}cursor:pointer;" onclick="showMemberDetail('${m.name}')"
+      onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">
+      <td class="td-name">${m.name}${alertBadge}</td>
       <td style="color:#A0AEC0;font-size:12px;">${h.date}</td>
       <td class="td-score" style="color:${SCORE_CLR(h.total/10)};">${h.total}</td>
       <td><span class="grade-badge ${gd.cls}">${gd.label}</span></td>
