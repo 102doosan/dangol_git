@@ -378,6 +378,13 @@
   <button class="screen-btn" onclick="go('compare')">④ 결과 비교</button>
   <button class="screen-btn" onclick="go('history')">⑤ 검진 이력</button>
   <button class="screen-btn" onclick="go('recommend')">⑥ 맞춤 운동</button>
+  <span style="width:1px;height:20px;background:#333;flex-shrink:0;"></span>
+  <span style="font-size:11px;font-weight:700;color:#9AE6B4;flex-shrink:0;">회원:</span>
+  <button class="screen-btn" id="member-btn-1" onclick="selectGolfMember(1)">김태훈</button>
+  <button class="screen-btn" id="member-btn-2" onclick="selectGolfMember(2)">이서연</button>
+  <button class="screen-btn" id="member-btn-3" onclick="selectGolfMember(3)">박민준</button>
+  <button class="screen-btn" id="member-btn-4" onclick="selectGolfMember(4)">정유진</button>
+  <button class="screen-btn" id="member-btn-5" onclick="selectGolfMember(5)">최준혁</button>
 </div>
 
 <!-- 폰 프레임 -->
@@ -395,24 +402,8 @@
       <div class="scroll-body" id="main-scroll">
 
         <!-- 최근 검진 배너 -->
-        <div style="background:linear-gradient(135deg,#1B4332,#2D6A4F);border-radius:16px;padding:16px;color:#fff;cursor:pointer;" onclick="go('result')">
-          <div style="font-size:11px;color:rgba(255,255,255,0.65);margin-bottom:4px;">최근 검진 · 2026.03.10</div>
-          <div style="display:flex;align-items:flex-end;gap:12px;margin-bottom:12px;">
-            <div>
-              <div style="font-size:13px;font-weight:700;opacity:.8;margin-bottom:2px;">종합 점수</div>
-              <div style="font-size:42px;font-weight:900;line-height:1;">76<span style="font-size:18px;font-weight:600;opacity:.7;"> / 100</span></div>
-            </div>
-            <div style="flex:1;text-align:right;">
-              <div style="display:inline-block;background:rgba(255,255,255,0.18);border-radius:10px;padding:6px 14px;">
-                <div style="font-size:24px;font-weight:900;">B+</div>
-                <div style="font-size:10px;opacity:.8;margin-top:1px;">양호</div>
-              </div>
-            </div>
-          </div>
-          <!-- 미니 바 차트 -->
-          <div style="display:flex;flex-direction:column;gap:5px;">
-            <div id="main-mini-bars"></div>
-          </div>
+        <div id="main-banner" style="background:linear-gradient(135deg,#1B4332,#2D6A4F);border-radius:16px;padding:16px;color:#fff;cursor:pointer;" onclick="go('result')">
+          <div id="main-banner-inner"></div>
           <div style="margin-top:10px;font-size:11px;color:rgba(255,255,255,0.6);">결과 상세 보기 →</div>
         </div>
 
@@ -421,14 +412,7 @@
         <div id="main-item-list"></div>
 
         <!-- 다음 검진 안내 -->
-        <div style="background:#fff;border-radius:12px;padding:13px 16px;box-shadow:0 1px 4px rgba(0,0,0,0.06);display:flex;align-items:center;gap:10px;">
-          <div style="font-size:22px;">📅</div>
-          <div style="flex:1;">
-            <div style="font-size:13px;font-weight:700;color:#1A202C;">다음 검진 권장일</div>
-            <div style="font-size:11px;color:#A0AEC0;margin-top:2px;">2026.06.10 (약 3개월 후)</div>
-          </div>
-          <div style="font-size:11px;font-weight:700;color:#2F855A;background:#F0FFF4;border-radius:8px;padding:4px 10px;">D-77</div>
-        </div>
+        <div id="main-next-card" style="background:#fff;border-radius:12px;padding:13px 16px;box-shadow:0 1px 4px rgba(0,0,0,0.06);display:flex;align-items:center;gap:10px;"></div>
 
       </div>
       <div class="bottom-cta">
@@ -440,42 +424,27 @@
     <div class="screen" id="screen-result">
       <div class="app-header">
         <button class="back-btn" onclick="go('main')">←</button>
-        <span class="header-title">검진 결과 요약</span>
+        <span class="header-title" id="result-header-title">검진 결과 요약</span>
         <button onclick="go('compare')" style="background:rgba(255,255,255,0.18);border:none;color:#fff;border-radius:8px;padding:5px 11px;font-size:11px;font-weight:700;cursor:pointer;font-family:'Noto Sans KR',sans-serif;">비교</button>
       </div>
       <div class="scroll-body" id="result-scroll">
-
-        <!-- 종합 점수 -->
-        <div class="total-card">
-          <div>
-            <div style="font-size:11px;opacity:.7;margin-bottom:4px;">2026.03.10 검진 결과</div>
-            <div style="font-size:50px;font-weight:900;line-height:1;">76</div>
-            <div style="font-size:14px;opacity:.7;margin-bottom:8px;">/ 100점</div>
-            <div class="total-grade">B+ 양호</div>
-          </div>
-          <div style="flex:1;">
-            <div id="result-radar"></div>
-          </div>
-        </div>
-
-        <!-- 항목별 점수 바 -->
-        <div class="sec-label">항목별 점수</div>
-        <div style="background:#fff;border-radius:16px;padding:16px;box-shadow:0 1px 5px rgba(0,0,0,0.07);" id="result-score-bars"></div>
-
+        <!-- 회차 선택 칩 -->
+        <div id="result-round-chips" style="display:flex;gap:6px;flex-wrap:wrap;"></div>
+        <!-- 종합 점수 카드 -->
+        <div id="result-total-card"></div>
+        <!-- 4그룹 카드 -->
+        <div class="sec-label">검진 그룹별 점수</div>
+        <div id="result-group-cards"></div>
         <!-- 트레이너 소견 -->
         <div style="background:#fff;border-radius:14px;padding:14px 16px;box-shadow:0 1px 5px rgba(0,0,0,0.07);">
           <div class="sec-label">트레이너 종합 소견</div>
-          <div style="font-size:13px;color:#2D3748;line-height:1.7;">
-            전반적으로 양호한 수준입니다. <strong>체형 분석</strong> 항목에서 골반 좌우 불균형이 관찰되며, 스윙 시 우측 어깨 드롭이 반복됩니다. 코어 안정화 운동과 고관절 유연성 강화 프로그램을 병행하면 효과적입니다.
-          </div>
-          <div style="margin-top:10px;font-size:11px;color:#A0AEC0;">담당 트레이너 · 박지훈 · 2026.03.10</div>
+          <div id="result-comment" style="font-size:13px;color:#2D3748;line-height:1.7;"></div>
+          <div style="margin-top:10px;font-size:11px;color:#A0AEC0;">담당 트레이너 · 박지훈</div>
         </div>
-
         <div style="display:flex;gap:8px;">
           <button onclick="go('detail')" style="flex:1;background:#F0FFF4;color:#2F855A;border:1.5px solid #C6F6D5;border-radius:12px;padding:11px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Noto Sans KR',sans-serif;">📋 상세 보기</button>
           <button onclick="go('recommend')" style="flex:1;background:#2F855A;color:#fff;border:none;border-radius:12px;padding:11px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Noto Sans KR',sans-serif;">💪 맞춤 운동</button>
         </div>
-
       </div>
     </div>
 
@@ -483,14 +452,20 @@
     <div class="screen" id="screen-detail">
       <div class="app-header">
         <button class="back-btn" onclick="go('result')">←</button>
-        <span class="header-title">결과 상세</span>
+        <span class="header-title" id="detail-header-title">결과 상세</span>
       </div>
-      <!-- 항목 탭 스크롤 -->
+      <!-- 회차 선택 + 그룹 탭 -->
       <div style="background:#fff;padding:10px 14px 8px;border-bottom:1px solid #F0F4F8;flex-shrink:0;">
+        <div id="detail-round-row" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;"></div>
         <div class="detail-tab-row" id="detail-tab-row"></div>
       </div>
       <div class="scroll-body" id="detail-scroll">
         <div id="detail-content"></div>
+        <!-- 갤러리 -->
+        <div id="detail-gallery-section" style="display:none;">
+          <div class="sec-label">첨부 이미지</div>
+          <div id="detail-gallery-grid"></div>
+        </div>
       </div>
     </div>
 
@@ -548,7 +523,173 @@
 
 <script>
 /* ══════════════════════════════════════
-   데이터
+   골프검진 데이터
+══════════════════════════════════════ */
+const GOLF_GROUPS = [
+  { id:'kvest', name:'K-vest 3D분석', icon:'🏌️', color:'#2C7A7B', bg:'#E6FFFA', items:[
+    { id:'kv_pelvis',   label:'골반 최대 속도',      unit:'deg/s', std:{m:410, f:360} },
+    { id:'kv_thorax',   label:'흉곽 최대 속도',      unit:'deg/s', std:{m:490, f:440} },
+    { id:'kv_arm',      label:'팔 최대 속도',        unit:'deg/s', std:{m:700, f:640} },
+    { id:'kv_xfactor',  label:'X-Factor',           unit:'°',     std:{m:45,  f:40}  },
+    { id:'kv_stretch',  label:'X-Factor Stretch',   unit:'°',     std:{m:10,  f:8}   },
+    { id:'kv_sidebend', label:'Side Bend (임팩트)',  unit:'°',     std:{m:40,  f:38}  },
+  ]},
+  { id:'trackman', name:'Trackman 탄도분석', icon:'⛳', color:'#553C9A', bg:'#FAF5FF', items:[
+    { id:'tm_speed',    label:'클럽 헤드 스피드',    unit:'mph',   std:{m:105, f:80}  },
+    { id:'tm_bspeed',   label:'볼 스피드',           unit:'mph',   std:{m:153, f:116} },
+    { id:'tm_smash',    label:'스매쉬 팩터(×100)',   unit:'',      std:{m:146, f:145} },
+    { id:'tm_carry',    label:'캐리 거리',           unit:'yards', std:{m:230, f:170} },
+    { id:'tm_launch',   label:'런치 앵글',           unit:'°',     std:{m:12,  f:13}  },
+    { id:'tm_spin',     label:'스핀 레이트(÷10)',    unit:'rpm',   std:{m:270, f:300} },
+  ]},
+  { id:'samputt', name:'Sam Putt 퍼팅', icon:'🎯', color:'#B7791F', bg:'#FFFBEB', items:[
+    { id:'sp_face',     label:'페이스 앵글 편차',    unit:'°×10',  std:{m:5,   f:5},   lowerBetter:true },
+    { id:'sp_path',     label:'퍼터 경로 편차',      unit:'°×10',  std:{m:8,   f:8},   lowerBetter:true },
+    { id:'sp_speed',    label:'임팩트 스피드(×10)',  unit:'mph',   std:{m:45,  f:40}  },
+    { id:'sp_impact',   label:'임팩트 위치 편차',    unit:'mm',    std:{m:3,   f:3},   lowerBetter:true },
+    { id:'sp_loft',     label:'다이나믹 로프트(×10)',unit:'°',     std:{m:35,  f:35}  },
+    { id:'sp_tempo',    label:'리듬 B:F(×10)',       unit:'',      std:{m:20,  f:20}  },
+  ]},
+  { id:'tpi', name:'TPI 신체검사', icon:'🧘', color:'#276749', bg:'#F0FFF4', items:[
+    { id:'tpi_squat',   label:'오버헤드 딥 스쿼트',  unit:'점',    std:{m:2,   f:2}   },
+    { id:'tpi_toe',     label:'토터치 & 연결성',     unit:'점',    std:{m:2,   f:2}   },
+    { id:'tpi_hip_l',   label:'고관절 가동성(좌)',    unit:'점',    std:{m:2,   f:2}   },
+    { id:'tpi_hip_r',   label:'고관절 가동성(우)',    unit:'점',    std:{m:2,   f:2}   },
+    { id:'tpi_thorax',  label:'흉추 회전',           unit:'점',    std:{m:2,   f:2}   },
+    { id:'tpi_bridge',  label:'브릿지 & 코어',       unit:'점',    std:{m:2,   f:2}   },
+    { id:'tpi_pelvic',  label:'골반 안정성',         unit:'점',    std:{m:2,   f:2}   },
+  ]},
+];
+const ALL_GOLF_ITEMS = GOLF_GROUPS.flatMap(g => g.items.map(it => ({...it, groupId:g.id, groupName:g.name, groupColor:g.color, groupBg:g.bg})));
+
+const GOLF_MEMBERS = [
+  { id:1, name:'김태훈', gender:'남', color:'#4299E1', phone:'010-1234-5678', history:[
+    { round:1, date:'2026-03-10', memo:'',
+      kv_pelvis:{value:430}, kv_thorax:{value:515}, kv_arm:{value:725}, kv_xfactor:{value:48}, kv_stretch:{value:12}, kv_sidebend:{value:42},
+      tm_speed:{value:108}, tm_bspeed:{value:157}, tm_smash:{value:145}, tm_carry:{value:238}, tm_launch:{value:11}, tm_spin:{value:260},
+      sp_face:{value:4}, sp_path:{value:6}, sp_speed:{value:48}, sp_impact:{value:2}, sp_loft:{value:36}, sp_tempo:{value:21},
+      tpi_squat:{value:2}, tpi_toe:{value:2}, tpi_hip_l:{value:2}, tpi_hip_r:{value:2}, tpi_thorax:{value:2}, tpi_bridge:{value:2}, tpi_pelvic:{value:2},
+    },
+    { round:2, date:'2025-11-15', memo:'',
+      kv_pelvis:{value:390}, kv_thorax:{value:470}, kv_arm:{value:680}, kv_xfactor:{value:42}, kv_stretch:{value:9}, kv_sidebend:{value:37},
+      tm_speed:{value:103}, tm_bspeed:{value:150}, tm_smash:{value:145}, tm_carry:{value:225}, tm_launch:{value:13}, tm_spin:{value:280},
+      sp_face:{value:7}, sp_path:{value:10}, sp_speed:{value:44}, sp_impact:{value:4}, sp_loft:{value:34}, sp_tempo:{value:19},
+      tpi_squat:{value:2}, tpi_toe:{value:1}, tpi_hip_l:{value:2}, tpi_hip_r:{value:1}, tpi_thorax:{value:2}, tpi_bridge:{value:2}, tpi_pelvic:{value:1},
+    },
+  ]},
+  { id:2, name:'이서연', gender:'여', color:'#ED64A6', phone:'010-2345-6789', history:[
+    { round:1, date:'2026-03-12', memo:'',
+      kv_pelvis:{value:370}, kv_thorax:{value:455}, kv_arm:{value:660}, kv_xfactor:{value:42}, kv_stretch:{value:9}, kv_sidebend:{value:39},
+      tm_speed:{value:82}, tm_bspeed:{value:119}, tm_smash:{value:145}, tm_carry:{value:175}, tm_launch:{value:13}, tm_spin:{value:295},
+      sp_face:{value:4}, sp_path:{value:7}, sp_speed:{value:42}, sp_impact:{value:2}, sp_loft:{value:36}, sp_tempo:{value:20},
+      tpi_squat:{value:2}, tpi_toe:{value:2}, tpi_hip_l:{value:2}, tpi_hip_r:{value:2}, tpi_thorax:{value:1}, tpi_bridge:{value:2}, tpi_pelvic:{value:2},
+    },
+  ]},
+  { id:3, name:'박민준', gender:'남', color:'#48BB78', phone:'010-3456-7890', history:[
+    { round:1, date:'2026-03-08', memo:'',
+      kv_pelvis:{value:360}, kv_thorax:{value:440}, kv_arm:{value:650}, kv_xfactor:{value:38}, kv_stretch:{value:7}, kv_sidebend:{value:33},
+      tm_speed:{value:98}, tm_bspeed:{value:142}, tm_smash:{value:145}, tm_carry:{value:210}, tm_launch:{value:14}, tm_spin:{value:290},
+      sp_face:{value:9}, sp_path:{value:12}, sp_speed:{value:41}, sp_impact:{value:5}, sp_loft:{value:32}, sp_tempo:{value:18},
+      tpi_squat:{value:1}, tpi_toe:{value:1}, tpi_hip_l:{value:1}, tpi_hip_r:{value:1}, tpi_thorax:{value:1}, tpi_bridge:{value:1}, tpi_pelvic:{value:1},
+    },
+  ]},
+  { id:4, name:'정유진', gender:'여', color:'#ED8936', phone:'010-4567-8901', history:[
+    { round:1, date:'2026-02-20', memo:'',
+      kv_pelvis:{value:340}, kv_thorax:{value:420}, kv_arm:{value:600}, kv_xfactor:{value:36}, kv_stretch:{value:6}, kv_sidebend:{value:32},
+      tm_speed:{value:76}, tm_bspeed:{value:110}, tm_smash:{value:145}, tm_carry:{value:158}, tm_launch:{value:15}, tm_spin:{value:320},
+      sp_face:{value:8}, sp_path:{value:11}, sp_speed:{value:39}, sp_impact:{value:4}, sp_loft:{value:30}, sp_tempo:{value:18},
+      tpi_squat:{value:1}, tpi_toe:{value:2}, tpi_hip_l:{value:1}, tpi_hip_r:{value:1}, tpi_thorax:{value:1}, tpi_bridge:{value:1}, tpi_pelvic:{value:2},
+    },
+  ]},
+  { id:5, name:'최준혁', gender:'남', color:'#9F7AEA', phone:'010-5678-9012', history:[
+    { round:1, date:'2026-01-15', memo:'',
+      kv_pelvis:{value:460}, kv_thorax:{value:540}, kv_arm:{value:760}, kv_xfactor:{value:52}, kv_stretch:{value:14}, kv_sidebend:{value:46},
+      tm_speed:{value:115}, tm_bspeed:{value:168}, tm_smash:{value:146}, tm_carry:{value:255}, tm_launch:{value:11}, tm_spin:{value:250},
+      sp_face:{value:2}, sp_path:{value:3}, sp_speed:{value:52}, sp_impact:{value:1}, sp_loft:{value:37}, sp_tempo:{value:21},
+      tpi_squat:{value:2}, tpi_toe:{value:2}, tpi_hip_l:{value:2}, tpi_hip_r:{value:2}, tpi_thorax:{value:2}, tpi_bridge:{value:2}, tpi_pelvic:{value:2},
+    },
+  ]},
+];
+
+// ── 골프 스코어 계산 ──────────────────────────────────────────
+function golfStd(item, gender){ return gender==='여' ? item.std.f : item.std.m; }
+function golfScore(item, value, gender){
+  const std = golfStd(item, gender);
+  if(std === 0) return 100;
+  if(item.lowerBetter){
+    if(value <= 0) return 130;
+    return Math.round(std / Math.max(value, 0.01) * 100);
+  }
+  return Math.round(value / std * 100);
+}
+function golfGrade(pct){
+  if(pct>=110) return {g:'A', label:'우수', color:'#2F855A', bg:'#C6F6D5'};
+  if(pct>=90)  return {g:'B+', label:'양호', color:'#2B6CB0', bg:'#BEE3F8'};
+  if(pct>=70)  return {g:'B', label:'보통', color:'#744210', bg:'#FEFCBF'};
+  return             {g:'C', label:'주의', color:'#742A2A', bg:'#FED7D7'};
+}
+function golfBarColor(pct){
+  if(pct>=110) return '#2F855A';
+  if(pct>=90)  return '#4299E1';
+  if(pct>=70)  return '#ECC94B';
+  return '#E53E3E';
+}
+function golfGroupAvg(m, h, gid){
+  const g=GOLF_GROUPS.find(x=>x.id===gid); if(!g) return 0;
+  let t=0,c=0;
+  g.items.forEach(it=>{ const v=h[it.id]; if(!v) return; t+=golfScore(it,v.value,m.gender); c++; });
+  return c?Math.round(t/c):0;
+}
+function golfTotalAvg(m, h){
+  let t=0,c=0;
+  ALL_GOLF_ITEMS.forEach(it=>{ const v=h[it.id]; if(!v) return; t+=golfScore(it,v.value,m.gender); c++; });
+  return c?Math.round(t/c):0;
+}
+
+// ── 상태 ──────────────────────────────────────────────────────
+let _selectedMemberId = 1;
+let _selectedRound = null; // null = 최신회차
+let _golfDetailGroup = 'kvest';
+
+function getSelectedMember(){ return GOLF_MEMBERS.find(m=>m.id===_selectedMemberId); }
+function getSelectedHistory(){
+  const m = getSelectedMember(); if(!m||!m.history.length) return null;
+  if(_selectedRound!==null) return m.history.find(h=>h.round===_selectedRound)||m.history[0];
+  return m.history[0];
+}
+
+function selectGolfMember(id){
+  _selectedMemberId = id;
+  _selectedRound = null;
+  _golfDetailGroup = 'kvest';
+  // 버튼 active 업데이트
+  GOLF_MEMBERS.forEach(m=>{
+    const btn=document.getElementById('member-btn-'+m.id);
+    if(btn) btn.classList.toggle('active', m.id===id);
+  });
+  renderMain();
+}
+
+// ── 이미지 모달 ───────────────────────────────────────────────
+function openGolfImgModal(src){
+  let modal=document.getElementById('golf-img-modal');
+  if(!modal){
+    modal=document.createElement('div');
+    modal.id='golf-img-modal';
+    modal.onclick=()=>{ modal.style.display='none'; };
+    modal.style.cssText='display:none;position:fixed;inset:0;background:rgba(0,0,0,0.82);z-index:9999;align-items:center;justify-content:center;';
+    modal.innerHTML=`<div onclick="event.stopPropagation()" style="position:relative;max-width:90vw;max-height:90vh;">
+      <img id="golf-img-modal-src" src="" style="max-width:90vw;max-height:88vh;border-radius:10px;display:block;box-shadow:0 8px 40px rgba(0,0,0,0.5);" />
+      <button onclick="document.getElementById('golf-img-modal').style.display='none'" style="position:absolute;top:-14px;right:-14px;background:#fff;border:none;border-radius:50%;width:30px;height:30px;font-size:16px;cursor:pointer;">✕</button>
+    </div>`;
+    document.body.appendChild(modal);
+  }
+  document.getElementById('golf-img-modal-src').src=src;
+  modal.style.display='flex';
+}
+
+/* ══════════════════════════════════════
+   기존 데이터 (스윙/관절/체형/근력/유연성)
 ══════════════════════════════════════ */
 const ITEMS = [
   {
@@ -660,84 +801,292 @@ function go(id) {
   if (el) el.scrollTop = 0;
 
   if (id === 'main')      renderMain();
-  if (id === 'result')    renderResult();
-  if (id === 'detail')    renderDetail(_detailIdx);
+  if (id === 'result')    renderGolfResult();
+  if (id === 'detail')    renderGolfDetail(_golfDetailGroup);
   if (id === 'compare')   renderCompare();
   if (id === 'history')   renderHistory();
   if (id === 'recommend') renderRecommend();
 }
 
 /* ══════════════════════════════════════
-   ① 메인
+   ① 메인 (골프검진 데이터 연동)
 ══════════════════════════════════════ */
 function renderMain() {
-  // 미니 바 차트 (배너 내)
-  document.getElementById('main-mini-bars').innerHTML = ITEMS.map(it => {
-    const sc = ITEM_SCORE[it.id];
-    const pct = sc + '%';
-    return `<div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
-      <div style="font-size:10px;color:rgba(255,255,255,0.7);width:60px;flex-shrink:0;">${it.name}</div>
-      <div style="flex:1;background:rgba(255,255,255,0.15);border-radius:99px;height:5px;overflow:hidden;">
-        <div style="width:${pct};height:100%;background:#68D391;border-radius:99px;"></div>
-      </div>
-      <div style="font-size:10px;font-weight:800;color:#fff;width:22px;text-align:right;">${sc}</div>
-    </div>`;
-  }).join('');
+  const m = getSelectedMember();
+  const h = getSelectedHistory();
 
-  // 항목 카드
-  document.getElementById('main-item-list').innerHTML = ITEMS.map((it, i) => {
-    const sc = ITEM_SCORE[it.id];
-    const gd = GRADE(sc);
-    return `<div class="item-card" onclick="openDetail(${i})" style="margin-bottom:8px;">
-      <div class="item-icon-box" style="background:${it.bg};">${it.icon}</div>
-      <div class="item-info">
-        <div class="item-name">${it.name}</div>
-        <div class="item-desc">${it.desc}</div>
-        <div class="prog-bar-wrap">
-          <div class="prog-bar-bg">
-            <div class="prog-bar-fill" style="width:${sc}%;background:${it.color};"></div>
+  // 배너
+  if(m && h){
+    const totalPct = golfTotalAvg(m,h);
+    const gr = golfGrade(totalPct);
+    document.getElementById('main-banner-inner').innerHTML = `
+      <div style="font-size:11px;color:rgba(255,255,255,0.65);margin-bottom:4px;">${m.name} (${m.gender}) · 최근 검진 · ${h.date} · ${h.round}회차</div>
+      <div style="display:flex;align-items:flex-end;gap:12px;margin-bottom:12px;">
+        <div>
+          <div style="font-size:13px;font-weight:700;opacity:.8;margin-bottom:2px;">종합 점수</div>
+          <div style="font-size:42px;font-weight:900;line-height:1;">${totalPct}<span style="font-size:18px;font-weight:600;opacity:.7;">%</span></div>
+        </div>
+        <div style="flex:1;text-align:right;">
+          <div style="display:inline-block;background:rgba(255,255,255,0.18);border-radius:10px;padding:6px 14px;">
+            <div style="font-size:24px;font-weight:900;">${gr.g}</div>
+            <div style="font-size:10px;opacity:.8;margin-top:1px;">${gr.label}</div>
           </div>
         </div>
       </div>
-      <div class="item-score-box">
-        <div class="item-score" style="color:${it.color};">${sc}</div>
-        <div class="item-grade" style="color:${it.color};">${gd.g}</div>
+      ${GOLF_GROUPS.map(g=>{
+        const pct=golfGroupAvg(m,h,g.id);
+        return `<div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+          <div style="font-size:10px;color:rgba(255,255,255,0.7);width:70px;flex-shrink:0;">${g.icon} ${g.name.split(' ')[0]}</div>
+          <div style="flex:1;background:rgba(255,255,255,0.15);border-radius:99px;height:5px;overflow:hidden;">
+            <div style="width:${Math.min(pct,100)}%;height:100%;background:#68D391;border-radius:99px;"></div>
+          </div>
+          <div style="font-size:10px;font-weight:800;color:#fff;width:30px;text-align:right;">${pct}%</div>
+        </div>`;
+      }).join('')}`;
+
+    // 다음 검진 날짜
+    const nextDate = new Date(h.date);
+    nextDate.setDate(nextDate.getDate()+90);
+    const nextStr = nextDate.toISOString().slice(0,10);
+    const left = Math.round((nextDate-new Date('2026-03-28'))/(1000*60*60*24));
+    document.getElementById('main-next-card').innerHTML = `
+      <div style="font-size:22px;">📅</div>
+      <div style="flex:1;">
+        <div style="font-size:13px;font-weight:700;color:#1A202C;">다음 검진 권장일</div>
+        <div style="font-size:11px;color:#A0AEC0;margin-top:2px;">${nextStr} (90일 주기)</div>
       </div>
-    </div>`;
-  }).join('');
+      <div style="font-size:11px;font-weight:700;color:${left>0?'#2F855A':'#E53E3E'};background:${left>0?'#F0FFF4':'#FED7D7'};border-radius:8px;padding:4px 10px;">${left>0?'D-'+left:'초과'}</div>`;
+  }
+
+  // 검진 항목 카드 (골프 그룹)
+  const itemListEl = document.getElementById('main-item-list');
+  if(m && h){
+    itemListEl.innerHTML = GOLF_GROUPS.map((g,i) => {
+      const pct=golfGroupAvg(m,h,g.id);
+      const gr=golfGrade(pct);
+      return `<div class="item-card" onclick="_golfDetailGroup='${g.id}';go('detail')" style="margin-bottom:8px;">
+        <div class="item-icon-box" style="background:${g.bg};">${g.icon}</div>
+        <div class="item-info">
+          <div class="item-name">${g.name}</div>
+          <div class="item-desc">${g.items.length}개 항목 · 기준치 대비 평균 점수</div>
+          <div class="prog-bar-wrap">
+            <div class="prog-bar-bg">
+              <div class="prog-bar-fill" style="width:${Math.min(pct,100)}%;background:${g.color};"></div>
+            </div>
+          </div>
+        </div>
+        <div class="item-score-box">
+          <div class="item-score" style="color:${g.color};">${pct}%</div>
+          <div class="item-grade" style="color:${g.color};">${gr.g}</div>
+        </div>
+      </div>`;
+    }).join('');
+  } else {
+    // 기존 ITEMS 기반 렌더
+    itemListEl.innerHTML = ITEMS.map((it, i) => {
+      const sc = ITEM_SCORE[it.id];
+      const gd = GRADE(sc);
+      return `<div class="item-card" onclick="openDetail(${i})" style="margin-bottom:8px;">
+        <div class="item-icon-box" style="background:${it.bg};">${it.icon}</div>
+        <div class="item-info">
+          <div class="item-name">${it.name}</div>
+          <div class="item-desc">${it.desc}</div>
+          <div class="prog-bar-wrap">
+            <div class="prog-bar-bg">
+              <div class="prog-bar-fill" style="width:${sc}%;background:${it.color};"></div>
+            </div>
+          </div>
+        </div>
+        <div class="item-score-box">
+          <div class="item-score" style="color:${it.color};">${sc}</div>
+          <div class="item-grade" style="color:${it.color};">${gd.g}</div>
+        </div>
+      </div>`;
+    }).join('');
+  }
 }
 
 /* ══════════════════════════════════════
-   ② 결과 요약
+   ② 결과 요약 (골프검진 실제 데이터)
 ══════════════════════════════════════ */
-function renderResult() {
-  // 레이더 차트 (SVG 오각형)
-  document.getElementById('result-radar').innerHTML = buildRadar(SESSIONS[0].scores, 80, true);
+function renderGolfResult() {
+  const m = getSelectedMember();
+  const h = getSelectedHistory();
+  if(!m || !h){ return; }
 
-  // 항목별 점수 바
-  document.getElementById('result-score-bars').innerHTML = ITEMS.map((it, i) => {
-    const sc = ITEM_SCORE[it.id];
-    const gd = GRADE(sc);
-    return `<div style="margin-bottom:${i < ITEMS.length-1 ? '14px' : '0'};">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;">
-        <div style="display:flex;align-items:center;gap:7px;">
-          <span style="font-size:15px;">${it.icon}</span>
-          <span style="font-size:13px;font-weight:700;color:#2D3748;">${it.name}</span>
-        </div>
-        <div style="display:flex;align-items:center;gap:6px;">
-          <span style="font-size:12px;font-weight:800;color:${it.color};">${sc}점</span>
-          <span style="font-size:10px;font-weight:700;padding:2px 7px;border-radius:99px;background:${it.bg};color:${it.color};">${gd.g}</span>
-        </div>
+  const el = document.getElementById('result-header-title');
+  if(el) el.textContent = `${m.name} · 검진 결과 요약`;
+
+  // 회차 선택 칩
+  const chipsEl = document.getElementById('result-round-chips');
+  if(chipsEl && m.history.length > 1){
+    chipsEl.innerHTML = m.history.map(hh=>{
+      const sel = hh.round === h.round;
+      return `<div onclick="_selectedRound=${hh.round};renderGolfResult()" style="
+        padding:5px 12px;border-radius:99px;font-size:11px;font-weight:700;cursor:pointer;
+        background:${sel?'#2F855A':'#fff'};color:${sel?'#fff':'#718096'};
+        border:1.5px solid ${sel?'#2F855A':'#E2E8F0'};font-family:inherit;">${hh.round}회차 (${hh.date})</div>`;
+    }).join('');
+  } else if(chipsEl){ chipsEl.innerHTML=''; }
+
+  const totalPct = golfTotalAvg(m,h);
+  const gr = golfGrade(totalPct);
+
+  // 종합 점수 카드
+  document.getElementById('result-total-card').innerHTML = `
+    <div class="total-card" style="margin-bottom:8px;">
+      <div>
+        <div style="font-size:11px;opacity:.7;margin-bottom:4px;">${h.date} · ${h.round}회차 검진 결과</div>
+        <div style="font-size:50px;font-weight:900;line-height:1;">${totalPct}<span style="font-size:20px;opacity:.7;">%</span></div>
+        <div style="font-size:14px;opacity:.7;margin-bottom:8px;">기준치 대비</div>
+        <div class="total-grade">${gr.g} ${gr.label}</div>
       </div>
-      <div class="prog-bar-bg">
-        <div class="prog-bar-fill" style="width:${sc}%;background:${it.color};"></div>
+      <div style="flex:1;">
+        ${buildGolfRadar(m, h, 80)}
       </div>
     </div>`;
+
+  // 4그룹 카드
+  document.getElementById('result-group-cards').innerHTML = GOLF_GROUPS.map(g=>{
+    const pct=golfGroupAvg(m,h,g.id);
+    const ggr=golfGrade(pct);
+    return `<div style="background:#fff;border-radius:14px;padding:14px 16px;box-shadow:0 1px 5px rgba(0,0,0,0.07);margin-bottom:8px;cursor:pointer;"
+      onclick="_golfDetailGroup='${g.id}';go('detail')">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span style="font-size:18px;">${g.icon}</span>
+          <span style="font-size:13px;font-weight:700;color:#1A202C;">${g.name}</span>
+        </div>
+        <span style="font-size:11px;font-weight:800;padding:3px 10px;border-radius:99px;background:${ggr.bg};color:${ggr.color};">${ggr.g} ${ggr.label}</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <div style="flex:1;background:#EDF2F7;border-radius:99px;height:8px;overflow:hidden;">
+          <div style="width:${Math.min(pct,100)}%;height:100%;background:${golfBarColor(pct)};border-radius:99px;transition:width .5s;"></div>
+        </div>
+        <span style="font-size:14px;font-weight:900;color:${golfBarColor(pct)};width:38px;text-align:right;">${pct}%</span>
+      </div>
+      <div style="margin-top:6px;font-size:10px;color:#A0AEC0;">상세 보기 →</div>
+    </div>`;
   }).join('');
+
+  // 트레이너 소견 (동적 생성)
+  let weakG=[], goodG=[];
+  GOLF_GROUPS.forEach(g=>{ const p=golfGroupAvg(m,h,g.id); if(p<70) weakG.push(g.name); else goodG.push(g.name); });
+  let comment = `${m.name}님의 골프검진 종합 결과는 기준치 대비 <strong>${totalPct}%</strong>로 <strong>${gr.label}</strong> 등급입니다. `;
+  if(weakG.length) comment += `<strong>${weakG.join(', ')}</strong> 부분이 기준치 70% 미만으로 집중적인 훈련 및 체력 강화가 권장됩니다.`;
+  else comment += `모든 검진 항목이 기준치 이상을 달성하여 전반적으로 우수한 상태입니다.`;
+  document.getElementById('result-comment').innerHTML = comment;
+}
+
+function buildGolfRadar(m, h, size) {
+  const cx = size/2, cy = size/2, r = size*0.38;
+  const groups = GOLF_GROUPS;
+  const n = groups.length;
+  const pts = groups.map((g,i)=>{
+    const angle = (Math.PI*2*i/n)-Math.PI/2;
+    const pct = Math.min(golfGroupAvg(m,h,g.id)/100, 1.3);
+    return { x: cx+r*pct*Math.cos(angle), y: cy+r*pct*Math.sin(angle),
+             gx: cx+(r+14)*Math.cos(angle), gy: cy+(r+14)*Math.sin(angle) };
+  });
+  const gridPts = [0.25,0.5,0.75,1].map(pct=>
+    groups.map((_,i)=>{ const angle=(Math.PI*2*i/n)-Math.PI/2; return `${cx+r*pct*Math.cos(angle)},${cy+r*pct*Math.sin(angle)}`; }).join(' ')
+  );
+  const polyPts = pts.map(p=>`${p.x},${p.y}`).join(' ');
+  const labels = ['K-vest','Trackman','Sam Putt','TPI'];
+  return `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" xmlns="http://www.w3.org/2000/svg">
+    ${gridPts.map(gp=>`<polygon points="${gp}" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="1"/>`).join('')}
+    ${groups.map((_,i)=>{ const angle=(Math.PI*2*i/n)-Math.PI/2; return `<line x1="${cx}" y1="${cy}" x2="${cx+r*Math.cos(angle)}" y2="${cy+r*Math.sin(angle)}" stroke="rgba(255,255,255,0.15)" stroke-width="1"/>`; }).join('')}
+    <polygon points="${polyPts}" fill="rgba(104,211,145,0.25)" stroke="#68D391" stroke-width="2"/>
+    ${pts.map(p=>`<circle cx="${p.x}" cy="${p.y}" r="3" fill="#68D391"/>`).join('')}
+    ${pts.map((p,i)=>`<text x="${p.gx}" y="${p.gy+4}" text-anchor="middle" font-size="8" fill="rgba(255,255,255,0.75)" font-family="Noto Sans KR,sans-serif">${labels[i]||''}</text>`).join('')}
+  </svg>`;
 }
 
 /* ══════════════════════════════════════
-   ③ 결과 상세
+   ③ 결과 상세 (골프검진 실제 데이터)
+══════════════════════════════════════ */
+function renderGolfDetail(gid) {
+  _golfDetailGroup = gid;
+  const m = getSelectedMember();
+  const h = getSelectedHistory();
+  if(!m || !h) return;
+
+  const el = document.getElementById('detail-header-title');
+  if(el) el.textContent = `${m.name} · 결과 상세`;
+
+  // 회차 선택 칩
+  const roundRow = document.getElementById('detail-round-row');
+  if(roundRow && m.history.length > 1){
+    roundRow.innerHTML = m.history.map(hh=>{
+      const sel = hh.round === h.round;
+      return `<div onclick="_selectedRound=${hh.round};renderGolfDetail('${gid}')" style="
+        padding:4px 10px;border-radius:99px;font-size:11px;font-weight:700;cursor:pointer;
+        background:${sel?'#2F855A':'#fff'};color:${sel?'#fff':'#718096'};
+        border:1.5px solid ${sel?'#2F855A':'#E2E8F0'};font-family:inherit;">${hh.round}회차</div>`;
+    }).join('');
+  } else if(roundRow){ roundRow.innerHTML=''; }
+
+  // 그룹 탭
+  document.getElementById('detail-tab-row').innerHTML = GOLF_GROUPS.map(g=>`
+    <div class="detail-chip${g.id===gid?' active':''}" onclick="renderGolfDetail('${g.id}')" style="${g.id===gid?'background:#2F855A;border-color:#2F855A;color:#fff;':''}">${g.icon} ${g.name.split(' ')[0]}</div>`
+  ).join('');
+
+  const g = GOLF_GROUPS.find(x=>x.id===gid);
+  const pct = golfGroupAvg(m,h,gid);
+  const gr = golfGrade(pct);
+
+  // 그룹 점수 카드 + 항목 2열 그리드
+  const itemCells = g.items.map(it=>{
+    const v=h[it.id]; if(!v) return '';
+    const std=golfStd(it,m.gender);
+    const ipct=golfScore(it,v.value,m.gender);
+    const igr=golfGrade(ipct);
+    const fillW=Math.min(ipct,100);
+    const color=golfBarColor(ipct);
+    return `<div style="background:#F7F9FC;border-radius:12px;padding:13px 14px;border:1.5px solid #E2E8F0;">
+      <div style="font-size:12px;font-weight:700;color:#2D3748;margin-bottom:8px;">${it.label}</div>
+      <div style="display:flex;align-items:baseline;gap:5px;margin-bottom:8px;">
+        <span style="font-size:20px;font-weight:900;color:${color};">${v.value}</span>
+        <span style="font-size:11px;color:#A0AEC0;">${it.unit}</span>
+        <span style="font-size:11px;font-weight:700;padding:2px 7px;border-radius:99px;background:${igr.bg};color:${igr.color};margin-left:auto;">${igr.g}</span>
+      </div>
+      <div style="background:#EDF2F7;border-radius:99px;height:8px;overflow:hidden;margin-bottom:5px;">
+        <div style="width:${fillW}%;height:100%;background:${color};border-radius:99px;"></div>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <span style="font-size:10px;font-weight:700;color:${color};">${ipct}%</span>
+        <span style="font-size:10px;color:#A0AEC0;">기준 ${std}${it.unit?' '+it.unit:''}${it.lowerBetter?' (낮을수록↓)':''}</span>
+      </div>
+    </div>`;
+  }).join('');
+
+  document.getElementById('detail-content').innerHTML = `
+    <div style="background:${g.color};border-radius:14px;padding:14px 16px;color:#fff;margin-bottom:10px;">
+      <div style="font-size:13px;font-weight:700;opacity:.8;margin-bottom:4px;">${g.icon} ${g.name}</div>
+      <div style="font-size:32px;font-weight:900;line-height:1;">${pct}%</div>
+      <div style="display:inline-block;background:rgba(255,255,255,0.2);border-radius:8px;padding:3px 10px;margin-top:5px;font-size:12px;font-weight:700;">${gr.g} ${gr.label}</div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:9px;">
+      ${itemCells}
+    </div>`;
+
+  // 이미지 갤러리
+  const galSec = document.getElementById('detail-gallery-section');
+  const galGrid = document.getElementById('detail-gallery-grid');
+  if(h.images && h.images.length && galSec && galGrid){
+    galSec.style.display='block';
+    galGrid.innerHTML = h.images.map(img=>`
+      <div onclick="openGolfImgModal('${img.dataUrl}')" style="border-radius:10px;overflow:hidden;border:1.5px solid #E2E8F0;cursor:pointer;margin-bottom:8px;">
+        <img src="${img.dataUrl}" alt="${img.name}" style="width:100%;height:auto;display:block;background:#F7F9FC;" />
+        <div style="font-size:11px;color:#718096;padding:5px 10px;background:#F0F4F8;">${img.name}</div>
+      </div>`).join('');
+  } else if(galSec){ galSec.style.display='none'; }
+
+  document.getElementById('detail-scroll').scrollTop=0;
+}
+
+/* ══════════════════════════════════════
+   ③ 결과 상세 (기존 스윙분석 데이터)
 ══════════════════════════════════════ */
 function renderDetail(idx) {
   _detailIdx = idx;
@@ -1007,6 +1356,13 @@ function buildRadar(scores, size, mini) {
 /* ══════════════════════════════════════
    초기화
 ══════════════════════════════════════ */
+// 첫 번째 회원 버튼 active 표시
+document.querySelectorAll('.screen-btn').forEach((b,i)=>{
+  const ids=['main','result','detail','compare','history','recommend'];
+  if(i<ids.length) b.classList.toggle('active', ids[i]==='main');
+});
+const firstMemberBtn = document.getElementById('member-btn-1');
+if(firstMemberBtn) firstMemberBtn.classList.add('active');
 renderMain();
 </script>
 </body>
