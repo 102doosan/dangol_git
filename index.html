@@ -9,193 +9,195 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: 'Noto Sans KR', sans-serif; background: #F0F4F8; min-height: 100vh; padding: 40px 24px 60px; color: #1A202C; }
 
-    .top-header { max-width: 1000px; margin: 0 auto 40px; }
+    .top-header { max-width: 960px; margin: 0 auto 40px; }
     .top-header h1 { font-size: 28px; font-weight: 900; margin-bottom: 6px; }
     .top-header p { font-size: 14px; color: #718096; }
-    .top-meta { display: flex; gap: 16px; margin-top: 14px; flex-wrap: wrap; }
-    .meta-badge { background: #fff; border-radius: 10px; padding: 8px 16px; font-size: 13px; font-weight: 700; box-shadow: 0 1px 4px rgba(0,0,0,0.07); display: flex; align-items: center; gap: 6px; }
 
-    .section { max-width: 1000px; margin: 0 auto 36px; }
-    .section-label { font-size: 11px; font-weight: 800; color: #A0AEC0; letter-spacing: 2px; margin-bottom: 14px; display: flex; align-items: center; gap: 10px; }
+    .section { max-width: 960px; margin: 0 auto 36px; }
+    .section-label {
+      font-size: 11px; font-weight: 800; color: #A0AEC0; letter-spacing: 2px;
+      margin-bottom: 14px; display: flex; align-items: center; gap: 10px;
+    }
     .section-label::after { content: ''; flex: 1; height: 1px; background: #E2E8F0; }
 
-    .card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 14px; }
+    .card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 14px; }
 
     .card {
-      background: #fff; border-radius: 18px; padding: 20px 22px;
+      background: #fff; border-radius: 18px; padding: 22px 24px;
       box-shadow: 0 2px 10px rgba(0,0,0,0.07);
       text-decoration: none; color: inherit;
-      display: flex; align-items: center; gap: 14px;
+      display: flex; align-items: center; gap: 16px;
       border: 2px solid transparent;
-      transition: all 0.2s; cursor: pointer;
+      transition: all 0.2s;
+      cursor: pointer;
     }
-    .card:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0,0,0,0.12); border-color: var(--accent, #4F9CF9); }
+    .card:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0,0,0,0.12); border-color: var(--accent); }
 
-    .card-icon { width: 50px; height: 50px; border-radius: 14px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 22px; background: var(--icon-bg, #EEF2FF); }
+    .card-icon {
+      width: 52px; height: 52px; border-radius: 14px; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 24px; background: var(--icon-bg);
+    }
     .card-info { flex: 1; min-width: 0; }
     .card-title { font-size: 15px; font-weight: 800; color: #1A202C; margin-bottom: 3px; }
-    .card-desc { font-size: 12px; color: #718096; font-weight: 500; line-height: 1.4; }
-    .card-screens { font-size: 12px; font-weight: 800; margin-top: 6px; color: var(--accent, #4F9CF9); }
+    .card-desc { font-size: 12px; color: #A0AEC0; font-weight: 500; }
+    .card-screens { font-size: 11px; font-weight: 700; margin-top: 6px; color: var(--accent); }
     .card-arrow { font-size: 20px; color: #CBD5E0; flex-shrink: 0; transition: transform 0.2s; }
-    .card:hover .card-arrow { transform: translateX(4px); color: var(--accent, #4F9CF9); }
+    .card:hover .card-arrow { transform: translateX(4px); color: var(--accent); }
 
-    /* 메인 카드 */
+    /* 특별 카드: 전체 목록 */
     .card-main {
       background: linear-gradient(135deg, #1E3A5F 0%, #2A5298 100%);
-      color: #fff; grid-column: 1 / -1; padding: 24px 28px;
+      color: #fff; border-color: transparent;
+      grid-column: 1 / -1;
+      padding: 28px 28px;
     }
     .card-main .card-title { font-size: 18px; color: #fff; }
     .card-main .card-desc { color: rgba(255,255,255,0.65); font-size: 13px; }
     .card-main .card-screens { color: #63B3ED; font-size: 13px; }
     .card-main .card-arrow { color: rgba(255,255,255,0.4); }
     .card-main:hover { border-color: #63B3ED; }
-    .card-main .card-icon { background: rgba(255,255,255,0.15); font-size: 26px; width: 56px; height: 56px; }
-
-    /* 로딩 */
-    .loading { text-align: center; padding: 40px; color: #A0AEC0; font-size: 14px; }
-    .error { text-align: center; padding: 40px; color: #E53E3E; font-size: 14px; }
+    .card-main .card-icon { background: rgba(255,255,255,0.15); font-size: 28px; width: 60px; height: 60px; }
   </style>
 </head>
 <body>
 
-<div class="top-header">
-  <h1>🏥 헬스케어 앱 디자인 허브</h1>
-  <p>전체앱-list.html 데이터를 자동으로 읽어 항상 최신 상태를 반영합니다</p>
-  <div class="top-meta" id="top-meta">
-    <div class="meta-badge">⏳ 데이터 로딩 중...</div>
+  <div class="top-header">
+    <h1>🏥 헬스케어 앱 디자인 허브</h1>
+    <p>모든 화면 디자인 파일을 한 곳에서 확인하세요</p>
   </div>
-</div>
 
-<!-- 전체 화면 목록 -->
-<div class="section">
-  <div class="section-label">📋 전체 화면 목록</div>
-  <div class="card-grid">
-    <a class="card card-main" href="전체앱-list.html" target="_blank">
-      <div class="card-icon">📋</div>
-      <div class="card-info">
-        <div class="card-title">전체 앱 화면 목록</div>
-        <div class="card-desc">사용자 앱 + 관리자 앱 전체 화면 구조 및 진행 현황 체크리스트</div>
-        <div class="card-screens" id="total-screens">로딩 중...</div>
-      </div>
-      <div class="card-arrow">›</div>
-    </a>
-  </div>
-</div>
-
-<!-- 사용자 앱 -->
-<div class="section">
-  <div class="section-label">📱 사용자 앱 화면 디자인</div>
-  <div class="card-grid" id="user-cards">
-    <div class="loading">데이터 로딩 중...</div>
-  </div>
-</div>
-
-<!-- 관리자 앱 -->
-<div class="section">
-  <div class="section-label">🖥️ 관리자 앱 화면 디자인</div>
-  <div class="card-grid" id="admin-cards">
-    <div class="loading">데이터 로딩 중...</div>
-  </div>
-</div>
-
-<script>
-// ── 카테고리별 디자인 파일 매핑 ──────────────────────────────────
-const designFiles = {
-  // 사용자 앱
-  'myPrescription': { file: 'my운동처방.html',  accent: '#3B6FF0', iconBg: '#EEF2FF' },
-  'exercise':       { file: '운동법.html',       accent: '#38A169', iconBg: '#F0FFF4' },
-  'rehab':          { file: '재활운동.html',     accent: '#D69E2E', iconBg: '#FFFFF0' },
-  'sfma':           { file: 'SFMA결과.html',     accent: '#805AD5', iconBg: '#FAF5FF' },
-  'lesson':         { file: '레슨.html',         accent: '#E67E22', iconBg: '#FFFAF0' },
-  'myRoutine':      { file: '마이루틴.html',     accent: '#9B6DFF', iconBg: '#F3EEFF' },
-  'myrecord':       { file: '나의기록.html',     accent: '#4ECDC4', iconBg: '#E6FFFA' },
-  'store':          { file: '스토어.html',       accent: '#F472B6', iconBg: '#FFF0F6' },
-  // 관리자 앱
-  'a-dashboard':       { file: '관리자-대시보드.html',          accent: '#4299E1', iconBg: '#EBF8FF' },
-  'a-my-prescription': { file: '관리자-My운동처방.html',        accent: '#E67E22', iconBg: '#FFFAF0' },
-  'a-prescription':    { file: '관리자-처방운동동작구성관리.html', accent: '#5A67D8', iconBg: '#EBF4FF' },
-};
-
-// ── 카드 HTML 생성 ────────────────────────────────────────────────
-function makeCard(cat, mapping) {
-  const screenCount = cat.screens.length;
-  const hasFile = !!mapping;
-  const accent   = mapping?.accent  || '#4F9CF9';
-  const iconBg   = mapping?.iconBg  || '#EEF2FF';
-  const fileHref = mapping?.file    || '#';
-
-  const screenNames = cat.screens.slice(0, 3).map(s => s.name).join(' · ')
-    + (cat.screens.length > 3 ? ' 외 ' + (cat.screens.length - 3) + '개' : '');
-
-  if (hasFile) {
-    return `
-      <a class="card" href="${fileHref}" target="_blank"
-         style="--accent:${accent};--icon-bg:${iconBg};">
-        <div class="card-icon">${cat.icon}</div>
+  <!-- 전체 화면 목록 -->
+  <div class="section">
+    <div class="section-label">📋 전체 화면 목록</div>
+    <div class="card-grid">
+      <a class="card card-main" href="전체앱-list.html" target="_blank">
+        <div class="card-icon">📋</div>
         <div class="card-info">
-          <div class="card-title">${cat.title}</div>
-          <div class="card-desc">${screenNames}</div>
-          <div class="card-screens">${screenCount}개 화면 · 디자인 파일 있음</div>
+          <div class="card-title">전체 앱 화면 목록</div>
+          <div class="card-desc">사용자 앱 + 관리자 앱 전체 화면 구조 및 진행 현황</div>
+          <div class="card-screens">사용자 앱 · 관리자 앱 · 체크리스트</div>
         </div>
         <div class="card-arrow">›</div>
-      </a>`;
-  } else {
-    return `
-      <div class="card" style="--accent:#A0AEC0;--icon-bg:#F7F9FC;opacity:0.7;cursor:default;">
-        <div class="card-icon" style="background:#EDF2F7;">${cat.icon}</div>
+      </a>
+    </div>
+  </div>
+
+  <!-- 사용자 앱 -->
+  <div class="section">
+    <div class="section-label">📱 사용자 앱 화면 디자인</div>
+    <div class="card-grid">
+
+      <a class="card" href="my운동처방.html" target="_blank" style="--accent:#3B6FF0;--icon-bg:#EEF2FF;">
+        <div class="card-icon">💊</div>
         <div class="card-info">
-          <div class="card-title" style="color:#4A5568;">${cat.title}</div>
-          <div class="card-desc">${screenNames}</div>
-          <div class="card-screens" style="color:#A0AEC0;">${screenCount}개 화면 · 디자인 파일 없음</div>
+          <div class="card-title">My 운동처방</div>
+          <div class="card-desc">처방 목록 · 상세 · 운동 진행 · 완료</div>
+          <div class="card-screens">5개 화면</div>
         </div>
-        <div class="card-arrow" style="color:#E2E8F0;">›</div>
-      </div>`;
-  }
-}
+        <div class="card-arrow">›</div>
+      </a>
 
-// ── 전체앱-list.html 에서 데이터 로드 ─────────────────────────────
-fetch('전체앱-list.html')
-  .then(r => r.text())
-  .then(html => {
-    // userData 추출
-    const userMatch  = html.match(/const userData\s*=\s*(\[[\s\S]*?\n\];)/);
-    const adminMatch = html.match(/const adminData\s*=\s*(\[[\s\S]*?\n\];)/);
+      <a class="card" href="운동법.html" target="_blank" style="--accent:#38A169;--icon-bg:#F0FFF4;">
+        <div class="card-icon">🏋️</div>
+        <div class="card-info">
+          <div class="card-title">운동법</div>
+          <div class="card-desc">운동 목록 · 상세 · 따라하기 · 완료</div>
+          <div class="card-screens">5개 화면</div>
+        </div>
+        <div class="card-arrow">›</div>
+      </a>
 
-    if (!userMatch || !adminMatch) throw new Error('데이터를 찾을 수 없습니다');
+      <a class="card" href="재활운동.html" target="_blank" style="--accent:#D69E2E;--icon-bg:#FFFFF0;">
+        <div class="card-icon">🦴</div>
+        <div class="card-info">
+          <div class="card-title">재활운동</div>
+          <div class="card-desc">재활 프로그램 · 단계별 운동 · 기록</div>
+          <div class="card-screens">5개 화면</div>
+        </div>
+        <div class="card-arrow">›</div>
+      </a>
 
-    const userData  = new Function('return ' + userMatch[1])();
-    const adminData = new Function('return ' + adminMatch[1])();
+      <a class="card" href="SFMA결과.html" target="_blank" style="--accent:#805AD5;--icon-bg:#FAF5FF;">
+        <div class="card-icon">📋</div>
+        <div class="card-info">
+          <div class="card-title">SFMA 결과</div>
+          <div class="card-desc">검사 결과 · 분석 · 히스토리</div>
+          <div class="card-screens">4개 화면</div>
+        </div>
+        <div class="card-arrow">›</div>
+      </a>
 
-    const totalUserScreens  = userData.reduce((s, c) => s + c.screens.length, 0);
-    const totalAdminScreens = adminData.reduce((s, c) => s + c.screens.length, 0);
-    const total = totalUserScreens + totalAdminScreens;
+      <a class="card" href="레슨.html" target="_blank" style="--accent:#E67E22;--icon-bg:#FFFAF0;">
+        <div class="card-icon">🎯</div>
+        <div class="card-info">
+          <div class="card-title">레슨</div>
+          <div class="card-desc">레슨 목록 · 예약 · 상세</div>
+          <div class="card-screens">3개 화면</div>
+        </div>
+        <div class="card-arrow">›</div>
+      </a>
 
-    // 상단 메타
-    document.getElementById('top-meta').innerHTML = `
-      <div class="meta-badge">📱 사용자 앱 ${userData.length}개 카테고리 · ${totalUserScreens}개 화면</div>
-      <div class="meta-badge">🖥️ 관리자 앱 ${adminData.length}개 카테고리 · ${totalAdminScreens}개 화면</div>
-      <div class="meta-badge">📊 전체 ${total}개 화면</div>
-    `;
+      <a class="card" href="마이루틴.html" target="_blank" style="--accent:#9B6DFF;--icon-bg:#F3EEFF;">
+        <div class="card-icon">🔄</div>
+        <div class="card-info">
+          <div class="card-title">마이루틴</div>
+          <div class="card-desc">루틴 홈 · 만들기 · 따라하기 · 달성이력</div>
+          <div class="card-screens">6개 화면</div>
+        </div>
+        <div class="card-arrow">›</div>
+      </a>
 
-    // 전체 목록 카드
-    document.getElementById('total-screens').textContent =
-      `사용자 앱 ${totalUserScreens}개 · 관리자 앱 ${totalAdminScreens}개 · 총 ${total}개 화면`;
+      <a class="card" href="나의기록.html" target="_blank" style="--accent:#4ECDC4;--icon-bg:#E6FFFA;">
+        <div class="card-icon">📈</div>
+        <div class="card-info">
+          <div class="card-title">나의기록</div>
+          <div class="card-desc">기록 홈 · 신체기록 · 캘린더 · 통계</div>
+          <div class="card-screens">5개 화면</div>
+        </div>
+        <div class="card-arrow">›</div>
+      </a>
 
-    // 사용자 앱 카드
-    document.getElementById('user-cards').innerHTML =
-      userData.map(cat => makeCard(cat, designFiles[cat.id])).join('');
+      <a class="card" href="스토어.html" target="_blank" style="--accent:#F472B6;--icon-bg:#FFF0F6;">
+        <div class="card-icon">🛒</div>
+        <div class="card-info">
+          <div class="card-title">스토어</div>
+          <div class="card-desc">상품 목록 · 상세 · 장바구니 · 주문</div>
+          <div class="card-screens">8개 화면</div>
+        </div>
+        <div class="card-arrow">›</div>
+      </a>
 
-    // 관리자 앱 카드
-    document.getElementById('admin-cards').innerHTML =
-      adminData.map(cat => makeCard(cat, designFiles[cat.id])).join('');
-  })
-  .catch(err => {
-    const msg = `<div class="error">⚠️ ${err.message}<br><small>로컬에서 열 경우 서버 환경(GitHub Pages 등)에서 확인하세요</small></div>`;
-    document.getElementById('user-cards').innerHTML  = msg;
-    document.getElementById('admin-cards').innerHTML = msg;
-    document.getElementById('top-meta').innerHTML    =
-      '<div class="meta-badge" style="color:#E53E3E;">⚠️ 데이터 로드 실패</div>';
-  });
-</script>
+    </div>
+  </div>
+
+  <!-- 관리자 앱 -->
+  <div class="section">
+    <div class="section-label">🖥️ 관리자 앱 화면 디자인</div>
+    <div class="card-grid">
+
+      <a class="card" href="관리자-대시보드.html" target="_blank" style="--accent:#4299E1;--icon-bg:#EBF8FF;">
+        <div class="card-icon">📊</div>
+        <div class="card-info">
+          <div class="card-title">대시보드</div>
+          <div class="card-desc">팝업 알림 · 미처리 업무 · 매출 · 회원 통계</div>
+          <div class="card-screens">1개 화면</div>
+        </div>
+        <div class="card-arrow">›</div>
+      </a>
+
+      <a class="card" href="관리자-My운동처방.html" target="_blank" style="--accent:#E67E22;--icon-bg:#FFFAF0;">
+        <div class="card-icon">💊</div>
+        <div class="card-info">
+          <div class="card-title">My 운동처방 관리</div>
+          <div class="card-desc">처방 현황 · 상세 조회 · 이력 · 신청 접수</div>
+          <div class="card-screens">4개 화면</div>
+        </div>
+        <div class="card-arrow">›</div>
+      </a>
+
+    </div>
+  </div>
+
 </body>
 </html>
