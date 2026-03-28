@@ -1373,6 +1373,45 @@ function buildKvestInputPanel(m){
     </div>`;
 }
 
+function getDefaultKvestAnalysis(p, t, a, c) {
+  // p=골반 순서, t=몸통, a=팔, c=클럽 (입력된 순서 숫자)
+  const lines = [];
+
+  // ── 백스윙 (골반·몸통 선행) ──
+  if (p === 1 && t === 2) {
+    lines.push('백스윙: 골반이 선행하고 몸통이 이어지는 이상적인 순서입니다. 하체 주도 스윙으로 충분한 코일이 형성됩니다.');
+  } else if (t < p) {
+    lines.push(`백스윙: 몸통(${t}번째)이 골반(${p}번째)보다 먼저 동작하는 역순서 패턴입니다. 상체 주도 스윙으로 코일 손실 및 허리 부담이 발생합니다.`);
+  } else if (p === 1) {
+    lines.push(`백스윙: 골반 선행은 정상이나 몸통(${t}번째) 회전이 지연됩니다. 흉추 회전 가동성 훈련을 권장합니다.`);
+  } else {
+    lines.push(`백스윙: 골반(${p}번째) 선행이 지연됩니다. 하체 주도 스윙 패턴 확립을 위한 힙 턴 훈련이 필요합니다.`);
+  }
+
+  // ── 트랜지션·다운스윙 (전환 시 순서 연속성) ──
+  const segs = [{id:'골반',v:p},{id:'몸통',v:t},{id:'팔',v:a},{id:'클럽',v:c}].sort((x,y)=>x.v-y.v);
+  const orderStr = segs.map(s=>s.id).join(' → ');
+  const wrongCount = [p!==1, t!==2, a!==3, c!==4].filter(Boolean).length;
+  if (wrongCount === 0) {
+    lines.push('트랜지션: 다운스윙 전환 시 순서가 완벽하게 유지됩니다. 운동에너지가 사슬처럼 효율적으로 전달됩니다.');
+  } else if (wrongCount === 1) {
+    lines.push(`트랜지션: 전환 순서(${orderStr})에서 1개 부위의 타이밍 조정이 필요합니다. 전반적인 시퀀스는 양호한 편입니다.`);
+  } else {
+    lines.push(`트랜지션: 현재 순서(${orderStr})로 전환되고 있습니다. 골반 → 몸통 → 팔 → 클럽 순서 반복 훈련이 필요합니다.`);
+  }
+
+  // ── 임팩트 (팔·클럽 최종 가속) ──
+  if (a === 3 && c === 4) {
+    lines.push('임팩트: 팔과 클럽이 순서대로 최종 가속됩니다. 클럽 헤드 스피드 극대화와 안정적인 페이스 컨트롤이 기대됩니다.');
+  } else if (c < a) {
+    lines.push(`임팩트: 클럽(${c}번째)이 팔(${a}번째)보다 먼저 가속되는 얼리 릴리즈 패턴입니다. 파워 손실과 방향성 불안정이 나타나므로 팔 주도 릴리즈 교정이 필요합니다.`);
+  } else {
+    lines.push(`임팩트: 팔(${a}번째)·클럽(${c}번째) 순서 미세 조정으로 임팩트 효율을 더 높일 수 있습니다.`);
+  }
+
+  return lines.join('\n');
+}
+
 function onKvestSeqChange(){
   KVEST_SEGS.forEach(s=>{
     const el=document.getElementById('inp-val-'+s.id);
@@ -1397,6 +1436,20 @@ function onKvestSeqChange(){
           <span style="font-size:12px;font-weight:900;padding:1px 7px;border-radius:99px;background:${correct?'#C6F6D5':'#FED7D7'};color:${correct?'#1A4731':'#742A2A'};">${v.order}${correct?'✓':'!'}</span>
         </div>`;
     }).join('');
+
+    // 분석결과 자동 입력 (비어있을 때만)
+    const ta = document.getElementById('inp-val-kv_analysis');
+    if(ta && !ta.value.trim()){
+      const seqMap = {};
+      KVEST_SEGS.forEach(s=>{ seqMap[s.id]=parseInt(document.getElementById('inp-val-'+s.id)?.value)||0; });
+      const defaultText = getDefaultKvestAnalysis(
+        seqMap['kv_seq_pelvis'], seqMap['kv_seq_thorax'],
+        seqMap['kv_seq_arm'],    seqMap['kv_seq_club']
+      );
+      ta.value = defaultText;
+      if(!_inputState['kv_analysis']) _inputState['kv_analysis']={value:''};
+      _inputState['kv_analysis'].value = defaultText;
+    }
   } else {
     visual.style.display='none';
   }
