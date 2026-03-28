@@ -702,13 +702,22 @@ const GOLF_GROUPS = [
     { id:'sp_tempo',    label:'리듬 B:F(×10)',       unit:'',      std:{m:20,  f:20}  },
   ]},
   { id:'tpi', name:'TPI 신체검사', icon:'🧘', color:'#276749', items:[
-    { id:'tpi_squat',   label:'오버헤드 딥 스쿼트',  unit:'점',    std:{m:2,   f:2}   },
-    { id:'tpi_toe',     label:'토터치 & 연결성',     unit:'점',    std:{m:2,   f:2}   },
-    { id:'tpi_hip_l',   label:'고관절 가동성(좌)',    unit:'점',    std:{m:2,   f:2}   },
-    { id:'tpi_hip_r',   label:'고관절 가동성(우)',    unit:'점',    std:{m:2,   f:2}   },
-    { id:'tpi_thorax',  label:'흉추 회전',           unit:'점',    std:{m:2,   f:2}   },
-    { id:'tpi_bridge',  label:'브릿지 & 코어',       unit:'점',    std:{m:2,   f:2}   },
-    { id:'tpi_pelvic',  label:'골반 안정성',         unit:'점',    std:{m:2,   f:2}   },
+    { id:'tpi_pelv_tilt',  label:'Pelvic Tilt',              isBool:true, std:{m:1,f:1} },
+    { id:'tpi_9090',       label:'90/90',                    isBool:true, std:{m:1,f:1} },
+    { id:'tpi_lat',        label:'Lat Length',               isBool:true, std:{m:1,f:1} },
+    { id:'tpi_pelv_rot',   label:'Pelvic Rotation',          isBool:true, std:{m:1,f:1} },
+    { id:'tpi_bridge',     label:'Single Leg Bridge',        isBool:true, std:{m:1,f:1} },
+    { id:'tpi_squat',      label:'Overhead Deep Squat',      isBool:true, std:{m:1,f:1} },
+    { id:'tpi_cerv_rot',   label:'Cervical Rotation',        isBool:true, std:{m:1,f:1} },
+    { id:'tpi_torso_rot',  label:'Torso Rotation',           isBool:true, std:{m:1,f:1} },
+    { id:'tpi_lower_rot',  label:'Lower Quarter Rotation',   isBool:true, std:{m:1,f:1} },
+    { id:'tpi_wrist_ps',   label:'Wrist Pronation/Supination',isBool:true,std:{m:1,f:1} },
+    { id:'tpi_wrist_fe',   label:'Wrist Flexion Extension',  isBool:true, std:{m:1,f:1} },
+    { id:'tpi_toe',        label:'Toe Touch',                isBool:true, std:{m:1,f:1} },
+    { id:'tpi_trunk_rot',  label:'Seated Trunk Rotation',    isBool:true, std:{m:1,f:1} },
+    { id:'tpi_reach',      label:'Reach Roll & Lift',        isBool:true, std:{m:1,f:1} },
+    { id:'tpi_wrist_ru',   label:'Wrist Radius/Ulnar',       isBool:true, std:{m:1,f:1} },
+    { id:'tpi_balance',    label:'Single Leg Balance',       isBool:true, std:{m:1,f:1} },
   ]},
 ];
 const ALL_GOLF_ITEMS = GOLF_GROUPS.flatMap(g => g.items.map(it => ({...it, groupId:g.id, groupName:g.name})));
@@ -717,6 +726,7 @@ const ALL_GOLF_ITEMS = GOLF_GROUPS.flatMap(g => g.items.map(it => ({...it, group
 function golfStd(item, gender){ return gender==='여' ? item.std.f : item.std.m; }
 function golfScore(item, value, gender){
   if(item.isText) return 100;
+  if(item.isBool) return value ? 100 : 0;
   if(item.isSeq){
     const diff = Math.abs(value - item.std.m);
     if(diff === 0) return 110;
@@ -751,13 +761,13 @@ const MEMBERS = [
       kv_seq_pelvis:{value:1}, kv_seq_thorax:{value:2}, kv_seq_arm:{value:3}, kv_seq_club:{value:3}, kv_analysis:{value:'골반과 몸통의 분리가 현재보다 빠르게 효과적. 몸통보다 팔의 쓰임이 큼\n골반 몸통 팔의 순서가 효율\n골반과 몸통의 로딩이 없다. 감속패턴을 나쁘게 함'},
       tm_speed:{value:108}, tm_bspeed:{value:157}, tm_smash:{value:145}, tm_carry:{value:238}, tm_launch:{value:11}, tm_spin:{value:260},
       sp_face:{value:4}, sp_path:{value:6}, sp_speed:{value:48}, sp_impact:{value:2}, sp_loft:{value:36}, sp_tempo:{value:21},
-      tpi_squat:{value:2}, tpi_toe:{value:2}, tpi_hip_l:{value:2}, tpi_hip_r:{value:2}, tpi_thorax:{value:2}, tpi_bridge:{value:2}, tpi_pelvic:{value:2},
+      tpi_pelv_tilt:{value:1},tpi_9090:{value:1},tpi_lat:{value:1},tpi_pelv_rot:{value:1},tpi_bridge:{value:1},tpi_squat:{value:1},tpi_cerv_rot:{value:1},tpi_torso_rot:{value:0},tpi_lower_rot:{value:1},tpi_wrist_ps:{value:1},tpi_wrist_fe:{value:1},tpi_toe:{value:1},tpi_trunk_rot:{value:0},tpi_reach:{value:1},tpi_wrist_ru:{value:1},tpi_balance:{value:1},
     },
     { round:2, date:'2025-11-15', memo:'',
       kv_seq_pelvis:{value:1}, kv_seq_thorax:{value:3}, kv_seq_arm:{value:2}, kv_seq_club:{value:4}, kv_analysis:{value:'골반 회전이 빠르나 몸통과 팔의 순서가 바뀜\n전환이 빠르나 팔이 몸통보다 먼저 동작\n클럽 속도는 정상 범위'},
       tm_speed:{value:103}, tm_bspeed:{value:150}, tm_smash:{value:145}, tm_carry:{value:225}, tm_launch:{value:13}, tm_spin:{value:280},
       sp_face:{value:7}, sp_path:{value:10}, sp_speed:{value:44}, sp_impact:{value:4}, sp_loft:{value:34}, sp_tempo:{value:19},
-      tpi_squat:{value:2}, tpi_toe:{value:1}, tpi_hip_l:{value:2}, tpi_hip_r:{value:1}, tpi_thorax:{value:2}, tpi_bridge:{value:2}, tpi_pelvic:{value:1},
+      tpi_pelv_tilt:{value:1},tpi_9090:{value:0},tpi_lat:{value:1},tpi_pelv_rot:{value:1},tpi_bridge:{value:1},tpi_squat:{value:1},tpi_cerv_rot:{value:1},tpi_torso_rot:{value:0},tpi_lower_rot:{value:0},tpi_wrist_ps:{value:1},tpi_wrist_fe:{value:1},tpi_toe:{value:0},tpi_trunk_rot:{value:1},tpi_reach:{value:0},tpi_wrist_ru:{value:1},tpi_balance:{value:0},
     },
   ]},
   { id:2, name:'이서연', gender:'여', color:'#ED64A6', phone:'010-2345-6789', history:[
@@ -765,7 +775,7 @@ const MEMBERS = [
       kv_seq_pelvis:{value:1}, kv_seq_thorax:{value:2}, kv_seq_arm:{value:3}, kv_seq_club:{value:4}, kv_analysis:{value:'표준 순서 일치. 골반 선행이 안정적\n부드러운 전환. 시퀀스 유지\n임팩트에서 모든 세그먼트 표준 순서 유지'},
       tm_speed:{value:82}, tm_bspeed:{value:119}, tm_smash:{value:145}, tm_carry:{value:175}, tm_launch:{value:13}, tm_spin:{value:295},
       sp_face:{value:4}, sp_path:{value:7}, sp_speed:{value:42}, sp_impact:{value:2}, sp_loft:{value:36}, sp_tempo:{value:20},
-      tpi_squat:{value:2}, tpi_toe:{value:2}, tpi_hip_l:{value:2}, tpi_hip_r:{value:2}, tpi_thorax:{value:1}, tpi_bridge:{value:2}, tpi_pelvic:{value:2},
+      tpi_pelv_tilt:{value:1},tpi_9090:{value:1},tpi_lat:{value:1},tpi_pelv_rot:{value:1},tpi_bridge:{value:1},tpi_squat:{value:1},tpi_cerv_rot:{value:0},tpi_torso_rot:{value:1},tpi_lower_rot:{value:1},tpi_wrist_ps:{value:1},tpi_wrist_fe:{value:1},tpi_toe:{value:1},tpi_trunk_rot:{value:1},tpi_reach:{value:1},tpi_wrist_ru:{value:0},tpi_balance:{value:1},
     },
   ]},
   { id:3, name:'박민준', gender:'남', color:'#48BB78', phone:'010-3456-7890', history:[
@@ -773,7 +783,7 @@ const MEMBERS = [
       kv_seq_pelvis:{value:2}, kv_seq_thorax:{value:1}, kv_seq_arm:{value:3}, kv_seq_club:{value:4}, kv_analysis:{value:'몸통이 골반보다 먼저 시작. 역순서 발생\n전환에서 상체 우선으로 파워 손실\n클럽 속도 저하. 순서 교정 필요'},
       tm_speed:{value:98}, tm_bspeed:{value:142}, tm_smash:{value:145}, tm_carry:{value:210}, tm_launch:{value:14}, tm_spin:{value:290},
       sp_face:{value:9}, sp_path:{value:12}, sp_speed:{value:41}, sp_impact:{value:5}, sp_loft:{value:32}, sp_tempo:{value:18},
-      tpi_squat:{value:1}, tpi_toe:{value:1}, tpi_hip_l:{value:1}, tpi_hip_r:{value:1}, tpi_thorax:{value:1}, tpi_bridge:{value:1}, tpi_pelvic:{value:1},
+      tpi_pelv_tilt:{value:0},tpi_9090:{value:0},tpi_lat:{value:1},tpi_pelv_rot:{value:0},tpi_bridge:{value:0},tpi_squat:{value:0},tpi_cerv_rot:{value:1},tpi_torso_rot:{value:0},tpi_lower_rot:{value:0},tpi_wrist_ps:{value:1},tpi_wrist_fe:{value:1},tpi_toe:{value:0},tpi_trunk_rot:{value:0},tpi_reach:{value:1},tpi_wrist_ru:{value:0},tpi_balance:{value:0},
     },
   ]},
   { id:4, name:'정유진', gender:'여', color:'#ED8936', phone:'010-4567-8901', history:[
@@ -781,7 +791,7 @@ const MEMBERS = [
       kv_seq_pelvis:{value:1}, kv_seq_thorax:{value:2}, kv_seq_arm:{value:4}, kv_seq_club:{value:3}, kv_analysis:{value:'골반·몸통 순서 정상. 팔과 클럽 순서 역전\n전환 과정에서 클럽이 팔보다 먼저 가속\n클럽 제어 불안정. 팔 속도 향상 필요'},
       tm_speed:{value:76}, tm_bspeed:{value:110}, tm_smash:{value:145}, tm_carry:{value:158}, tm_launch:{value:15}, tm_spin:{value:320},
       sp_face:{value:8}, sp_path:{value:11}, sp_speed:{value:39}, sp_impact:{value:4}, sp_loft:{value:30}, sp_tempo:{value:18},
-      tpi_squat:{value:1}, tpi_toe:{value:2}, tpi_hip_l:{value:1}, tpi_hip_r:{value:1}, tpi_thorax:{value:1}, tpi_bridge:{value:1}, tpi_pelvic:{value:2},
+      tpi_pelv_tilt:{value:1},tpi_9090:{value:0},tpi_lat:{value:1},tpi_pelv_rot:{value:1},tpi_bridge:{value:0},tpi_squat:{value:0},tpi_cerv_rot:{value:1},tpi_torso_rot:{value:0},tpi_lower_rot:{value:1},tpi_wrist_ps:{value:0},tpi_wrist_fe:{value:1},tpi_toe:{value:1},tpi_trunk_rot:{value:0},tpi_reach:{value:1},tpi_wrist_ru:{value:1},tpi_balance:{value:0},
     },
   ]},
   { id:5, name:'최준혁', gender:'남', color:'#9F7AEA', phone:'010-5678-9012', history:[
@@ -789,7 +799,7 @@ const MEMBERS = [
       kv_seq_pelvis:{value:1}, kv_seq_thorax:{value:2}, kv_seq_arm:{value:3}, kv_seq_club:{value:4}, kv_analysis:{value:'완벽한 표준 순서. 골반 선행이 최대 파워 생성\n이상적인 에너지 전달. 순서 완벽 유지\n모든 세그먼트 최적 가속. 클럽 헤드 스피드 최대화'},
       tm_speed:{value:115}, tm_bspeed:{value:168}, tm_smash:{value:146}, tm_carry:{value:255}, tm_launch:{value:11}, tm_spin:{value:250},
       sp_face:{value:2}, sp_path:{value:3}, sp_speed:{value:52}, sp_impact:{value:1}, sp_loft:{value:37}, sp_tempo:{value:21},
-      tpi_squat:{value:2}, tpi_toe:{value:2}, tpi_hip_l:{value:2}, tpi_hip_r:{value:2}, tpi_thorax:{value:2}, tpi_bridge:{value:2}, tpi_pelvic:{value:2},
+      tpi_pelv_tilt:{value:1},tpi_9090:{value:1},tpi_lat:{value:1},tpi_pelv_rot:{value:1},tpi_bridge:{value:1},tpi_squat:{value:1},tpi_cerv_rot:{value:1},tpi_torso_rot:{value:1},tpi_lower_rot:{value:1},tpi_wrist_ps:{value:1},tpi_wrist_fe:{value:1},tpi_toe:{value:1},tpi_trunk_rot:{value:1},tpi_reach:{value:1},tpi_wrist_ru:{value:1},tpi_balance:{value:1},
     },
   ]},
 ];
@@ -1209,6 +1219,29 @@ function openDetail(mid, targetRound=null){
       </div>`;
     }
 
+    // TPI: O/X 그리드
+    if(g.id === 'tpi'){
+      const passCount = g.items.filter(it=>h[it.id]?.value===1).length;
+      const total = g.items.length;
+      const tpiCells = g.items.map(it=>{
+        const v=h[it.id]; const pass=(v?.value===1);
+        return `<div style="background:${pass?'#F0FFF4':'#FFF5F5'};border-radius:10px;padding:8px 10px;border:1.5px solid ${pass?'#C6F6D5':'#FED7D7'};display:flex;align-items:center;justify-content:space-between;gap:6px;">
+          <span style="font-size:10px;font-weight:700;color:#2D3748;line-height:1.3;flex:1;">${it.label}</span>
+          <span style="font-size:16px;font-weight:900;flex-shrink:0;">${pass?'⭕':'❌'}</span>
+        </div>`;
+      }).join('');
+      return `<div class="group-detail-card">
+        <div class="group-detail-header" style="background:${g.color};">
+          <span>${g.icon} ${g.name}</span>
+          <span>${passCount}/${total} 통과 · <span class="grade-badge" style="background:rgba(255,255,255,0.25);color:#fff;font-size:10px;padding:2px 7px;">${gGr.label}</span></span>
+        </div>
+        <div class="group-detail-body">
+          <div style="font-size:11px;color:#718096;margin-bottom:10px;">통과 <strong style="color:#276749;">${passCount}개</strong> / 미통과 <strong style="color:#C53030;">${total-passCount}개</strong></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">${tpiCells}</div>
+        </div>
+      </div>`;
+    }
+
     const itemCells=g.items.map(it=>{
       const v=h[it.id]; if(!v) return '';
       const std=golfStd(it,m.gender);
@@ -1455,11 +1488,47 @@ function onKvestSeqChange(){
   }
 }
 
+function buildTpiInputPanel(){
+  const tpiG = GOLF_GROUPS.find(g=>g.id==='tpi');
+  return `<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+    ${tpiG.items.map(it=>`
+      <div id="tpi-block-${it.id}" style="background:#F7F9FC;border-radius:10px;padding:10px 12px;border:1.5px solid #E2E8F0;">
+        <div style="font-size:11px;font-weight:700;color:#2D3748;margin-bottom:8px;line-height:1.3;">${it.label}</div>
+        <div style="display:flex;gap:6px;">
+          <button id="tpi-o-${it.id}" onclick="onTpiToggle('${it.id}',1)"
+            style="flex:1;padding:6px 0;border-radius:8px;border:2px solid #C6F6D5;background:#fff;font-size:14px;font-weight:900;color:#276749;cursor:pointer;font-family:inherit;transition:all .15s;">⭕ O</button>
+          <button id="tpi-x-${it.id}" onclick="onTpiToggle('${it.id}',0)"
+            style="flex:1;padding:6px 0;border-radius:8px;border:2px solid #FED7D7;background:#fff;font-size:14px;font-weight:900;color:#C53030;cursor:pointer;font-family:inherit;transition:all .15s;">❌ X</button>
+        </div>
+      </div>`).join('')}
+  </div>`;
+}
+
+function onTpiToggle(id, val){
+  if(!_inputState[id]) _inputState[id]={value:null};
+  _inputState[id].value = val;
+  const oBtn = document.getElementById('tpi-o-'+id);
+  const xBtn = document.getElementById('tpi-x-'+id);
+  const block = document.getElementById('tpi-block-'+id);
+  if(!oBtn||!xBtn) return;
+  if(val === 1){
+    oBtn.style.cssText='flex:1;padding:6px 0;border-radius:8px;border:2px solid #276749;background:#276749;font-size:14px;font-weight:900;color:#fff;cursor:pointer;font-family:inherit;';
+    xBtn.style.cssText='flex:1;padding:6px 0;border-radius:8px;border:2px solid #FED7D7;background:#fff;font-size:14px;font-weight:900;color:#C53030;cursor:pointer;font-family:inherit;';
+    block.style.borderColor='#276749';
+  } else {
+    oBtn.style.cssText='flex:1;padding:6px 0;border-radius:8px;border:2px solid #C6F6D5;background:#fff;font-size:14px;font-weight:900;color:#276749;cursor:pointer;font-family:inherit;';
+    xBtn.style.cssText='flex:1;padding:6px 0;border-radius:8px;border:2px solid #C53030;background:#C53030;font-size:14px;font-weight:900;color:#fff;cursor:pointer;font-family:inherit;';
+    block.style.borderColor='#C53030';
+  }
+}
+
 function buildInputPanels(){
   const container = document.getElementById('input-group-panels');
   container.innerHTML = GOLF_GROUPS.map(g=>{
     const content = g.id === 'kvest'
       ? buildKvestInputPanel(_selectedMember)
+      : g.id === 'tpi'
+      ? buildTpiInputPanel()
       : `<div style="font-size:11px;color:#718096;margin-bottom:12px;">기준값: 성별에 따라 자동 표시${g.id==='samputt'?' · ★ 편차 항목은 낮을수록 좋음':''}</div>
          <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">${g.items.map(it=>renderItemBlock(it)).join('')}</div>`;
     return `<div class="card input-group-panel" id="inp-panel-${g.id}" style="display:${g.id==='kvest'?'block':'none'};">
@@ -1561,6 +1630,14 @@ function resetInput(){
   KVEST_SEGS.forEach(s=>{ const el=document.getElementById('inp-val-'+s.id); if(el) el.value=''; });
   const kvAEl=document.getElementById('inp-val-kv_analysis'); if(kvAEl) kvAEl.value='';
   const vd=document.getElementById('kvest-visual-display'); if(vd) vd.style.display='none';
+  // TPI 초기화
+  const tpiG=GOLF_GROUPS.find(g=>g.id==='tpi');
+  if(tpiG) tpiG.items.forEach(it=>{
+    const ob=document.getElementById('tpi-o-'+it.id); const xb=document.getElementById('tpi-x-'+it.id); const bl=document.getElementById('tpi-block-'+it.id);
+    if(ob) ob.style.cssText='flex:1;padding:6px 0;border-radius:8px;border:2px solid #C6F6D5;background:#fff;font-size:14px;font-weight:900;color:#276749;cursor:pointer;font-family:inherit;';
+    if(xb) xb.style.cssText='flex:1;padding:6px 0;border-radius:8px;border:2px solid #FED7D7;background:#fff;font-size:14px;font-weight:900;color:#C53030;cursor:pointer;font-family:inherit;';
+    if(bl) bl.style.borderColor='#E2E8F0';
+  });
   ALL_GOLF_ITEMS.forEach(it=>{
     const el = document.getElementById('inp-val-'+it.id);
     if(el) el.value='';
