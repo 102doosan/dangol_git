@@ -230,12 +230,12 @@ const userData = [
   {
     id:"golf", icon:"⛳", title:"골프검진", color:"#2F855A",
     screens:[
-      {id:"gf01",name:"골프검진 메인",desc:"검진 항목 카드 목록 · 스윙 분석 / 관절 이동성 / 체형 분석 / 근력 불균형 / 유연성 평가 · 최근 검진 결과 요약 배너 · [검진 신청] 버튼",priority:"필수",dev:"FE/BE"},
-      {id:"gf02",name:"검진 결과 요약",desc:"최근 검진 결과 카드 · 항목별 점수·등급 표시 · 총점 및 종합 평가 · [상세 보기] / [이전 결과 비교] 버튼",priority:"필수",dev:"FE/BE"},
-      {id:"gf03",name:"검진 결과 상세",desc:"항목별(스윙 분석·관절 이동성·체형 분석·근력 불균형·유연성) 상세 점수 및 코멘트 · 측정 영상/이미지 · 트레이너 종합 소견",priority:"필수",dev:"FE/BE"},
-      {id:"gf04",name:"검진 결과 비교",desc:"회차 선택(최대 3회 비교) · 항목별 점수 변화 차트 · 개선·악화 항목 하이라이트",priority:"필수",dev:"FE/BE"},
-      {id:"gf05",name:"검진 이력 목록",desc:"과거 검진 전체 이력 · 검진일·총점·담당 트레이너 · 클릭 시 상세 진입",priority:"권장",dev:"FE/BE"},
-      {id:"gf06",name:"골프 맞춤 운동 추천",desc:"검진 결과 기반 맞춤 재활·강화 운동 목록 추천 · 운동 선택 후 마이루틴에 저장 가능",priority:"권장",dev:"FE/BE"},
+      {id:"gf01",name:"골프검진 메인",desc:"회원 선택 칩(5명) · 4개 검진 항목 카드(K-vest 3D분석 / Trackman 탄도분석 / Sam Putt 퍼팅분석 / TPI 신체검사) · 최근 검진 결과 요약 배너(종합점수+4그룹 미니바) · [결과 요약 보기] 버튼",priority:"필수",dev:"FE/BE",file:"골프검진.html"},
+      {id:"gf02",name:"검진 결과 요약",desc:"회차 선택 칩 · 종합점수+SVG 레이더차트 · 4그룹 카드(K-vest/Trackman/Sam Putt/TPI) — 그룹별 평균% · 등급 배지 · 바 · 동적 트레이너 소견 · [상세 보기] 버튼",priority:"필수",dev:"FE/BE",file:"골프검진.html"},
+      {id:"gf03",name:"검진 결과 상세",desc:"회차 선택 칩 + 4그룹 탭(K-vest/Trackman/Sam Putt/TPI) · 각 탭: 항목 2열 그리드 카드(값+단위+기준 대비%+바+등급 배지) · 이미지 갤러리(크게 보기 모달)",priority:"필수",dev:"FE/BE",file:"골프검진.html"},
+      {id:"gf04",name:"검진 결과 비교",desc:"회차 선택(최대 2회) · 그룹별 항목 측정값 변화 가로 바 비교 · 개선·악화 항목 색상 하이라이트",priority:"필수",dev:"FE/BE",file:"골프검진.html"},
+      {id:"gf05",name:"검진 이력 목록",desc:"전체 측정 회차 목록 · 회차·날짜·4그룹 요약 칩·종합 평균% · 등급 배지 · 클릭 시 상세 진입",priority:"권장",dev:"FE/BE",file:"골프검진.html"},
+      {id:"gf06",name:"골프 맞춤 운동 추천",desc:"검진 결과 기반 맞춤 재활·강화 운동 목록 추천 · 운동 선택 후 마이루틴에 저장 가능",priority:"권장",dev:"FE/BE",file:"골프검진.html"},
     ]
   },
   {
@@ -482,12 +482,12 @@ const adminData = [
   {
     id:"a-golf", icon:"⛳", title:"골프검진 관리", color:"#2F855A",
     screens:[
-      {id:"ag10",name:"골프검진 결과 입력",desc:"회원 선택 → 검진일 설정 → 항목별(스윙 분석·관절 이동성·체형 분석·근력 불균형·유연성) 점수 입력 → 측정 영상/이미지 업로드 → 트레이너 종합 소견 입력 → 저장",priority:"필수",dev:"FE/BE"},
-      {id:"ag11",name:"골프검진 결과 수정",desc:"기존 결과 수정 · 수정 이력 저장",priority:"필수",dev:"FE/BE"},
-      {id:"ag12",name:"회원별 검진 이력 조회",desc:"회원 검색 → 전체 검진 이력 목록 · 검진일·총점·담당 트레이너 표시 · 지점별·기간별 필터",priority:"필수",dev:"FE/BE"},
-      {id:"ag13",name:"검진 결과 상세 조회",desc:"특정 회차 결과 상세 · 항목별 점수·코멘트 확인 · 회원이 보는 화면과 동일한 내용",priority:"필수",dev:"FE/BE"},
-      {id:"ag14",name:"골프검진 전체 현황 통계",desc:"전체·지점별 검진 완료 회원 현황 · 미검진 회원 목록 · 항목별 평균 점수 차트 · 기간별 검진 건수 추이",priority:"권장",dev:"FE/BE"},
-      {id:"ag15",name:"검진 항목 관리",desc:"검진 항목 추가·수정·삭제 · 각 항목별 평가 기준(점수 범위·등급 기준) 설정 · 노출 순서 관리",priority:"권장",dev:"FE/BE"},
+      {id:"ag01",name:"골프검진 대시보드",desc:"통계 카드 4개(전체 회원·이번달 검진·재검진 필요·정상 비율) · 최근 검진 테이블(K-vest/Trackman/Sam Putt/TPI 컬럼) · 60일 이상 미검진 목록(알림/입력 버튼) · 그룹별 정상 비율 grid",priority:"필수",dev:"FE/BE",file:"관리자-골프.html"},
+      {id:"ag02",name:"골프검진 결과 조회",desc:"회원 목록 테이블(4그룹 등급 칩+종합) · 상세 패널: 히어로카드·회차 선택·4그룹 요약바·분석 텍스트·항목 2열 그리드·이미지 갤러리",priority:"필수",dev:"FE/BE",file:"관리자-골프.html"},
+      {id:"ag03",name:"골프검진 결과 입력",desc:"회원 자동완성(이름/전화번호) → 검진일·회차·메모 → 4그룹 탭(K-vest/Trackman/Sam Putt/TPI): 항목별 수치 입력+바게이지 → 이미지 drag&drop 업로드 → 저장/초기화",priority:"필수",dev:"FE/BE",file:"관리자-골프.html"},
+      {id:"ag04",name:"골프검진 결과 수정",desc:"결과 조회 상세 패널 [수정] 버튼 → 입력 화면으로 회원 자동 선택 및 기존 회차 값 로드",priority:"필수",dev:"FE/BE",file:"관리자-골프.html"},
+      {id:"ag05",name:"회차 비교",desc:"회원 검색 자동완성 + 회차1/회차2 선택 → 4그룹별 항목 2열 그리드 비교바(회차1 청록·회차2 주황)",priority:"필수",dev:"FE/BE",file:"관리자-골프.html"},
+      {id:"ag06",name:"알림 설정",desc:"재검진 알림·기준치 미달 알림·신규 입력 알림 ON/OFF 토글 · 등급별(우수/양호/보통/주의) 재검진 주기 설정",priority:"권장",dev:"FE/BE",file:"관리자-골프.html"},
     ]
   },
   {
