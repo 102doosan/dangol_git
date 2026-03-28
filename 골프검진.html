@@ -432,6 +432,8 @@
         <div id="result-round-chips" style="display:flex;gap:6px;flex-wrap:wrap;"></div>
         <!-- 종합 점수 카드 -->
         <div id="result-total-card"></div>
+        <!-- 4그룹 바로가기 -->
+        <div id="result-group-shortcuts" style="display:flex;gap:6px;overflow-x:auto;padding-bottom:2px;flex-shrink:0;margin-bottom:4px;"></div>
         <!-- 4그룹 카드 -->
         <div class="sec-label">검진 그룹별 점수</div>
         <div id="result-group-cards"></div>
@@ -965,6 +967,22 @@ function renderGolfResult() {
         ${buildGolfRadar(m, h, 80)}
       </div>
     </div>`;
+
+  // 4그룹 바로가기 버튼
+  document.getElementById('result-group-shortcuts').innerHTML = GOLF_GROUPS.map(g=>{
+    const pct = golfGroupAvg(m,h,g.id);
+    const ggr = golfGrade(pct);
+    return `<div onclick="_golfDetailGroup='${g.id}';go('detail')" style="
+      display:flex;align-items:center;gap:5px;padding:7px 13px;border-radius:99px;
+      background:#fff;border:1.5px solid #E2E8F0;cursor:pointer;white-space:nowrap;flex-shrink:0;
+      font-family:'Noto Sans KR',sans-serif;transition:all .15s;"
+      onmouseover="this.style.borderColor='#2F855A';this.style.background='#F0FFF4';"
+      onmouseout="this.style.borderColor='#E2E8F0';this.style.background='#fff';">
+      <span style="font-size:14px;">${g.icon}</span>
+      <span style="font-size:12px;font-weight:700;color:#2D3748;">${g.name.split(' ')[0]}</span>
+      <span style="font-size:11px;font-weight:800;color:${ggr.color};background:${ggr.bg};padding:1px 6px;border-radius:99px;">${ggr.g}</span>
+    </div>`;
+  }).join('');
 
   // 4그룹 카드
   document.getElementById('result-group-cards').innerHTML = GOLF_GROUPS.map(g=>{
