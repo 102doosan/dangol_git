@@ -2341,29 +2341,58 @@ function renderCompare(){
 
   GOLF_GROUPS.forEach(g=>{
     html += `<div style="margin-bottom:18px;"><div style="font-size:13px;font-weight:800;color:#1A202C;margin-bottom:10px;">${g.icon} ${g.name}</div>`;
-    html += `<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">`;
-    g.items.forEach(it=>{
-      const pct1=h1&&h1[it.id]?golfScore(it,h1[it.id].value,m.gender):null;
-      const pct2=h2&&h2[it.id]?golfScore(it,h2[it.id].value,m.gender):null;
-      const diff = (pct1!==null&&pct2!==null)?pct1-pct2:null;
-      html += `<div class="cmp-row" style="background:#F7F9FC;border-radius:10px;padding:10px 12px;border:1.5px solid #E2E8F0;">
-        <div class="cmp-meta">
-          <div class="cmp-item-name" style="font-size:11px;">${it.label}</div>
-          ${diff!==null?`<span style="font-size:11px;font-weight:700;color:${diff>=0?'#38A169':'#E53E3E'}">${diff>=0?'▲':'▼'}${Math.abs(diff)}%</span>`:''}
-        </div>
-        <div class="cmp-bar-group">
-          ${pct1!==null?`<div class="cmp-bar-line">
-            <div class="cmp-bar-bg"><div class="cmp-bar-fill" style="width:${Math.min(pct1,100)}%;background:${colors[0]};"></div></div>
-            <div class="cmp-score">${h1[it.id].value}${it.unit?' '+it.unit:''}</div>
-          </div>`:''}
-          ${pct2!==null?`<div class="cmp-bar-line">
-            <div class="cmp-bar-bg"><div class="cmp-bar-fill" style="width:${Math.min(pct2,100)}%;background:${colors[1]};"></div></div>
-            <div class="cmp-score">${h2[it.id].value}${it.unit?' '+it.unit:''}</div>
-          </div>`:''}
+
+    const normalItems = g.items.filter(it=>!it.isText);
+    const textItems   = g.items.filter(it=>it.isText);
+
+    // 일반 항목: 4열 그리드
+    const cols = normalItems.length <= 4 ? normalItems.length : (normalItems.length <= 6 ? 3 : 4);
+    if(normalItems.length){
+      html += `<div style="display:grid;grid-template-columns:repeat(${cols},1fr);gap:10px;margin-bottom:${textItems.length?'10px':'0'};">`;
+      normalItems.forEach(it=>{
+        const pct1=h1&&h1[it.id]?golfScore(it,h1[it.id].value,m.gender):null;
+        const pct2=h2&&h2[it.id]?golfScore(it,h2[it.id].value,m.gender):null;
+        const diff=(pct1!==null&&pct2!==null)?pct1-pct2:null;
+        html += `<div class="cmp-row" style="background:#F7F9FC;border-radius:10px;padding:10px 12px;border:1.5px solid #E2E8F0;">
+          <div class="cmp-meta">
+            <div class="cmp-item-name" style="font-size:11px;">${it.label}</div>
+            ${diff!==null?`<span style="font-size:11px;font-weight:700;color:${diff>=0?'#38A169':'#E53E3E'}">${diff>=0?'▲':'▼'}${Math.abs(diff)}%</span>`:''}
+          </div>
+          <div class="cmp-bar-group">
+            ${pct1!==null?`<div class="cmp-bar-line">
+              <div class="cmp-bar-bg"><div class="cmp-bar-fill" style="width:${Math.min(pct1,100)}%;background:${colors[0]};"></div></div>
+              <div class="cmp-score">${h1[it.id].value}${it.unit?' '+it.unit:''}</div>
+            </div>`:''}
+            ${pct2!==null?`<div class="cmp-bar-line">
+              <div class="cmp-bar-bg"><div class="cmp-bar-fill" style="width:${Math.min(pct2,100)}%;background:${colors[1]};"></div></div>
+              <div class="cmp-score">${h2[it.id].value}${it.unit?' '+it.unit:''}</div>
+            </div>`:''}
+          </div>
+        </div>`;
+      });
+      html += `</div>`;
+    }
+
+    // 분석결과 등 텍스트 항목: 전체 너비 단독 행
+    textItems.forEach(it=>{
+      const v1=h1&&h1[it.id]?h1[it.id].value:'';
+      const v2=h2&&h2[it.id]?h2[it.id].value:'';
+      html += `<div style="background:#F7F9FC;border-radius:10px;padding:12px 14px;border:1.5px solid #E2E8F0;">
+        <div style="font-size:12px;font-weight:700;color:#4A5568;margin-bottom:8px;">${it.label}</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+          ${v1?`<div style="padding:8px 10px;background:#fff;border-radius:8px;border-left:3px solid ${colors[0]};">
+            <div style="font-size:10px;font-weight:700;color:${colors[0]};margin-bottom:4px;">${labels[0]}</div>
+            <div style="font-size:12px;color:#2D3748;line-height:1.6;white-space:pre-wrap;">${v1}</div>
+          </div>`:'<div></div>'}
+          ${v2?`<div style="padding:8px 10px;background:#fff;border-radius:8px;border-left:3px solid ${colors[1]};">
+            <div style="font-size:10px;font-weight:700;color:${colors[1]};margin-bottom:4px;">${labels[1]}</div>
+            <div style="font-size:12px;color:#2D3748;line-height:1.6;white-space:pre-wrap;">${v2}</div>
+          </div>`:'<div></div>'}
         </div>
       </div>`;
     });
-    html += `</div></div>`;
+
+    html += `</div>`;
   });
   html += '</div>';
   document.getElementById('compare-result').innerHTML = html;
