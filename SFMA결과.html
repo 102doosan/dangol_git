@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>SFMA / CSMI 결과 화면</title>
+  <title>SFMA/CSMI 검사</title>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet" />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -256,7 +256,7 @@
 
 <!-- 상단 모드 토글 -->
 <div class="toolbar">
-  <span class="toolbar-title" id="toolbar-title">📊 SFMA 결과 화면</span>
+  <span class="toolbar-title" id="toolbar-title">📊 SFMA/CSMI 검사</span>
   <div class="mode-toggle">
     <button class="mode-btn active-sfma" id="mode-btn-sfma" onclick="switchMode('sfma')">📊 SFMA 기능검사</button>
     <button class="mode-btn" id="mode-btn-csmi" onclick="switchMode('csmi')">💪 CSMI 근력측정</button>
@@ -779,7 +779,7 @@ function switchMode(mode) {
     pmS.style.cssText='background:#2A2A4A;border-color:#3A3A5A;color:#A0AEC0;';
     pmC.style.cssText='background:#2C7A7B;border-color:#81E6D9;color:#fff;';
   }
-  document.getElementById('toolbar-title').textContent = mode==='sfma'?'📊 SFMA 결과 화면':'💪 CSMI 근력측정 결과 화면';
+  document.getElementById('toolbar-title').textContent = '📊 SFMA/CSMI 검사';
   document.getElementById('member-label').style.color = mode==='sfma'?'#9B84FF':'#81E6D9';
   document.getElementById('memo-title').textContent = mode==='sfma'?'📊 SFMA 결과 화면 메모':'💪 CSMI 결과 화면 메모';
   // 회원 칩 스타일 갱신
