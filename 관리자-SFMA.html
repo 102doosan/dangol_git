@@ -847,8 +847,61 @@ function scoreFromChecks(checks) {
   const c = countChecks(checks);
   const tot = c.FN+c.FP+c.DP+c.DN;
   if (!tot) return 0;
-  return Math.round((c.FN*10+c.FP*7+c.DN*5+c.DP*2)/(tot*10)*100);
+  return Math.round((c.FN*100+c.FP*75+c.DN*50+c.DP*25)/(tot*100));
 }
+
+function getPartChecks(checks, partId) {
+  const items = SHEET_DATA[partId] || [];
+  const result = {};
+  items.forEach(item => {
+    const keys = item.bilateral ? [item.id+'_좌', item.id+'_우'] : [item.id];
+    keys.forEach(k => { if (checks[k]) result[k] = checks[k]; });
+  });
+  return result;
+}
+
+const PART_LABELS = {
+  top:'최고위평가', cervical:'경추', upper:'상지패턴',
+  msflex:'다중분절굴곡', msext:'다중분절신전', msrot:'다중분절회전',
+  singleleg:'한다리자세', squat:'오버헤드스쿼트'
+};
+
+function calcTotalFromParts(checks) {
+  if (!checks) return 0;
+  const parts = Object.keys(SHEET_DATA);
+  const scores = [];
+  parts.forEach(pid => {
+    const pc = getPartChecks(checks, pid);
+    const c = countChecks(pc);
+    if (c.FN+c.FP+c.DP+c.DN > 0) scores.push(scoreFromChecks(pc));
+  });
+  if (!scores.length) return 0;
+  return Math.round(scores.reduce((a,b)=>a+b,0)/scores.length);
+}
+
+function partScoresHtml(checks) {
+  if (!checks) return '';
+  const parts = Object.keys(SHEET_DATA);
+  const rows = parts.map(pid => {
+    const pc = getPartChecks(checks, pid);
+    const c = countChecks(pc);
+    const tot = c.FN+c.FP+c.DP+c.DN;
+    if (!tot) return '';
+    const s = scoreFromChecks(pc);
+    const color = s>=90?'#68D391':s>=75?'#90CDF4':s>=60?'#FAF089':'#FC8181';
+    return `<div style="margin-bottom:5px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2px;">
+        <span style="font-size:10px;color:rgba(255,255,255,0.85);">${PART_LABELS[pid]||pid}</span>
+        <span style="font-size:11px;font-weight:800;color:#fff;">${s}<span style="font-size:9px;opacity:.7;">점</span></span>
+      </div>
+      <div style="background:rgba(255,255,255,0.2);border-radius:99px;height:4px;overflow:hidden;">
+        <div style="width:${s}%;height:100%;background:${color};border-radius:99px;"></div>
+      </div>
+    </div>`;
+  }).join('');
+  return rows || '<div style="font-size:11px;color:rgba(255,255,255,0.6);">입력된 데이터 없음</div>';
+}
+
 function chipsHtml(cnt, tot) {
   const chipStyle = (bg,tc) => `style="font-size:10px;background:${bg};color:${tc};padding:2px 6px;border-radius:99px;font-weight:700;"`;
   return `<span ${chipStyle('#EBF8FF','#2B6CB0')}>FN ${cnt.FN}</span>
@@ -1116,7 +1169,7 @@ function renderDashboard() {
   // 알림 대상 (설정 주기 기준 초과+임박 회원수)
   const alertCnt = MEMBERS.filter(m => { const a = getAlertStatus(m); return a.status !== 'ok'; }).length + UNMEASURED.length;
   const avgFn = allHistory.length
-    ? Math.round(allHistory.reduce((s,h) => { const c=countChecks(h.sheetChecks); const t=c.FN+c.FP+c.DP+c.DN; return s+(t?c.FN/t*100:0); },0) / allHistory.length)
+    ? Math.round(allHistory.reduce((s,h) => s+calcTotalFromParts(h.sheetChecks), 0) / allHistory.length)
     : 0;
 
   const statCards = [
@@ -1248,7 +1301,7 @@ function renderList() {
       onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">
       <td class="td-name">${m.name}${alertBadge}</td>
       <td style="color:#A0AEC0;font-size:12px;">${h.date}</td>
-      <td class="td-score" style="color:${SCORE_CLR(h.total/10)};">${h.total}</td>
+      <td class="td-score" style="color:${SCORE_CLR(calcTotalFromParts(h.sheetChecks)/10)};">${calcTotalFromParts(h.sheetChecks)}</td>
       <td><span class="grade-badge ${gd.cls}">${gd.label}</span></td>
       <td style="font-size:12px;color:#718096;">${m.trainer}</td>
       <td style="font-size:12px;color:#9B84FF;font-weight:700;">${m.history.length}회</td>
@@ -1309,15 +1362,20 @@ function showMemberDetail(name) {
         <div style="font-size:13px;font-weight:700;">${h.round}차 <span style="font-size:11px;color:#A0AEC0;">(총 ${m.history.length}회)</span></div>
       </div>
     </div>
-    <div style="background:linear-gradient(135deg,#553C9A,#7B61FF);border-radius:10px;padding:12px;color:#fff;">
-      <div style="font-size:11px;opacity:.8;margin-bottom:6px;">📊 체크 집계</div>
-      <div style="display:flex;gap:8px;flex-wrap:wrap;" id="vw-sum-chips">
+    <div style="background:linear-gradient(135deg,#553C9A,#7B61FF);border-radius:10px;padding:14px;color:#fff;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+        <div style="font-size:11px;opacity:.8;">📊 SFMA 총점</div>
+        <div style="font-size:28px;font-weight:900;">${calcTotalFromParts(h.sheetChecks)}<span style="font-size:12px;font-weight:600;opacity:.7;"> / 100</span></div>
+      </div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;" id="vw-sum-chips">
         <div class="sh-sum-chip" style="background:rgba(255,255,255,0.15);">FN <b>${cnt.FN}</b></div>
         <div class="sh-sum-chip" style="background:rgba(255,255,255,0.15);">FP <b>${cnt.FP}</b></div>
         <div class="sh-sum-chip" style="background:rgba(255,255,255,0.15);">DP <b>${cnt.DP}</b></div>
         <div class="sh-sum-chip" style="background:rgba(255,255,255,0.15);">DN <b>${cnt.DN}</b></div>
         <span style="font-size:11px;opacity:.7;align-self:center;">총 ${vals.length}항목</span>
       </div>
+      <div style="font-size:10px;opacity:.7;margin-bottom:6px;border-top:1px solid rgba(255,255,255,0.2);padding-top:8px;">📈 파트별 점수</div>
+      ${partScoresHtml(h.sheetChecks)}
     </div>`;
 
   // 좌: 소견
@@ -1833,7 +1891,7 @@ function saveResult() {
 
   const m     = MEMBERS[parseInt(memberIdx)];
   const round = m.history.length + 1;
-  const total = scoreFromChecks(checks);
+  const total = calcTotalFromParts(checks);
   const grade = GRADE_INFO(total).label;
 
   m.history.unshift({ date, round, trainer, opinion, total, grade, sheetChecks:checks, sheetMemos:memos });
