@@ -705,19 +705,19 @@ const GOLF_GROUPS = [
   ]},
   { id:'trackman', name:'Trackman 탄도분석', icon:'⛳', color:'#553C9A', items:[
     // Driver
-    { id:'tm_face_d',   label:'페이스 앵글',        unit:'°',   std:{m:2,   f:2},   lowerBetter:true, cat:'방향',   club:'driver' },
-    { id:'tm_path_d',   label:'클럽 패스',           unit:'°',   std:{m:2,   f:2},   lowerBetter:true, cat:'방향',   club:'driver' },
-    { id:'tm_speed_d',  label:'클럽 헤드 스피드',    unit:'mph', std:{m:105, f:80},                    cat:'거리',   club:'driver' },
-    { id:'tm_launch_d', label:'런치 앵글',           unit:'°',   std:{m:12,  f:13},                    cat:'거리',   club:'driver' },
-    { id:'tm_smash_d',  label:'스매쉬 팩터(×100)',   unit:'',    std:{m:146, f:145},                   cat:'정확도', club:'driver' },
-    { id:'tm_bspeed_d', label:'볼 스피드',           unit:'mph', std:{m:153, f:116},                   cat:'정확도', club:'driver' },
+    { id:'tm_face_d',   label:'페이스 앵글',        unit:'°',   std:{m:1,   f:1},   lowerBetter:true, cat:'방향',   club:'driver' },
+    { id:'tm_path_d',   label:'클럽 패스',           unit:'°',   std:{m:1,   f:1},   lowerBetter:true, cat:'방향',   club:'driver' },
+    { id:'tm_speed_d',  label:'클럽 헤드 스피드',    unit:'mph', std:{m:113, f:94},                    cat:'거리',   club:'driver' },
+    { id:'tm_launch_d', label:'런치 앵글',           unit:'°',   std:{m:11,  f:13},                    cat:'거리',   club:'driver' },
+    { id:'tm_smash_d',  label:'스매쉬 팩터(×100)',   unit:'',    std:{m:148, f:149},                   cat:'정확도', club:'driver' },
+    { id:'tm_bspeed_d', label:'볼 스피드',           unit:'mph', std:{m:167, f:140},                   cat:'정확도', club:'driver' },
     // Iron
-    { id:'tm_face_i',   label:'페이스 앵글',        unit:'°',   std:{m:2,   f:2},   lowerBetter:true, cat:'방향',   club:'iron' },
-    { id:'tm_path_i',   label:'클럽 패스',           unit:'°',   std:{m:2,   f:2},   lowerBetter:true, cat:'방향',   club:'iron' },
-    { id:'tm_speed_i',  label:'클럽 헤드 스피드',    unit:'mph', std:{m:85,  f:65},                    cat:'거리',   club:'iron' },
-    { id:'tm_launch_i', label:'런치 앵글',           unit:'°',   std:{m:18,  f:20},                    cat:'거리',   club:'iron' },
-    { id:'tm_smash_i',  label:'스매쉬 팩터(×100)',   unit:'',    std:{m:138, f:136},                   cat:'정확도', club:'iron' },
-    { id:'tm_bspeed_i', label:'볼 스피드',           unit:'mph', std:{m:120, f:90},                    cat:'정확도', club:'iron' },
+    { id:'tm_face_i',   label:'페이스 앵글',        unit:'°',   std:{m:1,   f:1},   lowerBetter:true, cat:'방향',   club:'iron' },
+    { id:'tm_path_i',   label:'클럽 패스',           unit:'°',   std:{m:1,   f:1},   lowerBetter:true, cat:'방향',   club:'iron' },
+    { id:'tm_speed_i',  label:'클럽 헤드 스피드',    unit:'mph', std:{m:90,  f:72},                    cat:'거리',   club:'iron' },
+    { id:'tm_launch_i', label:'런치 앵글',           unit:'°',   std:{m:16,  f:19},                    cat:'거리',   club:'iron' },
+    { id:'tm_smash_i',  label:'스매쉬 팩터(×100)',   unit:'',    std:{m:142, f:139},                   cat:'정확도', club:'iron' },
+    { id:'tm_bspeed_i', label:'볼 스피드',           unit:'mph', std:{m:128, f:100},                   cat:'정확도', club:'iron' },
   ]},
   { id:'samputt', name:'Sam Putt 퍼팅', icon:'🎯', color:'#B7791F', items:[
     { id:'sp_tempo',  label:'타이밍 (Timing)',        unit:'',      std:{m:20,  f:20},                    cat:'중요1' },
@@ -1039,7 +1039,7 @@ function dashGoInput(mid, editRound=null){
     _selectedMember = m;
     ALL_GOLF_ITEMS.forEach(it=>{
       const lbl=document.getElementById('inp-std-label-'+it.id);
-      if(lbl) lbl.textContent=`기준: ${golfStd(it,m.gender)} ${it.unit}${it.lowerBetter?' (낮을수록 좋음)':''}`;
+      if(lbl) lbl.textContent=`남(PGA): ${it.std.m}${it.unit?' '+it.unit:''} / 여(LPGA): ${it.std.f}${it.unit?' '+it.unit:''}`;
     });
     buildInputPanels();
     if(editRound !== null){
@@ -1398,7 +1398,7 @@ function renderItemBlock(it){
         <div class="csmi-bar-val" id="inp-bar-val-${it.id}" style="width:0%;"></div>
         <div class="csmi-bar-label" id="inp-bar-label-${it.id}">0%</div>
       </div>
-      <div class="csmi-std-label" id="inp-std-label-${it.id}">기준: -</div>
+      <div class="csmi-std-label" id="inp-std-label-${it.id}">남(PGA): ${it.std.m}${it.unit?' '+it.unit:''} / 여(LPGA): ${it.std.f}${it.unit?' '+it.unit:''}</div>
     </div>
     <div class="csmi-input-row">
       <span style="font-size:12px;font-weight:700;color:#4A5568;">${it.label} (${it.unit||'수치'})</span>
@@ -1946,7 +1946,7 @@ function onInputVal(itemId, rawVal){
   document.getElementById('inp-bar-val-'+itemId).style.width = w+'%';
   document.getElementById('inp-bar-val-'+itemId).style.background = color;
   document.getElementById('inp-bar-label-'+itemId).textContent = pct+'%';
-  document.getElementById('inp-std-label-'+itemId).textContent = `기준: ${std}${item.unit?' '+item.unit:''}${item.lowerBetter?' (낮을수록 좋음)':''}`;
+  document.getElementById('inp-std-label-'+itemId).textContent = `남(PGA): ${item.std.m}${item.unit?' '+item.unit:''} / 여(LPGA): ${item.std.f}${item.unit?' '+item.unit:''}`;
   const pctBadge = document.getElementById('inp-pct-'+itemId);
   pctBadge.textContent = `${pct}% · ${gr.label}`;
   pctBadge.className = `csmi-percent-badge ${gr.pctCls}`;
