@@ -631,63 +631,63 @@
           <div class="page-sub">CSMI 재측정 알림 및 기준 설정</div>
         </div>
       </div>
-      <div class="card">
-        <div class="card-title">🔔 알림 설정</div>
-        <div class="notify-row">
-          <div>
-            <div class="notify-label">재측정 알림</div>
-            <div class="notify-sub">마지막 측정 후 일정 기간 경과 시 알림</div>
-          </div>
-          <label class="toggle-wrap"><input type="checkbox" class="toggle-input" checked /><span class="toggle-slider"></span></label>
-        </div>
-        <div class="notify-row">
-          <div>
-            <div class="notify-label">기준치 미달 알림</div>
-            <div class="notify-sub">성별 표준 대비 70% 미달 시 알림</div>
-          </div>
-          <label class="toggle-wrap"><input type="checkbox" class="toggle-input" checked /><span class="toggle-slider"></span></label>
-        </div>
-        <div class="notify-row">
-          <div>
-            <div class="notify-label">신규 입력 알림</div>
-            <div class="notify-sub">결과 저장 시 담당자에게 알림</div>
-          </div>
-          <label class="toggle-wrap"><input type="checkbox" class="toggle-input" /><span class="toggle-slider"></span></label>
-        </div>
-      </div>
-      <div class="card">
-        <div class="card-title">📏 재측정 주기 설정</div>
+
+      <!-- 전체 기본 주기 설정 -->
+      <div class="card" style="margin-bottom:14px;">
+        <div class="card-title">📏 재측정 주기 (전체 기본값)</div>
         <div class="form-row">
           <div class="form-group">
-            <label class="form-label">우수 (기준치 110% 이상)</label>
+            <label class="form-label">우수 (110% 이상)</label>
             <select class="form-select">
-              <option>180일 (6개월)</option>
-              <option>90일 (3개월)</option>
+              <option value="180">180일 (6개월)</option>
+              <option value="90">90일 (3개월)</option>
             </select>
           </div>
           <div class="form-group">
-            <label class="form-label">양호 (기준치 90~110%)</label>
+            <label class="form-label">양호 (90~110%)</label>
             <select class="form-select">
-              <option>90일 (3개월)</option>
-              <option selected>60일 (2개월)</option>
+              <option value="90">90일 (3개월)</option>
+              <option value="60" selected>60일 (2개월)</option>
             </select>
           </div>
           <div class="form-group">
-            <label class="form-label">보통 (기준치 70~90%)</label>
+            <label class="form-label">보통 (70~90%)</label>
             <select class="form-select">
-              <option selected>60일 (2개월)</option>
-              <option>30일 (1개월)</option>
+              <option value="60" selected>60일 (2개월)</option>
+              <option value="30">30일 (1개월)</option>
             </select>
           </div>
           <div class="form-group">
-            <label class="form-label">주의 (기준치 70% 미만)</label>
+            <label class="form-label">주의 (70% 미만)</label>
             <select class="form-select">
-              <option selected>30일 (1개월)</option>
-              <option>14일 (2주)</option>
+              <option value="30" selected>30일 (1개월)</option>
+              <option value="14">14일 (2주)</option>
             </select>
           </div>
         </div>
-        <button class="btn-primary">저장</button>
+        <button class="btn-primary" onclick="showToast('✅ 재측정 주기가 저장되었습니다.')">저장</button>
+      </div>
+
+      <!-- 회원별 알림 설정 -->
+      <div class="card">
+        <div class="card-title" style="margin-bottom:12px;">🔔 회원별 알림 설정</div>
+        <div class="tbl-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>회원명</th>
+                <th>성별</th>
+                <th>최근 측정</th>
+                <th>다음 측정 예정일</th>
+                <th style="color:#3182CE;">📅 재측정 알림</th>
+                <th style="color:#E53E3E;">⚠️ 기준치 미달</th>
+                <th style="color:#38A169;">✅ 신규 입력</th>
+                <th>측정일 설정</th>
+              </tr>
+            </thead>
+            <tbody id="settings-tbody"></tbody>
+          </table>
+        </div>
       </div>
     </div>
 
@@ -754,7 +754,9 @@ function barColor(pct){
 
 // 샘플 회원 데이터
 const MEMBERS = [
-  { id:1, name:'김태훈', gender:'남', color:'#4299E1', phone:'010-1234-5678', history:[
+  { id:1, name:'김태훈', gender:'남', color:'#4299E1', phone:'010-1234-5678',
+    nextDate:'', notify:{remeasure:true, underTarget:true, newEntry:false},
+    history:[
     { round:1, date:'2026-03-10',
       shoulder_l_add:{value:105,stability:true,power:true},
       shoulder_l_abd:{value:85,stability:true,power:true},
@@ -796,7 +798,9 @@ const MEMBERS = [
       ankle_r_ev:{value:20,stability:true,power:false},
     }
   ]},
-  { id:2, name:'이서연', gender:'여', color:'#ED64A6', phone:'010-2345-6789', history:[
+  { id:2, name:'이서연', gender:'여', color:'#ED64A6', phone:'010-2345-6789',
+    nextDate:'', notify:{remeasure:true, underTarget:true, newEntry:false},
+    history:[
     { round:1, date:'2026-03-12',
       shoulder_l_add:{value:68,stability:true,power:true},
       shoulder_l_abd:{value:52,stability:true,power:true},
@@ -818,7 +822,9 @@ const MEMBERS = [
       ankle_r_ev:{value:19,stability:true,power:false},
     }
   ]},
-  { id:3, name:'박민준', gender:'남', color:'#48BB78', phone:'010-3456-7890', history:[
+  { id:3, name:'박민준', gender:'남', color:'#48BB78', phone:'010-3456-7890',
+    nextDate:'', notify:{remeasure:true, underTarget:false, newEntry:false},
+    history:[
     { round:1, date:'2026-03-08',
       shoulder_l_add:{value:72,stability:false,power:false},
       shoulder_l_abd:{value:62,stability:false,power:false},
@@ -840,7 +846,9 @@ const MEMBERS = [
       ankle_r_ev:{value:20,stability:false,power:false},
     }
   ]},
-  { id:4, name:'정유진', gender:'여', color:'#ED8936', phone:'010-4567-8901', history:[
+  { id:4, name:'정유진', gender:'여', color:'#ED8936', phone:'010-4567-8901',
+    nextDate:'', notify:{remeasure:true, underTarget:true, newEntry:true},
+    history:[
     { round:1, date:'2026-02-20',
       shoulder_l_add:{value:58,stability:true,power:false},
       shoulder_l_abd:{value:45,stability:true,power:false},
@@ -862,7 +870,9 @@ const MEMBERS = [
       ankle_r_ev:{value:11,stability:false,power:false},
     }
   ]},
-  { id:5, name:'최준혁', gender:'남', color:'#9F7AEA', phone:'010-5678-9012', history:[
+  { id:5, name:'최준혁', gender:'남', color:'#9F7AEA', phone:'010-5678-9012',
+    nextDate:'', notify:{remeasure:false, underTarget:true, newEntry:false},
+    history:[
     { round:1, date:'2026-01-15',
       shoulder_l_add:{value:118,stability:true,power:true},
       shoulder_l_abd:{value:92,stability:true,power:true},
@@ -901,8 +911,9 @@ function showScreen(id, navBtn, sideItem){
   });
   if(sideItem) sideItem.classList.add('active');
   else document.querySelectorAll('.sidebar-item[onclick*="showScreen"]')[{dashboard:0,list:1,input:2,compare:3,settings:4}[id]]?.classList.add('active');
-  if(id==='list')    renderList();
-  if(id==='compare') initCompare();
+  if(id==='list')     renderList();
+  if(id==='compare')  initCompare();
+  if(id==='settings') renderSettings();
   document.getElementById('detail-panel').style.display='none';
   document.querySelectorAll('#screen-list .card')[0].style.display='block';
 }
@@ -1135,6 +1146,87 @@ function calcGroupPct(m, h, gid){
   g.items.forEach(it=>{ const v=h[it.id]; if(!v) return; t+=pctOf(v.value,stdFor(it,m.gender)); c++; });
   return c?Math.round(t/c):0;
 }
+function saveNextDate(mid){
+  const m=MEMBERS.find(x=>x.id===mid); if(!m) return;
+  const val=document.getElementById('next-date-input-'+mid).value;
+  if(!val){ showToast('날짜를 선택해주세요.'); return; }
+  m.nextDate=val;
+  showToast('✅ 측정 예정일이 저장되었습니다.');
+  openDetail(mid);
+}
+function resetNextDate(mid){
+  const m=MEMBERS.find(x=>x.id===mid); if(!m) return;
+  m.nextDate='';
+  showToast('🔄 등급 기준 자동 계산으로 변경되었습니다.');
+  openDetail(mid);
+}
+
+function renderSettings(){
+  const tbody=document.getElementById('settings-tbody');
+  if(!tbody) return;
+  const today='2026-03-26';
+  tbody.innerHTML=MEMBERS.map(m=>{
+    const h=m.history[0];
+    const gr=h?gradeByPct(calcAvgPct(m,h)):{label:'미측정'};
+    const period=GRADE_DAYS_CSMI[gr.label]||90;
+    const autoDate=h?addDaysStr(h.date,period):'-';
+    const displayDate=m.nextDate||autoDate;
+    const left=displayDate!=='-'?daysBetweenStr(today,displayDate):null;
+    const dday=left!==null?(left>0?`D-${left}`:'초과'):'-';
+    const ddayColor=left===null?'#A0AEC0':left>30?'#2C7A7B':left>0?'#B7791F':'#E53E3E';
+    const ntf=m.notify||{remeasure:true,underTarget:true,newEntry:false};
+    return `<tr>
+      <td style="font-weight:700;">${m.name}</td>
+      <td>${m.gender}</td>
+      <td style="font-size:12px;color:#718096;">${h?h.date:'미측정'}</td>
+      <td>
+        <span style="font-size:13px;font-weight:700;">${displayDate}</span>
+        <span style="font-size:11px;font-weight:800;color:${ddayColor};margin-left:6px;">${dday}</span>
+        ${m.nextDate?'<span style="font-size:10px;color:#81E6D9;background:#1A4731;padding:1px 5px;border-radius:4px;margin-left:4px;">수동</span>':''}
+      </td>
+      <td style="text-align:center;">
+        <label class="toggle-wrap"><input type="checkbox" class="toggle-input" ${ntf.remeasure?'checked':''} onchange="toggleNotify(${m.id},'remeasure',this.checked)"/><span class="toggle-slider"></span></label>
+      </td>
+      <td style="text-align:center;">
+        <label class="toggle-wrap"><input type="checkbox" class="toggle-input" ${ntf.underTarget?'checked':''} onchange="toggleNotify(${m.id},'underTarget',this.checked)"/><span class="toggle-slider"></span></label>
+      </td>
+      <td style="text-align:center;">
+        <label class="toggle-wrap"><input type="checkbox" class="toggle-input" ${ntf.newEntry?'checked':''} onchange="toggleNotify(${m.id},'newEntry',this.checked)"/><span class="toggle-slider"></span></label>
+      </td>
+      <td>
+        <div style="display:flex;gap:6px;align-items:center;">
+          <input type="date" id="st-date-${m.id}" value="${displayDate!=='-'?displayDate:''}"
+            style="padding:5px 8px;border:1.5px solid #E2E8F0;border-radius:7px;font-size:12px;font-family:'Noto Sans KR',sans-serif;" />
+          <button onclick="saveNextDateFrom(${m.id})"
+            style="padding:5px 10px;background:#2C7A7B;color:#fff;border:none;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Noto Sans KR',sans-serif;">저장</button>
+          ${m.nextDate?`<button onclick="resetNextDateFrom(${m.id})" style="padding:5px 8px;background:#EDF2F7;color:#4A5568;border:none;border-radius:7px;font-size:11px;cursor:pointer;font-family:'Noto Sans KR',sans-serif;">자동</button>`:''}
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function toggleNotify(mid,key,val){
+  const m=MEMBERS.find(x=>x.id===mid); if(!m) return;
+  if(!m.notify) m.notify={remeasure:true,underTarget:true,newEntry:false};
+  m.notify[key]=val;
+  showToast(`✅ ${m.name}님 알림 설정이 변경되었습니다.`);
+}
+function saveNextDateFrom(mid){
+  const m=MEMBERS.find(x=>x.id===mid); if(!m) return;
+  const val=document.getElementById('st-date-'+mid).value;
+  if(!val){ showToast('날짜를 선택해주세요.'); return; }
+  m.nextDate=val;
+  showToast(`✅ ${m.name}님 측정 예정일이 저장되었습니다.`);
+  renderSettings();
+}
+function resetNextDateFrom(mid){
+  const m=MEMBERS.find(x=>x.id===mid); if(!m) return;
+  m.nextDate='';
+  showToast(`🔄 ${m.name}님 측정일이 자동 계산으로 변경되었습니다.`);
+  renderSettings();
+}
+
 function addDaysStr(dateStr, days){
   const d=new Date(dateStr); d.setDate(d.getDate()+days); return d.toISOString().slice(0,10);
 }
@@ -1224,15 +1316,24 @@ function openDetail(mid, targetRound=null){
 
   // ③ 다음 측정일 카드
   const period=GRADE_DAYS_CSMI[gr.label]||90;
-  const nextDate=addDaysStr(h.date,period);
-  const left=daysBetweenStr('2026-03-26',nextDate);
-  const ndColor=left>30?'#1A4731':left>0?'#744210':'#742A2A';
+  const autoDate=addDaysStr(h.date,period);
+  const displayDate=m.nextDate||autoDate;
+  const left=daysBetweenStr('2026-03-26',displayDate);
   const ndBg=left>30?'linear-gradient(135deg,#1A4731,#2C7A7B)':left>0?'linear-gradient(135deg,#744210,#B7791F)':'linear-gradient(135deg,#742A2A,#C53030)';
   document.getElementById('detail-next-card').innerHTML=`
-    <div class="next-date-card" style="background:${ndBg};">
+    <div class="next-date-card" style="background:${ndBg};padding-bottom:14px;">
       <div class="nd-title">📅 다음 측정 예정일 (${h.round+1}회차)</div>
-      <div class="nd-date">${nextDate}</div>
-      <div class="nd-sub">${left>0?`D-${left} · ${period}일 주기 (${gr.label} 등급 기준)`:'측정 기간 초과 · 즉시 측정 권장'}</div>
+      <div class="nd-date">${displayDate}</div>
+      <div class="nd-sub">${left>0?`D-${left} · ${m.nextDate?'수동 지정':'등급 기준 자동('+period+'일)'}`:'측정 기간 초과 · 즉시 측정 권장'}</div>
+      <div style="margin-top:12px;display:flex;gap:8px;align-items:center;">
+        <input type="date" id="next-date-input-${m.id}" value="${displayDate}"
+          style="flex:1;padding:7px 10px;border-radius:8px;border:none;font-size:13px;font-family:'Noto Sans KR',sans-serif;" />
+        <button onclick="saveNextDate(${m.id})"
+          style="padding:7px 14px;background:#81E6D9;color:#1A4731;border:none;border-radius:8px;font-size:12px;font-weight:800;cursor:pointer;font-family:'Noto Sans KR',sans-serif;">
+          저장
+        </button>
+        ${m.nextDate?`<button onclick="resetNextDate(${m.id})" style="padding:7px 10px;background:rgba(255,255,255,0.2);color:#fff;border:none;border-radius:8px;font-size:11px;cursor:pointer;font-family:'Noto Sans KR',sans-serif;">자동</button>`:''}
+      </div>
     </div>`;
 
   // ④ 분석 텍스트
