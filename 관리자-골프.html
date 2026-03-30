@@ -1706,21 +1706,21 @@ function buildTpiInputPanel(){
 
   const activeCat = TPI_CATEGORIES.find(c=>c.id===_tpiActiveCat);
   const testCards = activeCat.tests.map(test=>`
-    <div style="background:#fff;border-radius:12px;border:1.5px solid #E2E8F0;padding:14px 14px;margin-bottom:10px;display:flex;gap:14px;align-items:flex-start;">
-      <div style="width:80px;flex-shrink:0;background:#F7F9FC;border-radius:8px;padding:4px 2px;display:flex;align-items:center;justify-content:center;">
-        ${TPI_IMGS[test.svgKey]||''}
+    <div style="background:#fff;border-radius:12px;border:1.5px solid #E2E8F0;padding:12px;margin-bottom:10px;display:flex;gap:12px;align-items:flex-start;">
+      <div style="width:240px;flex-shrink:0;background:#F7F9FC;border-radius:8px;padding:4px;display:flex;align-items:center;justify-content:center;">
+        ${(TPI_IMGS[test.svgKey]||'').replace("height:72px","height:216px").replace("width:100%","width:100%")}
       </div>
       <div style="flex:1;">
-        <div style="font-size:12px;font-weight:800;color:#1A202C;margin-bottom:10px;">${test.label}</div>
+        <div style="font-size:12px;font-weight:800;color:#1A202C;margin-bottom:8px;">${test.label}</div>
         ${test.checks.map(chk=>`
-          <div style="display:flex;align-items:center;gap:8px;margin-bottom:7px;" id="tpi-row-${chk.id}">
-            ${chk.label?`<span style="font-size:12px;font-weight:700;color:#4A5568;width:32px;flex-shrink:0;">${chk.label}</span>`:''}
+          <div style="display:flex;align-items:center;gap:5px;margin-bottom:5px;" id="tpi-row-${chk.id}">
+            ${chk.label?`<span style="font-size:11px;font-weight:700;color:#4A5568;width:24px;flex-shrink:0;">${chk.label}</span>`:''}
             <button id="tpi-o-${chk.id}" onclick="onTpiToggle('${chk.id}',1,${chk.tri||false})"
-              style="flex:1;padding:5px 0;border-radius:7px;border:1.5px solid #C6F6D5;background:#fff;font-size:13px;font-weight:900;color:#276749;cursor:pointer;font-family:inherit;">⭕ O</button>
+              style="flex:1;padding:3px 0;border-radius:6px;border:1.5px solid #C6F6D5;background:#fff;font-size:11px;font-weight:900;color:#276749;cursor:pointer;font-family:inherit;">⭕ O</button>
             ${chk.tri?`<button id="tpi-d-${chk.id}" onclick="onTpiToggle('${chk.id}',0.5,true)"
-              style="flex:1;padding:5px 0;border-radius:7px;border:1.5px solid #FEFCBF;background:#fff;font-size:13px;font-weight:900;color:#B7791F;cursor:pointer;font-family:inherit;">△</button>`:''}
+              style="flex:1;padding:3px 0;border-radius:6px;border:1.5px solid #FEFCBF;background:#fff;font-size:11px;font-weight:900;color:#B7791F;cursor:pointer;font-family:inherit;">△</button>`:''}
             <button id="tpi-x-${chk.id}" onclick="onTpiToggle('${chk.id}',0,${chk.tri||false})"
-              style="flex:1;padding:5px 0;border-radius:7px;border:1.5px solid #FED7D7;background:#fff;font-size:13px;font-weight:900;color:#C53030;cursor:pointer;font-family:inherit;">❌ X</button>
+              style="flex:1;padding:3px 0;border-radius:6px;border:1.5px solid #FED7D7;background:#fff;font-size:11px;font-weight:900;color:#C53030;cursor:pointer;font-family:inherit;">❌ X</button>
           </div>`).join('')}
       </div>
     </div>`).join('');
@@ -1747,21 +1747,21 @@ function switchTpiCat(catId){
   // 테스트 내용 업데이트
   const activeCat = TPI_CATEGORIES.find(c=>c.id===catId);
   const testCards = activeCat.tests.map(test=>`
-    <div style="background:#fff;border-radius:12px;border:1.5px solid #E2E8F0;padding:14px 14px;margin-bottom:10px;display:flex;gap:14px;align-items:flex-start;">
-      <div style="width:80px;flex-shrink:0;background:#F7F9FC;border-radius:8px;padding:4px 2px;display:flex;align-items:center;justify-content:center;">
-        ${TPI_IMGS[test.svgKey]||''}
+    <div style="background:#fff;border-radius:12px;border:1.5px solid #E2E8F0;padding:12px;margin-bottom:10px;display:flex;gap:12px;align-items:flex-start;">
+      <div style="width:240px;flex-shrink:0;background:#F7F9FC;border-radius:8px;padding:4px;display:flex;align-items:center;justify-content:center;">
+        ${(TPI_IMGS[test.svgKey]||'').replace("height:72px","height:216px")}
       </div>
       <div style="flex:1;">
-        <div style="font-size:12px;font-weight:800;color:#1A202C;margin-bottom:10px;">${test.label}</div>
+        <div style="font-size:12px;font-weight:800;color:#1A202C;margin-bottom:8px;">${test.label}</div>
         ${test.checks.map(chk=>`
-          <div style="display:flex;align-items:center;gap:8px;margin-bottom:7px;" id="tpi-row-${chk.id}">
-            ${chk.label?`<span style="font-size:12px;font-weight:700;color:#4A5568;width:32px;flex-shrink:0;">${chk.label}</span>`:''}
+          <div style="display:flex;align-items:center;gap:5px;margin-bottom:5px;" id="tpi-row-${chk.id}">
+            ${chk.label?`<span style="font-size:11px;font-weight:700;color:#4A5568;width:24px;flex-shrink:0;">${chk.label}</span>`:''}
             <button id="tpi-o-${chk.id}" onclick="onTpiToggle('${chk.id}',1,${chk.tri||false})"
-              style="flex:1;padding:5px 0;border-radius:7px;border:1.5px solid #C6F6D5;background:#fff;font-size:13px;font-weight:900;color:#276749;cursor:pointer;font-family:inherit;">⭕ O</button>
+              style="flex:1;padding:3px 0;border-radius:6px;border:1.5px solid #C6F6D5;background:#fff;font-size:11px;font-weight:900;color:#276749;cursor:pointer;font-family:inherit;">⭕ O</button>
             ${chk.tri?`<button id="tpi-d-${chk.id}" onclick="onTpiToggle('${chk.id}',0.5,true)"
-              style="flex:1;padding:5px 0;border-radius:7px;border:1.5px solid #FEFCBF;background:#fff;font-size:13px;font-weight:900;color:#B7791F;cursor:pointer;font-family:inherit;">△</button>`:''}
+              style="flex:1;padding:3px 0;border-radius:6px;border:1.5px solid #FEFCBF;background:#fff;font-size:11px;font-weight:900;color:#B7791F;cursor:pointer;font-family:inherit;">△</button>`:''}
             <button id="tpi-x-${chk.id}" onclick="onTpiToggle('${chk.id}',0,${chk.tri||false})"
-              style="flex:1;padding:5px 0;border-radius:7px;border:1.5px solid #FED7D7;background:#fff;font-size:13px;font-weight:900;color:#C53030;cursor:pointer;font-family:inherit;">❌ X</button>
+              style="flex:1;padding:3px 0;border-radius:6px;border:1.5px solid #FED7D7;background:#fff;font-size:11px;font-weight:900;color:#C53030;cursor:pointer;font-family:inherit;">❌ X</button>
           </div>`).join('')}
       </div>
     </div>`).join('');
