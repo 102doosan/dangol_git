@@ -681,7 +681,28 @@
       </div>
     </div>
 
-    <div class="form-row" style="margin-bottom:0;">
+    <!-- 동영상 -->
+    <div class="form-group" style="margin-top:16px;margin-bottom:0;">
+      <label class="form-label">🎬 프로그램 동영상</label>
+      <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px;">
+        <input class="form-input" id="prog-video-input" type="text" placeholder="YouTube URL 또는 동영상 파일 URL 입력"
+          oninput="previewProgVideo()" style="flex:1;" />
+        <button type="button" onclick="document.getElementById('prog-video-file').click()"
+          style="white-space:nowrap;padding:8px 14px;background:#EDF2F7;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Noto Sans KR',sans-serif;">
+          📁 파일 선택
+        </button>
+        <input type="file" id="prog-video-file" accept="video/*" style="display:none;" onchange="loadProgVideoFile(this)" />
+      </div>
+      <div id="prog-video-preview" style="display:none;border-radius:12px;overflow:hidden;background:#000;position:relative;">
+        <iframe id="prog-video-iframe" style="width:100%;height:280px;border:none;display:none;"></iframe>
+        <video id="prog-video-tag" controls style="width:100%;max-height:280px;display:none;"></video>
+        <div id="prog-video-overlay" style="position:absolute;top:8px;right:8px;">
+          <button onclick="clearProgVideo()" style="background:rgba(0,0,0,0.55);color:#fff;border:none;border-radius:6px;padding:4px 10px;font-size:12px;cursor:pointer;">✕ 제거</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-row" style="margin-top:12px;margin-bottom:0;">
       <div class="form-group" style="margin-bottom:0;">
         <label class="form-label">주의사항</label>
         <textarea class="form-textarea" id="prog-note-input" placeholder="금기 동작, 주의 사항 등" style="height:70px;"></textarea>
@@ -1630,6 +1651,8 @@ function editProg(idx) {
   document.getElementById('prog-time-input').value = p.time;
   document.getElementById('prog-note-input').value = p.note;
   document.getElementById('prog-active-select').value = p.active ? 'true' : 'false';
+  document.getElementById('prog-video-input').value = p.videoUrl || '';
+  if (p.videoUrl) previewProgVideo();
   document.getElementById('prog-save-btn').textContent = '저장';
   // 동작 구성 불러오기
   _progMotions = (p.motions || []).map(m => {
@@ -1657,9 +1680,10 @@ function saveProg() {
     duration:document.getElementById('prog-duration-select').value,
     freq:    document.getElementById('prog-freq-input').value.trim(),
     time:    document.getElementById('prog-time-input').value.trim(),
-    motions: _progMotions.map(m => ({ motionIdx: m.motionIdx, name: m.name, icon: m.icon, sets: m.sets, reps: m.reps, importance: m.importance })),
-    note:    document.getElementById('prog-note-input').value.trim(),
-    active:  document.getElementById('prog-active-select').value === 'true',
+    motions:  _progMotions.map(m => ({ motionIdx: m.motionIdx, name: m.name, icon: m.icon, sets: m.sets, reps: m.reps, importance: m.importance })),
+    videoUrl: document.getElementById('prog-video-input').value.trim(),
+    note:     document.getElementById('prog-note-input').value.trim(),
+    active:   document.getElementById('prog-active-select').value === 'true',
     count:   idx >= 0 ? progData[idx].count : 0,
   };
   if (idx >= 0) { progData[idx] = obj; showToast('✅ 프로그램이 수정되었습니다.'); }
@@ -1686,6 +1710,51 @@ function resetProgModal() {
   document.getElementById('prog-modal-title').textContent = '📋 프로그램 등록';
   _progMotions = [];
   _pmpFilter = 'all';
+  clearProgVideo();
+}
+
+function previewProgVideo() {
+  const url = document.getElementById('prog-video-input').value.trim();
+  if (!url) { clearProgVideo(); return; }
+  const preview = document.getElementById('prog-video-preview');
+  const iframe  = document.getElementById('prog-video-iframe');
+  const vtag    = document.getElementById('prog-video-tag');
+  preview.style.display = 'block';
+  // YouTube URL 변환
+  const ytMatch = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([A-Za-z0-9_-]{11})/);
+  if (ytMatch) {
+    iframe.src = `https://www.youtube.com/embed/${ytMatch[1]}?rel=0`;
+    iframe.style.display = 'block';
+    vtag.style.display = 'none';
+  } else {
+    vtag.src = url;
+    vtag.style.display = 'block';
+    iframe.style.display = 'none';
+  }
+}
+
+function loadProgVideoFile(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const objectUrl = URL.createObjectURL(file);
+  document.getElementById('prog-video-input').value = objectUrl;
+  const preview = document.getElementById('prog-video-preview');
+  const iframe  = document.getElementById('prog-video-iframe');
+  const vtag    = document.getElementById('prog-video-tag');
+  vtag.src = objectUrl;
+  vtag.style.display = 'block';
+  iframe.style.display = 'none';
+  preview.style.display = 'block';
+}
+
+function clearProgVideo() {
+  document.getElementById('prog-video-input').value = '';
+  document.getElementById('prog-video-preview').style.display = 'none';
+  document.getElementById('prog-video-iframe').src = '';
+  document.getElementById('prog-video-iframe').style.display = 'none';
+  document.getElementById('prog-video-tag').src = '';
+  document.getElementById('prog-video-tag').style.display = 'none';
+  document.getElementById('prog-video-file').value = '';
 }
 
 // ── 동작 DB ──────────────────────────────────────────
