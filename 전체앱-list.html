@@ -236,10 +236,10 @@ const userData = [
     ]
   },
   {
-    id:"sfma", icon:"🧠", title:"SFMA 결과", color:"#7B61FF",
+    id:"sfma", icon:"🧠", title:"SFMA/CSMI 검사", color:"#7B61FF",
     screens:[
-      {id:"sf01",name:"SFMA 로그인 / 회원 선택",desc:"회원 선택 화면 · 이름·최근 측정 회차·등급 배지 표시 · CSMI 결과 화면 교차 링크",priority:"필수",dev:"FE/BE",file:"사용자-SFMA.html"},
-      {id:"sf02",name:"SFMA 현황 탭",desc:"헤더: 총점·등급·전회차 대비 변화 · D-day 카드(다음 측정 예정일·등급별 주기) · FN/FP/DP/DN 막대차트 · 분석결과 카드 · 15항목 패턴 테이블",priority:"필수",dev:"FE/BE",file:"사용자-SFMA.html"},
+      {id:"sf01",name:"SFMA/CSMI 로그인 / 회원 선택",desc:"회원 선택 화면 · 이름·최근 측정 회차·등급 배지 표시 · SFMA/CSMI 모드 전환 링크",priority:"필수",dev:"FE/BE",file:"사용자-SFMA.html"},
+      {id:"sf02",name:"SFMA 현황 탭",desc:"헤더: 총점(FN×100+FP×75+DN×50+DP×25 합산÷항목수)·등급·전회차 대비 변화 · D-day 카드(다음 측정 예정일·등급별 주기) · FN/FP/DP/DN 막대차트 · 파트별 점수 바 차트 · 분석결과 카드 · 15항목 패턴 테이블",priority:"필수",dev:"FE/BE",file:"사용자-SFMA.html"},
       {id:"sf03",name:"SFMA 결과 상세 (바텀시트)",desc:"패턴별 FN/FP/DP/DN 체크 상태 · 트레이너 메모 · 종합 소견",priority:"필수",dev:"FE/BE",file:"사용자-SFMA.html"},
       {id:"sf04",name:"SFMA 비교 탭",desc:"회차 선택(최대 3회) · 회차별 FN/FP/DP/DN 집계 가로 바 비교 · 회차 간 변화 강조",priority:"필수",dev:"FE/BE",file:"사용자-SFMA.html"},
       {id:"sf05",name:"SFMA 이력 탭",desc:"전체 측정 회차 목록 · 회차·날짜·FN/FP/DP/DN 칩·총점·등급 · 항목 클릭 시 상세 바텀시트",priority:"권장",dev:"FE/BE",file:"사용자-SFMA.html"},
@@ -259,7 +259,7 @@ const userData = [
     screens:[
       {id:"gf01",name:"골프검진 메인",desc:"회원 선택 칩(5명) · 4개 검진 항목 카드(K-vest 3D분석 / Trackman 탄도분석 / Sam Putt 퍼팅분석 / TPI 신체검사) · 최근 검진 결과 요약 배너(종합점수+4그룹 미니바) · [결과 요약 보기] 버튼",priority:"필수",dev:"FE/BE",file:"골프검진.html"},
       {id:"gf02",name:"검진 결과 요약",desc:"회차 선택 칩 · 종합점수+SVG 레이더차트 · 4그룹 카드(K-vest/Trackman/Sam Putt/TPI) — 그룹별 평균% · 등급 배지 · 바 · 동적 트레이너 소견 · [상세 보기] 버튼",priority:"필수",dev:"FE/BE",file:"골프검진.html"},
-      {id:"gf03",name:"검진 결과 상세",desc:"회차 선택 칩 + 4그룹 탭(K-vest/Trackman/Sam Putt/TPI) · 각 탭: 항목 2열 그리드 카드(값+단위+기준 대비%+바+등급 배지) · 이미지 갤러리(크게 보기 모달)",priority:"필수",dev:"FE/BE",file:"골프검진.html"},
+      {id:"gf03",name:"검진 결과 상세",desc:"회차 선택 칩 + 4그룹 탭(K-vest/Trackman/Sam Putt/TPI) · 각 탭: 항목 2열 그리드 카드(값+단위+기준 대비%+바+등급 배지) · Trackman: 드라이버/아이언 탭 분리·방향/거리/정확도 카테고리·PGA남/여 기준값 표시 · Sam Putt: 중요1/2/3 카테고리 · TPI: 실제 사진 표시 · 이미지 갤러리(크게 보기 모달)",priority:"필수",dev:"FE/BE",file:"골프검진.html"},
       {id:"gf04",name:"검진 결과 비교",desc:"회차 선택(최대 2회) · 그룹별 항목 측정값 변화 가로 바 비교 · 개선·악화 항목 색상 하이라이트",priority:"필수",dev:"FE/BE",file:"골프검진.html"},
       {id:"gf05",name:"검진 이력 목록",desc:"전체 측정 회차 목록 · 회차·날짜·4그룹 요약 칩·종합 평균% · 등급 배지 · 클릭 시 상세 진입",priority:"권장",dev:"FE/BE",file:"골프검진.html"},
       {id:"gf06",name:"골프 맞춤 운동 추천",desc:"검진 결과 기반 맞춤 재활·강화 운동 목록 추천 · 운동 선택 후 마이루틴에 저장 가능",priority:"권장",dev:"FE/BE",file:"골프검진.html"},
@@ -489,8 +489,8 @@ const adminData = [
     id:"a-sfma", icon:"🧠", title:"검사측정관리 - SFMA", color:"#7B61FF",
     screens:[
       {id:"as01",name:"SFMA 현황 대시보드",desc:"요약 카드 4개(전체·이번달·재측정 필요·평균점수) · 최근 측정 10건 테이블 · 미측정 회원 목록 · 등급 분포 도넛 차트",priority:"필수",dev:"FE/BE",file:"관리자-SFMA.html"},
-      {id:"as02",name:"SFMA 결과 조회",desc:"회원 검색·등급·트레이너 필터 · 측정일·총점·등급·회차 목록 · 상세 클릭 시 2열 패널(좌: 회원정보+소견+다음측정일 / 우: 8탭 FN/FP/DP/DN 체크시트 읽기전용)",priority:"필수",dev:"FE/BE",file:"관리자-SFMA.html"},
-      {id:"as03",name:"SFMA 결과 입력 / 수정",desc:"회원 자동완성 검색 → 트레이너·날짜·회차 설정 → STEP2 재활프로그램 불러오기 → STEP3 8탭 체크시트 입력(최고위평가·경추·상지패턴·다중분절 굴곡/신전/회전·한다리자세·오버헤드스쿼트) → STEP4 종합 소견 → 저장",priority:"필수",dev:"FE/BE",file:"관리자-SFMA.html"},
+      {id:"as02",name:"SFMA 결과 조회",desc:"회원 검색·등급·트레이너 필터 · 측정일·총점·등급·회차 목록 · 상세 클릭 시 2열 패널(좌: 회원정보+소견+다음측정일+측정이력(회차 클릭 시 해당 회차 전환) / 우: 8탭 FN/FP/DP/DN 체크시트 읽기전용) · 총점: FN×100+FP×75+DN×50+DP×25 합산÷항목수 · 파트별 점수 바 차트",priority:"필수",dev:"FE/BE",file:"관리자-SFMA.html"},
+      {id:"as03",name:"SFMA 결과 입력 / 수정",desc:"회원 자동완성 검색 → 트레이너·날짜·회차 설정 → STEP2 재활프로그램 불러오기 → STEP3 8탭 체크시트 입력(최고위평가·경추·상지패턴·다중분절 굴곡/신전/회전·한다리자세·오버헤드스쿼트) → STEP4 종합 소견 → 저장 · 점수 공식: FN=100·FP=75·DN=50·DP=25",priority:"필수",dev:"FE/BE",file:"관리자-SFMA.html"},
       {id:"as04",name:"SFMA 결과 비교",desc:"회원 선택 → 비교 회차 2개 선택 → 15항목 FN/FP/DP/DN 나란히 비교 · 집계 변화 강조",priority:"필수",dev:"FE/BE",file:"관리자-SFMA.html"},
       {id:"as05",name:"SFMA 알림 설정",desc:"재측정 알림 ON/OFF · 알림 주기(등급별) · 알림 발송 이력 조회",priority:"권장",dev:"FE/BE",file:"관리자-SFMA.html"},
     ]
@@ -510,7 +510,7 @@ const adminData = [
     screens:[
       {id:"ag01",name:"골프검진 대시보드",desc:"통계 카드 4개(전체 회원·이번달 검진·재검진 필요·정상 비율) · 최근 검진 테이블(K-vest/Trackman/Sam Putt/TPI 컬럼) · 60일 이상 미검진 목록(알림/입력 버튼) · 그룹별 정상 비율 grid",priority:"필수",dev:"FE/BE",file:"관리자-골프.html"},
       {id:"ag02",name:"골프검진 결과 조회",desc:"회원 목록 테이블(4그룹 등급 칩+종합) · 상세 패널: 히어로카드·회차 선택·4그룹 요약바·분석 텍스트·항목 2열 그리드·이미지 갤러리",priority:"필수",dev:"FE/BE",file:"관리자-골프.html"},
-      {id:"ag03",name:"골프검진 결과 입력",desc:"회원 자동완성(이름/전화번호) → 검진일·회차·메모 → 4그룹 탭(K-vest/Trackman/Sam Putt/TPI): 항목별 수치 입력+바게이지 → 이미지 drag&drop 업로드 → 저장/초기화",priority:"필수",dev:"FE/BE",file:"관리자-골프.html"},
+      {id:"ag03",name:"골프검진 결과 입력",desc:"회원 자동완성(이름/전화번호) → 검진일·회차·메모 → 4그룹 탭(K-vest/Trackman/Sam Putt/TPI): 항목별 수치 입력+바게이지 · Trackman: 드라이버/아이언 탭 분리·방향/거리/정확도 카테고리·PGA남/여 기준값 상시 표시 · Sam Putt: 중요1(타이밍/일관성)/중요2(에이밍/임팩트)/중요3(스피드드롭/패스) 카테고리 · TPI: 실제 사진 3배 크기 표시 → 저장/초기화",priority:"필수",dev:"FE/BE",file:"관리자-골프.html"},
       {id:"ag04",name:"골프검진 결과 수정",desc:"결과 조회 상세 패널 [수정] 버튼 → 입력 화면으로 회원 자동 선택 및 기존 회차 값 로드",priority:"필수",dev:"FE/BE",file:"관리자-골프.html"},
       {id:"ag05",name:"회차 비교",desc:"회원 검색 자동완성 + 회차1/회차2 선택 → 4그룹별 항목 2열 그리드 비교바(회차1 청록·회차2 주황)",priority:"필수",dev:"FE/BE",file:"관리자-골프.html"},
       {id:"ag06",name:"알림 설정",desc:"재검진 알림·기준치 미달 알림·신규 입력 알림 ON/OFF 토글 · 등급별(우수/양호/보통/주의) 재검진 주기 설정",priority:"권장",dev:"FE/BE",file:"관리자-골프.html"},
