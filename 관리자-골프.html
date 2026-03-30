@@ -331,7 +331,20 @@
     <div class="sidebar-item" onclick="location.href='관리자-CSMI.html'">
       <span class="sidebar-item-icon">💪</span> CSMI
     </div>
-    <div class="sidebar-item active">
+    <div class="sidebar-section" style="margin-top:4px; padding-left:20px;">골프 검사항목</div>
+    <div class="sidebar-item" onclick="goInputGroup('kvest')" style="padding-left:28px;font-size:12px;">
+      <span class="sidebar-item-icon">🏌️</span> K-vest 3D분석
+    </div>
+    <div class="sidebar-item" onclick="goInputGroup('trackman')" style="padding-left:28px;font-size:12px;">
+      <span class="sidebar-item-icon">🎯</span> Trackman 탄도
+    </div>
+    <div class="sidebar-item" onclick="goInputGroup('samputt')" style="padding-left:28px;font-size:12px;">
+      <span class="sidebar-item-icon">⛳</span> Sam Putt 퍼팅
+    </div>
+    <div class="sidebar-item" onclick="goInputGroup('tpi')" style="padding-left:28px;font-size:12px;">
+      <span class="sidebar-item-icon">🧘</span> TPI 신체검사
+    </div>
+    <div class="sidebar-item active" style="margin-top:4px;">
       <span class="sidebar-item-icon">⛳</span> 골프검진
     </div>
     <div class="sidebar-section" style="margin-top:4px;">골프검진 메뉴</div>
@@ -883,6 +896,13 @@ const MEMBERS = [
     },
   ]},
 ];
+
+// ── 검사항목 바로가기 ──────────────────────────────────────────
+function goInputGroup(gid){
+  showScreen('input', null, null);
+  const btn = document.querySelector(`#input-group-tabs .group-tab[onclick*="'${gid}'"]`);
+  if(btn) switchInputGroup(gid, btn);
+}
 
 // ── 화면 전환 ─────────────────────────────────────────────────
 function showScreen(id, navBtn, sideItem){
