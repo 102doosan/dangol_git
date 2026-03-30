@@ -1313,12 +1313,12 @@ function renderList() {
   }).join('');
 }
 
-function showMemberDetail(name) {
+function showMemberDetail(name, roundIdx) {
   listSelectedMember = name;
   const m = MEMBERS.find(mb => mb.name === name);
   if (!m || !m.history.length) return;
 
-  const h = m.history[0];
+  const h = m.history[roundIdx !== undefined ? roundIdx : 0];
   const gd = GRADE_INFO(h.total);
 
   // 뷰 상태 세팅
@@ -1386,17 +1386,20 @@ function showMemberDetail(name) {
          <div style="font-size:11px;color:#9B84FF;margin-top:8px;">${m.trainer} · ${h.date}</div>`
       : `<div style="font-size:12px;color:#A0AEC0;">소견 없음</div>`}`;
 
-  // 좌: 이전 이력
-  if (m.history.length > 1) {
+  // 좌: 이전 이력 (현재 보는 회차 제외한 나머지 전부)
+  const otherHistory = m.history.map((r,i)=>({r,i})).filter(x=>x.i !== (roundIdx !== undefined ? roundIdx : 0));
+  if (otherHistory.length > 0) {
     document.getElementById('vw-history-card').style.display = 'block';
     document.getElementById('vw-history-card').innerHTML = `
-      <div class="card-title">📋 이전 측정 이력</div>
-      ${m.history.slice(1).map(prev => {
+      <div class="card-title">📋 측정 이력</div>
+      ${otherHistory.map(({r:prev, i:idx}) => {
         const pgd = GRADE_INFO(prev.total);
         const diff = h.total - prev.total;
-        return `<div style="display:flex;align-items:center;gap:10px;padding:8px;background:#F7F9FC;border-radius:8px;margin-bottom:6px;">
+        return `<div style="display:flex;align-items:center;gap:10px;padding:8px;background:#F7F9FC;border-radius:8px;margin-bottom:6px;cursor:pointer;transition:background .15s;"
+          onclick="showMemberDetail('${m.name}',${idx})"
+          onmouseover="this.style.background='#EDE9FE'" onmouseout="this.style.background='#F7F9FC'">
           <div style="flex:1;">
-            <div style="font-size:12px;font-weight:700;color:#1A202C;">${prev.round}차 · ${prev.date}</div>
+            <div style="font-size:12px;font-weight:700;color:#6B46C1;">${prev.round}차 · ${prev.date}</div>
             <div style="font-size:11px;color:#A0AEC0;">${m.trainer}</div>
           </div>
           <span style="font-size:16px;font-weight:900;color:#9B84FF;">${prev.total}</span>
