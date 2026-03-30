@@ -667,6 +667,24 @@
 
 <div class="toast" id="toast"></div>
 
+<!-- K-vest 분석메시지 관리 모달 -->
+<div id="kvest-msg-modal" onclick="closeKvestMsgModal()" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.55);z-index:9999;overflow-y:auto;padding:20px 0;">
+  <div onclick="event.stopPropagation()" style="background:#fff;border-radius:18px;margin:0 auto;max-width:640px;padding:24px 22px;font-family:'Noto Sans KR',sans-serif;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
+      <div>
+        <div style="font-size:17px;font-weight:900;color:#1A202C;">⚙️ 분석결과 자동메시지 관리</div>
+        <div style="font-size:11px;color:#A0AEC0;margin-top:3px;">변수: <code style="background:#EDF2F7;padding:1px 5px;border-radius:4px;">{p}</code> 골반순서 &nbsp;<code style="background:#EDF2F7;padding:1px 5px;border-radius:4px;">{t}</code> 몸통 &nbsp;<code style="background:#EDF2F7;padding:1px 5px;border-radius:4px;">{a}</code> 팔 &nbsp;<code style="background:#EDF2F7;padding:1px 5px;border-radius:4px;">{c}</code> 클럽 &nbsp;<code style="background:#EDF2F7;padding:1px 5px;border-radius:4px;">{orderStr}</code> 현재순서</div>
+      </div>
+      <button onclick="closeKvestMsgModal()" style="background:#EDF2F7;border:none;border-radius:8px;padding:6px 12px;cursor:pointer;font-size:14px;">✕</button>
+    </div>
+    <div id="kvest-msg-sections"></div>
+    <div style="display:flex;gap:8px;margin-top:20px;padding-top:16px;border-top:1px solid #EDF2F7;">
+      <button onclick="saveKvestMsgTemplates()" style="flex:1;padding:10px;background:#2C7A7B;color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">💾 저장</button>
+      <button onclick="resetKvestMsgTemplates()" style="padding:10px 16px;background:#EDF2F7;color:#4A5568;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">🔄 기본값 복원</button>
+    </div>
+  </div>
+</div>
+
 <!-- 이미지 확대 모달 -->
 <div class="img-modal" id="img-modal" onclick="closeImgModal()">
   <div class="img-modal-inner" onclick="event.stopPropagation()">
@@ -1398,7 +1416,10 @@ function buildKvestInputPanel(m){
     </div>
 
     <div style="background:#F7F9FC;border-radius:12px;padding:14px 16px;border:1.5px solid #E2E8F0;">
-      <div style="font-size:13px;font-weight:800;color:#1A202C;margin-bottom:10px;">📋 분석결과</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+        <div style="font-size:13px;font-weight:800;color:#1A202C;">📋 분석결과</div>
+        <button onclick="openKvestMsgModal()" style="background:#EDF2F7;border:1px solid #CBD5E0;border-radius:8px;padding:4px 10px;font-size:11px;font-weight:700;color:#4A5568;cursor:pointer;font-family:inherit;">⚙️ 메시지 설정</button>
+      </div>
       <textarea id="inp-val-kv_analysis" class="form-textarea"
         placeholder="분석 내용을 입력하세요..."
         oninput="if(!_inputState['kv_analysis'])_inputState['kv_analysis']={value:''};_inputState['kv_analysis'].value=this.value;"
@@ -1406,43 +1427,98 @@ function buildKvestInputPanel(m){
     </div>`;
 }
 
+// ── K-vest 분석 메시지 템플릿 ────────────────────────────────
+// 변수: {p}골반순서, {t}몸통순서, {a}팔순서, {c}클럽순서, {orderStr}현재순서
+const KVEST_MSG_DEFAULTS = {
+  bs_perfect:    '백스윙: 골반이 선행하고 몸통이 이어지는 이상적인 순서입니다. 하체 주도 스윙으로 충분한 코일이 형성됩니다.',
+  bs_reverse:    '백스윙: 몸통({t}번째)이 골반({p}번째)보다 먼저 동작하는 역순서 패턴입니다. 상체 주도 스윙으로 코일 손실 및 허리 부담이 발생합니다.',
+  bs_pelvis_ok:  '백스윙: 골반 선행은 정상이나 몸통({t}번째) 회전이 지연됩니다. 흉추 회전 가동성 훈련을 권장합니다.',
+  bs_pelvis_late:'백스윙: 골반({p}번째) 선행이 지연됩니다. 하체 주도 스윙 패턴 확립을 위한 힙 턴 훈련이 필요합니다.',
+  tr_perfect:    '트랜지션: 다운스윙 전환 시 순서가 완벽하게 유지됩니다. 운동에너지가 사슬처럼 효율적으로 전달됩니다.',
+  tr_one_off:    '트랜지션: 전환 순서({orderStr})에서 1개 부위의 타이밍 조정이 필요합니다. 전반적인 시퀀스는 양호한 편입니다.',
+  tr_wrong:      '트랜지션: 현재 순서({orderStr})로 전환되고 있습니다. 골반 → 몸통 → 팔 → 클럽 순서 반복 훈련이 필요합니다.',
+  im_perfect:    '임팩트: 팔과 클럽이 순서대로 최종 가속됩니다. 클럽 헤드 스피드 극대화와 안정적인 페이스 컨트롤이 기대됩니다.',
+  im_early:      '임팩트: 클럽({c}번째)이 팔({a}번째)보다 먼저 가속되는 얼리 릴리즈 패턴입니다. 파워 손실과 방향성 불안정이 나타나므로 팔 주도 릴리즈 교정이 필요합니다.',
+  im_adjust:     '임팩트: 팔({a}번째)·클럽({c}번째) 순서 미세 조정으로 임팩트 효율을 더 높일 수 있습니다.',
+};
+let KVEST_MSG_TEMPLATES = {...KVEST_MSG_DEFAULTS};
+
+function applyVars(tpl, vars){
+  return tpl.replace(/\{(\w+)\}/g, (_,k)=> vars[k]!==undefined ? vars[k] : `{${k}}`);
+}
+
 function getDefaultKvestAnalysis(p, t, a, c) {
-  // p=골반 순서, t=몸통, a=팔, c=클럽 (입력된 순서 숫자)
-  const lines = [];
-
-  // ── 백스윙 (골반·몸통 선행) ──
-  if (p === 1 && t === 2) {
-    lines.push('백스윙: 골반이 선행하고 몸통이 이어지는 이상적인 순서입니다. 하체 주도 스윙으로 충분한 코일이 형성됩니다.');
-  } else if (t < p) {
-    lines.push(`백스윙: 몸통(${t}번째)이 골반(${p}번째)보다 먼저 동작하는 역순서 패턴입니다. 상체 주도 스윙으로 코일 손실 및 허리 부담이 발생합니다.`);
-  } else if (p === 1) {
-    lines.push(`백스윙: 골반 선행은 정상이나 몸통(${t}번째) 회전이 지연됩니다. 흉추 회전 가동성 훈련을 권장합니다.`);
-  } else {
-    lines.push(`백스윙: 골반(${p}번째) 선행이 지연됩니다. 하체 주도 스윙 패턴 확립을 위한 힙 턴 훈련이 필요합니다.`);
-  }
-
-  // ── 트랜지션·다운스윙 (전환 시 순서 연속성) ──
   const segs = [{id:'골반',v:p},{id:'몸통',v:t},{id:'팔',v:a},{id:'클럽',v:c}].sort((x,y)=>x.v-y.v);
   const orderStr = segs.map(s=>s.id).join(' → ');
   const wrongCount = [p!==1, t!==2, a!==3, c!==4].filter(Boolean).length;
-  if (wrongCount === 0) {
-    lines.push('트랜지션: 다운스윙 전환 시 순서가 완벽하게 유지됩니다. 운동에너지가 사슬처럼 효율적으로 전달됩니다.');
-  } else if (wrongCount === 1) {
-    lines.push(`트랜지션: 전환 순서(${orderStr})에서 1개 부위의 타이밍 조정이 필요합니다. 전반적인 시퀀스는 양호한 편입니다.`);
-  } else {
-    lines.push(`트랜지션: 현재 순서(${orderStr})로 전환되고 있습니다. 골반 → 몸통 → 팔 → 클럽 순서 반복 훈련이 필요합니다.`);
-  }
+  const vars = {p, t, a, c, orderStr, wrongCount};
+  const T = KVEST_MSG_TEMPLATES;
 
-  // ── 임팩트 (팔·클럽 최종 가속) ──
-  if (a === 3 && c === 4) {
-    lines.push('임팩트: 팔과 클럽이 순서대로 최종 가속됩니다. 클럽 헤드 스피드 극대화와 안정적인 페이스 컨트롤이 기대됩니다.');
-  } else if (c < a) {
-    lines.push(`임팩트: 클럽(${c}번째)이 팔(${a}번째)보다 먼저 가속되는 얼리 릴리즈 패턴입니다. 파워 손실과 방향성 불안정이 나타나므로 팔 주도 릴리즈 교정이 필요합니다.`);
-  } else {
-    lines.push(`임팩트: 팔(${a}번째)·클럽(${c}번째) 순서 미세 조정으로 임팩트 효율을 더 높일 수 있습니다.`);
-  }
+  const bsKey = (p===1&&t===2)?'bs_perfect':(t<p)?'bs_reverse':(p===1)?'bs_pelvis_ok':'bs_pelvis_late';
+  const trKey = wrongCount===0?'tr_perfect':wrongCount===1?'tr_one_off':'tr_wrong';
+  const imKey = (a===3&&c===4)?'im_perfect':(c<a)?'im_early':'im_adjust';
 
-  return lines.join('\n');
+  return [applyVars(T[bsKey],vars), applyVars(T[trKey],vars), applyVars(T[imKey],vars)].join('\n');
+}
+
+// ── 메시지 관리 모달 ─────────────────────────────────────────
+const KVEST_MSG_LABELS = [
+  { section:'🏌️ 백스윙', items:[
+    { key:'bs_perfect',    cond:'골반(1)→몸통(2) 표준 순서일 때',      vars:[] },
+    { key:'bs_reverse',    cond:'몸통이 골반보다 먼저일 때 (역순서)',   vars:['{p}','({t})'] },
+    { key:'bs_pelvis_ok',  cond:'골반은 1번째, 몸통이 3·4번째일 때',   vars:['{t}'] },
+    { key:'bs_pelvis_late',cond:'골반이 2번째 이상 (선행 지연)',        vars:['{p}'] },
+  ]},
+  { section:'🔄 트랜지션', items:[
+    { key:'tr_perfect', cond:'모든 순서 일치 (오류 0개)',              vars:[] },
+    { key:'tr_one_off', cond:'오류 1개 (1개 부위만 순서 불일치)',      vars:['{orderStr}'] },
+    { key:'tr_wrong',   cond:'오류 2개 이상',                         vars:['{orderStr}'] },
+  ]},
+  { section:'⚡ 임팩트', items:[
+    { key:'im_perfect', cond:'팔(3)→클럽(4) 표준 순서일 때',         vars:[] },
+    { key:'im_early',   cond:'클럽이 팔보다 먼저 (얼리 릴리즈)',      vars:['{a}','{c}'] },
+    { key:'im_adjust',  cond:'팔·클럽 순서 불일치 (기타)',            vars:['{a}','{c}'] },
+  ]},
+];
+
+function openKvestMsgModal(){
+  const sec = document.getElementById('kvest-msg-sections');
+  sec.innerHTML = KVEST_MSG_LABELS.map(s=>`
+    <div style="margin-bottom:20px;">
+      <div style="font-size:13px;font-weight:800;color:#1A202C;margin-bottom:10px;padding-bottom:6px;border-bottom:2px solid #EDF2F7;">${s.section}</div>
+      ${s.items.map(item=>`
+        <div style="margin-bottom:12px;">
+          <div style="display:flex;align-items:center;gap:6px;margin-bottom:5px;">
+            <span style="font-size:11px;font-weight:700;color:#4A5568;background:#EDF2F7;padding:2px 8px;border-radius:99px;">${item.cond}</span>
+            ${item.vars.map(v=>`<code style="font-size:10px;background:#E6FFFA;color:#276749;padding:1px 5px;border-radius:4px;">${v}</code>`).join('')}
+          </div>
+          <textarea id="msg-ta-${item.key}" style="width:100%;min-height:62px;border-radius:8px;border:1.5px solid #E2E8F0;padding:8px 10px;font-size:12px;font-family:'Noto Sans KR',sans-serif;line-height:1.6;resize:vertical;box-sizing:border-box;">${KVEST_MSG_TEMPLATES[item.key]||''}</textarea>
+        </div>`).join('')}
+    </div>`).join('');
+  document.getElementById('kvest-msg-modal').style.display='block';
+}
+
+function closeKvestMsgModal(){
+  document.getElementById('kvest-msg-modal').style.display='none';
+}
+
+function saveKvestMsgTemplates(){
+  KVEST_MSG_LABELS.forEach(s=>s.items.forEach(item=>{
+    const el=document.getElementById('msg-ta-'+item.key);
+    if(el) KVEST_MSG_TEMPLATES[item.key]=el.value;
+  }));
+  closeKvestMsgModal();
+  showToast('✅ 분석 메시지가 저장되었습니다.');
+}
+
+function resetKvestMsgTemplates(){
+  if(!confirm('모든 메시지를 기본값으로 복원할까요?')) return;
+  KVEST_MSG_TEMPLATES = {...KVEST_MSG_DEFAULTS};
+  KVEST_MSG_LABELS.forEach(s=>s.items.forEach(item=>{
+    const el=document.getElementById('msg-ta-'+item.key);
+    if(el) el.value=KVEST_MSG_TEMPLATES[item.key];
+  }));
+  showToast('🔄 기본 메시지로 복원되었습니다.');
 }
 
 function onKvestSeqChange(){
