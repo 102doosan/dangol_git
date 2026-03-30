@@ -451,6 +451,8 @@
                 <th>Sam Putt</th>
                 <th>TPI</th>
                 <th>종합</th>
+                <th style="color:#7B61FF;">🧠 SFMA</th>
+                <th style="color:#2C7A7B;">💪 CSMI</th>
                 <th>관리</th>
               </tr>
             </thead>
@@ -478,6 +480,7 @@
         <div style="display:grid;grid-template-columns:280px 1fr;gap:14px;align-items:start;">
           <div>
             <div class="card" id="detail-member-card"></div>
+            <div id="detail-sfma-csmi-card"></div>
             <div id="detail-next-card"></div>
             <div class="card" id="detail-history-card" style="display:none;"></div>
             <div class="analysis-panel" id="detail-analysis" style="margin-bottom:14px;"></div>
@@ -807,7 +810,10 @@ function barColor(pct){
 
 // ── 회원 데이터 ──────────────────────────────────────────────
 const MEMBERS = [
-  { id:1, name:'김태훈', gender:'남', color:'#4299E1', phone:'010-1234-5678', history:[
+  { id:1, name:'김태훈', gender:'남', color:'#4299E1', phone:'010-1234-5678',
+    sfma:{total:78, grade:'양호', date:'2026-03-05', round:2},
+    csmi:{avg:82,  grade:'양호', date:'2026-03-10', round:1},
+    history:[
     { round:1, date:'2026-03-10', memo:'',
       kv_seq_pelvis:{value:1}, kv_seq_thorax:{value:2}, kv_seq_arm:{value:3}, kv_seq_club:{value:3}, kv_analysis:{value:'골반과 몸통의 분리가 현재보다 빠르게 효과적. 몸통보다 팔의 쓰임이 큼\n골반 몸통 팔의 순서가 효율\n골반과 몸통의 로딩이 없다. 감속패턴을 나쁘게 함'},
       tm_face_d:{value:1.2}, tm_path_d:{value:1.8}, tm_speed_d:{value:108}, tm_launch_d:{value:11}, tm_smash_d:{value:145}, tm_bspeed_d:{value:157},
@@ -823,7 +829,10 @@ const MEMBERS = [
       tpi_c_tilt_f:{value:1},tpi_c_tilt_b:{value:1},tpi_c_bridge_m:{value:1},tpi_c_bridge_l:{value:0},tpi_c_bridge_r:{value:1},tpi_c_balance_l:{value:1},tpi_c_balance_r:{value:1},tpi_l_pelv_s:{value:1},tpi_l_pelv_l:{value:1},tpi_l_pelv_r:{value:1},tpi_l_toe:{value:1},tpi_l_rot_l:{value:0},tpi_l_rot_r:{value:0},tpi_u_cerv_l:{value:1},tpi_u_cerv_r:{value:1},tpi_u_trunk_l:{value:1},tpi_u_trunk_r:{value:1},tpi_u_thor_s:{value:1},tpi_u_thor_l:{value:1},tpi_u_thor_r:{value:1},tpi_s_9090st_l:{value:1},tpi_s_9090st_r:{value:1},tpi_s_9090ad_l:{value:1},tpi_s_9090ad_r:{value:1},tpi_s_lat_l:{value:0.5},tpi_s_lat_r:{value:0.5},tpi_s_squat:{value:1},tpi_w_fe_lr_l:{value:1},tpi_w_fe_lr_r:{value:1},tpi_w_fe_ud_u:{value:1},tpi_w_fe_ud_d:{value:1},tpi_w_hi_lr_l:{value:1},tpi_w_hi_lr_r:{value:1},tpi_w_hi_ud_u:{value:1},tpi_w_hi_ud_d:{value:1},
     },
   ]},
-  { id:2, name:'이서연', gender:'여', color:'#ED64A6', phone:'010-2345-6789', history:[
+  { id:2, name:'이서연', gender:'여', color:'#ED64A6', phone:'010-2345-6789',
+    sfma:{total:84, grade:'양호', date:'2026-03-20', round:2},
+    csmi:{avg:79,  grade:'양호', date:'2026-03-12', round:1},
+    history:[
     { round:1, date:'2026-03-12', memo:'',
       kv_seq_pelvis:{value:1}, kv_seq_thorax:{value:2}, kv_seq_arm:{value:3}, kv_seq_club:{value:4}, kv_analysis:{value:'표준 순서 일치. 골반 선행이 안정적\n부드러운 전환. 시퀀스 유지\n임팩트에서 모든 세그먼트 표준 순서 유지'},
       tm_face_d:{value:1.5}, tm_path_d:{value:2.0}, tm_speed_d:{value:82}, tm_launch_d:{value:13}, tm_smash_d:{value:145}, tm_bspeed_d:{value:119},
@@ -832,7 +841,10 @@ const MEMBERS = [
       tpi_c_tilt_f:{value:1},tpi_c_tilt_b:{value:1},tpi_c_bridge_m:{value:1},tpi_c_bridge_l:{value:1},tpi_c_bridge_r:{value:1},tpi_c_balance_l:{value:1},tpi_c_balance_r:{value:1},tpi_l_pelv_s:{value:1},tpi_l_pelv_l:{value:1},tpi_l_pelv_r:{value:1},tpi_l_toe:{value:1},tpi_l_rot_l:{value:1},tpi_l_rot_r:{value:1},tpi_u_cerv_l:{value:1},tpi_u_cerv_r:{value:1},tpi_u_trunk_l:{value:1},tpi_u_trunk_r:{value:1},tpi_u_thor_s:{value:0},tpi_u_thor_l:{value:1},tpi_u_thor_r:{value:1},tpi_s_9090st_l:{value:1},tpi_s_9090st_r:{value:1},tpi_s_9090ad_l:{value:1},tpi_s_9090ad_r:{value:1},tpi_s_lat_l:{value:1},tpi_s_lat_r:{value:1},tpi_s_squat:{value:1},tpi_w_fe_lr_l:{value:0},tpi_w_fe_lr_r:{value:1},tpi_w_fe_ud_u:{value:1},tpi_w_fe_ud_d:{value:1},tpi_w_hi_lr_l:{value:1},tpi_w_hi_lr_r:{value:1},tpi_w_hi_ud_u:{value:1},tpi_w_hi_ud_d:{value:1},
     },
   ]},
-  { id:3, name:'박민준', gender:'남', color:'#48BB78', phone:'010-3456-7890', history:[
+  { id:3, name:'박민준', gender:'남', color:'#48BB78', phone:'010-3456-7890',
+    sfma:{total:52, grade:'주의', date:'2026-02-14', round:2},
+    csmi:{avg:65,  grade:'보통', date:'2026-03-08', round:1},
+    history:[
     { round:1, date:'2026-03-08', memo:'',
       kv_seq_pelvis:{value:2}, kv_seq_thorax:{value:1}, kv_seq_arm:{value:3}, kv_seq_club:{value:4}, kv_analysis:{value:'몸통이 골반보다 먼저 시작. 역순서 발생\n전환에서 상체 우선으로 파워 손실\n클럽 속도 저하. 순서 교정 필요'},
       tm_face_d:{value:4.2}, tm_path_d:{value:5.1}, tm_speed_d:{value:98}, tm_launch_d:{value:14}, tm_smash_d:{value:145}, tm_bspeed_d:{value:142},
@@ -841,7 +853,10 @@ const MEMBERS = [
       tpi_c_tilt_f:{value:0},tpi_c_tilt_b:{value:1},tpi_c_bridge_m:{value:0},tpi_c_bridge_l:{value:0},tpi_c_bridge_r:{value:0},tpi_c_balance_l:{value:1},tpi_c_balance_r:{value:1},tpi_l_pelv_s:{value:0},tpi_l_pelv_l:{value:0},tpi_l_pelv_r:{value:1},tpi_l_toe:{value:1},tpi_l_rot_l:{value:1},tpi_l_rot_r:{value:1},tpi_u_cerv_l:{value:1},tpi_u_cerv_r:{value:1},tpi_u_trunk_l:{value:1},tpi_u_trunk_r:{value:1},tpi_u_thor_s:{value:0},tpi_u_thor_l:{value:1},tpi_u_thor_r:{value:1},tpi_s_9090st_l:{value:1},tpi_s_9090st_r:{value:1},tpi_s_9090ad_l:{value:1},tpi_s_9090ad_r:{value:1},tpi_s_lat_l:{value:0.5},tpi_s_lat_r:{value:0},tpi_s_squat:{value:0},tpi_w_fe_lr_l:{value:1},tpi_w_fe_lr_r:{value:1},tpi_w_fe_ud_u:{value:1},tpi_w_fe_ud_d:{value:1},tpi_w_hi_lr_l:{value:0},tpi_w_hi_lr_r:{value:0},tpi_w_hi_ud_u:{value:1},tpi_w_hi_ud_d:{value:1},
     },
   ]},
-  { id:4, name:'정유진', gender:'여', color:'#ED8936', phone:'010-4567-8901', history:[
+  { id:4, name:'정유진', gender:'여', color:'#ED8936', phone:'010-4567-8901',
+    sfma:{total:68, grade:'보통', date:'2026-01-30', round:1},
+    csmi:{avg:71,  grade:'양호', date:'2026-02-20', round:1},
+    history:[
     { round:1, date:'2026-02-20', memo:'',
       kv_seq_pelvis:{value:1}, kv_seq_thorax:{value:2}, kv_seq_arm:{value:4}, kv_seq_club:{value:3}, kv_analysis:{value:'골반·몸통 순서 정상. 팔과 클럽 순서 역전\n전환 과정에서 클럽이 팔보다 먼저 가속\n클럽 제어 불안정. 팔 속도 향상 필요'},
       tm_face_d:{value:5.3}, tm_path_d:{value:6.1}, tm_speed_d:{value:76}, tm_launch_d:{value:15}, tm_smash_d:{value:145}, tm_bspeed_d:{value:110},
@@ -850,7 +865,10 @@ const MEMBERS = [
       tpi_c_tilt_f:{value:1},tpi_c_tilt_b:{value:1},tpi_c_bridge_m:{value:1},tpi_c_bridge_l:{value:0},tpi_c_bridge_r:{value:1},tpi_c_balance_l:{value:1},tpi_c_balance_r:{value:1},tpi_l_pelv_s:{value:1},tpi_l_pelv_l:{value:0},tpi_l_pelv_r:{value:1},tpi_l_toe:{value:1},tpi_l_rot_l:{value:1},tpi_l_rot_r:{value:1},tpi_u_cerv_l:{value:1},tpi_u_cerv_r:{value:1},tpi_u_trunk_l:{value:0},tpi_u_trunk_r:{value:1},tpi_u_thor_s:{value:1},tpi_u_thor_l:{value:0},tpi_u_thor_r:{value:1},tpi_s_9090st_l:{value:1},tpi_s_9090st_r:{value:1},tpi_s_9090ad_l:{value:1},tpi_s_9090ad_r:{value:1},tpi_s_lat_l:{value:0.5},tpi_s_lat_r:{value:0.5},tpi_s_squat:{value:1},tpi_w_fe_lr_l:{value:0},tpi_w_fe_lr_r:{value:1},tpi_w_fe_ud_u:{value:0},tpi_w_fe_ud_d:{value:1},tpi_w_hi_lr_l:{value:1},tpi_w_hi_lr_r:{value:1},tpi_w_hi_ud_u:{value:1},tpi_w_hi_ud_d:{value:1},
     },
   ]},
-  { id:5, name:'최준혁', gender:'남', color:'#9F7AEA', phone:'010-5678-9012', history:[
+  { id:5, name:'최준혁', gender:'남', color:'#9F7AEA', phone:'010-5678-9012',
+    sfma:{total:90, grade:'우수', date:'2026-03-01', round:3},
+    csmi:{avg:88,  grade:'우수', date:'2026-01-15', round:1},
+    history:[
     { round:1, date:'2026-01-15', memo:'',
       kv_seq_pelvis:{value:1}, kv_seq_thorax:{value:2}, kv_seq_arm:{value:3}, kv_seq_club:{value:4}, kv_analysis:{value:'완벽한 표준 순서. 골반 선행이 최대 파워 생성\n이상적인 에너지 전달. 순서 완벽 유지\n모든 세그먼트 최적 가속. 클럽 헤드 스피드 최대화'},
       tm_face_d:{value:0.8}, tm_path_d:{value:1.1}, tm_speed_d:{value:115}, tm_launch_d:{value:11}, tm_smash_d:{value:146}, tm_bspeed_d:{value:168},
@@ -1088,6 +1106,12 @@ function renderList(query=''){
     const h=m.history[0];
     if(!h) return `<tr><td class="td-name">${m.name}</td><td>${m.gender}</td><td colspan="8" style="color:#A0AEC0;">미검진</td></tr>`;
     const mg=memberGrade(m);
+    const sfmaCell = m.sfma
+      ? `<span class="grade-badge ${{우수:'grade-ex',양호:'grade-go',보통:'grade-av',주의:'grade-po'}[m.sfma.grade]||''}" title="${m.sfma.date} ${m.sfma.round}회차" style="cursor:pointer;" onclick="location.href='관리자-SFMA.html'">${m.sfma.grade} ${m.sfma.total}점</span>`
+      : `<span style="color:#A0AEC0;font-size:12px;">미측정</span>`;
+    const csmiCell = m.csmi
+      ? `<span class="grade-badge ${{우수:'grade-ex',양호:'grade-go',보통:'grade-av',주의:'grade-po'}[m.csmi.grade]||''}" title="${m.csmi.date} ${m.csmi.round}회차" style="cursor:pointer;" onclick="location.href='관리자-CSMI.html'">${m.csmi.grade} ${m.csmi.avg}%</span>`
+      : `<span style="color:#A0AEC0;font-size:12px;">미측정</span>`;
     return `<tr>
       <td class="td-name">${m.name}</td>
       <td>${m.gender}</td>
@@ -1098,6 +1122,8 @@ function renderList(query=''){
       <td>${groupSummary(m,h,'samputt')}</td>
       <td>${groupSummary(m,h,'tpi')}</td>
       <td><span class="grade-badge ${mg.cls}">${mg.label}</span></td>
+      <td>${sfmaCell}</td>
+      <td>${csmiCell}</td>
       <td><button class="btn-sm" style="background:#F0FFF4;color:#2F855A;" onclick="openDetail(${m.id})">상세</button></td>
     </tr>`;
   }).join('');
@@ -1192,6 +1218,37 @@ function openDetail(mid, targetRound=null){
         </div>`;
       }).join('')}
     </div>`;
+
+  // SFMA / CSMI 연동 카드
+  const sfmaCsmiHtml = (m.sfma || m.csmi) ? `
+    <div class="card" style="margin-top:14px;padding:14px 16px;">
+      <div class="card-title" style="margin-bottom:10px;">🔗 검사측정 연동</div>
+      ${m.sfma ? `
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 10px;background:#F5F3FF;border-radius:10px;margin-bottom:8px;cursor:pointer;" onclick="location.href='관리자-SFMA.html'">
+        <div>
+          <div style="font-size:12px;font-weight:800;color:#6B46C1;">🧠 SFMA</div>
+          <div style="font-size:11px;color:#9B84FF;margin-top:1px;">${m.sfma.date} · ${m.sfma.round}회차</div>
+        </div>
+        <div style="text-align:right;">
+          <span style="font-size:18px;font-weight:900;color:#7B61FF;">${m.sfma.total}</span>
+          <span style="font-size:11px;color:#9B84FF;">점</span>
+          <span class="grade-badge ${{우수:'grade-ex',양호:'grade-go',보통:'grade-av',주의:'grade-po'}[m.sfma.grade]||''}" style="margin-left:6px;">${m.sfma.grade}</span>
+        </div>
+      </div>` : ''}
+      ${m.csmi ? `
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 10px;background:#E6FFFA;border-radius:10px;cursor:pointer;" onclick="location.href='관리자-CSMI.html'">
+        <div>
+          <div style="font-size:12px;font-weight:800;color:#2C7A7B;">💪 CSMI</div>
+          <div style="font-size:11px;color:#4FD1C5;margin-top:1px;">${m.csmi.date} · ${m.csmi.round}회차</div>
+        </div>
+        <div style="text-align:right;">
+          <span style="font-size:18px;font-weight:900;color:#2C7A7B;">${m.csmi.avg}</span>
+          <span style="font-size:11px;color:#4FD1C5;">%</span>
+          <span class="grade-badge ${{우수:'grade-ex',양호:'grade-go',보통:'grade-av',주의:'grade-po'}[m.csmi.grade]||''}" style="margin-left:6px;">${m.csmi.grade}</span>
+        </div>
+      </div>` : ''}
+    </div>` : '';
+  document.getElementById('detail-sfma-csmi-card').innerHTML = sfmaCsmiHtml;
 
   // 다음 검진 예정일
   const period=GRADE_DAYS[gr.label]||90;
