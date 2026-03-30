@@ -1432,7 +1432,7 @@ function buildInputPanels(){
         </div>
       </div>`;
     } else {
-      itemsHtml = g.items.map(it=>renderItemBlock(it)).join('');
+      itemsHtml = `<div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">${g.items.map(it=>renderItemBlock(it)).join('')}</div>`;
     }
     return `<div class="card input-group-panel" id="inp-panel-${g.id}" style="display:${g.id==='shoulder'?'block':'none'};">
       <div class="card-title">${g.icon} ${g.name} 측정</div>
