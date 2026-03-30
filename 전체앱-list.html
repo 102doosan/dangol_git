@@ -34,6 +34,15 @@
     .progress-val { font-size: 13px; font-weight: 900; color: #4F9CF9; }
     .progress-bar { background: #EDF2F7; border-radius: 99px; height: 8px; overflow: hidden; }
     .progress-fill { height: 100%; max-width: 100%; background: linear-gradient(90deg, #4F9CF9, #9B6DFF); border-radius: 99px; transition: width 0.4s ease; }
+    .tab-progress-row { display: flex; gap: 12px; margin-top: 12px; }
+    .tab-progress-col { flex: 1; }
+    .tab-progress-top { display: flex; justify-content: space-between; margin-bottom: 4px; }
+    .tab-progress-label { font-size: 12px; font-weight: 700; color: #4A5568; }
+    .tab-progress-val { font-size: 12px; font-weight: 900; }
+    .user-val { color: #4F9CF9; }
+    .admin-val { color: #9B6DFF; }
+    .user-fill { background: linear-gradient(90deg, #4F9CF9, #63B3ED); }
+    .admin-fill { background: linear-gradient(90deg, #9B6DFF, #B794F4); }
 
     .filters { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
     .filter-btn {
@@ -129,6 +138,22 @@
       <span class="progress-val" id="progress-val">0 / 0 (0%)</span>
     </div>
     <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+    <div class="tab-progress-row">
+      <div class="tab-progress-col">
+        <div class="tab-progress-top">
+          <span class="tab-progress-label">🙍 사용자 앱</span>
+          <span class="tab-progress-val user-val" id="user-progress-val">0 / 0</span>
+        </div>
+        <div class="progress-bar"><div class="progress-fill user-fill" id="user-progress-fill"></div></div>
+      </div>
+      <div class="tab-progress-col">
+        <div class="tab-progress-top">
+          <span class="tab-progress-label">🖥️ 관리자</span>
+          <span class="tab-progress-val admin-val" id="admin-progress-val">0 / 0</span>
+        </div>
+        <div class="progress-bar"><div class="progress-fill admin-fill" id="admin-progress-fill"></div></div>
+      </div>
+    </div>
   </div>
   <div class="filters" id="filters"></div>
 
@@ -642,6 +667,18 @@ function updateStats() {
   `;
   document.getElementById('progress-val').textContent = `${done} / ${total} (${pct}%)`;
   document.getElementById('progress-fill').style.width = pct + '%';
+
+  const userScreens = tabScreens('user');
+  const userDone = userScreens.filter(s => isScreenDone(s)).length;
+  const userPct = userScreens.length ? Math.min(100, Math.round(userDone/userScreens.length*100)) : 0;
+  document.getElementById('user-progress-val').textContent = `${userDone} / ${userScreens.length} (${userPct}%)`;
+  document.getElementById('user-progress-fill').style.width = userPct + '%';
+
+  const adminScreens = tabScreens('admin');
+  const adminDone = adminScreens.filter(s => isScreenDone(s)).length;
+  const adminPct = adminScreens.length ? Math.min(100, Math.round(adminDone/adminScreens.length*100)) : 0;
+  document.getElementById('admin-progress-val').textContent = `${adminDone} / ${adminScreens.length} (${adminPct}%)`;
+  document.getElementById('admin-progress-fill').style.width = adminPct + '%';
 }
 
 function setFilter(f) { activeFilter = f; render(); }
@@ -651,7 +688,7 @@ function toggleCat(id) { openCats[id] = !openCats[id]; render(); }
 
 function tabProgress(tab) {
   const screens = tabScreens(tab);
-  const done = screens.filter(s => checked[s.id]).length;
+  const done = screens.filter(s => isScreenDone(s)).length;
   return `${done}/${screens.length}`;
 }
 
