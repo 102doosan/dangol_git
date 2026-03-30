@@ -847,7 +847,7 @@ function scoreFromChecks(checks) {
   const c = countChecks(checks);
   const tot = c.FN+c.FP+c.DP+c.DN;
   if (!tot) return 0;
-  return Math.round((c.FN*100+c.FP*75+c.DN*50+c.DP*25)/(tot*100));
+  return Math.round((c.FN*100+c.FP*75+c.DN*50+c.DP*25)/tot);
 }
 
 function getPartChecks(checks, partId) {
