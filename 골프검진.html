@@ -544,12 +544,12 @@ const GOLF_GROUPS = [
     { id:'tm_bspeed', label:'볼 스피드',           unit:'mph', std:{m:153, f:116},                   cat:'정확도' },
   ]},
   { id:'samputt', name:'Sam Putt 퍼팅', icon:'🎯', color:'#B7791F', bg:'#FFFBEB', items:[
-    { id:'sp_face',     label:'페이스 앵글 편차',    unit:'°×10',  std:{m:5,   f:5},   lowerBetter:true },
-    { id:'sp_path',     label:'퍼터 경로 편차',      unit:'°×10',  std:{m:8,   f:8},   lowerBetter:true },
-    { id:'sp_speed',    label:'임팩트 스피드(×10)',  unit:'mph',   std:{m:45,  f:40}  },
-    { id:'sp_impact',   label:'임팩트 위치 편차',    unit:'mm',    std:{m:3,   f:3},   lowerBetter:true },
-    { id:'sp_loft',     label:'다이나믹 로프트(×10)',unit:'°',     std:{m:35,  f:35}  },
-    { id:'sp_tempo',    label:'리듬 B:F(×10)',       unit:'',      std:{m:20,  f:20}  },
+    { id:'sp_tempo',  label:'타이밍 (Timing)',        unit:'',      std:{m:20,  f:20},                    cat:'중요1' },
+    { id:'sp_loft',   label:'일관성 (Consistency)',   unit:'°',     std:{m:35,  f:35},                    cat:'중요1' },
+    { id:'sp_face',   label:'에이밍 (Aiming)',         unit:'°×10',  std:{m:5,   f:5},   lowerBetter:true, cat:'중요2' },
+    { id:'sp_impact', label:'임팩트 (Impact)',         unit:'mm',    std:{m:3,   f:3},   lowerBetter:true, cat:'중요2' },
+    { id:'sp_speed',  label:'스피드 드롭 (Speed Drop)',unit:'mph',   std:{m:45,  f:40},                    cat:'중요3' },
+    { id:'sp_path',   label:'패스 (Path)',             unit:'°×10',  std:{m:8,   f:8},   lowerBetter:true, cat:'중요3' },
   ]},
   { id:'tpi', name:'TPI 신체검사', icon:'🧘', color:'#276749', bg:'#F0FFF4', items:[
     { id:'tpi_pelv_tilt',  label:'Pelvic Tilt',              isBool:true, std:{m:1,f:1} },
