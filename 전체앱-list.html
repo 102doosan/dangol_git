@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>헬스케어 앱 화면 목록</title>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet" />
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     body {
@@ -562,12 +564,39 @@ const priorityStyle = {
   "선택":{bg:"#F0FFF4",color:"#38A169",border:"#C6F6D5"},
 };
 
+// ── Firebase 초기화 ──
+const firebaseConfig = {
+  apiKey: "AIzaSyCiqM2RiCiOGcen01gS4dDV8hJK0-oB4MI",
+  authDomain: "dangol-checklist.firebaseapp.com",
+  projectId: "dangol-checklist",
+  storageBucket: "dangol-checklist.firebasestorage.app",
+  messagingSenderId: "41914009789",
+  appId: "1:41914009789:web:87349b225f5e4b278a8fd4"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+const checkRef = db.collection("checkboxes").doc("state");
+
 let checked = {};
 let activeFilter = "전체";
 let activeTab = "user";
 let activeSubTab = "all";
 let openCats = {};
 allData.forEach(c => openCats[c.id] = true);
+
+// Firestore 실시간 동기화
+checkRef.onSnapshot(doc => {
+  if (doc.exists) {
+    checked = doc.data();
+  } else {
+    checked = {};
+  }
+  render();
+});
+
+function saveToFirestore() {
+  checkRef.set(checked);
+}
 
 function allScreens() { return allData.flatMap(c => c.screens); }
 function tabScreens(tab) { return (tab === "user" ? userData : adminData).flatMap(c => c.screens); }
@@ -592,14 +621,14 @@ function toggleCheck(id) {
     subs.forEach((_, i) => { checked[id + '_' + i] = !allDone; });
     checked[id] = !allDone;
   }
-  render();
+  saveToFirestore();
 }
 function toggleSubCheck(screenId, idx, total, event) {
   event.stopPropagation();
   checked[screenId + '_' + idx] = !checked[screenId + '_' + idx];
   const allDone = Array.from({length: total}, (_, i) => !!checked[screenId + '_' + i]).every(Boolean);
   checked[screenId] = allDone;
-  render();
+  saveToFirestore();
 }
 
 function updateStats() {
@@ -699,7 +728,7 @@ function render() {
   document.getElementById('tab-content').innerHTML = renderCats(visibleCats);
 }
 
-render();
+// Firestore 연결 후 onSnapshot이 render()를 호출하므로 초기 render() 제거
 </script>
 </body>
 </html>
