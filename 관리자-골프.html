@@ -1459,29 +1459,48 @@ function openDetail(mid, targetRound=null){
       const total = tpiItems.length;
       const score = Math.round(tpiItems.reduce((s,it)=>s+(h[it.id]?.value||0),0)/total*100);
 
-      const catSections = TPI_CATEGORIES.map(cat=>{
+      // 카테고리 탭 + compact 행 렌더링
+      const catColor = {core:'#2C7A7B',lower:'#553C9A',upper:'#B7791F',shoulder:'#276749',wrist:'#C05621'};
+      const catBg    = {core:'#E6FFFA',lower:'#FAF5FF',upper:'#FFFBEB',shoulder:'#F0FFF4',wrist:'#FFF5EB'};
+      const catTabs = TPI_CATEGORIES.map((cat,ci)=>{
         const catItems = cat.tests.flatMap(t=>t.checks);
-        const catPass = catItems.filter(c=>h[c.id]?.value===1).length;
-        const catHalf = catItems.filter(c=>(h[c.id]?.value||0)===0.5).length;
-        const testRows = cat.tests.map(test=>`
-          <div style="margin-bottom:8px;">
-            <div style="font-size:11px;font-weight:700;color:#2D3748;margin-bottom:4px;">${test.label}</div>
-            <div style="display:flex;flex-wrap:wrap;gap:4px;">
-              ${test.checks.map(chk=>{
-                const v=h[chk.id]?.value; const pass=(v===1); const half=(v===0.5);
-                return `<div style="background:${pass?'#F0FFF4':half?'#FFFFF0':'#FFF5F5'};border-radius:8px;padding:4px 8px;border:1px solid ${pass?'#C6F6D5':half?'#FEFCBF':'#FED7D7'};display:flex;align-items:center;gap:4px;">
-                  ${chk.label?`<span style="font-size:10px;font-weight:700;color:#4A5568;">${chk.label}</span>`:''}
-                  <span style="font-size:13px;">${pass?'⭕':half?'△':'❌'}</span>
-                </div>`;
-              }).join('')}
-            </div>
-          </div>`).join('');
-        return `<div style="margin-bottom:10px;">
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
-            <span style="font-size:11px;font-weight:800;color:#276749;">${cat.label}</span>
-            <span style="font-size:10px;color:#718096;">통과 ${catPass}${catHalf?` / △ ${catHalf}`:''} / 전체 ${catItems.length}</span>
-          </div>
-          ${testRows}
+        const catPass = catItems.reduce((s,c)=>{const v=h[c.id]?.value||0;return s+(c.tri?v:(v===1?1:0));},0);
+        const allPass = catPass >= catItems.length;
+        const cc = catColor[cat.id]||'#718096';
+        return `<div onclick="
+          document.querySelectorAll('.tpi-det-panel').forEach(p=>p.style.display='none');
+          document.getElementById('tpi-det-${cat.id}').style.display='block';
+          this.parentNode.querySelectorAll('.tpi-det-tab').forEach(t=>{t.style.background='#fff';t.style.color='#718096';t.style.borderColor='#E2E8F0';});
+          this.style.background='${cc}';this.style.color='#fff';this.style.borderColor='${cc}';"
+          class="tpi-det-tab" style="padding:5px 10px;border-radius:99px;font-size:10px;font-weight:700;cursor:pointer;white-space:nowrap;flex-shrink:0;border:1.5px solid ${ci===0?cc:'#E2E8F0'};background:${ci===0?cc:'#fff'};color:${ci===0?'#fff':'#718096'};font-family:inherit;display:flex;align-items:center;gap:4px;transition:all .15s;">
+          ${cat.label.replace('검사','').replace(' ','')}<span style="font-size:9px;padding:1px 5px;border-radius:99px;background:rgba(255,255,255,0.25);">${Math.round(catPass)}/${catItems.length}</span>
+        </div>`;
+      }).join('');
+
+      const catPanels = TPI_CATEGORIES.map((cat,ci)=>{
+        const cc = catColor[cat.id]||'#718096';
+        const cb = catBg[cat.id]||'#F7FAFC';
+        const rows = cat.tests.map(test=>{
+          const chips = test.checks.map(chk=>{
+            const v=h[chk.id]?.value; const pass=(v===1); const half=(chk.tri&&v>0&&v<1);
+            const icon = pass?'⭕':half?'☑':'❌';
+            const bg = pass?'#F0FFF4':half?'#FFFBEB':'#FFF5F5';
+            const border = pass?'#C6F6D5':half?'#F6E05E':'#FED7D7';
+            return `<span style="display:inline-flex;align-items:center;gap:3px;padding:3px 7px;border-radius:99px;background:${bg};border:1px solid ${border};font-size:11px;font-weight:700;white-space:nowrap;">
+              ${chk.label?`<span style="color:#718096;font-size:10px;">${chk.label}</span>`:''}${icon}
+            </span>`;
+          }).join('');
+          const allPass = test.checks.every(c=>(h[c.id]?.value||0)>=1);
+          const anyFail = test.checks.some(c=>!(h[c.id]?.value));
+          const rowBg = allPass?'#F0FFF4':anyFail?'#FFF5F5':'#FFFBEB';
+          return `<div style="display:flex;align-items:center;background:${rowBg};border-radius:10px;padding:7px 10px;margin-bottom:5px;gap:8px;">
+            <span style="font-size:11px;font-weight:700;color:#2D3748;min-width:80px;flex-shrink:0;">${test.label}</span>
+            <div style="display:flex;flex-wrap:wrap;gap:4px;flex:1;">${chips}</div>
+          </div>`;
+        }).join('');
+        return `<div id="tpi-det-${cat.id}" class="tpi-det-panel" style="display:${ci===0?'block':'none'};">
+          <div style="font-size:10px;font-weight:800;color:${cc};margin-bottom:8px;padding:6px 10px;background:${cb};border-radius:8px;">${cat.label}</div>
+          ${rows}
         </div>`;
       }).join('');
 
@@ -1491,8 +1510,12 @@ function openDetail(mid, targetRound=null){
           <span>${score}% · <span class="grade-badge" style="background:rgba(255,255,255,0.25);color:#fff;font-size:10px;padding:2px 7px;">${gGr.label}</span></span>
         </div>
         <div class="group-detail-body">
-          <div style="font-size:11px;color:#718096;margin-bottom:12px;">통과 <strong style="color:#276749;">${passCount}</strong>${halfCount?` / △ <strong style="color:#B7791F;">${halfCount}</strong>`:''} / 전체 <strong>${total}</strong></div>
-          ${catSections}
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+            <span style="font-size:11px;color:#718096;">통과 <strong style="color:#276749;">${passCount}</strong>${halfCount?` / △ <strong style="color:#B7791F;">${halfCount}</strong>`:''} / 전체 <strong>${total}</strong></span>
+            <span style="font-size:10px;color:#A0AEC0;">⭕통과 ☑부분 ❌미통과</span>
+          </div>
+          <div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:10px;">${catTabs}</div>
+          ${catPanels}
         </div>
       </div>`;
     }
