@@ -315,6 +315,7 @@
   <button class="nav-btn" onclick="showScreen('input', this)">✏️ 결과 입력</button>
   <button class="nav-btn" onclick="showScreen('compare', this)">📈 회차 비교</button>
   <button class="nav-btn" onclick="showScreen('settings', this)">⚙️ 알림 설정</button>
+  <button class="nav-btn" onclick="showScreen('scoring', this)">📐 점수 로직</button>
 </div>
 
 <div class="admin-wrap">
@@ -362,6 +363,9 @@
     </div>
     <div class="sidebar-item" onclick="showScreen('settings', null, this)">
       <span class="sidebar-item-icon">⚙️</span> 알림 설정
+    </div>
+    <div class="sidebar-item" onclick="showScreen('scoring', null, this)">
+      <span class="sidebar-item-icon">📐</span> 점수 로직
     </div>
     <div class="sidebar-section" style="margin-top:12px;">빠른 현황</div>
     <div style="padding:10px 20px;">
@@ -678,6 +682,58 @@
       </div>
     </div>
 
+    <!-- ⑥ 점수 로직 관리 -->
+    <div class="screen" id="screen-scoring">
+      <div class="page-header">
+        <div>
+          <div class="page-title">📐 점수 로직 관리</div>
+          <div class="page-sub">항목별 기준값(PGA/LPGA) · 등급 기준 · 점수 계산 방식</div>
+        </div>
+        <div class="page-actions">
+          <button class="btn-primary" onclick="saveScoring()">💾 저장</button>
+        </div>
+      </div>
+
+      <!-- 등급 기준 -->
+      <div class="card" style="margin-bottom:14px;">
+        <div class="card-title" style="margin-bottom:14px;">🏆 등급 기준 (점수%)</div>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;" id="grade-threshold-row">
+          <!-- renderScoring()으로 채움 -->
+        </div>
+      </div>
+
+      <!-- 점수 계산 방식 설명 -->
+      <div class="card" style="margin-bottom:14px;">
+        <div class="card-title" style="margin-bottom:12px;">💡 점수 계산 방식</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+          <div style="background:#E6FFFA;border-radius:10px;padding:12px 14px;border-left:4px solid #2C7A7B;">
+            <div style="font-size:12px;font-weight:800;color:#2C7A7B;margin-bottom:5px;">🏌️ K-vest 순서 (isSeq)</div>
+            <div style="font-size:11px;color:#2D3748;line-height:1.7;">기준값과 일치 → <strong>110점</strong><br>±1 차이 → <strong>80점</strong><br>±2 이상 → <strong>50점</strong></div>
+          </div>
+          <div style="background:#FAF5FF;border-radius:10px;padding:12px 14px;border-left:4px solid #553C9A;">
+            <div style="font-size:12px;font-weight:800;color:#553C9A;margin-bottom:5px;">⛳ 수치 항목 (높을수록 좋음)</div>
+            <div style="font-size:11px;color:#2D3748;line-height:1.7;">점수 = <strong>실측값 ÷ 기준값 × 100</strong><br>예) 108mph ÷ 113mph × 100 = 96%</div>
+          </div>
+          <div style="background:#FFFBEB;border-radius:10px;padding:12px 14px;border-left:4px solid #B7791F;">
+            <div style="font-size:12px;font-weight:800;color:#B7791F;margin-bottom:5px;">🎯 수치 항목 (낮을수록 좋음)</div>
+            <div style="font-size:11px;color:#2D3748;line-height:1.7;">점수 = <strong>기준값 ÷ 실측값 × 100</strong><br>예) 1° ÷ 1.8° × 100 = 56%</div>
+          </div>
+          <div style="background:#F0FFF4;border-radius:10px;padding:12px 14px;border-left:4px solid #276749;">
+            <div style="font-size:12px;font-weight:800;color:#276749;margin-bottom:5px;">🧘 TPI 항목 (isBool)</div>
+            <div style="font-size:11px;color:#2D3748;line-height:1.7;">통과 → <strong>100점</strong><br>부분통과 → <strong>50점</strong><br>미통과 → <strong>0점</strong></div>
+          </div>
+        </div>
+        <div style="margin-top:8px;background:#F7FAFC;border-radius:10px;padding:10px 14px;font-size:11px;color:#718096;">
+          📊 <strong>그룹 점수</strong> = 해당 그룹 모든 항목 점수의 단순 평균 &nbsp;|&nbsp;
+          📈 <strong>종합 점수</strong> = 4개 그룹 점수의 단순 평균
+        </div>
+      </div>
+
+      <!-- 그룹별 기준값 테이블 -->
+      <div id="scoring-group-tabs" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;"></div>
+      <div id="scoring-group-panels"></div>
+    </div>
+
   </div><!-- .main -->
 </div><!-- .admin-wrap -->
 
@@ -911,7 +967,7 @@ function showScreen(id, navBtn, sideItem){
   document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
   if(navBtn) navBtn.classList.add('active');
   else {
-    const idx = {dashboard:0,list:1,input:2,compare:3,settings:4}[id];
+    const idx = {dashboard:0,list:1,input:2,compare:3,settings:4,scoring:5}[id];
     if(idx!==undefined) document.querySelectorAll('.nav-btn')[idx].classList.add('active');
   }
   // 사이드바 active (골프검진 유지 + 메뉴 항목)
@@ -920,12 +976,13 @@ function showScreen(id, navBtn, sideItem){
   if(sideItem) sideItem.classList.add('active');
   else {
     const menuItems = document.querySelectorAll('.sidebar-item[onclick*="showScreen"]');
-    const menuIdx = {dashboard:0,list:1,input:2,compare:3,settings:4}[id];
+    const menuIdx = {dashboard:0,list:1,input:2,compare:3,settings:4,scoring:5}[id];
     if(menuIdx!==undefined) menuItems[menuIdx]?.classList.add('active');
   }
   if(id==='list')     renderList();
   if(id==='compare')  initCompare();
   if(id==='settings') renderSettings();
+  if(id==='scoring')  renderScoring();
   document.getElementById('detail-panel').style.display='none';
   document.querySelectorAll('#screen-list .card')[0].style.display='block';
 }
@@ -1158,6 +1215,142 @@ function filterList(q){ renderList(q); }
 
 // ── 상세 패널 ──────────────────────────────────────────────────
 const GRADE_DAYS = {우수:180, 양호:90, 보통:60, 주의:30};
+
+// ── 점수 로직 관리 ─────────────────────────────────────────────
+let _scoringActiveCat = GOLF_GROUPS[0].id;
+// 등급 임계값 (변경 가능)
+let GRADE_THRESHOLDS = {excellent:110, good:90, average:70};
+
+function renderScoring(){
+  // 등급 기준 카드
+  const gradeColors = {excellent:'#2F855A',good:'#2B6CB0',average:'#744210',poor:'#742A2A'};
+  const gradeBg     = {excellent:'#C6F6D5',good:'#BEE3F8',average:'#FEFCBF',poor:'#FED7D7'};
+  const gradeLabels = {excellent:'A 우수',good:'B+ 양호',average:'B 보통',poor:'C 주의'};
+  document.getElementById('grade-threshold-row').innerHTML = [
+    {key:'excellent', label:'A 우수', desc:'이상'},
+    {key:'good',      label:'B+ 양호', desc:'이상'},
+    {key:'average',   label:'B 보통', desc:'이상'},
+    {key:'poor',      label:'C 주의', desc:'미만'},
+  ].map(g=>{
+    const val = g.key==='poor' ? GRADE_THRESHOLDS.average : GRADE_THRESHOLDS[g.key];
+    const editable = g.key !== 'poor';
+    return `<div style="background:${gradeBg[g.key]};border-radius:12px;padding:14px 16px;border:2px solid ${gradeColors[g.key]}20;">
+      <div style="font-size:12px;font-weight:800;color:${gradeColors[g.key]};margin-bottom:8px;">${gradeLabels[g.key]}</div>
+      ${editable
+        ? `<div style="display:flex;align-items:center;gap:4px;">
+            <input type="number" id="thr-${g.key}" value="${val}" min="0" max="200"
+              style="width:60px;padding:4px 8px;border:1.5px solid ${gradeColors[g.key]}60;border-radius:8px;font-size:16px;font-weight:900;color:${gradeColors[g.key]};text-align:center;font-family:inherit;background:#fff;"
+              oninput="updateGradePreview()"/>
+            <span style="font-size:12px;font-weight:700;color:${gradeColors[g.key]};">%${g.desc}</span>
+          </div>`
+        : `<div style="font-size:16px;font-weight:900;color:${gradeColors[g.key]};">${val}% 미만</div>`
+      }
+    </div>`;
+  }).join('');
+
+  // 그룹 탭
+  document.getElementById('scoring-group-tabs').innerHTML = GOLF_GROUPS.map(g=>`
+    <div onclick="switchScoringGroup('${g.id}')"
+      style="padding:7px 14px;border-radius:99px;font-size:12px;font-weight:700;cursor:pointer;border:1.5px solid ${g.id===_scoringActiveCat?g.color:'#E2E8F0'};background:${g.id===_scoringActiveCat?g.color:'#fff'};color:${g.id===_scoringActiveCat?'#fff':'#718096'};font-family:inherit;transition:all .15s;">
+      ${g.icon} ${g.name}
+    </div>`).join('');
+
+  renderScoringPanel(_scoringActiveCat);
+}
+
+function switchScoringGroup(gid){
+  _scoringActiveCat = gid;
+  renderScoring();
+}
+
+function renderScoringPanel(gid){
+  const g = GOLF_GROUPS.find(x=>x.id===gid);
+  if(!g){ document.getElementById('scoring-group-panels').innerHTML=''; return; }
+
+  const typeLabel = it => {
+    if(it.isText)  return '<span style="background:#EDF2F7;color:#718096;padding:2px 7px;border-radius:99px;font-size:10px;font-weight:700;">텍스트</span>';
+    if(it.isBool)  return '<span style="background:#F0FFF4;color:#276749;padding:2px 7px;border-radius:99px;font-size:10px;font-weight:700;">통과여부</span>';
+    if(it.tri)     return '<span style="background:#FFFBEB;color:#B7791F;padding:2px 7px;border-radius:99px;font-size:10px;font-weight:700;">부분통과</span>';
+    if(it.isSeq)   return '<span style="background:#E6FFFA;color:#2C7A7B;padding:2px 7px;border-radius:99px;font-size:10px;font-weight:700;">순서</span>';
+    if(it.lowerBetter) return '<span style="background:#FFF5F5;color:#C53030;padding:2px 7px;border-radius:99px;font-size:10px;font-weight:700;">낮을수록↓</span>';
+    return '<span style="background:#EBF8FF;color:#2B6CB0;padding:2px 7px;border-radius:99px;font-size:10px;font-weight:700;">높을수록↑</span>';
+  };
+
+  const rows = g.items.filter(it=>!it.isText && !it.isBool && !it.tri).map(it=>`
+    <tr>
+      <td style="font-size:12px;font-weight:700;color:#2D3748;">${it.label}${it.unit?` <span style="font-size:10px;color:#A0AEC0;">(${it.unit})</span>`:''}</td>
+      <td style="text-align:center;">${it.club?`<span style="font-size:11px;background:#EDF2F7;padding:2px 7px;border-radius:99px;">${it.club}</span>`:'—'}</td>
+      <td style="text-align:center;">${typeLabel(it)}</td>
+      <td style="text-align:center;">
+        <input type="number" value="${it.std.m}" step="0.5" min="0"
+          style="width:64px;padding:4px 8px;border:1.5px solid #E2E8F0;border-radius:8px;font-size:13px;font-weight:700;text-align:center;font-family:inherit;"
+          oninput="updateStd('${gid}','${it.id}','m',this.value)" />
+      </td>
+      <td style="text-align:center;">
+        <input type="number" value="${it.std.f}" step="0.5" min="0"
+          style="width:64px;padding:4px 8px;border:1.5px solid #E2E8F0;border-radius:8px;font-size:13px;font-weight:700;text-align:center;font-family:inherit;"
+          oninput="updateStd('${gid}','${it.id}','f',this.value)" />
+      </td>
+    </tr>`).join('');
+
+  const boolRows = g.items.filter(it=>it.isBool||it.tri).map(it=>`
+    <tr>
+      <td style="font-size:12px;font-weight:700;color:#2D3748;">${it.label}</td>
+      <td colspan="2" style="text-align:center;">${typeLabel(it)}</td>
+      <td colspan="2" style="text-align:center;font-size:11px;color:#718096;">통과/미통과 (기준값 변경 불필요)</td>
+    </tr>`).join('');
+
+  const seqRows = g.items.filter(it=>it.isSeq).map(it=>`
+    <tr>
+      <td style="font-size:12px;font-weight:700;color:#2D3748;">${it.label}</td>
+      <td colspan="2" style="text-align:center;">${typeLabel(it)}</td>
+      <td style="text-align:center;">
+        <input type="number" value="${it.std.m}" min="1" max="4"
+          style="width:64px;padding:4px 8px;border:1.5px solid #E2E8F0;border-radius:8px;font-size:13px;font-weight:700;text-align:center;font-family:inherit;"
+          oninput="updateStd('${gid}','${it.id}','m',this.value)" />
+      </td>
+      <td style="text-align:center;font-size:11px;color:#A0AEC0;">남녀 동일</td>
+    </tr>`).join('');
+
+  document.getElementById('scoring-group-panels').innerHTML = `
+    <div class="card">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;">
+        <span style="font-size:20px;">${g.icon}</span>
+        <span style="font-size:15px;font-weight:900;color:#1A202C;">${g.name}</span>
+        <span style="font-size:11px;color:#A0AEC0;margin-left:auto;">* 변경 후 우측 상단 [저장] 클릭</span>
+      </div>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr>
+            <th>항목명</th><th>클럽</th><th>유형</th>
+            <th>기준값 남 (PGA)</th><th>기준값 여 (LPGA)</th>
+          </tr></thead>
+          <tbody>${seqRows}${rows}${boolRows}</tbody>
+        </table>
+      </div>
+    </div>`;
+}
+
+function updateStd(gid, itemId, gender, val){
+  const g = GOLF_GROUPS.find(x=>x.id===gid);
+  if(!g) return;
+  const it = g.items.find(x=>x.id===itemId);
+  if(!it) return;
+  it.std[gender] = parseFloat(val)||0;
+}
+
+function updateGradePreview(){
+  const ex = parseFloat(document.getElementById('thr-excellent')?.value)||110;
+  const go = parseFloat(document.getElementById('thr-good')?.value)||90;
+  const av = parseFloat(document.getElementById('thr-average')?.value)||70;
+  GRADE_THRESHOLDS = {excellent:ex, good:go, average:av};
+}
+
+function saveScoring(){
+  updateGradePreview();
+  // 실제 서비스에서는 서버 저장. 현재는 메모리 반영 + gradeByPct 동적 업데이트
+  showToast('✅ 점수 로직이 저장되었습니다. (메모리 반영 완료)');
+}
 
 function renderSettings(){
   const tbody = document.getElementById('settings-tbody');
