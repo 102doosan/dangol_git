@@ -433,7 +433,7 @@
         <!-- 종합 점수 카드 -->
         <div id="result-total-card"></div>
         <!-- 4그룹 바로가기 -->
-        <div id="result-group-shortcuts" style="display:flex;gap:6px;overflow-x:auto;padding-bottom:2px;flex-shrink:0;margin-bottom:4px;"></div>
+        <div id="result-group-shortcuts" style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:4px;"></div>
         <!-- 4그룹 카드 -->
         <div class="sec-label">검진 그룹별 점수</div>
         <div id="result-group-cards"></div>
@@ -1016,14 +1016,17 @@ function renderGolfResult() {
     const pct = golfGroupAvg(m,h,g.id);
     const ggr = golfGrade(pct);
     return `<div onclick="_golfDetailGroup='${g.id}';go('detail')" style="
-      display:flex;align-items:center;gap:5px;padding:7px 13px;border-radius:99px;
-      background:#fff;border:1.5px solid #E2E8F0;cursor:pointer;white-space:nowrap;flex-shrink:0;
+      display:flex;align-items:center;gap:6px;padding:10px 12px;border-radius:14px;
+      background:#fff;border:1.5px solid #E2E8F0;cursor:pointer;
       font-family:'Noto Sans KR',sans-serif;transition:all .15s;"
-      onmouseover="this.style.borderColor='#2F855A';this.style.background='#F0FFF4';"
+      onmouseover="this.style.borderColor='${g.color}';this.style.background='${g.bg}';"
       onmouseout="this.style.borderColor='#E2E8F0';this.style.background='#fff';">
-      <span style="font-size:14px;">${g.icon}</span>
-      <span style="font-size:12px;font-weight:700;color:#2D3748;">${g.name.split(' ')[0]}</span>
-      <span style="font-size:11px;font-weight:800;color:${ggr.color};background:${ggr.bg};padding:1px 6px;border-radius:99px;">${ggr.g}</span>
+      <span style="font-size:18px;">${g.icon}</span>
+      <div style="flex:1;min-width:0;">
+        <div style="font-size:11px;font-weight:700;color:#4A5568;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${g.name.split(' ')[0]}</div>
+        <div style="font-size:13px;font-weight:900;color:${ggr.color};">${pct}%</div>
+      </div>
+      <span style="font-size:11px;font-weight:800;color:${ggr.color};background:${ggr.bg};padding:2px 7px;border-radius:99px;flex-shrink:0;">${ggr.g}</span>
     </div>`;
   }).join('');
 
