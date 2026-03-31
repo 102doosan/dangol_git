@@ -258,8 +258,8 @@ const userData = [
     id:"golf", icon:"⛳", title:"골프검진", color:"#2F855A",
     screens:[
       {id:"gf01",name:"골프검진 메인",desc:"회원 선택 칩(5명) · 4개 검진 항목 카드(K-vest 3D분석 / Trackman 탄도분석 / Sam Putt 퍼팅분석 / TPI 신체검사) · 최근 검진 결과 요약 배너(종합점수+4그룹 미니바) · [결과 요약 보기] 버튼",priority:"필수",dev:"FE/BE",file:"골프검진.html"},
-      {id:"gf02",name:"검진 결과 요약",desc:"회차 선택 칩 · 종합점수+SVG 레이더차트 · 4그룹 카드(K-vest/Trackman/Sam Putt/TPI) — 그룹별 평균% · 등급 배지 · 바 · 동적 트레이너 소견 · [상세 보기] 버튼",priority:"필수",dev:"FE/BE",file:"골프검진.html"},
-      {id:"gf03",name:"검진 결과 상세",desc:"회차 선택 칩 + 4그룹 탭(K-vest/Trackman/Sam Putt/TPI) · 각 탭: 항목 2열 그리드 카드(값+단위+기준 대비%+바+등급 배지) · Trackman: 드라이버/아이언 탭 분리·방향/거리/정확도 카테고리·PGA남/여 기준값 표시 · Sam Putt: 중요1/2/3 카테고리 · TPI: 실제 사진 표시 · 이미지 갤러리(크게 보기 모달)",priority:"필수",dev:"FE/BE",file:"골프검진.html"},
+      {id:"gf02",name:"검진 결과 요약",desc:"회차 선택 칩 · 종합점수+SVG 레이더차트 · 4그룹 바로가기 2×2 그리드(아이콘+그룹명+%+등급 카드형) · 4그룹 상세 카드(K-vest/Trackman/Sam Putt/TPI) — 그룹별 평균% · 등급 배지 · 바 · 동적 트레이너 소견 · [상세 보기] 버튼",priority:"필수",dev:"FE/BE",file:"골프검진.html"},
+      {id:"gf03",name:"검진 결과 상세",desc:"회차 선택 칩 + 4그룹 탭(K-vest/Trackman/Sam Putt/TPI) · 각 탭: 항목 2열 그리드 카드(값+단위+기준 대비%+바+등급 배지) · Trackman: 드라이버/아이언 탭 분리 표시(중복 제거)·방향/거리/정확도 카테고리·PGA남/여 기준값 표시 · Sam Putt: 중요1/2/3 카테고리 · TPI: 38개 항목을 5개 카테고리(코어조절/하체분리/상체분리/손올리고자세유지/골프클럽세트릴리즈) 카드+pill 뱃지(⭕통과 ☑부분통과 ❌미통과) 컴팩트 디자인 · 이미지 갤러리(크게 보기 모달)",priority:"필수",dev:"FE/BE",file:"골프검진.html"},
       {id:"gf04",name:"검진 결과 비교",desc:"회차 선택(최대 2회) · 그룹별 항목 측정값 변화 가로 바 비교 · 개선·악화 항목 색상 하이라이트",priority:"필수",dev:"FE/BE",file:"골프검진.html"},
       {id:"gf05",name:"검진 이력 목록",desc:"전체 측정 회차 목록 · 회차·날짜·4그룹 요약 칩·종합 평균% · 등급 배지 · 클릭 시 상세 진입",priority:"권장",dev:"FE/BE",file:"골프검진.html"},
       {id:"gf06",name:"골프 맞춤 운동 추천",desc:"검진 결과 기반 맞춤 재활·강화 운동 목록 추천 · 운동 선택 후 마이루틴에 저장 가능",priority:"권장",dev:"FE/BE",file:"골프검진.html"},
@@ -509,11 +509,12 @@ const adminData = [
     id:"a-golf", icon:"⛳", title:"골프검진 관리", color:"#2F855A",
     screens:[
       {id:"ag01",name:"골프검진 대시보드",desc:"통계 카드 4개(전체 회원·이번달 검진·재검진 필요·정상 비율) · 최근 검진 테이블(K-vest/Trackman/Sam Putt/TPI 컬럼) · 60일 이상 미검진 목록(알림/입력 버튼) · 그룹별 정상 비율 grid",priority:"필수",dev:"FE/BE",file:"관리자-골프.html"},
-      {id:"ag02",name:"골프검진 결과 조회",desc:"회원 목록 테이블(4그룹 등급 칩+종합) · 상세 패널: 히어로카드·회차 선택·4그룹 요약바·분석 텍스트·항목 2열 그리드·이미지 갤러리",priority:"필수",dev:"FE/BE",file:"관리자-골프.html"},
-      {id:"ag03",name:"골프검진 결과 입력",desc:"회원 자동완성(이름/전화번호) → 검진일·회차·메모 → 4그룹 탭(K-vest/Trackman/Sam Putt/TPI): 항목별 수치 입력+바게이지 · Trackman: 드라이버/아이언 탭 분리·방향/거리/정확도 카테고리·PGA남/여 기준값 상시 표시 · Sam Putt: 중요1(타이밍/일관성)/중요2(에이밍/임팩트)/중요3(스피드드롭/패스) 카테고리 · TPI: 실제 사진 3배 크기 표시 → 저장/초기화",priority:"필수",dev:"FE/BE",file:"관리자-골프.html"},
+      {id:"ag02",name:"골프검진 결과 조회",desc:"회원 목록 테이블(4그룹 등급 칩+종합) · 상세 패널: 히어로카드·회차 선택·4그룹 요약바·분석 텍스트·항목 2열 그리드·이미지 갤러리 · TPI 상세: 카테고리 탭(전체/코어조절/하체분리/상체분리/손올리고자세유지/골프클럽세트릴리즈)+compact 행(검사명|통과여부 pill)",priority:"필수",dev:"FE/BE",file:"관리자-골프.html"},
+      {id:"ag03",name:"골프검진 결과 입력",desc:"사이드바 검사항목 바로가기(K-vest/Trackman/Sam Putt/TPI 클릭 시 결과입력 탭 해당 그룹 자동 이동) · 회원 자동완성(이름/전화번호) → 검진일·회차·메모 → 4그룹 탭(K-vest/Trackman/Sam Putt/TPI): 항목별 수치 입력+바게이지 · Trackman: 드라이버/아이언 탭 분리 · Sam Putt: 중요1/2/3 카테고리 · TPI: 5개 카테고리 탭·사진+⭕☑❌ 버튼 → 저장/초기화",priority:"필수",dev:"FE/BE",file:"관리자-골프.html"},
       {id:"ag04",name:"골프검진 결과 수정",desc:"결과 조회 상세 패널 [수정] 버튼 → 입력 화면으로 회원 자동 선택 및 기존 회차 값 로드",priority:"필수",dev:"FE/BE",file:"관리자-골프.html"},
       {id:"ag05",name:"회차 비교",desc:"회원 검색 자동완성 + 회차1/회차2 선택 → 4그룹별 항목 2열 그리드 비교바(회차1 청록·회차2 주황)",priority:"필수",dev:"FE/BE",file:"관리자-골프.html"},
       {id:"ag06",name:"알림 설정",desc:"재검진 알림·기준치 미달 알림·신규 입력 알림 ON/OFF 토글 · 등급별(우수/양호/보통/주의) 재검진 주기 설정",priority:"권장",dev:"FE/BE",file:"관리자-골프.html"},
+      {id:"ag07",name:"점수 로직 관리",desc:"📐 등급 기준 편집(우수/양호/보통/주의 기준% 직접 변경 + 미리보기) · 계산 방식 설명(golfScore 로직: isText/isBool/tri/isSeq/lowerBetter/기본) · 그룹별 탭(K-vest/Trackman/Sam Putt/TPI) · 항목별 PGA남/LPGA여 기준값 직접 편집 테이블 · [저장] 버튼",priority:"권장",dev:"FE/BE",file:"관리자-골프.html"},
     ]
   },
   {
