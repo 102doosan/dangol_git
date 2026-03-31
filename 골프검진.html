@@ -1192,37 +1192,54 @@ function renderGolfDetail(gid) {
     const tpiG = GOLF_GROUPS.find(x=>x.id==='tpi');
     const passCount = tpiG.items.reduce((sum,it)=>{ const v=h[it.id]?.value||0; return sum+(it.tri?v:v===1?1:0); },0);
     const total = tpiG.items.length;
-    // 카테고리별 그룹핑
+    const failCount = tpiG.items.filter(it=>{ const v=h[it.id]?.value||0; return it.tri?v===0:v!==1; }).length;
+    // 카테고리별 컴팩트 pill 렌더링
+    const catColor = {코어조절:'#2C7A7B',하체분리:'#553C9A',상체분리:'#B7791F',자세유지:'#276749',손목릴리즈:'#C05621'};
+    const catBg    = {코어조절:'#E6FFFA',하체분리:'#FAF5FF',상체분리:'#FFFBEB',자세유지:'#F0FFF4',손목릴리즈:'#FFF5EB'};
     const cats = [...new Set(tpiG.items.map(it=>it.cat||'기타'))];
     const catSections = cats.map(cat=>{
       const items = tpiG.items.filter(it=>(it.cat||'기타')===cat);
-      const cells = items.map(it=>{
+      const catPass = items.reduce((s,it)=>{ const v=h[it.id]?.value||0; return s+(it.tri?v:v===1?1:0); },0);
+      const cc = catColor[cat]||'#718096';
+      const cb = catBg[cat]||'#F7FAFC';
+      const pills = items.map(it=>{
         const v=h[it.id]; const val=v?.value??0;
         const pass = it.tri ? val>0 : val===1;
         const partial = it.tri && val>0 && val<1;
-        const icon = partial ? '☑️' : pass ? '⭕' : '❌';
-        const bg = partial ? '#FFFBEB' : pass ? '#F0FFF4' : '#FFF5F5';
-        const border = partial ? '#F6E05E' : pass ? '#C6F6D5' : '#FED7D7';
-        return `<div style="background:${bg};border-radius:10px;padding:8px 10px;border:1.5px solid ${border};display:flex;align-items:center;justify-content:space-between;gap:6px;">
-          <span style="font-size:10px;font-weight:700;color:#2D3748;line-height:1.3;flex:1;">${it.label}</span>
-          <span style="font-size:15px;flex-shrink:0;">${icon}</span>
-        </div>`;
+        const dot = partial ? '▲' : pass ? '●' : '○';
+        const dotColor = partial ? '#D69E2E' : pass ? '#276749' : '#E53E3E';
+        const textColor = pass||partial ? '#1A202C' : '#A0AEC0';
+        return `<span style="display:inline-flex;align-items:center;gap:3px;padding:4px 8px;border-radius:99px;background:${pass||partial?'#fff':'#F7FAFC'};border:1.5px solid ${pass?'#C6F6D5':partial?'#F6E05E':'#E2E8F0'};font-size:10px;font-weight:700;color:${textColor};white-space:nowrap;">
+          <span style="color:${dotColor};font-size:8px;">${dot}</span>${it.label}
+        </span>`;
       }).join('');
-      return `<div style="margin-bottom:12px;">
-        <div style="font-size:10px;font-weight:800;color:#276749;letter-spacing:1px;margin-bottom:6px;padding:0 2px;">${cat}</div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;">${cells}</div>
+      return `<div style="background:${cb};border-radius:14px;padding:12px 14px;margin-bottom:8px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+          <span style="font-size:11px;font-weight:900;color:${cc};">${cat}</span>
+          <span style="font-size:10px;font-weight:700;color:${cc};background:rgba(255,255,255,0.7);padding:2px 8px;border-radius:99px;">${Math.round(catPass)}/${items.length}</span>
+        </div>
+        <div style="display:flex;flex-wrap:wrap;gap:5px;">${pills}</div>
       </div>`;
     }).join('');
     detailBody = `
       <div style="background:${g.color};border-radius:14px;padding:14px 16px;color:#fff;margin-bottom:10px;">
-        <div style="font-size:13px;font-weight:700;opacity:.8;margin-bottom:4px;">${g.icon} ${g.name}</div>
-        <div style="font-size:32px;font-weight:900;line-height:1;">${passCount.toFixed(1).replace('.0','')}<span style="font-size:16px;opacity:.7;">/${total}</span></div>
-        <div style="font-size:13px;opacity:.7;margin-bottom:6px;">통과 항목 (⭕통과 ☑️부분통과 ❌미통과)</div>
-        <div style="display:inline-block;background:rgba(255,255,255,0.2);border-radius:8px;padding:3px 10px;font-size:12px;font-weight:700;">${gr.g} ${gr.label}</div>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+          <span style="font-size:13px;font-weight:700;opacity:.8;">${g.icon} ${g.name}</span>
+          <span style="font-size:11px;font-weight:700;background:rgba(255,255,255,0.2);padding:3px 10px;border-radius:99px;">${gr.g} ${gr.label}</span>
+        </div>
+        <div style="display:flex;gap:16px;align-items:flex-end;">
+          <div><div style="font-size:36px;font-weight:900;line-height:1;">${Math.round(passCount)}<span style="font-size:16px;opacity:.6;">/${total}</span></div><div style="font-size:11px;opacity:.7;margin-top:2px;">통과 항목</div></div>
+          <div style="flex:1;display:flex;gap:10px;justify-content:flex-end;padding-bottom:4px;">
+            <div style="text-align:center;"><div style="font-size:18px;font-weight:900;">${Math.round(passCount)}</div><div style="font-size:9px;opacity:.7;">통과</div></div>
+            <div style="text-align:center;"><div style="font-size:18px;font-weight:900;">${failCount}</div><div style="font-size:9px;opacity:.7;">미통과</div></div>
+          </div>
+        </div>
+        <div style="background:rgba(255,255,255,0.2);border-radius:99px;height:5px;margin-top:10px;overflow:hidden;">
+          <div style="width:${Math.round(passCount/total*100)}%;height:100%;background:#fff;border-radius:99px;"></div>
+        </div>
       </div>
-      <div style="background:#fff;border-radius:14px;padding:14px 16px;">
-        ${catSections}
-      </div>`;
+      <div style="font-size:9px;color:#A0AEC0;margin-bottom:8px;padding:0 2px;">● 통과 &nbsp; ▲ 부분통과 &nbsp; ○ 미통과</div>
+      ${catSections}`;
   } else {
     // club 구분이 있으면(Trackman) Driver/Iron 탭으로 분리
     const clubs = [...new Set(g.items.map(it=>it.club).filter(Boolean))];
