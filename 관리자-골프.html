@@ -1655,6 +1655,17 @@ function openDetail(mid, targetRound=null){
       // 카테고리 탭 + compact 행 렌더링
       const catColor = {core:'#2C7A7B',lower:'#553C9A',upper:'#B7791F',shoulder:'#276749',wrist:'#C05621'};
       const catBg    = {core:'#E6FFFA',lower:'#FAF5FF',upper:'#FFFBEB',shoulder:'#F0FFF4',wrist:'#FFF5EB'};
+      const allItems = TPI_CATEGORIES.flatMap(cat=>cat.tests.flatMap(t=>t.checks));
+      const allPass2 = allItems.reduce((s,c)=>{const v=h[c.id]?.value||0;return s+(c.tri?v:(v===1?1:0));},0);
+      const allTabHtml = `<div onclick="
+          document.querySelectorAll('.tpi-det-panel').forEach(p=>p.style.display='none');
+          document.getElementById('tpi-det-all').style.display='block';
+          this.parentNode.querySelectorAll('.tpi-det-tab').forEach(t=>{t.style.background='#fff';t.style.color='#718096';t.style.borderColor='#E2E8F0';});
+          this.style.background='#4A5568';this.style.color='#fff';this.style.borderColor='#4A5568';"
+          class="tpi-det-tab" style="padding:5px 10px;border-radius:99px;font-size:10px;font-weight:700;cursor:pointer;white-space:nowrap;flex-shrink:0;border:1.5px solid #E2E8F0;background:#fff;color:#718096;font-family:inherit;display:flex;align-items:center;gap:4px;transition:all .15s;">
+          전체<span style="font-size:9px;padding:1px 5px;border-radius:99px;background:rgba(0,0,0,0.08);">${Math.round(allPass2)}/${allItems.length}</span>
+        </div>`;
+
       const catTabs = TPI_CATEGORIES.map((cat,ci)=>{
         const catItems = cat.tests.flatMap(t=>t.checks);
         const catPass = catItems.reduce((s,c)=>{const v=h[c.id]?.value||0;return s+(c.tri?v:(v===1?1:0));},0);
@@ -1669,6 +1680,34 @@ function openDetail(mid, targetRound=null){
           ${cat.label.replace('검사','').replace(' ','')}<span style="font-size:9px;padding:1px 5px;border-radius:99px;background:rgba(255,255,255,0.25);">${Math.round(catPass)}/${catItems.length}</span>
         </div>`;
       }).join('');
+
+      const makeRows = (cat) => {
+        const cc = catColor[cat.id]||'#718096';
+        const cb = catBg[cat.id]||'#F7FAFC';
+        const rows = cat.tests.map(test=>{
+          const chips = test.checks.map(chk=>{
+            const v=h[chk.id]?.value; const pass=(v===1); const half=(chk.tri&&v>0&&v<1);
+            const icon = pass?'⭕':half?'☑':'❌';
+            const bg = pass?'#F0FFF4':half?'#FFFBEB':'#FFF5F5';
+            const border = pass?'#C6F6D5':half?'#F6E05E':'#FED7D7';
+            return `<span style="display:inline-flex;align-items:center;gap:3px;padding:3px 7px;border-radius:99px;background:${bg};border:1px solid ${border};font-size:11px;font-weight:700;white-space:nowrap;">
+              ${chk.label?`<span style="color:#718096;font-size:10px;">${chk.label}</span>`:''}${icon}
+            </span>`;
+          }).join('');
+          const allPass = test.checks.every(c=>(h[c.id]?.value||0)>=1);
+          const anyFail = test.checks.some(c=>!(h[c.id]?.value));
+          const rowBg = allPass?'#F0FFF4':anyFail?'#FFF5F5':'#FFFBEB';
+          return `<div style="display:flex;align-items:center;background:${rowBg};border-radius:10px;padding:7px 10px;margin-bottom:5px;gap:8px;">
+            <span style="font-size:11px;font-weight:700;color:#2D3748;min-width:80px;flex-shrink:0;">${test.label}</span>
+            <div style="display:flex;flex-wrap:wrap;gap:4px;flex:1;">${chips}</div>
+          </div>`;
+        }).join('');
+        return `<div style="font-size:10px;font-weight:800;color:${cc};margin-bottom:8px;padding:6px 10px;background:${cb};border-radius:8px;">${cat.label}</div>${rows}`;
+      };
+
+      const allPanel = `<div id="tpi-det-all" class="tpi-det-panel" style="display:none;">
+        ${TPI_CATEGORIES.map(cat=>makeRows(cat)).join('<div style="height:8px;"></div>')}
+      </div>`;
 
       const catPanels = TPI_CATEGORIES.map((cat,ci)=>{
         const cc = catColor[cat.id]||'#718096';
@@ -1707,8 +1746,8 @@ function openDetail(mid, targetRound=null){
             <span style="font-size:11px;color:#718096;">통과 <strong style="color:#276749;">${passCount}</strong>${halfCount?` / △ <strong style="color:#B7791F;">${halfCount}</strong>`:''} / 전체 <strong>${total}</strong></span>
             <span style="font-size:10px;color:#A0AEC0;">⭕통과 ☑부분 ❌미통과</span>
           </div>
-          <div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:10px;">${catTabs}</div>
-          ${catPanels}
+          <div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:10px;">${allTabHtml}${catTabs}</div>
+          ${allPanel}${catPanels}
         </div>
       </div>`;
     }
