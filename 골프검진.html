@@ -1224,8 +1224,9 @@ function renderGolfDetail(gid) {
         ${catSections}
       </div>`;
   } else {
-    // 기존 그룹: 항목 2열 그리드
-    const itemCells = g.items.map(it=>{
+    // club 구분이 있으면(Trackman) Driver/Iron 탭으로 분리
+    const clubs = [...new Set(g.items.map(it=>it.club).filter(Boolean))];
+    const makeItemCells = (items) => items.map(it=>{
       const v=h[it.id]; if(!v) return '';
       const std=golfStd(it,m.gender);
       const ipct=golfScore(it,v.value,m.gender);
@@ -1249,15 +1250,37 @@ function renderGolfDetail(gid) {
       </div>`;
     }).join('');
 
+    let gridContent;
+    if(clubs.length > 1){
+      const clubLabel = {driver:'🏌️ Driver', iron:'🔩 Iron'};
+      const panels = clubs.map((club,ci)=>{
+        const items = g.items.filter(it=>it.club===club);
+        const clubPct = Math.round(items.reduce((s,it)=>{ const v=h[it.id]; return s+(v?golfScore(it,v.value,m.gender):0); },0)/items.length);
+        return `<div id="tm-panel-${club}" style="display:${ci===0?'block':'none'};">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+            <span style="font-size:11px;font-weight:800;color:#553C9A;">${clubLabel[club]||club}</span>
+            <span style="font-size:11px;font-weight:700;color:#718096;">${clubPct}%</span>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:9px;">${makeItemCells(items)}</div>
+        </div>`;
+      }).join('');
+      const tabs = clubs.map((club,ci)=>{
+        const clubLabel = {driver:'🏌️ Driver', iron:'🔩 Iron'};
+        return `<div onclick="document.querySelectorAll('[id^=tm-panel-]').forEach(p=>p.style.display='none');document.getElementById('tm-panel-${club}').style.display='block';this.parentNode.querySelectorAll('.tm-tab').forEach(t=>t.style.cssText='padding:5px 14px;border-radius:99px;font-size:12px;font-weight:700;cursor:pointer;border:1.5px solid #E2E8F0;background:#fff;color:#718096;font-family:inherit;');this.style.cssText='padding:5px 14px;border-radius:99px;font-size:12px;font-weight:700;cursor:pointer;border:1.5px solid #553C9A;background:#553C9A;color:#fff;font-family:inherit;'"
+          class="tm-tab" style="padding:5px 14px;border-radius:99px;font-size:12px;font-weight:700;cursor:pointer;border:1.5px solid ${ci===0?'#553C9A':'#E2E8F0'};background:${ci===0?'#553C9A':'#fff'};color:${ci===0?'#fff':'#718096'};font-family:inherit;">${clubLabel[club]||club}</div>`;
+      }).join('');
+      gridContent = `<div style="display:flex;gap:8px;margin-bottom:12px;">${tabs}</div>${panels}`;
+    } else {
+      gridContent = `<div style="display:grid;grid-template-columns:1fr 1fr;gap:9px;">${makeItemCells(g.items)}</div>`;
+    }
+
     detailBody = `
       <div style="background:${g.color};border-radius:14px;padding:14px 16px;color:#fff;margin-bottom:10px;">
         <div style="font-size:13px;font-weight:700;opacity:.8;margin-bottom:4px;">${g.icon} ${g.name}</div>
         <div style="font-size:32px;font-weight:900;line-height:1;">${pct}%</div>
         <div style="display:inline-block;background:rgba(255,255,255,0.2);border-radius:8px;padding:3px 10px;margin-top:5px;font-size:12px;font-weight:700;">${gr.g} ${gr.label}</div>
       </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:9px;">
-        ${itemCells}
-      </div>`;
+      ${gridContent}`;
   }
 
   document.getElementById('detail-content').innerHTML = detailBody;
