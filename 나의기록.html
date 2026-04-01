@@ -32,7 +32,7 @@
       width: 120px; height: 30px; background: #1A202C; border-radius: 0 0 20px 20px;
       margin: 0 auto; position: relative; z-index: 10;
     }
-    .phone-screen { padding: 0; min-height: 720px; background: #F7F9FC; overflow: hidden; }
+    .phone-screen { padding: 0; height: 740px; background: #F7F9FC; overflow: hidden; }
 
     /* 공통 상단바 */
     .status-bar { display: flex; justify-content: space-between; align-items: center; padding: 8px 20px 4px; background: #fff; }
@@ -47,14 +47,15 @@
     .top-action { font-size: 13px; color: #4ECDC4; font-weight: 700; }
 
     /* 화면들 */
-    .screen { display: none; }
+    .screen { display: none; height: 100%; overflow-y: auto; }
     .screen.active { display: block; }
 
     /* ── 1. 나의기록 홈 ── */
     .home-header { background: linear-gradient(135deg, #4ECDC4 0%, #45B7AA 100%); padding: 20px 20px 28px; color: #fff; }
     .home-greeting { font-size: 13px; opacity: 0.85; margin-bottom: 4px; }
     .home-title { font-size: 20px; font-weight: 900; }
-    .body-summary { background: #fff; margin: -16px 16px 0; border-radius: 16px; padding: 16px; box-shadow: 0 4px 16px rgba(0,0,0,0.1); }
+    .body-summary { background: #fff; margin: -16px 16px 0; border-radius: 16px; padding: 16px; box-shadow: 0 4px 16px rgba(0,0,0,0.1); cursor: pointer; }
+    .body-summary:active { opacity: 0.85; }
     .body-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
     .body-item { text-align: center; }
     .body-label { font-size: 11px; color: #A0AEC0; font-weight: 600; margin-bottom: 2px; }
@@ -64,30 +65,42 @@
     .body-change.up { color: #E53E3E; }
     .body-change.down { color: #38A169; }
     .section-title { font-size: 15px; font-weight: 800; padding: 16px 20px 8px; color: #2D3748; }
-    .record-card { background: #fff; margin: 0 16px 12px; border-radius: 14px; padding: 14px 16px; display: flex; align-items: center; gap: 12px; box-shadow: 0 1px 6px rgba(0,0,0,0.06); }
+    .record-card { background: #fff; margin: 0 16px 10px; border-radius: 14px; padding: 14px 16px; display: flex; align-items: center; gap: 12px; box-shadow: 0 1px 6px rgba(0,0,0,0.06); cursor: pointer; transition: all 0.15s; }
+    .record-card:active { transform: scale(0.98); opacity: 0.85; }
     .record-icon { width: 42px; height: 42px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
     .record-info { flex: 1; }
     .record-name { font-size: 14px; font-weight: 700; color: #2D3748; }
     .record-sub { font-size: 12px; color: #A0AEC0; margin-top: 2px; }
     .record-arrow { color: #CBD5E0; font-size: 16px; }
-    .month-card { background: #fff; margin: 0 16px 16px; border-radius: 14px; padding: 16px; box-shadow: 0 1px 6px rgba(0,0,0,0.06); }
+    .month-card { background: #fff; margin: 0 16px 16px; border-radius: 14px; padding: 16px; box-shadow: 0 1px 6px rgba(0,0,0,0.06); cursor: pointer; }
     .month-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
     .month-label { font-size: 13px; font-weight: 700; color: #4A5568; }
     .month-val { font-size: 13px; font-weight: 900; color: #4ECDC4; }
     .month-bar { background: #EDF2F7; border-radius: 99px; height: 8px; overflow: hidden; }
     .month-fill { height: 100%; border-radius: 99px; }
 
+    /* 홈 퀵 카드 그리드 */
+    .quick-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 0 16px 16px; }
+    .quick-card { background: #fff; border-radius: 14px; padding: 14px; box-shadow: 0 1px 6px rgba(0,0,0,0.06); cursor: pointer; transition: all 0.15s; }
+    .quick-card:active { transform: scale(0.97); }
+    .quick-card-icon { font-size: 24px; margin-bottom: 8px; }
+    .quick-card-name { font-size: 13px; font-weight: 800; color: #2D3748; margin-bottom: 3px; }
+    .quick-card-sub { font-size: 11px; color: #A0AEC0; }
+    .quick-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 99px; margin-top: 6px; }
+
     /* ── 2. 신체 기록 ── */
     .input-section { padding: 16px 20px; }
     .input-date-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
     .input-date { font-size: 15px; font-weight: 800; color: #2D3748; }
-    .input-date-edit { font-size: 12px; color: #4ECDC4; font-weight: 700; }
+    .input-date-edit { font-size: 12px; color: #4ECDC4; font-weight: 700; cursor: pointer; }
     .input-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
-    .input-box { background: #F7F9FC; border-radius: 12px; padding: 12px 14px; }
+    .input-box { background: #F7F9FC; border-radius: 12px; padding: 12px 14px; cursor: pointer; transition: all 0.15s; }
+    .input-box:hover { background: #EDF2F7; }
     .input-box-label { font-size: 11px; color: #A0AEC0; font-weight: 600; margin-bottom: 4px; }
     .input-box-val { font-size: 22px; font-weight: 900; color: #2D3748; }
     .input-box-unit { font-size: 12px; color: #A0AEC0; }
-    .input-btn { width: 100%; background: #4ECDC4; color: #fff; border: none; border-radius: 12px; padding: 14px; font-size: 15px; font-weight: 800; font-family: 'Noto Sans KR', sans-serif; cursor: pointer; margin-bottom: 20px; }
+    .input-btn { width: 100%; background: #4ECDC4; color: #fff; border: none; border-radius: 12px; padding: 14px; font-size: 15px; font-weight: 800; font-family: 'Noto Sans KR', sans-serif; cursor: pointer; margin-bottom: 20px; transition: all 0.15s; }
+    .input-btn:active { transform: scale(0.98); background: #38B2AC; }
     .chart-placeholder { background: #F7F9FC; border-radius: 14px; margin: 0 20px 16px; padding: 16px; }
     .chart-label { font-size: 12px; color: #A0AEC0; font-weight: 700; margin-bottom: 12px; }
     .chart-bars { display: flex; align-items: flex-end; gap: 8px; height: 60px; }
@@ -95,7 +108,8 @@
     .chart-bar { width: 100%; border-radius: 4px 4px 0 0; }
     .chart-day { font-size: 10px; color: #A0AEC0; }
     .history-list { padding: 0 20px; }
-    .history-item { display: flex; align-items: center; padding: 12px 0; border-bottom: 1px solid #F0F4F8; gap: 12px; }
+    .history-item { display: flex; align-items: center; padding: 12px 0; border-bottom: 1px solid #F0F4F8; gap: 12px; cursor: pointer; }
+    .history-item:active { background: #F7F9FC; }
     .history-date { font-size: 12px; color: #A0AEC0; font-weight: 600; width: 60px; }
     .history-vals { flex: 1; display: flex; gap: 12px; flex-wrap: wrap; }
     .history-val { font-size: 12px; color: #4A5568; font-weight: 600; }
@@ -115,33 +129,32 @@
     .detail-memo-label { font-size: 12px; color: #A0AEC0; font-weight: 700; margin-bottom: 6px; }
     .detail-memo-txt { font-size: 13px; color: #4A5568; line-height: 1.5; }
     .detail-btns { display: flex; gap: 10px; padding: 0 20px 16px; }
-    .detail-edit-btn { flex: 1; background: #4ECDC4; color: #fff; border: none; border-radius: 12px; padding: 14px; font-size: 14px; font-weight: 800; font-family: 'Noto Sans KR', sans-serif; cursor: pointer; }
-    .detail-del-btn { flex: 1; background: #FED7D7; color: #E53E3E; border: none; border-radius: 12px; padding: 14px; font-size: 14px; font-weight: 800; font-family: 'Noto Sans KR', sans-serif; cursor: pointer; }
+    .detail-edit-btn { flex: 1; background: #4ECDC4; color: #fff; border: none; border-radius: 12px; padding: 14px; font-size: 14px; font-weight: 800; font-family: 'Noto Sans KR', sans-serif; cursor: pointer; transition: all 0.15s; }
+    .detail-edit-btn:active { background: #38B2AC; }
+    .detail-del-btn { flex: 1; background: #FED7D7; color: #E53E3E; border: none; border-radius: 12px; padding: 14px; font-size: 14px; font-weight: 800; font-family: 'Noto Sans KR', sans-serif; cursor: pointer; transition: all 0.15s; }
+    .detail-del-btn:active { background: #FEB2B2; }
     .trend-wrap { padding: 0 20px 16px; }
     .trend-label { font-size: 13px; font-weight: 800; color: #2D3748; margin-bottom: 10px; }
     .trend-chart { background: #F7F9FC; border-radius: 12px; padding: 14px; height: 90px; display: flex; align-items: flex-end; gap: 6px; }
-    .trend-point-wrap { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; }
-    .trend-point { width: 8px; height: 8px; border-radius: 50%; background: #4ECDC4; }
-    .trend-line { height: 2px; background: #4ECDC4; opacity: 0.4; flex: 1; }
-    .trend-day { font-size: 9px; color: #A0AEC0; }
 
     /* ── 4. 운동 기록 캘린더 ── */
     .cal-header { display: flex; justify-content: space-between; align-items: center; padding: 16px 20px 12px; background: #fff; }
     .cal-month { font-size: 18px; font-weight: 900; color: #2D3748; }
     .cal-nav { display: flex; gap: 8px; }
-    .cal-nav-btn { background: #F7F9FC; border: none; border-radius: 8px; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 14px; }
+    .cal-nav-btn { background: #F7F9FC; border: none; border-radius: 8px; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 14px; transition: all 0.15s; }
+    .cal-nav-btn:active { background: #E2E8F0; }
     .cal-grid { padding: 0 12px 12px; background: #fff; }
     .cal-days-row { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; margin-bottom: 4px; }
     .cal-day-label { text-align: center; font-size: 11px; font-weight: 700; color: #A0AEC0; padding: 4px 0; }
     .cal-day-label.sun { color: #E53E3E; }
     .cal-day-label.sat { color: #4299E1; }
     .cal-dates { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; }
-    .cal-date { text-align: center; padding: 6px 2px; font-size: 13px; font-weight: 600; color: #4A5568; border-radius: 8px; position: relative; cursor: pointer; }
-    .cal-date.empty { color: transparent; }
-    .cal-date.has-record { color: #2D3748; }
+    .cal-date { text-align: center; padding: 6px 2px; font-size: 13px; font-weight: 600; color: #4A5568; border-radius: 8px; position: relative; cursor: pointer; transition: all 0.15s; }
+    .cal-date:hover:not(.empty) { background: #F0F4F8; }
+    .cal-date.empty { color: transparent; pointer-events: none; }
     .cal-date.has-record::after { content: ''; width: 6px; height: 6px; background: #4ECDC4; border-radius: 50%; position: absolute; bottom: 2px; left: 50%; transform: translateX(-50%); }
     .cal-date.today { background: #4ECDC4; color: #fff; font-weight: 900; }
-    .cal-date.today::after { background: #fff; }
+    .cal-date.today::after { background: rgba(255,255,255,0.6); }
     .cal-date.selected { background: #E6FFFA; font-weight: 900; color: #2C7A7B; }
     .cal-date.sun-col { color: #E53E3E; }
     .cal-stats-row { display: flex; gap: 8px; padding: 0 16px 12px; }
@@ -150,14 +163,15 @@
     .cal-stat-label { font-size: 10px; color: #A0AEC0; font-weight: 600; margin-top: 2px; }
     .day-records { padding: 0 16px 16px; }
     .day-records-title { font-size: 13px; font-weight: 800; color: #4A5568; margin-bottom: 8px; }
-    .day-record-item { background: #fff; border-radius: 12px; padding: 12px 14px; margin-bottom: 8px; display: flex; align-items: center; gap: 12px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
+    .day-record-item { background: #fff; border-radius: 12px; padding: 12px 14px; margin-bottom: 8px; display: flex; align-items: center; gap: 12px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); cursor: pointer; transition: all 0.15s; }
+    .day-record-item:active { transform: scale(0.98); }
     .day-record-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
     .day-record-name { font-size: 13px; font-weight: 700; flex: 1; color: #2D3748; }
     .day-record-time { font-size: 12px; color: #A0AEC0; font-weight: 600; }
 
     /* ── 5. 운동 기록 통계 ── */
     .stat-tabs { display: flex; background: #F7F9FC; margin: 12px 20px; border-radius: 10px; padding: 4px; }
-    .stat-tab { flex: 1; text-align: center; padding: 8px; font-size: 13px; font-weight: 700; color: #A0AEC0; border-radius: 8px; cursor: pointer; }
+    .stat-tab { flex: 1; text-align: center; padding: 8px; font-size: 13px; font-weight: 700; color: #A0AEC0; border-radius: 8px; cursor: pointer; transition: all 0.15s; }
     .stat-tab.active { background: #fff; color: #4ECDC4; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
     .stat-summary { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; padding: 0 20px 16px; }
     .stat-sum-item { background: #fff; border-radius: 12px; padding: 12px 8px; text-align: center; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
@@ -184,6 +198,120 @@
     .donut-leg-name { font-size: 11px; color: #4A5568; flex: 1; }
     .donut-leg-pct { font-size: 11px; font-weight: 700; color: #2D3748; }
 
+    /* ── 토스트 ── */
+    .toast {
+      position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%) translateY(20px);
+      background: #2D3748; color: #fff; padding: 10px 20px; border-radius: 99px;
+      font-size: 13px; font-weight: 700; white-space: nowrap; z-index: 9999;
+      opacity: 0; transition: all 0.25s; pointer-events: none;
+    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    /* ── 숫자 입력 모달 ── */
+    .modal-backdrop {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 8000;
+      display: flex; align-items: flex-end; justify-content: center;
+      opacity: 0; pointer-events: none; transition: opacity 0.2s;
+    }
+    .modal-backdrop.open { opacity: 1; pointer-events: all; }
+    .input-modal {
+      background: #fff; border-radius: 24px 24px 0 0; padding: 24px 20px 32px;
+      width: 375px; max-width: 100%; transform: translateY(100%); transition: transform 0.3s;
+    }
+    .modal-backdrop.open .input-modal { transform: translateY(0); }
+    .modal-title { font-size: 15px; font-weight: 900; color: #2D3748; margin-bottom: 4px; }
+    .modal-sub { font-size: 12px; color: #A0AEC0; margin-bottom: 16px; }
+    .modal-input { width: 100%; font-size: 32px; font-weight: 900; color: #2D3748; border: none; border-bottom: 2px solid #4ECDC4; padding: 8px 0; outline: none; font-family: 'Noto Sans KR', sans-serif; text-align: center; background: transparent; }
+    .modal-btns { display: flex; gap: 10px; margin-top: 20px; }
+    .modal-cancel { flex: 1; background: #EDF2F7; color: #718096; border: none; border-radius: 12px; padding: 14px; font-size: 15px; font-weight: 800; font-family: 'Noto Sans KR', sans-serif; cursor: pointer; }
+    .modal-confirm { flex: 2; background: #4ECDC4; color: #fff; border: none; border-radius: 12px; padding: 14px; font-size: 15px; font-weight: 800; font-family: 'Noto Sans KR', sans-serif; cursor: pointer; }
+
+    /* ── 인라인 편집 ── */
+    .editable-val { border: none; background: #EDF2F7; border-radius: 8px; font-size: 24px; font-weight: 900; color: #2D3748; width: 80px; text-align: center; padding: 4px; font-family: 'Noto Sans KR', sans-serif; outline: none; }
+
+    /* ── 예약 모달 ── */
+    .reserve-modal { padding: 24px 20px 32px; }
+    .reserve-modal .modal-title { margin-bottom: 16px; }
+    .reserve-slot { background: #F7F9FC; border-radius: 12px; padding: 12px 14px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; transition: all 0.15s; }
+    .reserve-slot:hover { background: #E6FFFA; }
+    .reserve-slot-info { font-size: 13px; font-weight: 700; color: #2D3748; }
+    .reserve-slot-sub { font-size: 11px; color: #A0AEC0; margin-top: 2px; }
+    .reserve-btn { background: #4ECDC4; color: #fff; border: none; border-radius: 99px; padding: 6px 14px; font-size: 12px; font-weight: 700; cursor: pointer; font-family: 'Noto Sans KR', sans-serif; }
+
+    /* ── 6. 출석/방문 기록 ── */
+    .visit-streak { background: linear-gradient(135deg, #667EEA 0%, #764BA2 100%); margin: 12px 16px; border-radius: 16px; padding: 16px; color: #fff; display: flex; align-items: center; gap: 16px; }
+    .streak-num { font-size: 40px; font-weight: 900; line-height: 1; }
+    .streak-label { font-size: 12px; opacity: 0.85; margin-top: 2px; }
+    .streak-sub { font-size: 11px; opacity: 0.7; margin-top: 4px; }
+    .visit-time-wrap { background: #fff; margin: 0 16px 12px; border-radius: 14px; padding: 14px 16px; box-shadow: 0 1px 6px rgba(0,0,0,0.06); }
+    .visit-time-title { font-size: 13px; font-weight: 800; color: #2D3748; margin-bottom: 12px; }
+    .time-bars { display: flex; align-items: flex-end; gap: 4px; height: 50px; }
+    .time-bar-wrap { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px; }
+    .time-bar { width: 100%; border-radius: 3px 3px 0 0; transition: all 0.3s; }
+    .time-bar-lbl { font-size: 9px; color: #A0AEC0; }
+    .visit-list-item { display: flex; align-items: center; padding: 11px 0; border-bottom: 1px solid #F0F4F8; gap: 12px; }
+    .visit-list-date { font-size: 12px; color: #A0AEC0; font-weight: 600; width: 65px; flex-shrink: 0; }
+    .visit-list-info { flex: 1; }
+    .visit-list-name { font-size: 13px; font-weight: 700; color: #2D3748; }
+    .visit-list-sub { font-size: 11px; color: #A0AEC0; margin-top: 1px; }
+    .visit-tag { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 99px; }
+
+    /* ── 7. 검진 히스토리 ── */
+    .check-tabs { display: flex; gap: 6px; padding: 12px 16px 8px; overflow-x: auto; }
+    .check-tab { padding: 6px 14px; border-radius: 99px; font-size: 12px; font-weight: 700; cursor: pointer; white-space: nowrap; border: 1.5px solid #E2E8F0; background: #fff; color: #718096; transition: all 0.15s; font-family: 'Noto Sans KR', sans-serif; }
+    .check-tab.active { background: #2F855A; color: #fff; border-color: #2F855A; }
+    .check-dday { background: linear-gradient(135deg, #2F855A 0%, #276749 100%); margin: 0 16px 12px; border-radius: 14px; padding: 14px 16px; color: #fff; display: flex; justify-content: space-between; align-items: center; }
+    .check-dday-label { font-size: 12px; opacity: 0.85; margin-bottom: 2px; }
+    .check-dday-val { font-size: 18px; font-weight: 900; }
+    .check-dday-btn { background: rgba(255,255,255,0.2); border: none; border-radius: 10px; padding: 8px 14px; font-size: 12px; font-weight: 700; color: #fff; cursor: pointer; font-family: 'Noto Sans KR', sans-serif; transition: all 0.15s; }
+    .check-dday-btn:active { background: rgba(255,255,255,0.35); }
+    .check-timeline { padding: 0 16px; }
+    .check-tl-item { display: flex; gap: 12px; margin-bottom: 14px; cursor: pointer; }
+    .check-tl-line { display: flex; flex-direction: column; align-items: center; gap: 0; flex-shrink: 0; }
+    .check-tl-dot { width: 12px; height: 12px; border-radius: 50%; background: #2F855A; flex-shrink: 0; margin-top: 3px; }
+    .check-tl-seg { width: 2px; flex: 1; background: #E2E8F0; min-height: 20px; }
+    .check-tl-body { flex: 1; background: #fff; border-radius: 12px; padding: 12px 14px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); margin-bottom: 0; }
+    .check-tl-date { font-size: 11px; color: #A0AEC0; font-weight: 600; margin-bottom: 4px; }
+    .check-tl-title { font-size: 13px; font-weight: 800; color: #2D3748; margin-bottom: 6px; }
+    .check-tl-grades { display: flex; gap: 5px; flex-wrap: wrap; }
+    .check-grade-badge { font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 99px; }
+    .check-score-row { display: flex; gap: 8px; margin-top: 8px; }
+    .check-score-item { flex: 1; background: #F7F9FC; border-radius: 8px; padding: 8px; text-align: center; }
+    .check-score-label { font-size: 10px; color: #A0AEC0; margin-bottom: 2px; }
+    .check-score-val { font-size: 15px; font-weight: 900; }
+
+    /* ── 8. 재활운동 수행 기록 ── */
+    .rehab-summary { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; padding: 12px 16px; }
+    .rehab-sum-card { background: #fff; border-radius: 12px; padding: 12px 8px; text-align: center; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
+    .rehab-sum-icon { font-size: 20px; margin-bottom: 4px; }
+    .rehab-sum-val { font-size: 18px; font-weight: 900; }
+    .rehab-sum-label { font-size: 10px; color: #A0AEC0; margin-top: 2px; }
+    .rehab-part-wrap { background: #fff; margin: 0 16px 12px; border-radius: 14px; padding: 14px 16px; box-shadow: 0 1px 6px rgba(0,0,0,0.06); }
+    .rehab-part-title { font-size: 13px; font-weight: 800; color: #2D3748; margin-bottom: 10px; }
+    .rehab-part-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+    .rehab-part-name { font-size: 12px; font-weight: 700; color: #4A5568; width: 40px; flex-shrink: 0; }
+    .rehab-part-bar-bg { flex: 1; background: #EDF2F7; border-radius: 99px; height: 8px; overflow: hidden; }
+    .rehab-part-bar-fill { height: 100%; border-radius: 99px; }
+    .rehab-part-count { font-size: 12px; font-weight: 700; color: #2D3748; width: 30px; text-align: right; }
+    .rehab-prog-list { padding: 0 16px 16px; }
+    .rehab-prog-item { background: #fff; border-radius: 12px; padding: 12px 14px; margin-bottom: 8px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); cursor: pointer; transition: all 0.15s; }
+    .rehab-prog-item:active { transform: scale(0.98); }
+    .rehab-prog-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+    .rehab-prog-name { font-size: 13px; font-weight: 800; color: #2D3748; }
+    .rehab-prog-date { font-size: 11px; color: #A0AEC0; }
+    .rehab-prog-meta { display: flex; gap: 8px; align-items: center; margin-bottom: 8px; }
+    .rehab-meta-tag { font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 99px; }
+    .rehab-prog-progress { background: #EDF2F7; border-radius: 99px; height: 6px; overflow: hidden; }
+    .rehab-prog-fill { height: 100%; border-radius: 99px; background: linear-gradient(90deg, #4ECDC4, #45B7AA); }
+    .rehab-prog-pct { font-size: 11px; color: #4ECDC4; font-weight: 700; margin-top: 4px; }
+
+    /* 하단 네비 */
+    .bottom-nav { display: flex; justify-content: space-around; background: #fff; padding: 10px 0 16px; border-top: 1px solid #F0F4F8; position: sticky; bottom: 0; }
+    .nav-item { display: flex; flex-direction: column; align-items: center; gap: 3px; cursor: pointer; }
+    .nav-item-icon { font-size: 20px; }
+    .nav-item-label { font-size: 10px; color: #A0AEC0; font-weight: 600; }
+    .nav-item.active .nav-item-label { color: #4ECDC4; }
+
     /* 메모판 */
     .memo-panel {
       flex: 1; background: #fff; border-radius: 20px;
@@ -199,24 +327,59 @@
     .memo-dot { width: 6px; height: 6px; border-radius: 50%; background: #4ECDC4; margin-top: 5px; flex-shrink: 0; }
     .memo-text { font-size: 13px; color: #4A5568; line-height: 1.6; }
     .memo-tag { display: inline-block; padding: 3px 10px; border-radius: 99px; font-size: 11px; font-weight: 700; margin: 2px 2px; }
-
-    .bottom-nav { display: flex; justify-content: space-around; background: #fff; padding: 10px 0 16px; border-top: 1px solid #F0F4F8; }
-    .nav-item { display: flex; flex-direction: column; align-items: center; gap: 3px; }
-    .nav-item-icon { font-size: 20px; }
-    .nav-item-label { font-size: 10px; color: #A0AEC0; font-weight: 600; }
-    .nav-item.active .nav-item-label { color: #4ECDC4; }
   </style>
 </head>
 <body>
+  <!-- 토스트 -->
+  <div class="toast" id="toast"></div>
+
+  <!-- 숫자 입력 모달 -->
+  <div class="modal-backdrop" id="num-modal" onclick="closeNumModal(event)">
+    <div class="input-modal">
+      <div class="modal-title" id="num-modal-title">몸무게 입력</div>
+      <div class="modal-sub" id="num-modal-sub">kg 단위로 입력하세요</div>
+      <input class="modal-input" id="num-modal-input" type="number" step="0.1" inputmode="decimal" />
+      <div class="modal-btns">
+        <button class="modal-cancel" onclick="closeNumModal()">취소</button>
+        <button class="modal-confirm" onclick="confirmNumInput()">저장</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 예약 모달 -->
+  <div class="modal-backdrop" id="reserve-modal" onclick="closeReserveModal(event)">
+    <div class="input-modal reserve-modal">
+      <div class="modal-title" id="reserve-modal-title">검진 예약</div>
+      <div class="reserve-slot" onclick="confirmReserve('4월 12일 오전 9:00')">
+        <div><div class="reserve-slot-info">4월 12일 (토) 오전 9:00</div><div class="reserve-slot-sub">담당: 김트레이너 · 잔여 2석</div></div>
+        <button class="reserve-btn">예약</button>
+      </div>
+      <div class="reserve-slot" onclick="confirmReserve('4월 14일 오전 10:00')">
+        <div><div class="reserve-slot-info">4월 14일 (월) 오전 10:00</div><div class="reserve-slot-sub">담당: 이트레이너 · 잔여 1석</div></div>
+        <button class="reserve-btn">예약</button>
+      </div>
+      <div class="reserve-slot" onclick="confirmReserve('4월 15일 오후 2:00')">
+        <div><div class="reserve-slot-info">4월 15일 (화) 오후 2:00</div><div class="reserve-slot-sub">담당: 김트레이너 · 잔여 3석</div></div>
+        <button class="reserve-btn">예약</button>
+      </div>
+      <div class="modal-btns" style="margin-top:12px;">
+        <button class="modal-cancel" onclick="closeReserveModal()">닫기</button>
+      </div>
+    </div>
+  </div>
+
   <h1>📈 나의기록 화면 디자인</h1>
-  <p class="subtitle">사용자 앱 · 나의기록 · 5개 화면 목업</p>
+  <p class="subtitle">사용자 앱 · 나의기록 · 8개 화면 목업</p>
 
   <div class="nav">
-    <button class="nav-btn active" onclick="showScreen(0, this)">① 나의기록 홈</button>
-    <button class="nav-btn" onclick="showScreen(1, this)">② 신체 기록</button>
-    <button class="nav-btn" onclick="showScreen(2, this)">③ 신체 기록 상세/수정</button>
-    <button class="nav-btn" onclick="showScreen(3, this)">④ 운동 기록 캘린더</button>
-    <button class="nav-btn" onclick="showScreen(4, this)">⑤ 운동 기록 통계</button>
+    <button class="nav-btn active" onclick="goScreen(0, this)">① 나의기록 홈</button>
+    <button class="nav-btn" onclick="goScreen(1, this)">② 신체 기록</button>
+    <button class="nav-btn" onclick="goScreen(2, this)">③ 신체 기록 상세</button>
+    <button class="nav-btn" onclick="goScreen(3, this)">④ 운동 캘린더</button>
+    <button class="nav-btn" onclick="goScreen(4, this)">⑤ 운동 통계</button>
+    <button class="nav-btn" onclick="goScreen(5, this)">⑥ 출석/방문 기록</button>
+    <button class="nav-btn" onclick="goScreen(6, this)">⑦ 검진 히스토리</button>
+    <button class="nav-btn" onclick="goScreen(7, this)">⑧ 재활운동 기록</button>
   </div>
 
   <div class="workspace">
@@ -232,8 +395,11 @@
               <div class="home-greeting">안녕하세요, 김도산님 👋</div>
               <div class="home-title">나의 기록</div>
             </div>
-            <div class="body-summary">
-              <div style="font-size:12px;font-weight:800;color:#A0AEC0;margin-bottom:10px;">신체 정보 요약</div>
+            <div class="body-summary" onclick="goScreen(1, navBtn(1))">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+                <div style="font-size:12px;font-weight:800;color:#A0AEC0;">신체 정보 요약</div>
+                <div style="font-size:11px;color:#4ECDC4;font-weight:700;">상세보기 ›</div>
+              </div>
               <div class="body-grid">
                 <div class="body-item">
                   <div class="body-label">몸무게</div>
@@ -258,8 +424,49 @@
               </div>
             </div>
 
-            <div class="section-title">최근 운동 기록</div>
-            <div class="record-card">
+            <div class="section-title">이번 달 달성 현황</div>
+            <div class="month-card" onclick="goScreen(3, navBtn(3))">
+              <div class="month-row">
+                <span class="month-label">🏃 운동 목표</span>
+                <span class="month-val">16 / 20일</span>
+              </div>
+              <div class="month-bar"><div class="month-fill" style="width:80%;height:100%;background:linear-gradient(90deg,#4ECDC4,#45B7AA);border-radius:99px;"></div></div>
+              <div class="month-row" style="margin-top:10px;margin-bottom:0;">
+                <span class="month-label">📅 출석</span>
+                <span style="font-size:13px;font-weight:900;color:#667EEA;">22일 연속</span>
+              </div>
+            </div>
+
+            <div class="section-title">기록 바로가기</div>
+            <div class="quick-grid">
+              <div class="quick-card" onclick="goScreen(3, navBtn(3))">
+                <div class="quick-card-icon">🏃</div>
+                <div class="quick-card-name">운동 기록</div>
+                <div class="quick-card-sub">이번달 16회</div>
+                <div class="quick-badge" style="background:#E6FFFA;color:#2C7A7B;">7h 20m</div>
+              </div>
+              <div class="quick-card" onclick="goScreen(5, navBtn(5))">
+                <div class="quick-card-icon">📅</div>
+                <div class="quick-card-name">출석/방문</div>
+                <div class="quick-card-sub">연속 22일 출석</div>
+                <div class="quick-badge" style="background:#E9D8FD;color:#553C9A;">최고 기록 🎉</div>
+              </div>
+              <div class="quick-card" onclick="goScreen(6, navBtn(6))">
+                <div class="quick-card-icon">🩺</div>
+                <div class="quick-card-name">검진 히스토리</div>
+                <div class="quick-card-sub">골프·SFMA·CSMI</div>
+                <div class="quick-badge" style="background:#FEF3C7;color:#B7791F;">재검진 D-12</div>
+              </div>
+              <div class="quick-card" onclick="goScreen(7, navBtn(7))">
+                <div class="quick-card-icon">🏥</div>
+                <div class="quick-card-name">재활운동 기록</div>
+                <div class="quick-card-sub">어깨·허리 프로그램</div>
+                <div class="quick-badge" style="background:#FFF5EB;color:#C05621;">3개 진행중</div>
+              </div>
+            </div>
+
+            <div class="section-title">최근 활동</div>
+            <div class="record-card" onclick="goScreen(3, navBtn(3))">
               <div class="record-icon" style="background:#E6FFFA;">🏋️</div>
               <div class="record-info">
                 <div class="record-name">상체 근력 루틴</div>
@@ -267,30 +474,28 @@
               </div>
               <div class="record-arrow">›</div>
             </div>
-            <div class="record-card">
-              <div class="record-icon" style="background:#EBF8FF;">🚴</div>
+            <div class="record-card" onclick="goScreen(7, navBtn(7))">
+              <div class="record-icon" style="background:#FFF5EB;">🏥</div>
               <div class="record-info">
-                <div class="record-name">유산소 + 스트레칭</div>
-                <div class="record-sub">어제 · 30분 · 140 kcal</div>
+                <div class="record-name">어깨 재활 프로그램</div>
+                <div class="record-sub">어제 · 4/8회차 완료</div>
+              </div>
+              <div class="record-arrow">›</div>
+            </div>
+            <div class="record-card" onclick="goScreen(6, navBtn(6))">
+              <div class="record-icon" style="background:#F0FFF4;">🩺</div>
+              <div class="record-info">
+                <div class="record-name">골프검진 결과</div>
+                <div class="record-sub">3월 15일 · 종합 82% · 양호</div>
               </div>
               <div class="record-arrow">›</div>
             </div>
 
-            <div class="section-title">이번 달 달성 현황</div>
-            <div class="month-card">
-              <div class="month-row">
-                <span class="month-label">운동 목표</span>
-                <span class="month-val">16 / 20일</span>
-              </div>
-              <div class="month-bar"><div class="month-fill" style="width:80%;height:100%;background:linear-gradient(90deg,#4ECDC4,#45B7AA);border-radius:99px;"></div></div>
-              <div style="font-size:11px;color:#A0AEC0;margin-top:6px;">목표까지 4일 남음</div>
-            </div>
-
             <div class="bottom-nav">
-              <div class="nav-item"><div class="nav-item-icon">🏠</div><div class="nav-item-label">홈</div></div>
-              <div class="nav-item"><div class="nav-item-icon">🏋️</div><div class="nav-item-label">운동</div></div>
+              <div class="nav-item" onclick="location.href='index.html'"><div class="nav-item-icon">🏠</div><div class="nav-item-label">홈</div></div>
+              <div class="nav-item" onclick="location.href='마이루틴.html'"><div class="nav-item-icon">🏋️</div><div class="nav-item-label">운동</div></div>
               <div class="nav-item active"><div class="nav-item-icon">📈</div><div class="nav-item-label" style="color:#4ECDC4;">기록</div></div>
-              <div class="nav-item"><div class="nav-item-icon">👤</div><div class="nav-item-label">마이</div></div>
+              <div class="nav-item" onclick="location.href='index.html'"><div class="nav-item-icon">👤</div><div class="nav-item-label">마이</div></div>
             </div>
           </div>
 
@@ -298,74 +503,62 @@
           <div class="screen" id="s1">
             <div class="status-bar"><span class="status-time">9:41</span><span class="status-icons">●●●</span></div>
             <div class="top-bar">
-              <span class="top-back">‹</span>
+              <span class="top-back" onclick="goScreen(0, navBtn(0))">‹</span>
               <span class="top-title">신체 기록</span>
-              <span class="top-action">+ 기록</span>
+              <span class="top-action" onclick="goScreen(2, navBtn(2))">+ 기록</span>
             </div>
             <div class="input-section">
               <div class="input-date-row">
-                <div class="input-date">2026년 3월 16일</div>
+                <div class="input-date">2026년 3월 31일</div>
                 <div class="input-date-edit">날짜 변경</div>
               </div>
               <div class="input-grid">
-                <div class="input-box">
+                <div class="input-box" onclick="showNumModal('weight','몸무게','kg 단위로 입력')">
                   <div class="input-box-label">몸무게</div>
-                  <div><span class="input-box-val">72.4</span><span class="input-box-unit"> kg</span></div>
+                  <div><span class="input-box-val" id="val-weight">72.4</span><span class="input-box-unit"> kg</span></div>
                 </div>
-                <div class="input-box">
+                <div class="input-box" onclick="showNumModal('bodyfat','체지방률','% 단위로 입력')">
                   <div class="input-box-label">체지방률</div>
-                  <div><span class="input-box-val">18.2</span><span class="input-box-unit"> %</span></div>
+                  <div><span class="input-box-val" id="val-bodyfat">18.2</span><span class="input-box-unit"> %</span></div>
                 </div>
-                <div class="input-box">
+                <div class="input-box" onclick="showNumModal('muscle','근육량','kg 단위로 입력')">
                   <div class="input-box-label">근육량</div>
-                  <div><span class="input-box-val">34.1</span><span class="input-box-unit"> kg</span></div>
+                  <div><span class="input-box-val" id="val-muscle">34.1</span><span class="input-box-unit"> kg</span></div>
                 </div>
-                <div class="input-box">
+                <div class="input-box" onclick="showNumModal('water','체수분','% 단위로 입력')">
                   <div class="input-box-label">체수분</div>
-                  <div><span class="input-box-val">56.4</span><span class="input-box-unit"> %</span></div>
+                  <div><span class="input-box-val" id="val-water">56.4</span><span class="input-box-unit"> %</span></div>
                 </div>
               </div>
-              <button class="input-btn">기록 저장</button>
+              <button class="input-btn" onclick="saveBodyRecord()">기록 저장</button>
             </div>
             <div class="chart-placeholder">
               <div class="chart-label">최근 7일 몸무게 변화</div>
               <div class="chart-bars">
-                <div class="chart-bar-wrap"><div class="chart-bar" style="height:45px;background:#4ECDC4;border-radius:4px 4px 0 0;"></div><div class="chart-day">월</div></div>
-                <div class="chart-bar-wrap"><div class="chart-bar" style="height:50px;background:#4ECDC4;border-radius:4px 4px 0 0;"></div><div class="chart-day">화</div></div>
-                <div class="chart-bar-wrap"><div class="chart-bar" style="height:42px;background:#4ECDC4;border-radius:4px 4px 0 0;"></div><div class="chart-day">수</div></div>
-                <div class="chart-bar-wrap"><div class="chart-bar" style="height:48px;background:#4ECDC4;border-radius:4px 4px 0 0;"></div><div class="chart-day">목</div></div>
-                <div class="chart-bar-wrap"><div class="chart-bar" style="height:44px;background:#4ECDC4;border-radius:4px 4px 0 0;"></div><div class="chart-day">금</div></div>
-                <div class="chart-bar-wrap"><div class="chart-bar" style="height:40px;background:#E2E8F0;border-radius:4px 4px 0 0;"></div><div class="chart-day">토</div></div>
-                <div class="chart-bar-wrap"><div class="chart-bar" style="height:38px;background:#9B6DFF;border-radius:4px 4px 0 0;"></div><div class="chart-day">일</div></div>
+                <div class="chart-bar-wrap"><div class="chart-bar" style="height:45px;background:#4ECDC4;"></div><div class="chart-day">월</div></div>
+                <div class="chart-bar-wrap"><div class="chart-bar" style="height:50px;background:#4ECDC4;"></div><div class="chart-day">화</div></div>
+                <div class="chart-bar-wrap"><div class="chart-bar" style="height:42px;background:#4ECDC4;"></div><div class="chart-day">수</div></div>
+                <div class="chart-bar-wrap"><div class="chart-bar" style="height:48px;background:#4ECDC4;"></div><div class="chart-day">목</div></div>
+                <div class="chart-bar-wrap"><div class="chart-bar" style="height:44px;background:#4ECDC4;"></div><div class="chart-day">금</div></div>
+                <div class="chart-bar-wrap"><div class="chart-bar" style="height:40px;background:#E2E8F0;"></div><div class="chart-day">토</div></div>
+                <div class="chart-bar-wrap"><div class="chart-bar" style="height:38px;background:#9B6DFF;"></div><div class="chart-day">일</div></div>
               </div>
             </div>
             <div class="section-title" style="padding-top:4px;">기록 이력</div>
             <div class="history-list">
-              <div class="history-item">
-                <div class="history-date">03/16</div>
-                <div class="history-vals">
-                  <span class="history-val">72.4kg</span>
-                  <span class="history-val">18.2%</span>
-                  <span class="history-val">34.1kg</span>
-                </div>
+              <div class="history-item" onclick="goScreen(2, navBtn(2))">
+                <div class="history-date">03/31</div>
+                <div class="history-vals"><span class="history-val">72.4kg</span><span class="history-val">18.2%</span><span class="history-val">34.1kg</span></div>
                 <div class="history-arrow">›</div>
               </div>
-              <div class="history-item">
-                <div class="history-date">03/13</div>
-                <div class="history-vals">
-                  <span class="history-val">73.2kg</span>
-                  <span class="history-val">18.7%</span>
-                  <span class="history-val">33.8kg</span>
-                </div>
+              <div class="history-item" onclick="goScreen(2, navBtn(2))">
+                <div class="history-date">03/28</div>
+                <div class="history-vals"><span class="history-val">73.2kg</span><span class="history-val">18.7%</span><span class="history-val">33.8kg</span></div>
                 <div class="history-arrow">›</div>
               </div>
-              <div class="history-item">
-                <div class="history-date">03/10</div>
-                <div class="history-vals">
-                  <span class="history-val">73.8kg</span>
-                  <span class="history-val">19.1%</span>
-                  <span class="history-val">33.5kg</span>
-                </div>
+              <div class="history-item" onclick="goScreen(2, navBtn(2))">
+                <div class="history-date">03/24</div>
+                <div class="history-vals"><span class="history-val">73.8kg</span><span class="history-val">19.1%</span><span class="history-val">33.5kg</span></div>
                 <div class="history-arrow">›</div>
               </div>
             </div>
@@ -375,77 +568,71 @@
           <div class="screen" id="s2">
             <div class="status-bar"><span class="status-time">9:41</span><span class="status-icons">●●●</span></div>
             <div class="top-bar">
-              <span class="top-back">‹</span>
+              <span class="top-back" onclick="goScreen(1, navBtn(1))">‹</span>
               <span class="top-title">기록 상세</span>
               <span class="top-action"></span>
             </div>
             <div class="detail-date">
-              <div class="detail-date-txt">2026년 3월 16일 (월)</div>
+              <div class="detail-date-txt">2026년 3월 31일 (화)</div>
             </div>
-            <div class="detail-grid">
+            <div class="detail-grid" id="detail-grid">
               <div class="detail-item">
                 <div class="detail-item-icon">⚖️</div>
                 <div class="detail-item-label">몸무게</div>
-                <div><span class="detail-item-val">72.4</span><span class="detail-item-unit"> kg</span></div>
-                <div class="detail-item-change" style="color:#38A169;">▼ 0.8 kg (전회 대비)</div>
+                <div id="detail-weight-view"><span class="detail-item-val">72.4</span><span class="detail-item-unit"> kg</span></div>
+                <div id="detail-weight-edit" style="display:none;"><input class="editable-val" id="edit-weight" value="72.4" type="number" step="0.1"><span class="detail-item-unit"> kg</span></div>
+                <div class="detail-item-change" style="color:#38A169;">▼ 0.8 kg</div>
               </div>
               <div class="detail-item">
                 <div class="detail-item-icon">🔥</div>
                 <div class="detail-item-label">체지방률</div>
-                <div><span class="detail-item-val">18.2</span><span class="detail-item-unit"> %</span></div>
+                <div id="detail-bodyfat-view"><span class="detail-item-val">18.2</span><span class="detail-item-unit"> %</span></div>
+                <div id="detail-bodyfat-edit" style="display:none;"><input class="editable-val" id="edit-bodyfat" value="18.2" type="number" step="0.1"><span class="detail-item-unit"> %</span></div>
                 <div class="detail-item-change" style="color:#38A169;">▼ 0.5%</div>
               </div>
               <div class="detail-item">
                 <div class="detail-item-icon">💪</div>
                 <div class="detail-item-label">근육량</div>
-                <div><span class="detail-item-val">34.1</span><span class="detail-item-unit"> kg</span></div>
+                <div id="detail-muscle-view"><span class="detail-item-val">34.1</span><span class="detail-item-unit"> kg</span></div>
+                <div id="detail-muscle-edit" style="display:none;"><input class="editable-val" id="edit-muscle" value="34.1" type="number" step="0.1"><span class="detail-item-unit"> kg</span></div>
                 <div class="detail-item-change" style="color:#E53E3E;">▲ 0.3 kg</div>
               </div>
               <div class="detail-item">
                 <div class="detail-item-icon">💧</div>
                 <div class="detail-item-label">체수분</div>
-                <div><span class="detail-item-val">56.4</span><span class="detail-item-unit"> %</span></div>
+                <div id="detail-water-view"><span class="detail-item-val">56.4</span><span class="detail-item-unit"> %</span></div>
+                <div id="detail-water-edit" style="display:none;"><input class="editable-val" id="edit-water" value="56.4" type="number" step="0.1"><span class="detail-item-unit"> %</span></div>
                 <div class="detail-item-change" style="color:#A0AEC0;">변동 없음</div>
               </div>
             </div>
             <div class="detail-memo">
               <div class="detail-memo-label">메모</div>
-              <div class="detail-memo-txt">오늘 아침 공복 측정. 어제 상체 운동 후라 근육량 소폭 증가.</div>
+              <div id="detail-memo-view" class="detail-memo-txt">오늘 아침 공복 측정. 어제 상체 운동 후라 근육량 소폭 증가.</div>
+              <textarea id="detail-memo-edit" style="display:none;width:100%;border:1px solid #E2E8F0;border-radius:8px;padding:8px;font-size:13px;font-family:'Noto Sans KR',sans-serif;resize:none;height:60px;outline:none;">오늘 아침 공복 측정. 어제 상체 운동 후라 근육량 소폭 증가.</textarea>
             </div>
             <div class="trend-wrap">
-              <div class="trend-label">몸무게 추이 (최근 4주)</div>
+              <div class="trend-label">몸무게 추이 (최근 4회)</div>
               <div class="trend-chart">
-                <div style="flex:1;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:4px;">
-                  <div style="font-size:9px;color:#A0AEC0;">75.2</div>
-                  <div style="width:8px;height:8px;border-radius:50%;background:#CBD5E0;"></div>
-                  <div style="font-size:9px;color:#A0AEC0;">2/24</div>
-                </div>
-                <div style="flex:1;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:4px;">
-                  <div style="font-size:9px;color:#A0AEC0;">74.1</div>
-                  <div style="width:8px;height:8px;border-radius:50%;background:#CBD5E0;"></div>
-                  <div style="font-size:9px;color:#A0AEC0;">3/3</div>
-                </div>
-                <div style="flex:1;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:4px;">
-                  <div style="font-size:9px;color:#A0AEC0;">73.2</div>
-                  <div style="width:8px;height:8px;border-radius:50%;background:#CBD5E0;"></div>
-                  <div style="font-size:9px;color:#A0AEC0;">3/10</div>
-                </div>
-                <div style="flex:1;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:4px;">
-                  <div style="font-size:9px;color:#4ECDC4;font-weight:700;">72.4</div>
-                  <div style="width:10px;height:10px;border-radius:50%;background:#4ECDC4;box-shadow:0 0 0 3px rgba(78,205,196,0.3);"></div>
-                  <div style="font-size:9px;color:#A0AEC0;">3/16</div>
-                </div>
+                <div style="flex:1;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:4px;"><div style="font-size:9px;color:#A0AEC0;">75.2</div><div style="width:8px;height:8px;border-radius:50%;background:#CBD5E0;"></div><div style="font-size:9px;color:#A0AEC0;">3/10</div></div>
+                <div style="flex:1;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:4px;"><div style="font-size:9px;color:#A0AEC0;">74.1</div><div style="width:8px;height:8px;border-radius:50%;background:#CBD5E0;"></div><div style="font-size:9px;color:#A0AEC0;">3/17</div></div>
+                <div style="flex:1;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:4px;"><div style="font-size:9px;color:#A0AEC0;">73.2</div><div style="width:8px;height:8px;border-radius:50%;background:#CBD5E0;"></div><div style="font-size:9px;color:#A0AEC0;">3/24</div></div>
+                <div style="flex:1;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:4px;"><div style="font-size:9px;color:#4ECDC4;font-weight:700;">72.4</div><div style="width:10px;height:10px;border-radius:50%;background:#4ECDC4;box-shadow:0 0 0 3px rgba(78,205,196,0.3);"></div><div style="font-size:9px;color:#A0AEC0;">3/31</div></div>
               </div>
             </div>
             <div class="detail-btns">
-              <button class="detail-edit-btn">수정</button>
-              <button class="detail-del-btn">삭제</button>
+              <button class="detail-edit-btn" id="detail-edit-btn" onclick="toggleDetailEdit()">수정</button>
+              <button class="detail-del-btn" id="detail-del-btn" onclick="deleteRecord()">삭제</button>
             </div>
           </div>
 
           <!-- ④ 운동 기록 캘린더 -->
           <div class="screen" id="s3">
             <div class="status-bar"><span class="status-time">9:41</span><span class="status-icons">●●●</span></div>
+            <div class="top-bar">
+              <span class="top-back" onclick="goScreen(0, navBtn(0))">‹</span>
+              <span class="top-title">운동 기록</span>
+              <span class="top-action" onclick="goScreen(4, navBtn(4))">통계</span>
+            </div>
             <div class="cal-header">
               <div class="cal-month">2026년 3월</div>
               <div class="cal-nav">
@@ -455,61 +642,24 @@
             </div>
             <div class="cal-grid">
               <div class="cal-days-row">
-                <div class="cal-day-label sun">일</div>
-                <div class="cal-day-label">월</div>
-                <div class="cal-day-label">화</div>
-                <div class="cal-day-label">수</div>
-                <div class="cal-day-label">목</div>
-                <div class="cal-day-label">금</div>
-                <div class="cal-day-label sat">토</div>
+                <div class="cal-day-label sun">일</div><div class="cal-day-label">월</div><div class="cal-day-label">화</div><div class="cal-day-label">수</div><div class="cal-day-label">목</div><div class="cal-day-label">금</div><div class="cal-day-label sat">토</div>
               </div>
-              <div class="cal-dates">
-                <div class="cal-date empty"></div>
-                <div class="cal-date empty"></div>
-                <div class="cal-date empty"></div>
-                <div class="cal-date empty"></div>
-                <div class="cal-date empty"></div>
-                <div class="cal-date empty"></div>
-                <div class="cal-date">1</div>
-                <div class="cal-date has-record sun-col">2</div>
-                <div class="cal-date has-record">3</div>
-                <div class="cal-date">4</div>
-                <div class="cal-date has-record">5</div>
-                <div class="cal-date has-record">6</div>
-                <div class="cal-date has-record">7</div>
-                <div class="cal-date">8</div>
-                <div class="cal-date has-record sun-col">9</div>
-                <div class="cal-date has-record">10</div>
-                <div class="cal-date">11</div>
-                <div class="cal-date has-record">12</div>
-                <div class="cal-date has-record">13</div>
-                <div class="cal-date has-record">14</div>
-                <div class="cal-date">15</div>
-                <div class="cal-date today selected">16</div>
-                <div class="cal-date has-record">17</div>
-                <div class="cal-date">18</div>
-                <div class="cal-date has-record">19</div>
-                <div class="cal-date has-record">20</div>
-                <div class="cal-date has-record">21</div>
-                <div class="cal-date">22</div>
-                <div class="cal-date sun-col">23</div>
-                <div class="cal-date has-record">24</div>
-                <div class="cal-date">25</div>
-                <div class="cal-date has-record">26</div>
-                <div class="cal-date has-record">27</div>
-                <div class="cal-date has-record">28</div>
-                <div class="cal-date">29</div>
-                <div class="cal-date sun-col">30</div>
-                <div class="cal-date has-record">31</div>
+              <div class="cal-dates" id="exercise-cal">
+                <div class="cal-date empty"></div><div class="cal-date empty"></div><div class="cal-date empty"></div><div class="cal-date empty"></div><div class="cal-date empty"></div><div class="cal-date empty"></div><div class="cal-date">1</div>
+                <div class="cal-date has-record sun-col">2</div><div class="cal-date has-record">3</div><div class="cal-date">4</div><div class="cal-date has-record">5</div><div class="cal-date has-record">6</div><div class="cal-date has-record">7</div><div class="cal-date">8</div>
+                <div class="cal-date has-record sun-col">9</div><div class="cal-date has-record">10</div><div class="cal-date">11</div><div class="cal-date has-record">12</div><div class="cal-date has-record">13</div><div class="cal-date has-record">14</div><div class="cal-date">15</div>
+                <div class="cal-date has-record sun-col">16</div><div class="cal-date has-record">17</div><div class="cal-date">18</div><div class="cal-date has-record">19</div><div class="cal-date has-record">20</div><div class="cal-date has-record">21</div><div class="cal-date">22</div>
+                <div class="cal-date sun-col">23</div><div class="cal-date has-record">24</div><div class="cal-date">25</div><div class="cal-date has-record">26</div><div class="cal-date has-record">27</div><div class="cal-date has-record">28</div><div class="cal-date">29</div>
+                <div class="cal-date sun-col">30</div><div class="cal-date today selected">31</div>
               </div>
             </div>
             <div class="cal-stats-row">
               <div class="cal-stat"><div class="cal-stat-val" style="color:#4ECDC4;">16</div><div class="cal-stat-label">이번달 운동</div></div>
-              <div class="cal-stat"><div class="cal-stat-val" style="color:#9B6DFF;">7h 20m</div><div class="cal-stat-label">총 운동시간</div></div>
+              <div class="cal-stat"><div class="cal-stat-val" style="color:#9B6DFF;">7h 20m</div><div class="cal-stat-label">총 시간</div></div>
               <div class="cal-stat"><div class="cal-stat-val" style="color:#F6AD55;">3,520</div><div class="cal-stat-label">총 kcal</div></div>
             </div>
             <div class="day-records">
-              <div class="day-records-title">3월 16일 운동 기록</div>
+              <div class="day-records-title">3월 31일 운동 기록</div>
               <div class="day-record-item">
                 <div class="day-record-dot" style="background:#4ECDC4;"></div>
                 <div class="day-record-name">상체 근력 루틴</div>
@@ -527,72 +677,29 @@
           <div class="screen" id="s4">
             <div class="status-bar"><span class="status-time">9:41</span><span class="status-icons">●●●</span></div>
             <div class="top-bar">
-              <span class="top-back">‹</span>
+              <span class="top-back" onclick="goScreen(3, navBtn(3))">‹</span>
               <span class="top-title">운동 기록 통계</span>
               <span class="top-action"></span>
             </div>
             <div class="stat-tabs">
-              <div class="stat-tab active">주간</div>
-              <div class="stat-tab">월간</div>
+              <div class="stat-tab active" onclick="setStatTab(this, 0)">주간</div>
+              <div class="stat-tab" onclick="setStatTab(this, 1)">월간</div>
             </div>
             <div class="stat-summary">
-              <div class="stat-sum-item">
-                <div class="stat-sum-icon">🏃</div>
-                <div class="stat-sum-val" style="color:#4ECDC4;">5</div>
-                <div class="stat-sum-unit">회</div>
-                <div class="stat-sum-label">운동 횟수</div>
-              </div>
-              <div class="stat-sum-item">
-                <div class="stat-sum-icon">⏱</div>
-                <div class="stat-sum-val" style="color:#9B6DFF;">3.5</div>
-                <div class="stat-sum-unit">시간</div>
-                <div class="stat-sum-label">총 운동시간</div>
-              </div>
-              <div class="stat-sum-item">
-                <div class="stat-sum-icon">🔥</div>
-                <div class="stat-sum-val" style="color:#F6AD55;">1,240</div>
-                <div class="stat-sum-unit">kcal</div>
-                <div class="stat-sum-label">소모 칼로리</div>
-              </div>
+              <div class="stat-sum-item"><div class="stat-sum-icon">🏃</div><div class="stat-sum-val" style="color:#4ECDC4;">5</div><div class="stat-sum-unit">회</div><div class="stat-sum-label">운동 횟수</div></div>
+              <div class="stat-sum-item"><div class="stat-sum-icon">⏱</div><div class="stat-sum-val" style="color:#9B6DFF;">3.5</div><div class="stat-sum-unit">시간</div><div class="stat-sum-label">총 시간</div></div>
+              <div class="stat-sum-item"><div class="stat-sum-icon">🔥</div><div class="stat-sum-val" style="color:#F6AD55;">1,240</div><div class="stat-sum-unit">kcal</div><div class="stat-sum-label">소모 칼로리</div></div>
             </div>
             <div class="stat-chart-wrap">
               <div class="stat-chart-title">요일별 운동 시간 (분)</div>
               <div class="bar-chart">
-                <div class="bar-col">
-                  <div class="bar-val">0</div>
-                  <div class="bar-body" style="height:4px;background:#EDF2F7;"></div>
-                  <div class="bar-lbl">월</div>
-                </div>
-                <div class="bar-col">
-                  <div class="bar-val">45</div>
-                  <div class="bar-body" style="height:45px;background:#4ECDC4;"></div>
-                  <div class="bar-lbl">화</div>
-                </div>
-                <div class="bar-col">
-                  <div class="bar-val">30</div>
-                  <div class="bar-body" style="height:30px;background:#4ECDC4;"></div>
-                  <div class="bar-lbl">수</div>
-                </div>
-                <div class="bar-col">
-                  <div class="bar-val">0</div>
-                  <div class="bar-body" style="height:4px;background:#EDF2F7;"></div>
-                  <div class="bar-lbl">목</div>
-                </div>
-                <div class="bar-col">
-                  <div class="bar-val">60</div>
-                  <div class="bar-body" style="height:60px;background:#4ECDC4;"></div>
-                  <div class="bar-lbl">금</div>
-                </div>
-                <div class="bar-col">
-                  <div class="bar-val">40</div>
-                  <div class="bar-body" style="height:40px;background:#9B6DFF;"></div>
-                  <div class="bar-lbl">토</div>
-                </div>
-                <div class="bar-col">
-                  <div class="bar-val">35</div>
-                  <div class="bar-body" style="height:35px;background:#4ECDC4;"></div>
-                  <div class="bar-lbl">일</div>
-                </div>
+                <div class="bar-col"><div class="bar-val">0</div><div class="bar-body" style="height:4px;background:#EDF2F7;"></div><div class="bar-lbl">월</div></div>
+                <div class="bar-col"><div class="bar-val">45</div><div class="bar-body" style="height:45px;background:#4ECDC4;"></div><div class="bar-lbl">화</div></div>
+                <div class="bar-col"><div class="bar-val">30</div><div class="bar-body" style="height:30px;background:#4ECDC4;"></div><div class="bar-lbl">수</div></div>
+                <div class="bar-col"><div class="bar-val">0</div><div class="bar-body" style="height:4px;background:#EDF2F7;"></div><div class="bar-lbl">목</div></div>
+                <div class="bar-col"><div class="bar-val">60</div><div class="bar-body" style="height:60px;background:#4ECDC4;"></div><div class="bar-lbl">금</div></div>
+                <div class="bar-col"><div class="bar-val">40</div><div class="bar-body" style="height:40px;background:#9B6DFF;"></div><div class="bar-lbl">토</div></div>
+                <div class="bar-col"><div class="bar-val">35</div><div class="bar-body" style="height:35px;background:#4ECDC4;"></div><div class="bar-lbl">일</div></div>
               </div>
             </div>
             <div class="stat-chart-wrap">
@@ -606,10 +713,7 @@
                     <circle cx="40" cy="40" r="30" fill="none" stroke="#F6AD55" stroke-width="12" stroke-dasharray="25 163" stroke-dashoffset="-90" transform="rotate(-90 40 40)"/>
                     <circle cx="40" cy="40" r="30" fill="none" stroke="#FC8181" stroke-width="12" stroke-dasharray="20 168" stroke-dashoffset="-115" transform="rotate(-90 40 40)"/>
                   </svg>
-                  <div class="donut-center">
-                    <div class="donut-center-val">5회</div>
-                    <div class="donut-center-lbl">이번주</div>
-                  </div>
+                  <div class="donut-center"><div class="donut-center-val">5회</div><div class="donut-center-lbl">이번주</div></div>
                 </div>
                 <div class="donut-legend">
                   <div class="donut-leg-item"><div class="donut-leg-dot" style="background:#4ECDC4;"></div><div class="donut-leg-name">상체</div><div class="donut-leg-pct">40%</div></div>
@@ -617,6 +721,297 @@
                   <div class="donut-leg-item"><div class="donut-leg-dot" style="background:#F6AD55;"></div><div class="donut-leg-name">코어</div><div class="donut-leg-pct">25%</div></div>
                   <div class="donut-leg-item"><div class="donut-leg-dot" style="background:#FC8181;"></div><div class="donut-leg-name">유산소</div><div class="donut-leg-pct">15%</div></div>
                 </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ⑥ 출석/방문 기록 -->
+          <div class="screen" id="s5">
+            <div class="status-bar"><span class="status-time">9:41</span><span class="status-icons">●●●</span></div>
+            <div class="top-bar">
+              <span class="top-back" onclick="goScreen(0, navBtn(0))">‹</span>
+              <span class="top-title">출석/방문 기록</span>
+              <span class="top-action"></span>
+            </div>
+
+            <!-- 연속 출석 배너 -->
+            <div class="visit-streak">
+              <div>
+                <div style="font-size:12px;opacity:0.85;margin-bottom:2px;">🔥 연속 출석 중</div>
+                <div style="display:flex;align-items:baseline;gap:4px;">
+                  <div class="streak-num">22</div>
+                  <div style="font-size:16px;font-weight:700;opacity:0.85;">일째</div>
+                </div>
+                <div class="streak-sub">최고 기록 갱신 중! 역대 최고: 22일</div>
+              </div>
+              <div style="text-align:center;">
+                <div style="font-size:28px;">🏆</div>
+                <div style="font-size:11px;opacity:0.75;margin-top:4px;">이번달 22회</div>
+              </div>
+            </div>
+
+            <!-- 월 통계 -->
+            <div class="cal-stats-row" style="padding:0 16px 12px;">
+              <div class="cal-stat"><div class="cal-stat-val" style="color:#667EEA;">22</div><div class="cal-stat-label">이번달 방문</div></div>
+              <div class="cal-stat"><div class="cal-stat-val" style="color:#4ECDC4;">3.2h</div><div class="cal-stat-label">평균 이용시간</div></div>
+              <div class="cal-stat"><div class="cal-stat-val" style="color:#F6AD55;">오전9시</div><div class="cal-stat-label">주 이용시간대</div></div>
+            </div>
+
+            <!-- 시간대별 방문 분포 -->
+            <div class="visit-time-wrap">
+              <div class="visit-time-title">시간대별 방문 빈도</div>
+              <div class="time-bars">
+                <div class="time-bar-wrap"><div class="time-bar" style="height:20px;background:#EDF2F7;"></div><div class="time-bar-lbl">6시</div></div>
+                <div class="time-bar-wrap"><div class="time-bar" style="height:35px;background:#667EEA;"></div><div class="time-bar-lbl">7시</div></div>
+                <div class="time-bar-wrap"><div class="time-bar" style="height:45px;background:#667EEA;"></div><div class="time-bar-lbl">8시</div></div>
+                <div class="time-bar-wrap"><div class="time-bar" style="height:50px;background:#553C9A;border-radius:3px 3px 0 0;"></div><div class="time-bar-lbl">9시</div></div>
+                <div class="time-bar-wrap"><div class="time-bar" style="height:38px;background:#667EEA;"></div><div class="time-bar-lbl">10시</div></div>
+                <div class="time-bar-wrap"><div class="time-bar" style="height:22px;background:#EDF2F7;"></div><div class="time-bar-lbl">11시</div></div>
+                <div class="time-bar-wrap"><div class="time-bar" style="height:15px;background:#EDF2F7;"></div><div class="time-bar-lbl">12시</div></div>
+                <div class="time-bar-wrap"><div class="time-bar" style="height:18px;background:#EDF2F7;"></div><div class="time-bar-lbl">오후</div></div>
+                <div class="time-bar-wrap"><div class="time-bar" style="height:30px;background:#667EEA;"></div><div class="time-bar-lbl">6시</div></div>
+                <div class="time-bar-wrap"><div class="time-bar" style="height:28px;background:#667EEA;"></div><div class="time-bar-lbl">7시</div></div>
+              </div>
+            </div>
+
+            <!-- 최근 방문 이력 -->
+            <div class="section-title" style="padding-top:4px;">최근 방문 이력</div>
+            <div style="padding:0 20px 16px;">
+              <div class="visit-list-item">
+                <div class="visit-list-date">03/31 화</div>
+                <div class="visit-list-info">
+                  <div class="visit-list-name">오전 9:12 입장 — 오전 11:05 퇴장</div>
+                  <div class="visit-list-sub">이용시간 1시간 53분</div>
+                </div>
+                <div class="visit-tag" style="background:#E6FFFA;color:#2C7A7B;">헬스</div>
+              </div>
+              <div class="visit-list-item">
+                <div class="visit-list-date">03/30 월</div>
+                <div class="visit-list-info">
+                  <div class="visit-list-name">오전 8:45 입장 — 오전 10:30 퇴장</div>
+                  <div class="visit-list-sub">이용시간 1시간 45분</div>
+                </div>
+                <div class="visit-tag" style="background:#E6FFFA;color:#2C7A7B;">헬스</div>
+              </div>
+              <div class="visit-list-item">
+                <div class="visit-list-date">03/29 일</div>
+                <div class="visit-list-info">
+                  <div class="visit-list-name">오전 9:02 입장 — 오전 11:30 퇴장</div>
+                  <div class="visit-list-sub">이용시간 2시간 28분</div>
+                </div>
+                <div class="visit-tag" style="background:#F0FFF4;color:#276749;">골프</div>
+              </div>
+              <div class="visit-list-item">
+                <div class="visit-list-date">03/28 토</div>
+                <div class="visit-list-info">
+                  <div class="visit-list-name">오전 8:30 입장 — 오전 10:00 퇴장</div>
+                  <div class="visit-list-sub">이용시간 1시간 30분</div>
+                </div>
+                <div class="visit-tag" style="background:#FFF5EB;color:#C05621;">재활</div>
+              </div>
+              <div class="visit-list-item">
+                <div class="visit-list-date">03/27 금</div>
+                <div class="visit-list-info">
+                  <div class="visit-list-name">오전 9:20 입장 — 오전 11:10 퇴장</div>
+                  <div class="visit-list-sub">이용시간 1시간 50분</div>
+                </div>
+                <div class="visit-tag" style="background:#E6FFFA;color:#2C7A7B;">헬스</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ⑦ 검진 히스토리 -->
+          <div class="screen" id="s6">
+            <div class="status-bar"><span class="status-time">9:41</span><span class="status-icons">●●●</span></div>
+            <div class="top-bar">
+              <span class="top-back" onclick="goScreen(0, navBtn(0))">‹</span>
+              <span class="top-title">검진 히스토리</span>
+              <span class="top-action"></span>
+            </div>
+
+            <div class="check-tabs">
+              <button class="check-tab active" onclick="switchCheckTab(this, 'golf')">⛳ 골프검진</button>
+              <button class="check-tab" onclick="switchCheckTab(this, 'sfma')">🔵 SFMA</button>
+              <button class="check-tab" onclick="switchCheckTab(this, 'csmi')">🟠 CSMI</button>
+            </div>
+
+            <!-- 다음 검진 D-day -->
+            <div class="check-dday" id="check-dday-banner">
+              <div>
+                <div class="check-dday-label">다음 권장 골프검진</div>
+                <div class="check-dday-val">D-12 <span style="font-size:13px;opacity:0.8;">(4월 12일)</span></div>
+              </div>
+              <button class="check-dday-btn" onclick="openReserveModal('골프검진')">예약하기</button>
+            </div>
+
+            <!-- 검진 타임라인 -->
+            <div class="check-timeline" id="check-timeline">
+              <!-- 골프 타임라인 (기본 표시) -->
+              <div class="check-tl-item" onclick="location.href='골프검진.html'">
+                <div class="check-tl-line">
+                  <div class="check-tl-dot" style="background:#2F855A;"></div>
+                  <div class="check-tl-seg"></div>
+                </div>
+                <div class="check-tl-body">
+                  <div class="check-tl-date">2026년 3월 15일 · 4회차</div>
+                  <div class="check-tl-title">골프 종합검진 ›</div>
+                  <div class="check-tl-grades">
+                    <span class="check-grade-badge" style="background:#F0FFF4;color:#276749;">K-vest 양호</span>
+                    <span class="check-grade-badge" style="background:#E6FFFA;color:#2C7A7B;">Trackman 우수</span>
+                    <span class="check-grade-badge" style="background:#FFFBEB;color:#B7791F;">TPI 보통</span>
+                  </div>
+                  <div class="check-score-row">
+                    <div class="check-score-item"><div class="check-score-label">종합</div><div class="check-score-val" style="color:#276749;">82%</div></div>
+                    <div class="check-score-item"><div class="check-score-label">전회 대비</div><div class="check-score-val" style="color:#38A169;">▲ 5%</div></div>
+                    <div class="check-score-item"><div class="check-score-label">등급</div><div class="check-score-val" style="color:#276749;">양호</div></div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="check-tl-item" onclick="location.href='골프검진.html'">
+                <div class="check-tl-line">
+                  <div class="check-tl-dot" style="background:#A0AEC0;"></div>
+                  <div class="check-tl-seg"></div>
+                </div>
+                <div class="check-tl-body">
+                  <div class="check-tl-date">2026년 1월 10일 · 3회차</div>
+                  <div class="check-tl-title">골프 종합검진 ›</div>
+                  <div class="check-tl-grades">
+                    <span class="check-grade-badge" style="background:#F0FFF4;color:#276749;">K-vest 양호</span>
+                    <span class="check-grade-badge" style="background:#FFFBEB;color:#B7791F;">Trackman 보통</span>
+                    <span class="check-grade-badge" style="background:#FFF5F5;color:#C53030;">TPI 주의</span>
+                  </div>
+                  <div class="check-score-row">
+                    <div class="check-score-item"><div class="check-score-label">종합</div><div class="check-score-val" style="color:#B7791F;">77%</div></div>
+                    <div class="check-score-item"><div class="check-score-label">전회 대비</div><div class="check-score-val" style="color:#38A169;">▲ 3%</div></div>
+                    <div class="check-score-item"><div class="check-score-label">등급</div><div class="check-score-val" style="color:#B7791F;">보통</div></div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="check-tl-item" onclick="location.href='골프검진.html'">
+                <div class="check-tl-line">
+                  <div class="check-tl-dot" style="background:#CBD5E0;"></div>
+                  <div class="check-tl-seg" style="display:none;"></div>
+                </div>
+                <div class="check-tl-body">
+                  <div class="check-tl-date">2025년 11월 8일 · 2회차</div>
+                  <div class="check-tl-title">골프 종합검진 ›</div>
+                  <div class="check-tl-grades">
+                    <span class="check-grade-badge" style="background:#FFFBEB;color:#B7791F;">K-vest 보통</span>
+                    <span class="check-grade-badge" style="background:#FFFBEB;color:#B7791F;">Trackman 보통</span>
+                    <span class="check-grade-badge" style="background:#FFF5F5;color:#C53030;">TPI 주의</span>
+                  </div>
+                  <div class="check-score-row">
+                    <div class="check-score-item"><div class="check-score-label">종합</div><div class="check-score-val" style="color:#B7791F;">74%</div></div>
+                    <div class="check-score-item"><div class="check-score-label">전회 대비</div><div class="check-score-val" style="color:#A0AEC0;">— 첫 회</div></div>
+                    <div class="check-score-item"><div class="check-score-label">등급</div><div class="check-score-val" style="color:#B7791F;">보통</div></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ⑧ 재활운동 수행 기록 -->
+          <div class="screen" id="s7">
+            <div class="status-bar"><span class="status-time">9:41</span><span class="status-icons">●●●</span></div>
+            <div class="top-bar">
+              <span class="top-back" onclick="goScreen(0, navBtn(0))">‹</span>
+              <span class="top-title">재활운동 기록</span>
+              <span class="top-action"></span>
+            </div>
+
+            <!-- 요약 통계 -->
+            <div class="rehab-summary">
+              <div class="rehab-sum-card"><div class="rehab-sum-icon">🏥</div><div class="rehab-sum-val" style="color:#C05621;">3</div><div class="rehab-sum-label">진행중</div></div>
+              <div class="rehab-sum-card"><div class="rehab-sum-icon">✅</div><div class="rehab-sum-val" style="color:#38A169;">12</div><div class="rehab-sum-label">완료 회차</div></div>
+              <div class="rehab-sum-card"><div class="rehab-sum-icon">📅</div><div class="rehab-sum-val" style="color:#4ECDC4;">18</div><div class="rehab-sum-label">총 수행일</div></div>
+            </div>
+
+            <!-- 부위별 수행 현황 -->
+            <div class="rehab-part-wrap">
+              <div class="rehab-part-title">부위별 수행 현황</div>
+              <div class="rehab-part-row">
+                <div class="rehab-part-name">어깨</div>
+                <div class="rehab-part-bar-bg"><div class="rehab-part-bar-fill" style="width:85%;background:linear-gradient(90deg,#4ECDC4,#45B7AA);"></div></div>
+                <div class="rehab-part-count">8회</div>
+              </div>
+              <div class="rehab-part-row">
+                <div class="rehab-part-name">허리</div>
+                <div class="rehab-part-bar-bg"><div class="rehab-part-bar-fill" style="width:60%;background:linear-gradient(90deg,#9B6DFF,#B794F4);"></div></div>
+                <div class="rehab-part-count">6회</div>
+              </div>
+              <div class="rehab-part-row">
+                <div class="rehab-part-name">무릎</div>
+                <div class="rehab-part-bar-bg"><div class="rehab-part-bar-fill" style="width:40%;background:linear-gradient(90deg,#F6AD55,#F6CC75);"></div></div>
+                <div class="rehab-part-count">4회</div>
+              </div>
+              <div class="rehab-part-row">
+                <div class="rehab-part-name">발목</div>
+                <div class="rehab-part-bar-bg"><div class="rehab-part-bar-fill" style="width:20%;background:#EDF2F7;"></div></div>
+                <div class="rehab-part-count">2회</div>
+              </div>
+            </div>
+
+            <!-- 프로그램 목록 -->
+            <div class="section-title" style="padding-top:4px;">진행중인 프로그램</div>
+            <div class="rehab-prog-list">
+              <div class="rehab-prog-item" onclick="location.href='재활운동.html'">
+                <div class="rehab-prog-top">
+                  <div class="rehab-prog-name">어깨 회전근개 강화</div>
+                  <div class="rehab-prog-date">마지막 수행 어제</div>
+                </div>
+                <div class="rehab-prog-meta">
+                  <span class="rehab-meta-tag" style="background:#E6FFFA;color:#2C7A7B;">어깨</span>
+                  <span class="rehab-meta-tag" style="background:#EBF8FF;color:#2B6CB0;">8동작</span>
+                  <span style="font-size:11px;color:#A0AEC0;">처방: 김재활 치료사</span>
+                </div>
+                <div class="rehab-prog-progress"><div class="rehab-prog-fill" style="width:50%;"></div></div>
+                <div class="rehab-prog-pct">4 / 8회차 완료 (50%)</div>
+              </div>
+
+              <div class="rehab-prog-item" onclick="location.href='재활운동.html'">
+                <div class="rehab-prog-top">
+                  <div class="rehab-prog-name">허리 코어 안정화</div>
+                  <div class="rehab-prog-date">3일 전</div>
+                </div>
+                <div class="rehab-prog-meta">
+                  <span class="rehab-meta-tag" style="background:#FAF5FF;color:#553C9A;">허리</span>
+                  <span class="rehab-meta-tag" style="background:#EBF8FF;color:#2B6CB0;">6동작</span>
+                  <span style="font-size:11px;color:#A0AEC0;">처방: 김재활 치료사</span>
+                </div>
+                <div class="rehab-prog-progress"><div class="rehab-prog-fill" style="width:75%;background:linear-gradient(90deg,#9B6DFF,#B794F4);"></div></div>
+                <div class="rehab-prog-pct" style="color:#9B6DFF;">6 / 8회차 완료 (75%)</div>
+              </div>
+
+              <div class="rehab-prog-item" onclick="location.href='재활운동.html'">
+                <div class="rehab-prog-top">
+                  <div class="rehab-prog-name">무릎 주변 근력 강화</div>
+                  <div class="rehab-prog-date">5일 전</div>
+                </div>
+                <div class="rehab-prog-meta">
+                  <span class="rehab-meta-tag" style="background:#FFFBEB;color:#B7791F;">무릎</span>
+                  <span class="rehab-meta-tag" style="background:#EBF8FF;color:#2B6CB0;">5동작</span>
+                  <span style="font-size:11px;color:#A0AEC0;">처방: 이물리 치료사</span>
+                </div>
+                <div class="rehab-prog-progress"><div class="rehab-prog-fill" style="width:25%;background:linear-gradient(90deg,#F6AD55,#F6CC75);"></div></div>
+                <div class="rehab-prog-pct" style="color:#F6AD55;">2 / 8회차 완료 (25%)</div>
+              </div>
+            </div>
+
+            <div class="section-title" style="padding-top:0;">완료한 프로그램</div>
+            <div class="rehab-prog-list">
+              <div class="rehab-prog-item" style="opacity:0.7;" onclick="location.href='재활운동.html'">
+                <div class="rehab-prog-top">
+                  <div class="rehab-prog-name">발목 균형 훈련</div>
+                  <div class="rehab-prog-date">2월 완료 ✅</div>
+                </div>
+                <div class="rehab-prog-meta">
+                  <span class="rehab-meta-tag" style="background:#F7FAFC;color:#718096;">발목</span>
+                  <span class="rehab-meta-tag" style="background:#F7FAFC;color:#718096;">4동작</span>
+                </div>
+                <div class="rehab-prog-progress"><div class="rehab-prog-fill" style="width:100%;background:#CBD5E0;"></div></div>
+                <div class="rehab-prog-pct" style="color:#A0AEC0;">8 / 8회차 완료 (100%)</div>
               </div>
             </div>
           </div>
@@ -640,65 +1035,19 @@
         title: "① 나의기록 홈",
         id: "mr01 · 필수 · FE/BE",
         sections: [
-          {
-            title: "화면 구성",
-            items: [
-              "상단 그라데이션 헤더 + 인사말",
-              "신체 정보 요약 카드 (몸무게·체지방률·근육량·체수분 + 전회 대비 변화)",
-              "최근 운동 기록 2~3개 리스트",
-              "이번 달 달성 현황 프로그레스 바"
-            ]
-          },
-          {
-            title: "동작",
-            items: [
-              "신체 정보 카드 클릭 → 신체 기록 화면으로 이동",
-              "운동 기록 항목 클릭 → 해당 운동 상세 확인",
-              "달성 현황 클릭 → 운동 기록 캘린더로 이동"
-            ]
-          },
-          {
-            title: "기술 스펙",
-            items: [
-              "최근 측정값 API 호출 (GET /my-record/body/latest)",
-              "이번 달 운동 횟수 집계 API",
-              "전회 대비 증감 계산은 FE에서 처리"
-            ]
-          }
+          { title: "화면 구성", items: ["상단 그라데이션 헤더 + 인사말", "신체 정보 요약 카드 (클릭 → 신체기록 이동)", "이번 달 운동 목표 + 연속 출석일 프로그레스", "기록 바로가기 2×2 그리드 (운동/출석/검진/재활)", "최근 활동 리스트 (각 항목 클릭 → 해당 화면)"] },
+          { title: "동작", items: ["신체 카드 클릭 → ② 신체 기록", "운동 카드 클릭 → ④ 운동 캘린더", "출석 카드 클릭 → ⑥ 출석/방문 기록", "검진 카드 클릭 → ⑦ 검진 히스토리", "재활 카드 클릭 → ⑧ 재활운동 기록"] },
+          { title: "기술 스펙", items: ["GET /my-record/summary – 홈 요약 데이터 (신체·운동·출석·검진·재활 한 번에)", "연속 출석일 서버에서 계산 후 내려줌", "재검진 D-day 자동 계산 (검진일 + 권장주기)"] }
         ],
-        tags: [["#홈", "#4ECDC4"], ["#신체요약", "#9B6DFF"], ["#운동기록", "#F6AD55"], ["#달성현황", "#38A169"]]
+        tags: [["#홈", "#4ECDC4"], ["#신체요약", "#9B6DFF"], ["#바로가기그리드", "#F6AD55"], ["#최근활동", "#38A169"]]
       },
       {
         title: "② 신체 기록",
         id: "mr02 · 필수 · FE/BE",
         sections: [
-          {
-            title: "화면 구성",
-            items: [
-              "날짜 선택 (기본: 오늘)",
-              "측정값 입력 그리드 (몸무게·체지방률·근육량·체수분)",
-              "[기록 저장] 버튼",
-              "최근 7일 몸무게 변화 바 차트",
-              "기록 이력 리스트 (날짜·측정값·상세 링크)"
-            ]
-          },
-          {
-            title: "동작",
-            items: [
-              "각 입력 박스 탭 → 숫자 키패드 팝업",
-              "날짜 변경 클릭 → 날짜 피커",
-              "기록 저장 → 성공 토스트 메시지",
-              "이력 항목 클릭 → 신체 기록 상세로 이동"
-            ]
-          },
-          {
-            title: "기술 스펙",
-            items: [
-              "POST /my-record/body – 기록 저장",
-              "GET /my-record/body?from=&to= – 이력 조회",
-              "차트는 FE 렌더링 (Canvas or SVG)"
-            ]
-          }
+          { title: "화면 구성", items: ["날짜 선택 (기본: 오늘)", "측정값 입력 그리드 4칸 (몸무게·체지방률·근육량·체수분)", "[기록 저장] 버튼 → 성공 토스트", "최근 7일 몸무게 바 차트", "기록 이력 리스트 (클릭 → ③ 상세)"] },
+          { title: "동작", items: ["각 입력 박스 탭 → 숫자 키패드", "날짜 변경 → 날짜 피커", "이력 항목 클릭 → ③ 신체 기록 상세"] },
+          { title: "기술 스펙", items: ["POST /my-record/body", "GET /my-record/body?from=&to=", "차트 FE 렌더링"] }
         ],
         tags: [["#입력", "#4ECDC4"], ["#차트", "#9B6DFF"], ["#이력", "#F6AD55"]]
       },
@@ -706,105 +1055,73 @@
         title: "③ 신체 기록 상세 / 수정",
         id: "mr03 · 필수 · FE/BE",
         sections: [
-          {
-            title: "화면 구성",
-            items: [
-              "측정 날짜 표시",
-              "4개 측정 항목 카드 (아이콘·값·전회 대비 증감)",
-              "메모 영역",
-              "몸무게 추이 미니 차트 (최근 4회)",
-              "[수정] [삭제] 버튼"
-            ]
-          },
-          {
-            title: "동작",
-            items: [
-              "수정 클릭 → 동일 화면에서 입력 필드 활성화",
-              "삭제 클릭 → 확인 다이얼로그 → DELETE API 호출",
-              "저장 완료 시 이전 화면으로 돌아가며 목록 갱신"
-            ]
-          },
-          {
-            title: "기술 스펙",
-            items: [
-              "GET /my-record/body/:id",
-              "PUT /my-record/body/:id – 수정",
-              "DELETE /my-record/body/:id – 삭제"
-            ]
-          }
+          { title: "화면 구성", items: ["측정 날짜", "4개 항목 카드 (아이콘·값·전회 대비 증감)", "메모 영역", "몸무게 추이 미니 차트 (최근 4회)", "[수정] [삭제] 버튼"] },
+          { title: "동작", items: ["수정 클릭 → 인라인 편집 모드", "삭제 클릭 → 확인 다이얼로그 → 삭제 후 ② 로 이동"] },
+          { title: "기술 스펙", items: ["GET /my-record/body/:id", "PUT /my-record/body/:id", "DELETE /my-record/body/:id"] }
         ],
-        tags: [["#상세", "#4ECDC4"], ["#수정", "#F6AD55"], ["#삭제", "#FC8181"], ["#추이차트", "#9B6DFF"]]
+        tags: [["#상세", "#4ECDC4"], ["#수정", "#F6AD55"], ["#삭제", "#FC8181"]]
       },
       {
         title: "④ 운동 기록 캘린더",
         id: "mr04 · 필수 · FE/BE",
         sections: [
-          {
-            title: "화면 구성",
-            items: [
-              "월 네비게이션 (이전/다음 월 이동)",
-              "7열 캘린더 그리드 – 운동한 날 녹색 점 표시",
-              "월 통계 요약 (운동 횟수·총 시간·총 kcal)",
-              "날짜 클릭 시 해당일 운동 기록 목록 표시"
-            ]
-          },
-          {
-            title: "동작",
-            items: [
-              "날짜 클릭 → 하단에 해당일 운동 목록 슬라이드",
-              "운동 항목 클릭 → 운동 상세 화면으로 이동",
-              "월 변경 → API 재호출로 새 월 데이터 갱신"
-            ]
-          },
-          {
-            title: "기술 스펙",
-            items: [
-              "GET /my-record/exercise?year=&month= – 월별 기록 조회",
-              "캘린더 dot 렌더링은 FE에서 처리",
-              "날짜 클릭 이벤트로 상세 목록 토글"
-            ]
-          }
+          { title: "화면 구성", items: ["월 네비게이션", "7열 캘린더 – 운동한 날 초록 점", "월 통계 (횟수·시간·kcal)", "날짜 클릭 시 하단에 해당일 운동 목록"] },
+          { title: "동작", items: ["날짜 클릭 → 하단 운동 목록 갱신", "[통계] 버튼 → ⑤ 운동 통계", "운동 항목 클릭 → 운동 상세"] },
+          { title: "기술 스펙", items: ["GET /my-record/exercise?year=&month=", "달력 dot 렌더링 FE 처리"] }
         ],
-        tags: [["#캘린더", "#4ECDC4"], ["#월별통계", "#9B6DFF"], ["#운동목록", "#F6AD55"]]
+        tags: [["#캘린더", "#4ECDC4"], ["#월별통계", "#9B6DFF"]]
       },
       {
         title: "⑤ 운동 기록 통계",
         id: "mr05 · 권장 · FE/BE",
         sections: [
-          {
-            title: "화면 구성",
-            items: [
-              "주간 / 월간 탭 전환",
-              "요약 카드 3개 (운동 횟수·총 시간·소모 칼로리)",
-              "요일별 운동 시간 바 차트",
-              "부위별 운동 비율 도넛 차트 + 범례"
-            ]
-          },
-          {
-            title: "동작",
-            items: [
-              "주간/월간 탭 전환 시 API 재호출 및 차트 업데이트",
-              "차트 항목 탭 → 해당 날짜/부위 상세 tooltip 표시"
-            ]
-          },
-          {
-            title: "기술 스펙",
-            items: [
-              "GET /my-record/stats?period=week|month",
-              "운동 부위 분류 기준은 운동처방 DB 카테고리와 매핑",
-              "차트 라이브러리 또는 SVG 직접 구현"
-            ]
-          }
+          { title: "화면 구성", items: ["주간/월간 탭", "요약 3개 (횟수·시간·칼로리)", "요일별 운동시간 바 차트", "부위별 비율 도넛 차트"] },
+          { title: "동작", items: ["탭 전환 → API 재호출 + 차트 업데이트"] },
+          { title: "기술 스펙", items: ["GET /my-record/stats?period=week|month"] }
         ],
-        tags: [["#통계", "#4ECDC4"], ["#바차트", "#9B6DFF"], ["#도넛차트", "#F6AD55"], ["#주간", "#38A169"], ["#월간", "#E53E3E"]]
+        tags: [["#통계", "#4ECDC4"], ["#바차트", "#9B6DFF"], ["#도넛차트", "#F6AD55"]]
+      },
+      {
+        title: "⑥ 출석/방문 기록",
+        id: "mr06 · 필수 · FE/BE",
+        sections: [
+          { title: "화면 구성", items: ["연속 출석 배너 (연속일수 + 최고기록 여부)", "월 통계 3개 (방문 횟수·평균 이용시간·주 이용시간대)", "시간대별 방문 빈도 바 차트 (6시~저녁)", "최근 방문 이력 (날짜·입장/퇴장시간·이용시간·구역태그)"] },
+          { title: "동작", items: ["방문 이력 항목 클릭 → 해당일 운동 기록과 연결", "QR 입장 데이터 자동 수집 (입장시간·퇴장시간·구역)"] },
+          { title: "기술 스펙", items: ["GET /my-record/attendance?year=&month=", "QR 스캔 시 입장 이벤트 기록 → BE 자동 처리", "연속 출석일수 서버 계산"] }
+        ],
+        tags: [["#출석", "#667EEA"], ["#방문이력", "#4ECDC4"], ["#연속기록", "#F6AD55"], ["#시간대분포", "#9B6DFF"]]
+      },
+      {
+        title: "⑦ 검진 히스토리",
+        id: "mr07 · 필수 · FE/BE",
+        sections: [
+          { title: "화면 구성", items: ["3개 탭 (⛳골프검진 / 🔵SFMA / 🟠CSMI)", "다음 권장 검진 D-day 배너 + [예약하기] 버튼", "회차별 타임라인 카드 (날짜·회차·그룹별 등급 배지·종합점수·전회 대비 증감)"] },
+          { title: "동작", items: ["타임라인 카드 클릭 → 해당 검진 상세 결과 화면으로 이동 (골프검진.html 등)", "탭 전환 → 해당 검진 종류 타임라인 표시", "[예약하기] 버튼 → 검진 예약 화면"] },
+          { title: "기술 스펙", items: ["GET /golf/history/:memberId", "GET /sfma/history/:memberId", "GET /csmi/history/:memberId", "D-day = 마지막 검진일 + 권장 재검진 주기 (관리자 설정값)"] }
+        ],
+        tags: [["#검진이력", "#2F855A"], ["#D-day", "#F6AD55"], ["#타임라인", "#4ECDC4"], ["#등급변화", "#9B6DFF"]]
+      },
+      {
+        title: "⑧ 재활운동 수행 기록",
+        id: "mr08 · 권장 · FE/BE",
+        sections: [
+          { title: "화면 구성", items: ["요약 3개 (진행중 프로그램·완료 회차·총 수행일)", "부위별 수행 현황 바 (어깨/허리/무릎/발목 등)", "진행중 프로그램 카드 (이름·마지막 수행일·처방 담당자·회차 프로그레스바)", "완료한 프로그램 목록"] },
+          { title: "동작", items: ["프로그램 카드 클릭 → 해당 재활운동 상세 (재활운동.html 연결)", "진행중 카드 → 이어서 수행하기 가능"] },
+          { title: "기술 스펙", items: ["GET /rehab/my-programs/:memberId", "GET /rehab/history/:memberId", "진행 % = (완료 회차 / 전체 회차) × 100"] }
+        ],
+        tags: [["#재활이력", "#C05621"], ["#부위별통계", "#4ECDC4"], ["#프로그램진행", "#9B6DFF"]]
       }
     ];
 
-    function showScreen(idx, btn) {
+    function navBtn(idx) {
+      return document.querySelectorAll('.nav-btn')[idx];
+    }
+
+    function goScreen(idx, btn) {
       document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
       document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
       document.getElementById('s' + idx).classList.add('active');
-      btn.classList.add('active');
+      if (btn) btn.classList.add('active');
 
       const m = memos[idx];
       document.getElementById('memo-title').textContent = m.title;
@@ -812,8 +1129,7 @@
 
       let html = '';
       m.sections.forEach(sec => {
-        html += `<div class="memo-section">
-          <div class="memo-section-title">${sec.title}</div>`;
+        html += `<div class="memo-section"><div class="memo-section-title">${sec.title}</div>`;
         sec.items.forEach(item => {
           html += `<div class="memo-item"><div class="memo-dot"></div><div class="memo-text">${item}</div></div>`;
         });
@@ -827,10 +1143,226 @@
         html += '</div></div>';
       }
       document.getElementById('memo-body').innerHTML = html;
+
+      // 폰 화면 스크롤 상단으로
+      const screen = document.getElementById('s' + idx);
+      screen.scrollTop = 0;
     }
 
-    // 초기 메모 렌더링
-    showScreen(0, document.querySelector('.nav-btn.active'));
+    function setStatTab(el, idx) {
+      el.parentNode.querySelectorAll('.stat-tab').forEach(t => t.classList.remove('active'));
+      el.classList.add('active');
+    }
+
+    const checkData = {
+      golf: {
+        dday: 'D-12 (4월 12일)', label: '다음 권장 골프검진',
+        items: [
+          { date: '2026년 3월 15일 · 4회차', title: '골프 종합검진', grades: [['K-vest 양호','#F0FFF4','#276749'],['Trackman 우수','#E6FFFA','#2C7A7B'],['TPI 보통','#FFFBEB','#B7791F']], total:'82%', totalColor:'#276749', diff:'▲ 5%', diffColor:'#38A169', grade:'양호' },
+          { date: '2026년 1월 10일 · 3회차', title: '골프 종합검진', grades: [['K-vest 양호','#F0FFF4','#276749'],['Trackman 보통','#FFFBEB','#B7791F'],['TPI 주의','#FFF5F5','#C53030']], total:'77%', totalColor:'#B7791F', diff:'▲ 3%', diffColor:'#38A169', grade:'보통' },
+          { date: '2025년 11월 8일 · 2회차', title: '골프 종합검진', grades: [['K-vest 보통','#FFFBEB','#B7791F'],['Trackman 보통','#FFFBEB','#B7791F'],['TPI 주의','#FFF5F5','#C53030']], total:'74%', totalColor:'#B7791F', diff:'— 첫 회', diffColor:'#A0AEC0', grade:'보통' }
+        ]
+      },
+      sfma: {
+        dday: 'D-30 (4월 30일)', label: '다음 권장 SFMA',
+        items: [
+          { date: '2026년 3월 1일 · 2회차', title: 'SFMA 검사', grades: [['이동패턴 양호','#F0FFF4','#276749'],['안정성 보통','#FFFBEB','#B7791F']], total:'78%', totalColor:'#276749', diff:'▲ 8%', diffColor:'#38A169', grade:'양호' },
+          { date: '2025년 12월 15일 · 1회차', title: 'SFMA 검사', grades: [['이동패턴 보통','#FFFBEB','#B7791F'],['안정성 주의','#FFF5F5','#C53030']], total:'70%', totalColor:'#B7791F', diff:'— 첫 회', diffColor:'#A0AEC0', grade:'보통' }
+        ]
+      },
+      csmi: {
+        dday: 'D-45 (5월 15일)', label: '다음 권장 CSMI',
+        items: [
+          { date: '2026년 2월 20일 · 3회차', title: 'CSMI 검사', grades: [['근력 우수','#E6FFFA','#2C7A7B'],['유연성 양호','#F0FFF4','#276749'],['균형 양호','#F0FFF4','#276749']], total:'88%', totalColor:'#2C7A7B', diff:'▲ 6%', diffColor:'#38A169', grade:'우수' },
+          { date: '2025년 11월 10일 · 2회차', title: 'CSMI 검사', grades: [['근력 양호','#F0FFF4','#276749'],['유연성 보통','#FFFBEB','#B7791F'],['균형 보통','#FFFBEB','#B7791F']], total:'82%', totalColor:'#276749', diff:'▲ 10%', diffColor:'#38A169', grade:'양호' }
+        ]
+      }
+    };
+
+    function switchCheckTab(btn, type) {
+      document.querySelectorAll('.check-tab').forEach(t => t.classList.remove('active'));
+      btn.classList.add('active');
+      const d = checkData[type];
+      // D-day 배너 업데이트
+      document.getElementById('check-dday-banner').innerHTML = `
+        <div>
+          <div class="check-dday-label">${d.label}</div>
+          <div class="check-dday-val">${d.dday}</div>
+        </div>
+        <button class="check-dday-btn" onclick="alert('${d.label} 예약 화면으로 이동')">예약하기</button>`;
+      // 타임라인 업데이트
+      const tl = document.getElementById('check-timeline');
+      tl.innerHTML = d.items.map((item, i) => `
+        <div class="check-tl-item" onclick="location.href='골프검진.html'">
+          <div class="check-tl-line">
+            <div class="check-tl-dot" style="background:${i===0?'#2F855A':'#CBD5E0'};"></div>
+            ${i < d.items.length-1 ? '<div class="check-tl-seg"></div>' : ''}
+          </div>
+          <div class="check-tl-body">
+            <div class="check-tl-date">${item.date}</div>
+            <div class="check-tl-title">${item.title} ›</div>
+            <div class="check-tl-grades">${item.grades.map(([g,bg,c])=>`<span class="check-grade-badge" style="background:${bg};color:${c};">${g}</span>`).join('')}</div>
+            <div class="check-score-row">
+              <div class="check-score-item"><div class="check-score-label">종합</div><div class="check-score-val" style="color:${item.totalColor};">${item.total}</div></div>
+              <div class="check-score-item"><div class="check-score-label">전회 대비</div><div class="check-score-val" style="color:${item.diffColor};">${item.diff}</div></div>
+              <div class="check-score-item"><div class="check-score-label">등급</div><div class="check-score-val" style="color:${item.totalColor};">${item.grade}</div></div>
+            </div>
+          </div>
+        </div>`).join('');
+    }
+
+    // 초기 렌더링
+    goScreen(0, navBtn(0));
+
+    /* ── 토스트 ── */
+    function showToast(msg, duration = 2000) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), duration);
+    }
+
+    /* ── 숫자 입력 모달 ── */
+    let _numField = null;
+    function showNumModal(field, title, sub) {
+      _numField = field;
+      document.getElementById('num-modal-title').textContent = title + ' 입력';
+      document.getElementById('num-modal-sub').textContent = sub;
+      const cur = document.getElementById('val-' + field);
+      document.getElementById('num-modal-input').value = cur ? cur.textContent : '';
+      document.getElementById('num-modal').classList.add('open');
+      setTimeout(() => document.getElementById('num-modal-input').focus(), 300);
+    }
+    function closeNumModal(e) {
+      if (e && e.target !== document.getElementById('num-modal')) return;
+      document.getElementById('num-modal').classList.remove('open');
+    }
+    function confirmNumInput() {
+      const val = parseFloat(document.getElementById('num-modal-input').value);
+      if (isNaN(val)) { showToast('올바른 숫자를 입력하세요'); return; }
+      const el = document.getElementById('val-' + _numField);
+      if (el) el.textContent = val.toFixed(1);
+      document.getElementById('num-modal').classList.remove('open');
+      showToast('입력되었습니다. [기록 저장]을 눌러 저장하세요.');
+    }
+
+    /* ── 신체기록 저장 ── */
+    function saveBodyRecord() {
+      const w = document.getElementById('val-weight')?.textContent;
+      const b = document.getElementById('val-bodyfat')?.textContent;
+      const m = document.getElementById('val-muscle')?.textContent;
+      const wa = document.getElementById('val-water')?.textContent;
+      if (!w || !b || !m || !wa) { showToast('모든 항목을 입력해주세요'); return; }
+      showToast('✅ 기록이 저장되었습니다!');
+      // 이력 목록 첫 행 업데이트
+      const firstVals = document.querySelectorAll('.history-item')[0]?.querySelectorAll('.history-val');
+      if (firstVals) {
+        firstVals[0].textContent = w + 'kg';
+        firstVals[1].textContent = b + '%';
+        firstVals[2].textContent = m + 'kg';
+      }
+    }
+
+    /* ── 신체기록 상세 수정 모드 ── */
+    let _editMode = false;
+    function toggleDetailEdit() {
+      _editMode = !_editMode;
+      const fields = ['weight','bodyfat','muscle','water'];
+      fields.forEach(f => {
+        document.getElementById('detail-' + f + '-view').style.display = _editMode ? 'none' : 'block';
+        document.getElementById('detail-' + f + '-edit').style.display = _editMode ? 'flex' : 'none';
+      });
+      // 메모 편집
+      document.getElementById('detail-memo-view').style.display = _editMode ? 'none' : 'block';
+      document.getElementById('detail-memo-edit').style.display = _editMode ? 'block' : 'none';
+
+      const editBtn = document.getElementById('detail-edit-btn');
+      const delBtn = document.getElementById('detail-del-btn');
+      if (_editMode) {
+        editBtn.textContent = '저장';
+        editBtn.style.background = '#38A169';
+        delBtn.textContent = '취소';
+        delBtn.style.background = '#EDF2F7';
+        delBtn.style.color = '#718096';
+      } else {
+        // 저장 처리
+        fields.forEach(f => {
+          const input = document.getElementById('edit-' + f);
+          const view = document.getElementById('detail-' + f + '-view').querySelector('.detail-item-val');
+          if (input && view) view.textContent = parseFloat(input.value).toFixed(1);
+        });
+        const memo = document.getElementById('detail-memo-edit').value;
+        document.getElementById('detail-memo-view').textContent = memo;
+        editBtn.textContent = '수정';
+        editBtn.style.background = '#4ECDC4';
+        delBtn.textContent = '삭제';
+        delBtn.style.background = '#FED7D7';
+        delBtn.style.color = '#E53E3E';
+        showToast('✅ 수정 사항이 저장되었습니다!');
+      }
+    }
+    function deleteRecord() {
+      if (_editMode) {
+        // 취소 모드
+        _editMode = true;
+        toggleDetailEdit();
+        return;
+      }
+      if (confirm('이 기록을 삭제하시겠습니까?')) {
+        showToast('🗑️ 삭제되었습니다.');
+        setTimeout(() => goScreen(1, navBtn(1)), 800);
+      }
+    }
+
+    /* ── 예약 모달 ── */
+    function openReserveModal(type) {
+      document.getElementById('reserve-modal-title').textContent = type + ' 예약';
+      document.getElementById('reserve-modal').classList.add('open');
+    }
+    function closeReserveModal(e) {
+      if (e && e.target !== document.getElementById('reserve-modal')) return;
+      document.getElementById('reserve-modal').classList.remove('open');
+    }
+    function confirmReserve(slot) {
+      document.getElementById('reserve-modal').classList.remove('open');
+      showToast('✅ ' + slot + ' 예약 완료!');
+    }
+
+    /* ── 달력 날짜 클릭 ── */
+    const exerciseRecords = {
+      '31': [{ name: '상체 근력 루틴', time: '45분 · 220 kcal', color: '#4ECDC4' }, { name: '코어 & 스트레칭', time: '20분 · 80 kcal', color: '#9B6DFF' }],
+      '28': [{ name: '유산소 + 스트레칭', time: '30분 · 140 kcal', color: '#F6AD55' }],
+      '27': [{ name: '하체 루틴', time: '50분 · 280 kcal', color: '#4ECDC4' }],
+      '26': [{ name: '어깨 재활 운동', time: '35분 · 120 kcal', color: '#9B6DFF' }],
+      '24': [{ name: '전신 순환 운동', time: '40분 · 200 kcal', color: '#4ECDC4' }],
+      '21': [{ name: '상체 근력 루틴', time: '45분 · 220 kcal', color: '#4ECDC4' }],
+      '19': [{ name: '코어 강화', time: '25분 · 100 kcal', color: '#F6AD55' }],
+      '17': [{ name: '유산소', time: '30분 · 150 kcal', color: '#9B6DFF' }],
+    };
+    document.addEventListener('DOMContentLoaded', () => {});
+    // 달력 날짜에 클릭 이벤트 바인딩
+    setTimeout(() => {
+      document.querySelectorAll('#exercise-cal .cal-date:not(.empty)').forEach(cell => {
+        cell.addEventListener('click', function() {
+          document.querySelectorAll('#exercise-cal .cal-date').forEach(c => c.classList.remove('selected'));
+          this.classList.add('selected');
+          const day = this.textContent.trim();
+          const recs = exerciseRecords[day] || [];
+          const title = document.querySelector('.day-records-title');
+          const list = document.querySelector('.day-records');
+          if (title) title.textContent = '3월 ' + day + '일 운동 기록';
+          // 기존 항목 제거 후 재렌더
+          document.querySelectorAll('.day-record-item').forEach(el => el.remove());
+          if (recs.length === 0) {
+            list.insertAdjacentHTML('beforeend', '<div style="font-size:13px;color:#A0AEC0;padding:12px 0;">운동 기록이 없습니다.</div>');
+          } else {
+            recs.forEach(r => {
+              list.insertAdjacentHTML('beforeend', `<div class="day-record-item"><div class="day-record-dot" style="background:${r.color};"></div><div class="day-record-name">${r.name}</div><div class="day-record-time">${r.time}</div></div>`);
+            });
+          }
+        });
+      });
+    }, 100);
   </script>
 </body>
 </html>
