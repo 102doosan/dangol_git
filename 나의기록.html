@@ -496,14 +496,14 @@
                   <div class="body-change down">▼ 0.5%</div>
                 </div>
                 <div class="body-item">
-                  <div class="body-label">근육량</div>
+                  <div class="body-label">골격근량</div>
                   <div><span class="body-val">34.1</span><span class="body-unit"> kg</span></div>
                   <div class="body-change up">▲ 0.3 kg</div>
                 </div>
                 <div class="body-item">
-                  <div class="body-label">체수분</div>
-                  <div><span class="body-val">56.4</span><span class="body-unit"> %</span></div>
-                  <div class="body-change" style="color:#A0AEC0;">— 변동없음</div>
+                  <div class="body-label">BMI</div>
+                  <div><span class="body-val">23.2</span><span class="body-unit"></span></div>
+                  <div class="body-change down">▼ 0.3</div>
                 </div>
               </div>
             </div>
@@ -615,13 +615,13 @@
                   <div class="input-box-label">체지방률</div>
                   <div><span class="input-box-val" id="val-bodyfat">18.2</span><span class="input-box-unit"> %</span></div>
                 </div>
-                <div class="input-box" onclick="showNumModal('muscle','근육량','kg 단위로 입력')">
-                  <div class="input-box-label">근육량</div>
+                <div class="input-box" onclick="showNumModal('muscle','골격근량','kg 단위로 입력')">
+                  <div class="input-box-label">골격근량</div>
                   <div><span class="input-box-val" id="val-muscle">34.1</span><span class="input-box-unit"> kg</span></div>
                 </div>
-                <div class="input-box" onclick="showNumModal('water','체수분','% 단위로 입력')">
-                  <div class="input-box-label">체수분</div>
-                  <div><span class="input-box-val" id="val-water">56.4</span><span class="input-box-unit"> %</span></div>
+                <div class="input-box" style="background:#F7F9FC;cursor:default;">
+                  <div class="input-box-label">BMI <span style="font-size:10px;color:#CBD5E0;">자동계산</span></div>
+                  <div><span class="input-box-val" id="val-bmi">23.2</span><span class="input-box-unit"></span></div>
                 </div>
               </div>
               <button class="input-btn" onclick="saveBodyRecord()">기록 저장</button>
@@ -686,17 +686,17 @@
               </div>
               <div class="detail-item">
                 <div class="detail-item-icon">💪</div>
-                <div class="detail-item-label">근육량</div>
+                <div class="detail-item-label">골격근량</div>
                 <div id="detail-muscle-view"><span class="detail-item-val">34.1</span><span class="detail-item-unit"> kg</span></div>
                 <div id="detail-muscle-edit" style="display:none;"><input class="editable-val" id="edit-muscle" value="34.1" type="number" step="0.1"><span class="detail-item-unit"> kg</span></div>
                 <div class="detail-item-change" style="color:#E53E3E;">▲ 0.3 kg</div>
               </div>
               <div class="detail-item">
-                <div class="detail-item-icon">💧</div>
-                <div class="detail-item-label">체수분</div>
-                <div id="detail-water-view"><span class="detail-item-val">56.4</span><span class="detail-item-unit"> %</span></div>
-                <div id="detail-water-edit" style="display:none;"><input class="editable-val" id="edit-water" value="56.4" type="number" step="0.1"><span class="detail-item-unit"> %</span></div>
-                <div class="detail-item-change" style="color:#A0AEC0;">변동 없음</div>
+                <div class="detail-item-icon">📊</div>
+                <div class="detail-item-label">BMI</div>
+                <div id="detail-water-view"><span class="detail-item-val" id="detail-bmi-val">23.2</span><span class="detail-item-unit"></span></div>
+                <div id="detail-water-edit" style="display:none;"><span style="font-size:11px;color:#A0AEC0;">몸무게 저장 시 자동계산</span></div>
+                <div class="detail-item-change" style="color:#38A169;">▼ 0.3</div>
               </div>
             </div>
             <div class="detail-memo">
@@ -1339,6 +1339,10 @@
       if (isNaN(val)) { showToast('올바른 숫자를 입력하세요'); return; }
       const el = document.getElementById('val-' + _numField);
       if (el) el.textContent = val.toFixed(1);
+      // 몸무게 변경 시 BMI 자동 재계산
+      if (_numField === 'weight') {
+        document.getElementById('val-bmi').textContent = calcBMI(val.toFixed(1));
+      }
       document.getElementById('num-modal').classList.remove('open');
       showToast('입력되었습니다. [기록 저장]을 눌러 저장하세요.');
     }
@@ -1386,19 +1390,36 @@
       }
       document.getElementById('date-modal-grid').innerHTML = html;
     }
+    // 키(cm) 설정 - 실제 서비스에선 프로필에서 가져옴
+    const USER_HEIGHT_M = 1.72;
+
+    function calcBMI(weightStr) {
+      const w = parseFloat(weightStr);
+      if (isNaN(w)) return '—';
+      return (w / (USER_HEIGHT_M * USER_HEIGHT_M)).toFixed(1);
+    }
+
     // 날짜별 측정 기록 데이터 (key: YYYY-MM-DD)
     const bodyRecordData = {
-      '2026-03-31': { weight: '72.4', bodyfat: '18.2', muscle: '34.1', water: '56.4' },
-      '2026-03-28': { weight: '73.2', bodyfat: '18.7', muscle: '33.8', water: '56.1' },
-      '2026-03-24': { weight: '73.8', bodyfat: '19.1', muscle: '33.5', water: '55.8' },
-      '2026-03-20': { weight: '74.2', bodyfat: '19.4', muscle: '33.2', water: '55.5' },
-      '2026-03-15': { weight: '74.8', bodyfat: '19.8', muscle: '33.0', water: '55.2' },
-      '2026-03-10': { weight: '75.1', bodyfat: '20.0', muscle: '32.8', water: '54.9' },
-      '2026-03-05': { weight: '75.5', bodyfat: '20.3', muscle: '32.5', water: '54.6' },
-      '2026-02-28': { weight: '76.0', bodyfat: '20.6', muscle: '32.2', water: '54.3' },
-      '2026-02-20': { weight: '76.4', bodyfat: '21.0', muscle: '32.0', water: '54.0' },
-      '2026-02-10': { weight: '77.0', bodyfat: '21.5', muscle: '31.8', water: '53.7' },
+      '2026-03-31': { weight: '72.4', bodyfat: '18.2', muscle: '34.1' },
+      '2026-03-28': { weight: '73.2', bodyfat: '18.7', muscle: '33.8' },
+      '2026-03-24': { weight: '73.8', bodyfat: '19.1', muscle: '33.5' },
+      '2026-03-20': { weight: '74.2', bodyfat: '19.4', muscle: '33.2' },
+      '2026-03-15': { weight: '74.8', bodyfat: '19.8', muscle: '33.0' },
+      '2026-03-10': { weight: '75.1', bodyfat: '20.0', muscle: '32.8' },
+      '2026-03-05': { weight: '75.5', bodyfat: '20.3', muscle: '32.5' },
+      '2026-02-28': { weight: '76.0', bodyfat: '20.6', muscle: '32.2' },
+      '2026-02-20': { weight: '76.4', bodyfat: '21.0', muscle: '32.0' },
+      '2026-02-10': { weight: '77.0', bodyfat: '21.5', muscle: '31.8' },
     };
+
+    function setBodyFields(w, bf, mu) {
+      const bmi = calcBMI(w);
+      document.getElementById('val-weight').textContent  = w;
+      document.getElementById('val-bodyfat').textContent = bf;
+      document.getElementById('val-muscle').textContent  = mu;
+      document.getElementById('val-bmi').textContent     = bmi;
+    }
 
     function selectDate(year, month, day) {
       document.getElementById('date-modal').classList.remove('open');
@@ -1408,16 +1429,11 @@
       const rec = bodyRecordData[key];
 
       if (rec) {
-        document.getElementById('val-weight').textContent  = rec.weight;
-        document.getElementById('val-bodyfat').textContent = rec.bodyfat;
-        document.getElementById('val-muscle').textContent  = rec.muscle;
-        document.getElementById('val-water').textContent   = rec.water;
+        setBodyFields(rec.weight, rec.bodyfat, rec.muscle);
         showToast(`📅 ${month}월 ${day}일 측정값을 불러왔습니다.`);
       } else {
-        document.getElementById('val-weight').textContent  = '—';
-        document.getElementById('val-bodyfat').textContent = '—';
-        document.getElementById('val-muscle').textContent  = '—';
-        document.getElementById('val-water').textContent   = '—';
+        setBodyFields('—', '—', '—');
+        document.getElementById('val-bmi').textContent = '—';
         showToast(`📅 ${month}월 ${day}일 · 기록 없음. 새로 입력하세요.`);
       }
     }
@@ -1427,8 +1443,7 @@
       const w = document.getElementById('val-weight')?.textContent;
       const b = document.getElementById('val-bodyfat')?.textContent;
       const m = document.getElementById('val-muscle')?.textContent;
-      const wa = document.getElementById('val-water')?.textContent;
-      if (!w || !b || !m || !wa) { showToast('모든 항목을 입력해주세요'); return; }
+      if (!w || !b || !m || w==='—') { showToast('모든 항목을 입력해주세요'); return; }
       showToast('✅ 기록이 저장되었습니다!');
       // 이력 목록 첫 행 업데이트
       const firstVals = document.querySelectorAll('.history-item')[0]?.querySelectorAll('.history-val');
@@ -1443,7 +1458,7 @@
     let _editMode = false;
     function toggleDetailEdit() {
       _editMode = !_editMode;
-      const fields = ['weight','bodyfat','muscle','water'];
+      const fields = ['weight','bodyfat','muscle'];
       fields.forEach(f => {
         document.getElementById('detail-' + f + '-view').style.display = _editMode ? 'none' : 'block';
         document.getElementById('detail-' + f + '-edit').style.display = _editMode ? 'flex' : 'none';
