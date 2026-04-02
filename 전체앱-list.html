@@ -123,6 +123,8 @@
       box-shadow: 0 1px 3px rgba(0,0,0,0.08); white-space: nowrap;
     }
     .subtab-btn.active { background: #4F9CF9; color: #fff; box-shadow: 0 2px 6px rgba(79,156,249,0.35); }
+    .subtab-btn.all-done { border: 2px solid #48BB78; color: #38A169; background: #F0FFF4; }
+    .subtab-btn.all-done.active { background: #4F9CF9; color: #fff; border-color: #4F9CF9; }
   </style>
 </head>
 <body>
@@ -745,8 +747,10 @@ function render() {
   const subtabAll = {id:"all", icon:"📋", title:"전체"};
   document.getElementById('subtabs').innerHTML = [subtabAll, ...cats].map(c => {
     const screens = c.id === "all" ? cats.flatMap(x => x.screens) : c.screens;
-    const done = screens.filter(s => checked[s.id]).length;
-    return `<button class="subtab-btn ${activeSubTab===c.id?'active':''}" onclick="setSubTab('${c.id}')">${c.icon ? c.icon+' ' : ''}${c.title} <span style="opacity:0.7;font-size:10px">${done}/${screens.length}</span></button>`;
+    const done = screens.filter(s => isScreenDone(s)).length;
+    const isAllDone = screens.length > 0 && done === screens.length;
+    const classes = ['subtab-btn', activeSubTab===c.id?'active':'', isAllDone?'all-done':''].filter(Boolean).join(' ');
+    return `<button class="${classes}" onclick="setSubTab('${c.id}')">${isAllDone && c.id!=='all' ? '✅ ' : (c.icon ? c.icon+' ' : '')}${c.title} <span style="opacity:0.7;font-size:10px">${done}/${screens.length}</span></button>`;
   }).join('');
 
   const visibleCats = activeSubTab === "all" ? cats : cats.filter(c => c.id === activeSubTab);
