@@ -56,6 +56,8 @@
     .section-label { font-size: 11px; font-weight: 800; color: #A0AEC0; letter-spacing: 1.5px; margin: 20px 0 10px; padding-left: 4px; }
 
     .category { background: #fff; border-radius: 16px; box-shadow: 0 1px 6px rgba(0,0,0,0.07); margin-bottom: 12px; overflow: hidden; }
+    .category.all-done { box-shadow: 0 0 0 2px #48BB78, 0 1px 6px rgba(0,0,0,0.07); background: #F0FFF4; }
+    .category.all-done .cat-header { background: #F0FFF4; }
     .cat-header {
       display: flex; align-items: center; padding: 14px 20px;
       cursor: pointer; user-select: none; border-left: 4px solid;
@@ -712,12 +714,13 @@ function renderCats(cats) {
           </div>
         </div>`;
     }).join('') : '';
+    const isAllDone = filtered.length > 0 && catDone === filtered.length;
     return `
-      <div class="category">
-        <div class="cat-header" style="border-color:${cat.color}" onclick="toggleCat('${cat.id}')">
-          <span class="cat-icon">${cat.icon}</span>
+      <div class="category${isAllDone ? ' all-done' : ''}">
+        <div class="cat-header" style="border-color:${isAllDone ? '#48BB78' : cat.color}" onclick="toggleCat('${cat.id}')">
+          <span class="cat-icon">${isAllDone ? '✅' : cat.icon}</span>
           <span class="cat-title">${cat.title}</span>
-          <span class="cat-count" style="color:${cat.color};background:${cat.color}18">${catDone}/${filtered.length}</span>
+          <span class="cat-count" style="color:${isAllDone ? '#38A169' : cat.color};background:${isAllDone ? '#C6F6D5' : cat.color+'18'}">${catDone}/${filtered.length}</span>
           <span class="cat-toggle">${isOpen?'▲':'▼'}</span>
         </div>
         <div class="screen-list">${items}</div>
