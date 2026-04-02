@@ -404,6 +404,32 @@
     </div>
   </div>
 
+  <!-- 날짜 선택 모달 -->
+  <div class="modal-backdrop" id="date-modal" onclick="closeDateModal(event)">
+    <div class="input-modal">
+      <div class="modal-title">날짜 선택</div>
+      <div class="modal-sub">기록할 날짜를 선택하세요</div>
+      <div style="display:flex;align-items:center;justify-content:center;gap:8px;margin:16px 0 8px;">
+        <button onclick="changeDateMonth(-1)" style="width:36px;height:36px;border-radius:50%;border:none;background:#EDF2F7;font-size:16px;cursor:pointer;font-family:'Noto Sans KR',sans-serif;">‹</button>
+        <span id="date-modal-month" style="font-size:16px;font-weight:900;color:#2D3748;min-width:110px;text-align:center;">2026년 3월</span>
+        <button onclick="changeDateMonth(1)" style="width:36px;height:36px;border-radius:50%;border:none;background:#EDF2F7;font-size:16px;cursor:pointer;font-family:'Noto Sans KR',sans-serif;">›</button>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;text-align:center;margin-bottom:8px;">
+        <div style="font-size:11px;font-weight:700;color:#E53E3E;padding:4px 0;">일</div>
+        <div style="font-size:11px;font-weight:700;color:#A0AEC0;padding:4px 0;">월</div>
+        <div style="font-size:11px;font-weight:700;color:#A0AEC0;padding:4px 0;">화</div>
+        <div style="font-size:11px;font-weight:700;color:#A0AEC0;padding:4px 0;">수</div>
+        <div style="font-size:11px;font-weight:700;color:#A0AEC0;padding:4px 0;">목</div>
+        <div style="font-size:11px;font-weight:700;color:#A0AEC0;padding:4px 0;">금</div>
+        <div style="font-size:11px;font-weight:700;color:#4299E1;padding:4px 0;">토</div>
+      </div>
+      <div id="date-modal-grid" style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;text-align:center;"></div>
+      <div class="modal-btns" style="margin-top:16px;">
+        <button class="modal-cancel" onclick="closeDateModal()">취소</button>
+      </div>
+    </div>
+  </div>
+
   <!-- 예약 모달 -->
   <div class="modal-backdrop" id="reserve-modal" onclick="closeReserveModal(event)">
     <div class="input-modal reserve-modal">
@@ -578,10 +604,7 @@
             <div class="input-section">
               <div class="input-date-row">
                 <div class="input-date" id="body-record-date">2026년 3월 31일</div>
-                <div class="input-date-edit" onclick="document.getElementById('date-picker-input').click()">날짜 변경</div>
-                <input type="date" id="date-picker-input" value="2026-03-31"
-                  style="position:absolute;opacity:0;pointer-events:none;width:0;height:0;"
-                  onchange="applyDateChange(this.value)">
+                <div class="input-date-edit" onclick="openDateModal()">날짜 변경</div>
               </div>
               <div class="input-grid">
                 <div class="input-box" onclick="showNumModal('weight','몸무게','kg 단위로 입력')">
@@ -1320,12 +1343,47 @@
       showToast('입력되었습니다. [기록 저장]을 눌러 저장하세요.');
     }
 
-    /* ── 날짜 변경 ── */
-    function applyDateChange(val) {
-      const d = new Date(val);
-      const year = d.getFullYear();
-      const month = d.getMonth() + 1;
-      const day = d.getDate();
+    /* ── 날짜 선택 모달 ── */
+    let _dateCur = { year: 2026, month: 3 };
+
+    function openDateModal() {
+      _dateCur = { year: 2026, month: 3 };
+      renderDateGrid();
+      document.getElementById('date-modal').classList.add('open');
+    }
+    function closeDateModal(e) {
+      if (e && e.target !== document.getElementById('date-modal')) return;
+      document.getElementById('date-modal').classList.remove('open');
+    }
+    function changeDateMonth(delta) {
+      _dateCur.month += delta;
+      if (_dateCur.month > 12) { _dateCur.month = 1; _dateCur.year++; }
+      if (_dateCur.month < 1)  { _dateCur.month = 12; _dateCur.year--; }
+      renderDateGrid();
+    }
+    function renderDateGrid() {
+      const { year, month } = _dateCur;
+      document.getElementById('date-modal-month').textContent = `${year}년 ${month}월`;
+      const firstDay = new Date(year, month - 1, 1).getDay();
+      const daysInMonth = new Date(year, month, 0).getDate();
+      const today = new Date();
+      const isToday = (d) => today.getFullYear()===year && today.getMonth()+1===month && today.getDate()===d;
+      let html = '';
+      for (let i = 0; i < firstDay; i++) html += '<div></div>';
+      for (let d = 1; d <= daysInMonth; d++) {
+        const col = (firstDay + d - 1) % 7;
+        const isFuture = new Date(year, month - 1, d) > today;
+        const color = col === 0 ? '#E53E3E' : col === 6 ? '#4299E1' : '#2D3748';
+        const bg = isToday(d) ? '#4ECDC4' : isFuture ? '#EDF2F7' : '';
+        const txtColor = isToday(d) ? '#fff' : isFuture ? '#CBD5E0' : color;
+        const cursor = isFuture ? 'default' : 'pointer';
+        html += `<div onclick="${isFuture ? '' : `selectDate(${year},${month},${d})`}"
+          style="padding:7px 2px;font-size:13px;font-weight:600;color:${txtColor};background:${bg};border-radius:8px;cursor:${cursor};">${d}</div>`;
+      }
+      document.getElementById('date-modal-grid').innerHTML = html;
+    }
+    function selectDate(year, month, day) {
+      document.getElementById('date-modal').classList.remove('open');
       document.getElementById('body-record-date').textContent = `${year}년 ${month}월 ${day}일`;
       showToast(`📅 ${month}월 ${day}일로 변경되었습니다.`);
     }
