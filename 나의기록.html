@@ -238,6 +238,16 @@
     .reserve-slot-sub { font-size: 11px; color: #A0AEC0; margin-top: 2px; }
     .reserve-btn { background: #4ECDC4; color: #fff; border: none; border-radius: 99px; padding: 6px 14px; font-size: 12px; font-weight: 700; cursor: pointer; font-family: 'Noto Sans KR', sans-serif; }
 
+    /* ── 목표 설정 모달 ── */
+    .goal-row { display: flex; align-items: center; gap: 12px; padding: 14px 0; border-bottom: 1px solid #F0F4F8; }
+    .goal-row-label { font-size: 13px; font-weight: 700; color: #4A5568; flex: 1; }
+    .goal-row-sub { font-size: 11px; color: #A0AEC0; margin-top: 2px; }
+    .goal-stepper { display: flex; align-items: center; gap: 10px; }
+    .goal-step-btn { width: 32px; height: 32px; border-radius: 50%; border: none; background: #EDF2F7; font-size: 18px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; color: #4A5568; transition: all 0.15s; font-family: 'Noto Sans KR', sans-serif; }
+    .goal-step-btn:active { background: #4ECDC4; color: #fff; }
+    .goal-step-val { font-size: 18px; font-weight: 900; color: #2D3748; min-width: 36px; text-align: center; }
+    .goal-step-unit { font-size: 12px; color: #A0AEC0; }
+
     /* ── 6. 출석/방문 기록 ── */
     .visit-streak { background: linear-gradient(135deg, #667EEA 0%, #764BA2 100%); margin: 12px 16px; border-radius: 16px; padding: 16px; color: #fff; display: flex; align-items: center; gap: 16px; }
     .streak-num { font-size: 40px; font-weight: 900; line-height: 1; }
@@ -346,6 +356,54 @@
     </div>
   </div>
 
+  <!-- 목표 설정 모달 -->
+  <div class="modal-backdrop" id="goal-modal" onclick="closeGoalModal(event)">
+    <div class="input-modal">
+      <div class="modal-title">목표 설정</div>
+      <div class="modal-sub">이번 달 달성 목표를 설정하세요</div>
+      <div class="goal-row">
+        <div>
+          <div class="goal-row-label">🏃 이번 달 운동 목표</div>
+          <div class="goal-row-sub">월 운동 횟수 목표 (일 단위)</div>
+        </div>
+        <div class="goal-stepper">
+          <button class="goal-step-btn" onclick="stepGoal('exercise', -1)">−</button>
+          <span class="goal-step-val" id="goal-exercise-val">20</span>
+          <span class="goal-step-unit">일</span>
+          <button class="goal-step-btn" onclick="stepGoal('exercise', 1)">+</button>
+        </div>
+      </div>
+      <div class="goal-row">
+        <div>
+          <div class="goal-row-label">⏱ 하루 운동 시간 목표</div>
+          <div class="goal-row-sub">하루 목표 운동 시간</div>
+        </div>
+        <div class="goal-stepper">
+          <button class="goal-step-btn" onclick="stepGoal('duration', -10)">−</button>
+          <span class="goal-step-val" id="goal-duration-val">45</span>
+          <span class="goal-step-unit">분</span>
+          <button class="goal-step-btn" onclick="stepGoal('duration', 10)">+</button>
+        </div>
+      </div>
+      <div class="goal-row" style="border-bottom:none;">
+        <div>
+          <div class="goal-row-label">🔥 일일 칼로리 소모 목표</div>
+          <div class="goal-row-sub">하루 목표 소모 칼로리</div>
+        </div>
+        <div class="goal-stepper">
+          <button class="goal-step-btn" onclick="stepGoal('kcal', -50)">−</button>
+          <span class="goal-step-val" id="goal-kcal-val">300</span>
+          <span class="goal-step-unit">kcal</span>
+          <button class="goal-step-btn" onclick="stepGoal('kcal', 50)">+</button>
+        </div>
+      </div>
+      <div class="modal-btns">
+        <button class="modal-cancel" onclick="closeGoalModal()">취소</button>
+        <button class="modal-confirm" onclick="saveGoal()">저장</button>
+      </div>
+    </div>
+  </div>
+
   <!-- 예약 모달 -->
   <div class="modal-backdrop" id="reserve-modal" onclick="closeReserveModal(event)">
     <div class="input-modal reserve-modal">
@@ -424,13 +482,23 @@
               </div>
             </div>
 
-            <div class="section-title">이번 달 달성 현황</div>
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px 8px;">
+              <span style="font-size:15px;font-weight:800;color:#2D3748;">이번 달 달성 현황</span>
+              <button onclick="openGoalModal()" style="background:#F0FFF4;color:#276749;border:none;border-radius:99px;padding:5px 12px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Noto Sans KR',sans-serif;">⚙ 목표 설정</button>
+            </div>
             <div class="month-card" onclick="goScreen(3, navBtn(3))">
               <div class="month-row">
                 <span class="month-label">🏃 운동 목표</span>
-                <span class="month-val">16 / 20일</span>
+                <span class="month-val">16 / <span id="display-exercise-goal">20</span>일</span>
               </div>
-              <div class="month-bar"><div class="month-fill" style="width:80%;height:100%;background:linear-gradient(90deg,#4ECDC4,#45B7AA);border-radius:99px;"></div></div>
+              <div class="month-bar"><div class="month-fill" id="exercise-goal-bar" style="width:80%;height:100%;background:linear-gradient(90deg,#4ECDC4,#45B7AA);border-radius:99px;"></div></div>
+              <div style="font-size:11px;color:#A0AEC0;margin-top:4px;" id="exercise-goal-hint">목표까지 4일 남음</div>
+              <div class="month-row" style="margin-top:10px;margin-bottom:4px;">
+                <span class="month-label">⏱ 오늘 운동 시간</span>
+                <span class="month-val">65분 / <span id="display-duration-goal">45</span>분</span>
+              </div>
+              <div class="month-bar"><div class="month-fill" style="width:100%;height:100%;background:linear-gradient(90deg,#9B6DFF,#B794F4);border-radius:99px;"></div></div>
+              <div style="font-size:11px;color:#9B6DFF;margin-top:4px;">오늘 목표 달성 🎉</div>
               <div class="month-row" style="margin-top:10px;margin-bottom:0;">
                 <span class="month-label">📅 출석</span>
                 <span style="font-size:13px;font-weight:900;color:#667EEA;">22일 연속</span>
@@ -1312,6 +1380,40 @@
         showToast('🗑️ 삭제되었습니다.');
         setTimeout(() => goScreen(1, navBtn(1)), 800);
       }
+    }
+
+    /* ── 목표 설정 모달 ── */
+    const goals = { exercise: 20, duration: 45, kcal: 300 };
+    const goalMin = { exercise: 1, duration: 10, kcal: 50 };
+    const goalMax = { exercise: 31, duration: 180, kcal: 1000 };
+
+    function openGoalModal() {
+      document.getElementById('goal-exercise-val').textContent = goals.exercise;
+      document.getElementById('goal-duration-val').textContent = goals.duration;
+      document.getElementById('goal-kcal-val').textContent = goals.kcal;
+      document.getElementById('goal-modal').classList.add('open');
+    }
+    function closeGoalModal(e) {
+      if (e && e.target !== document.getElementById('goal-modal')) return;
+      document.getElementById('goal-modal').classList.remove('open');
+    }
+    function stepGoal(key, delta) {
+      const v = Math.min(goalMax[key], Math.max(goalMin[key], goals[key] + delta));
+      goals[key] = v;
+      document.getElementById('goal-' + key + '-val').textContent = v;
+    }
+    function saveGoal() {
+      document.getElementById('goal-modal').classList.remove('open');
+      // 운동 목표 반영
+      const current = 16;
+      const pct = Math.min(100, Math.round(current / goals.exercise * 100));
+      document.getElementById('display-exercise-goal').textContent = goals.exercise;
+      document.getElementById('exercise-goal-bar').style.width = pct + '%';
+      const remain = goals.exercise - current;
+      document.getElementById('exercise-goal-hint').textContent =
+        remain > 0 ? `목표까지 ${remain}일 남음` : '이번 달 목표 달성! 🎉';
+      document.getElementById('display-duration-goal').textContent = goals.duration;
+      showToast('✅ 목표가 저장되었습니다!');
     }
 
     /* ── 예약 모달 ── */
