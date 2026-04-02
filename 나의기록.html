@@ -1084,6 +1084,9 @@
             </div>
           </div>
 
+          <!-- ⑨ 운동 상세 (동적 렌더링) -->
+          <div class="screen" id="ex-detail-screen" style="overflow-y:auto;"></div>
+
         </div><!-- phone-screen end -->
       </div><!-- phone end -->
     </div><!-- phone-wrap end -->
@@ -1431,6 +1434,80 @@
     }
 
     /* ── 달력 날짜 클릭 ── */
+    // 운동 상세 데이터 (동작 목록 포함)
+    const exerciseDetail = {
+      '상체 근력 루틴': {
+        color: '#4ECDC4', type: 'routine', totalTime: '45분', kcal: '220 kcal',
+        moves: [
+          { name: '덤벨 숄더 프레스', sets: '3세트 × 12회', icon: '💪', done: true },
+          { name: '벤트오버 로우', sets: '3세트 × 10회', icon: '🏋️', done: true },
+          { name: '라터럴 레이즈', sets: '3세트 × 15회', icon: '💪', done: true },
+          { name: '바이셉 컬', sets: '3세트 × 12회', icon: '💪', done: true },
+          { name: '트라이셉 익스텐션', sets: '3세트 × 12회', icon: '💪', done: false },
+        ]
+      },
+      '코어 & 스트레칭': {
+        color: '#9B6DFF', type: 'routine', totalTime: '20분', kcal: '80 kcal',
+        moves: [
+          { name: '플랭크', sets: '3세트 × 40초', icon: '🧘', done: true },
+          { name: '사이드 플랭크', sets: '2세트 × 30초', icon: '🧘', done: true },
+          { name: '버드독', sets: '3세트 × 10회', icon: '🧘', done: true },
+          { name: '전신 스트레칭', sets: '1세트 × 5분', icon: '🤸', done: true },
+        ]
+      },
+      '어깨 재활 운동': {
+        color: '#9B6DFF', type: 'rehab', totalTime: '35분', kcal: '120 kcal',
+        moves: [
+          { name: '어깨 외회전 밴드 운동', sets: '3세트 × 15회', icon: '🏥', done: true },
+          { name: '사이드 레이즈 (경량)', sets: '3세트 × 20회', icon: '💪', done: true },
+          { name: '어깨 굴곡 스트레칭', sets: '2세트 × 30초', icon: '🤸', done: true },
+          { name: 'Wall slide', sets: '3세트 × 10회', icon: '🏥', done: false },
+        ]
+      },
+      '하체 루틴': {
+        color: '#4ECDC4', type: 'routine', totalTime: '50분', kcal: '280 kcal',
+        moves: [
+          { name: '스쿼트', sets: '4세트 × 15회', icon: '🏋️', done: true },
+          { name: '런지', sets: '3세트 × 12회 (좌우)', icon: '🏋️', done: true },
+          { name: '레그 프레스', sets: '3세트 × 10회', icon: '💪', done: true },
+          { name: '카프 레이즈', sets: '3세트 × 20회', icon: '🦵', done: true },
+          { name: '햄스트링 스트레칭', sets: '1세트 × 5분', icon: '🤸', done: false },
+        ]
+      },
+      '유산소 + 스트레칭': {
+        color: '#F6AD55', type: 'cardio', totalTime: '30분', kcal: '140 kcal',
+        moves: [
+          { name: '트레드밀 걷기 (경사)', sets: '15분', icon: '🚶', done: true },
+          { name: '사이클', sets: '10분', icon: '🚴', done: true },
+          { name: '전신 스트레칭', sets: '5분', icon: '🤸', done: true },
+        ]
+      },
+      '전신 순환 운동': {
+        color: '#4ECDC4', type: 'routine', totalTime: '40분', kcal: '200 kcal',
+        moves: [
+          { name: '버피', sets: '3세트 × 10회', icon: '🏃', done: true },
+          { name: '푸시업', sets: '3세트 × 15회', icon: '💪', done: true },
+          { name: '스쿼트 점프', sets: '3세트 × 12회', icon: '🦵', done: true },
+          { name: '마운틴 클라이머', sets: '3세트 × 20회', icon: '🏃', done: false },
+        ]
+      },
+      '코어 강화': {
+        color: '#F6AD55', type: 'routine', totalTime: '25분', kcal: '100 kcal',
+        moves: [
+          { name: '크런치', sets: '3세트 × 20회', icon: '💪', done: true },
+          { name: '레그 레이즈', sets: '3세트 × 15회', icon: '🧘', done: true },
+          { name: '플랭크', sets: '3세트 × 45초', icon: '🧘', done: true },
+        ]
+      },
+      '유산소': {
+        color: '#9B6DFF', type: 'cardio', totalTime: '30분', kcal: '150 kcal',
+        moves: [
+          { name: '트레드밀 조깅', sets: '20분', icon: '🏃', done: true },
+          { name: '스트레칭', sets: '10분', icon: '🤸', done: true },
+        ]
+      },
+    };
+
     const exerciseRecords = {
       '31': [{ name: '상체 근력 루틴', time: '45분 · 220 kcal', color: '#4ECDC4' }, { name: '코어 & 스트레칭', time: '20분 · 80 kcal', color: '#9B6DFF' }],
       '28': [{ name: '유산소 + 스트레칭', time: '30분 · 140 kcal', color: '#F6AD55' }],
@@ -1441,6 +1518,82 @@
       '19': [{ name: '코어 강화', time: '25분 · 100 kcal', color: '#F6AD55' }],
       '17': [{ name: '유산소', time: '30분 · 150 kcal', color: '#9B6DFF' }],
     };
+
+    // 운동 상세 화면 열기
+    let _detailFromDay = '';
+    function openExerciseDetail(name, day) {
+      _detailFromDay = day;
+      const d = exerciseDetail[name] || { color: '#4ECDC4', type: 'routine', totalTime: '-', kcal: '-', moves: [] };
+      const typeLabel = { routine: '루틴', rehab: '재활운동', cardio: '유산소' };
+      const typeBg = { routine: '#E6FFFA', rehab: '#FFF5EB', cardio: '#FFFBEB' };
+      const typeColor = { routine: '#2C7A7B', rehab: '#C05621', cardio: '#B7791F' };
+      const doneCount = d.moves.filter(m => m.done).length;
+      const pct = d.moves.length ? Math.round(doneCount / d.moves.length * 100) : 0;
+
+      const moveRows = d.moves.map((m, i) => `
+        <div style="display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid #F0F4F8;" id="move-row-${i}">
+          <div style="width:36px;height:36px;border-radius:10px;background:${m.done ? d.color + '22' : '#F7F9FC'};display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;">${m.icon}</div>
+          <div style="flex:1;">
+            <div style="font-size:13px;font-weight:700;color:${m.done ? '#2D3748' : '#A0AEC0'};">${m.name}</div>
+            <div style="font-size:11px;color:#A0AEC0;margin-top:2px;">${m.sets}</div>
+          </div>
+          <div style="font-size:18px;">${m.done ? '✅' : '⬜'}</div>
+        </div>`).join('');
+
+      document.getElementById('ex-detail-screen').innerHTML = `
+        <div class="status-bar"><span class="status-time">9:41</span><span class="status-icons">●●●</span></div>
+        <div class="top-bar">
+          <span class="top-back" onclick="goScreen(3, navBtn(3))" style="font-size:18px;cursor:pointer;color:#4A5568;margin-right:10px;">‹</span>
+          <span style="font-size:17px;font-weight:800;flex:1;">${name}</span>
+        </div>
+        <!-- 요약 헤더 -->
+        <div style="background:linear-gradient(135deg,${d.color},${d.color}CC);margin:0 16px 14px;border-radius:16px;padding:16px;color:#fff;">
+          <div style="display:flex;gap:8px;margin-bottom:10px;">
+            <span style="background:rgba(255,255,255,0.25);padding:3px 10px;border-radius:99px;font-size:11px;font-weight:700;">${typeLabel[d.type] || d.type}</span>
+            <span style="background:rgba(255,255,255,0.25);padding:3px 10px;border-radius:99px;font-size:11px;font-weight:700;">3월 ${day}일</span>
+          </div>
+          <div style="display:flex;gap:16px;">
+            <div style="text-align:center;"><div style="font-size:20px;font-weight:900;">${d.totalTime}</div><div style="font-size:11px;opacity:0.8;">운동시간</div></div>
+            <div style="width:1px;background:rgba(255,255,255,0.3);"></div>
+            <div style="text-align:center;"><div style="font-size:20px;font-weight:900;">${d.kcal}</div><div style="font-size:11px;opacity:0.8;">소모 칼로리</div></div>
+            <div style="width:1px;background:rgba(255,255,255,0.3);"></div>
+            <div style="text-align:center;"><div style="font-size:20px;font-weight:900;">${doneCount}/${d.moves.length}</div><div style="font-size:11px;opacity:0.8;">동작 완료</div></div>
+          </div>
+          <!-- 진행 바 -->
+          <div style="margin-top:12px;">
+            <div style="display:flex;justify-content:space-between;font-size:11px;opacity:0.85;margin-bottom:4px;"><span>완료율</span><span>${pct}%</span></div>
+            <div style="background:rgba(255,255,255,0.3);border-radius:99px;height:6px;overflow:hidden;">
+              <div style="width:${pct}%;height:100%;background:#fff;border-radius:99px;"></div>
+            </div>
+          </div>
+        </div>
+        <!-- 동작 목록 -->
+        <div style="padding:0 16px;">
+          <div style="font-size:14px;font-weight:800;color:#2D3748;margin-bottom:4px;">동작 목록</div>
+          ${moveRows}
+        </div>
+        <!-- 다시 시작 버튼 -->
+        <div style="padding:20px 16px 32px;display:flex;gap:10px;">
+          <button onclick="goScreen(3, navBtn(3))" style="flex:1;background:#EDF2F7;color:#4A5568;border:none;border-radius:14px;padding:15px;font-size:14px;font-weight:800;cursor:pointer;font-family:'Noto Sans KR',sans-serif;">뒤로</button>
+          <button onclick="startExercise('${name}', '${d.type}')" style="flex:2;background:${d.color};color:#fff;border:none;border-radius:14px;padding:15px;font-size:15px;font-weight:900;cursor:pointer;font-family:'Noto Sans KR',sans-serif;">▶ 다시 시작</button>
+        </div>`;
+
+      // 화면 전환 (s8 = 운동 상세)
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+      document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+      document.getElementById('ex-detail-screen').classList.add('active');
+    }
+
+    function startExercise(name, type) {
+      if (type === 'rehab') {
+        showToast('재활운동 앱으로 이동합니다...');
+        setTimeout(() => location.href = '재활운동.html', 800);
+      } else {
+        showToast('마이루틴에서 시작합니다...');
+        setTimeout(() => location.href = '마이루틴.html', 800);
+      }
+    }
+
     document.addEventListener('DOMContentLoaded', () => {});
     // 달력 날짜에 클릭 이벤트 바인딩
     setTimeout(() => {
@@ -1459,10 +1612,16 @@
             list.insertAdjacentHTML('beforeend', '<div style="font-size:13px;color:#A0AEC0;padding:12px 0;">운동 기록이 없습니다.</div>');
           } else {
             recs.forEach(r => {
-              list.insertAdjacentHTML('beforeend', `<div class="day-record-item"><div class="day-record-dot" style="background:${r.color};"></div><div class="day-record-name">${r.name}</div><div class="day-record-time">${r.time}</div></div>`);
+              list.insertAdjacentHTML('beforeend', `<div class="day-record-item" onclick="openExerciseDetail('${r.name}','${day}')" style="cursor:pointer;"><div class="day-record-dot" style="background:${r.color};"></div><div class="day-record-name">${r.name}</div><div class="day-record-time">${r.time}</div></div>`);
             });
           }
         });
+      });
+      // 초기 31일 항목에도 클릭 이벤트
+      document.querySelectorAll('.day-record-item').forEach(item => {
+        const name = item.querySelector('.day-record-name')?.textContent;
+        if (name) item.onclick = () => openExerciseDetail(name, '31');
+        item.style.cursor = 'pointer';
       });
     }, 100);
   </script>
