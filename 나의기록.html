@@ -577,8 +577,11 @@
             </div>
             <div class="input-section">
               <div class="input-date-row">
-                <div class="input-date">2026년 3월 31일</div>
-                <div class="input-date-edit">날짜 변경</div>
+                <div class="input-date" id="body-record-date">2026년 3월 31일</div>
+                <div class="input-date-edit" onclick="document.getElementById('date-picker-input').click()">날짜 변경</div>
+                <input type="date" id="date-picker-input" value="2026-03-31"
+                  style="position:absolute;opacity:0;pointer-events:none;width:0;height:0;"
+                  onchange="applyDateChange(this.value)">
               </div>
               <div class="input-grid">
                 <div class="input-box" onclick="showNumModal('weight','몸무게','kg 단위로 입력')">
@@ -1315,6 +1318,16 @@
       if (el) el.textContent = val.toFixed(1);
       document.getElementById('num-modal').classList.remove('open');
       showToast('입력되었습니다. [기록 저장]을 눌러 저장하세요.');
+    }
+
+    /* ── 날짜 변경 ── */
+    function applyDateChange(val) {
+      const d = new Date(val);
+      const year = d.getFullYear();
+      const month = d.getMonth() + 1;
+      const day = d.getDate();
+      document.getElementById('body-record-date').textContent = `${year}년 ${month}월 ${day}일`;
+      showToast(`📅 ${month}월 ${day}일로 변경되었습니다.`);
     }
 
     /* ── 신체기록 저장 ── */
