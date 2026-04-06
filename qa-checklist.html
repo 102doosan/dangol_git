@@ -1,0 +1,777 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>QA 체크리스트</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet" />
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Noto Sans KR', sans-serif;
+      background: #F7F9FC;
+      color: #1A202C;
+      min-height: 100vh;
+      padding: 32px 16px 48px;
+    }
+    .container { max-width: 760px; margin: 0 auto; }
+
+    .header { margin-bottom: 24px; }
+    .header-row { display: flex; align-items: center; gap: 10px; margin-bottom: 4px; }
+    .header-row h1 { font-size: 22px; font-weight: 900; letter-spacing: -0.5px; }
+    .header p { color: #718096; font-size: 13px; }
+    .header-link { margin-left: auto; font-size: 12px; font-weight: 700; color: #4F9CF9; text-decoration: none; padding: 6px 14px; border-radius: 99px; background: #EBF8FF; }
+    .header-link:hover { background: #BEE3F8; }
+
+    .stats { display: flex; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; }
+    .stat-box { background: #fff; border-radius: 12px; padding: 12px 18px; box-shadow: 0 1px 4px rgba(0,0,0,0.07); flex: 1; min-width: 90px; text-align: center; }
+    .stat-num { font-size: 24px; font-weight: 900; }
+    .stat-label { font-size: 11px; color: #A0AEC0; margin-top: 2px; font-weight: 600; }
+
+    .tabs { display: flex; gap: 4px; margin-bottom: 16px; background: #fff; border-radius: 14px; padding: 6px; box-shadow: 0 1px 6px rgba(0,0,0,0.07); }
+    .tab-btn {
+      flex: 1; padding: 10px; border: none; border-radius: 10px; cursor: pointer;
+      font-size: 14px; font-weight: 700; font-family: 'Noto Sans KR', sans-serif;
+      transition: all 0.2s; background: transparent; color: #A0AEC0;
+    }
+    .tab-btn.active { background: #4F9CF9; color: #fff; box-shadow: 0 2px 8px rgba(79,156,249,0.35); }
+    .tab-count { font-size: 11px; font-weight: 600; margin-top: 2px; opacity: 0.7; }
+
+    .empty-state { text-align: center; padding: 60px 20px; color: #A0AEC0; }
+    .empty-state .empty-icon { font-size: 48px; margin-bottom: 12px; }
+    .empty-state p { font-size: 14px; }
+
+    .category { background: #fff; border-radius: 16px; box-shadow: 0 1px 6px rgba(0,0,0,0.07); margin-bottom: 12px; overflow: hidden; }
+    .cat-header {
+      display: flex; align-items: center; padding: 12px 20px;
+      cursor: pointer; user-select: none; border-left: 4px solid;
+      gap: 10px;
+    }
+    .cat-icon { font-size: 18px; }
+    .cat-title { font-size: 14px; font-weight: 800; flex: 1; }
+    .cat-count-badge { font-size: 11px; font-weight: 800; padding: 2px 9px; border-radius: 99px; }
+    .cat-toggle { color: #A0AEC0; font-size: 12px; }
+
+    .qa-item { border-top: 1px solid #EDF2F7; padding: 14px 20px; }
+    .qa-item-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+    .qa-screen-name { font-size: 14px; font-weight: 700; color: #2D3748; flex: 1; }
+    .qa-file-link {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 3px 10px; border-radius: 8px; font-size: 11px; font-weight: 700;
+      text-decoration: none; color: #fff;
+    }
+
+    .qa-status-row { display: flex; gap: 8px; margin-bottom: 10px; }
+    .status-btn {
+      flex: 1; padding: 8px 4px; border-radius: 10px; border: 2px solid transparent;
+      cursor: pointer; font-size: 13px; font-weight: 700; font-family: 'Noto Sans KR', sans-serif;
+      transition: all 0.2s; background: #F7F9FC; color: #A0AEC0;
+      text-align: center;
+    }
+    .status-btn:hover { filter: brightness(0.97); }
+    .status-btn.pass { background: #F0FFF4; color: #38A169; border-color: #48BB78; }
+    .status-btn.fix  { background: #FFFAF0; color: #C05621; border-color: #ED8936; }
+    .status-btn.add  { background: #EBF8FF; color: #2B6CB0; border-color: #4299E1; }
+
+    .qa-memo {
+      width: 100%; border: 1.5px solid #E2E8F0; border-radius: 10px;
+      padding: 9px 12px; font-size: 13px; font-family: 'Noto Sans KR', sans-serif;
+      color: #2D3748; background: #F7F9FC; resize: vertical; min-height: 52px;
+      transition: border-color 0.2s;
+    }
+    .qa-memo:focus { outline: none; border-color: #4F9CF9; background: #fff; }
+    .qa-memo::placeholder { color: #CBD5E0; }
+
+    .save-indicator { font-size: 11px; color: #A0AEC0; text-align: right; margin-top: 4px; height: 16px; }
+    .save-indicator.saved { color: #48BB78; }
+
+    .section-label { font-size: 11px; font-weight: 800; color: #A0AEC0; letter-spacing: 1.5px; margin: 20px 0 10px; padding-left: 4px; }
+
+    .subtabs { display: flex; gap: 6px; margin-bottom: 16px; flex-wrap: wrap; }
+    .subtab-btn {
+      padding: 5px 12px; border-radius: 99px; border: none; cursor: pointer;
+      font-size: 12px; font-weight: 700; font-family: 'Noto Sans KR', sans-serif;
+      transition: all 0.2s; background: #fff; color: #718096;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.08); white-space: nowrap;
+    }
+    .subtab-btn.active { background: #4F9CF9; color: #fff; }
+
+    .progress-wrap { background: #fff; border-radius: 14px; padding: 14px 18px; box-shadow: 0 1px 6px rgba(0,0,0,0.07); margin-bottom: 16px; }
+    .progress-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+    .progress-label { font-size: 12px; font-weight: 700; color: #4A5568; }
+    .progress-val { font-size: 12px; font-weight: 900; color: #4F9CF9; }
+    .progress-bar { background: #EDF2F7; border-radius: 99px; height: 7px; overflow: hidden; }
+    .progress-fill { height: 100%; max-width: 100%; border-radius: 99px; transition: width 0.4s ease; }
+    .progress-row { display: flex; gap: 10px; margin-top: 10px; }
+    .progress-col { flex: 1; }
+    .progress-sub-top { display: flex; justify-content: space-between; margin-bottom: 4px; }
+    .progress-sub-label { font-size: 11px; font-weight: 700; color: #4A5568; }
+    .progress-sub-val { font-size: 11px; font-weight: 900; }
+
+    .badge-pass { background: #F0FFF4; color: #38A169; padding: 2px 8px; border-radius: 99px; font-size: 10px; font-weight: 800; }
+    .badge-fix  { background: #FFFAF0; color: #C05621; padding: 2px 8px; border-radius: 99px; font-size: 10px; font-weight: 800; }
+    .badge-add  { background: #EBF8FF; color: #2B6CB0; padding: 2px 8px; border-radius: 99px; font-size: 10px; font-weight: 800; }
+    .badge-none { background: #EDF2F7; color: #718096; padding: 2px 8px; border-radius: 99px; font-size: 10px; font-weight: 800; }
+  </style>
+</head>
+<body>
+<div class="container">
+
+  <div class="header">
+    <div class="header-row">
+      <span style="font-size:26px">🔍</span>
+      <h1>QA 체크리스트</h1>
+      <a href="전체앱-list.html" class="header-link">← 전체앱 관리</a>
+    </div>
+    <p>완료 처리된 화면을 검증 · 통과 / 수정 / 추가 항목을 기록</p>
+  </div>
+
+  <div class="stats" id="stats"></div>
+
+  <div class="progress-wrap" id="progress-wrap"></div>
+
+  <div class="tabs" id="tabs"></div>
+  <div class="subtabs" id="subtabs"></div>
+  <div id="content"></div>
+
+</div>
+
+<script>
+// ── 앱 데이터 (전체앱-list.html 과 동일) ──
+const userData = [
+  {
+    id:"auth", icon:"🔐", title:"인증", color:"#4F9CF9",
+    screens:[
+      {id:"s01",name:"스플래시",desc:"앱 로딩 & 로고 화면",file:null},
+      {id:"s02",name:"온보딩",desc:"서비스 소개 슬라이드 (3~4장)",file:null},
+      {id:"s03",name:"로그인",desc:"전화번호 + 비밀번호 로그인 / 소셜 로그인 선택 / 로그인 유지 체크박스",file:null},
+      {id:"s04",name:"회원가입",desc:"전화번호, 비밀번호 입력 → 신체정보(이름·핸드폰·키·몸무게·성별·주거지·불편 부위 체크·진단 메모) → 가입경로 선택(지인소개·SNS·검색·현수막·기타)",file:null},
+      {id:"s05",name:"이메일 인증",desc:"인증 링크 발송 안내 화면",file:null},
+      {id:"s06",name:"비밀번호 찾기",desc:"이메일로 재설정 링크 발송",file:null},
+      {id:"s07",name:"비밀번호 재설정",desc:"새 비밀번호 입력",file:null},
+      {id:"s08",name:"소셜 로그인 (카카오)",desc:"카카오 OAuth 연동",file:null},
+      {id:"s09",name:"소셜 로그인 (애플)",desc:"Apple Sign In 연동 (앱스토어 정책 필수)",file:null},
+      {id:"s09b",name:"소셜 로그인 (네이버)",desc:"네이버 OAuth 연동",file:null},
+      {id:"s09c",name:"소셜 로그인 (구글)",desc:"Google OAuth 연동",file:null},
+      {id:"s10",name:"약관 동의",desc:"서비스 이용약관 동의(필수) · 개인정보 수집·이용 동의(필수) · 민감정보(신체정보·건강정보) 수집·이용 동의(필수, 일반 동의와 별도 체크박스) · 미동의 시 불이익 안내('맞춤 운동처방 제한') · 마케팅 수신 동의(선택)",file:null},
+      {id:"s12",name:"알림 권한 요청",desc:"푸시 알림 허용 요청",file:null},
+    ]
+  },
+  {
+    id:"home", icon:"🏠", title:"홈", color:"#38B2AC",
+    screens:[
+      {id:"s13",name:"홈 대시보드",desc:"[최상단] 광고 배너(5초 자동 슬라이드) · ① 입장하기 QR · ② 현재 회원권 & 이용지점 표시 · ③ 오늘의 운동 · ④ My 운동처방 · ⑤ 운동법 · ⑥ 재활운동 · ⑦ SFMA 결과 · ⑧ 레슨 현황 · ⑨ My 루틴 · ⑩ 운동검진 · ⑪ 골프검진 · ⑫ 이용권 · ⑫ 나의 기록 · ⑬ 프로필 수정 · ⑭ 알림센터(종 아이콘) · 하단 홈 버튼",file:null},
+      {id:"s14",name:"알림 센터 (목록)",desc:"우측 상단 종(🔔) 아이콘 진입 · 미읽음 빨간 뱃지(숫자) · 읽지않음(진한 텍스트+파란 점) / 읽음(회색 처리) · 모두 읽음 · 개별 X 삭제 / 전체 삭제 · 유형 태그(시스템·이벤트·레슨) · 상대 시간 표시 · 빈 상태 화면",file:null},
+      {id:"s14b",name:"알림 상세 (딥링크)",desc:"알림 항목 클릭 시 관련 화면으로 바로 이동 · 레슨 알림 → 레슨 상세 / 이벤트 알림 → 이벤트 페이지 등 유형별 이동 처리 · 알림 수신 설정은 마이페이지에서 ON/OFF",file:null},
+      {id:"b01",name:"메인 광고 배너",desc:"홈 최상단 5초 자동 슬라이드 배너 · 이미지/동영상 지원 · 배너 클릭 시 랜딩 URL 이동",file:null},
+    ]
+  },
+  {
+    id:"entrance", icon:"🚪", title:"입장하기", color:"#00B894",
+    screens:[
+      {id:"e01",name:"입장 QR 화면",desc:"QR 클릭 시 입장 코드 생성 · 15초 카운트다운 후 자동 소멸 & 즉시 재생성 · 위변조 방지용 1회성 토큰 발급",file:null},
+      {id:"e02",name:"입장 처리 결과",desc:"QR 스캔 성공 / 실패 안내 화면 · 입장 시간 기록",file:null},
+    ]
+  },
+  {
+    id:"prescription", icon:"💊", title:"My 운동처방", color:"#E67E22",
+    screens:[
+      {id:"p01",name:"운동처방 내역 목록",desc:"내가 받은 처방 내역 리스트",file:"my운동처방.html"},
+      {id:"p02",name:"운동처방 상세",desc:"처방 내역 클릭 시 진입",file:"my운동처방.html"},
+      {id:"p03",name:"운동 진행 화면",desc:"운동 순서대로 1개씩 진행",file:"my운동처방.html"},
+      {id:"p04",name:"운동 완료 화면",desc:"모든 운동 완료 후 결과 화면",file:"my운동처방.html"},
+      {id:"p05",name:"트레이너 메모 확인",desc:"트레이너가 작성한 회원 특이사항·주의사항 메모 열람",file:"my운동처방.html"},
+    ]
+  },
+  {
+    id:"exercise-guide", icon:"📚", title:"운동법", color:"#00B894",
+    screens:[
+      {id:"eg01",name:"운동법 메인",desc:"부위별 카테고리 선택 화면",file:"운동법.html"},
+      {id:"eg02",name:"부위별 운동 목록",desc:"선택한 부위의 운동 목록",file:"운동법.html"},
+      {id:"eg03",name:"운동 상세",desc:"운동 이름·설명·이미지/영상",file:"운동법.html"},
+      {id:"eg04",name:"나만의 운동 만들기",desc:"부위별로 선택한 운동 목록 확인",file:"운동법.html"},
+      {id:"eg05",name:"나만의 운동 저장 완료",desc:"저장 완료 안내",file:"운동법.html"},
+    ]
+  },
+  {
+    id:"rehab", icon:"🩺", title:"재활운동", color:"#E53E3E",
+    screens:[
+      {id:"rh01",name:"재활운동 메인",desc:"시술·수술 카테고리 선택 화면",file:"재활운동.html"},
+      {id:"rh02",name:"카테고리별 재활운동 목록",desc:"선택한 시술·수술 카테고리의 재활운동 목록",file:"재활운동.html"},
+      {id:"rh03",name:"재활운동 상세",desc:"운동 이름·설명·이미지/영상",file:"재활운동.html"},
+      {id:"rh04",name:"나만의 재활운동 만들기",desc:"선택한 재활운동 목록 확인",file:"재활운동.html"},
+      {id:"rh05",name:"나만의 재활운동 저장 완료",desc:"저장 완료 안내",file:"재활운동.html"},
+    ]
+  },
+  {
+    id:"sfma", icon:"🧠", title:"SFMA/CSMI 검사", color:"#7B61FF",
+    screens:[
+      {id:"sf01",name:"SFMA/CSMI 로그인 / 회원 선택",desc:"회원 선택 화면",file:"SFMA CSMI결과.html"},
+      {id:"sf02",name:"SFMA 현황 탭",desc:"헤더: 총점·등급·전회차 대비 변화",file:"SFMA CSMI결과.html"},
+      {id:"sf03",name:"SFMA 결과 상세 (바텀시트)",desc:"패턴별 FN/FP/DP/DN 체크 상태",file:"SFMA CSMI결과.html"},
+      {id:"sf04",name:"SFMA 비교 탭",desc:"회차 선택(최대 3회)",file:"SFMA CSMI결과.html"},
+      {id:"sf05",name:"SFMA 이력 탭",desc:"전체 측정 회차 목록",file:"SFMA CSMI결과.html"},
+    ]
+  },
+  {
+    id:"csmi", icon:"💪", title:"CSMI 결과", color:"#2C7A7B",
+    screens:[
+      {id:"cs01",name:"CSMI 로그인 / 회원 선택",desc:"회원 선택 화면",file:"SFMA CSMI결과.html"},
+      {id:"cs02",name:"CSMI 현황 탭",desc:"헤더: 기준치 대비 평균%·등급",file:"SFMA CSMI결과.html"},
+      {id:"cs03",name:"CSMI 비교 탭",desc:"회차 선택(최대 3회)",file:"SFMA CSMI결과.html"},
+      {id:"cs04",name:"CSMI 이력 탭",desc:"전체 측정 회차 목록",file:"SFMA CSMI결과.html"},
+    ]
+  },
+  {
+    id:"golf", icon:"⛳", title:"골프검진", color:"#2F855A",
+    screens:[
+      {id:"gf01",name:"골프검진 메인",desc:"회원 선택 칩(5명) · 4개 검진 항목 카드",file:"골프검진.html"},
+      {id:"gf02",name:"검진 결과 요약",desc:"회차 선택 칩 · 종합점수+SVG 레이더차트",file:"골프검진.html"},
+      {id:"gf03",name:"검진 결과 상세",desc:"회차 선택 칩 + 4그룹 탭(K-vest/Trackman/Sam Putt/TPI)",file:"골프검진.html"},
+      {id:"gf04",name:"검진 결과 비교",desc:"회차 선택(최대 2회)",file:"골프검진.html"},
+      {id:"gf05",name:"검진 이력 목록",desc:"전체 측정 회차 목록",file:"골프검진.html"},
+      {id:"gf06",name:"골프 맞춤 운동 추천",desc:"검진 결과 기반 맞춤 재활·강화 운동 목록 추천",file:"골프검진.html"},
+    ]
+  },
+  {
+    id:"lesson", icon:"🎓", title:"레슨", color:"#F6AD55",
+    screens:[
+      {id:"ls01",name:"레슨 캘린더",desc:"월별 캘린더 뷰",file:"레슨.html"},
+      {id:"ls02",name:"레슨 예정 목록",desc:"오늘 기준 예정된 레슨 리스트",file:"레슨.html"},
+      {id:"ls03",name:"레슨 상세",desc:"선택한 레슨의 날짜·시간·종류",file:"레슨.html"},
+      {id:"ls04",name:"레슨 알림 설정",desc:"레슨 상세 화면 하단",file:"레슨.html"},
+    ]
+  },
+  {
+    id:"routine", icon:"🔄", title:"마이루틴", color:"#9B6DFF",
+    screens:[
+      {id:"s15",name:"마이루틴 홈",desc:"[내 루틴] 내가 저장한 루틴 목록",file:"마이루틴.html"},
+      {id:"s15b",name:"최근 운동 목록",desc:"지난번 수행한 운동 이력 리스트",file:"마이루틴.html"},
+      {id:"s16",name:"루틴 만들기",desc:"루틴 이름 입력 · 운동 항목 추가",file:"마이루틴.html"},
+      {id:"s17",name:"루틴 상세 / 운동 따라하기",desc:"루틴 운동 목록 확인",file:"마이루틴.html"},
+      {id:"s18",name:"루틴 수정 / 삭제",desc:"등록된 루틴 편집",file:"마이루틴.html"},
+      {id:"s19",name:"루틴 달성 이력",desc:"날짜별 루틴 완료 기록",file:"마이루틴.html"},
+      {id:"s20",name:"루틴 알림 설정",desc:"루틴별 푸시 알림 시간 설정",file:"마이루틴.html"},
+    ]
+  },
+  {
+    id:"store", icon:"🎟️", title:"이용권", color:"#2B6CB0",
+    screens:[
+      {id:"st01",name:"이용권 홈",desc:"이용권 카테고리",file:"이용권.html"},
+      {id:"st02",name:"이용권 목록",desc:"카테고리별 이용권 리스트",file:"이용권.html"},
+      {id:"st03",name:"이용권 상세",desc:"이용권 이름·혜택 설명",file:"이용권.html"},
+      {id:"st04",name:"장바구니",desc:"담은 이용권 목록",file:"이용권.html"},
+      {id:"st05",name:"결제",desc:"이용자 정보 확인",file:"이용권.html"},
+      {id:"st06",name:"구매 완료",desc:"이용권 발급 완료 안내",file:"이용권.html"},
+      {id:"st07",name:"구매 내역",desc:"과거 구매 이용권 목록",file:"이용권.html"},
+      {id:"st08",name:"이용권 상세",desc:"단건 이용권 상세",file:"이용권.html"},
+    ]
+  },
+  {
+    id:"myrecord", icon:"📈", title:"나의기록", color:"#4ECDC4",
+    screens:[
+      {id:"mr01",name:"나의기록 홈",desc:"신체 정보 요약 카드",file:"나의기록.html"},
+      {id:"mr02",name:"신체 기록",desc:"날짜 선택 · 측정값 입력",file:"나의기록.html"},
+      {id:"mr03",name:"신체 기록 상세 / 수정",desc:"측정값 2열 카드 · 메모",file:"나의기록.html"},
+      {id:"mr04",name:"운동 기록 캘린더",desc:"월 네비게이션",file:"나의기록.html"},
+      {id:"mr05",name:"운동 기록 통계",desc:"주간/월간 탭 전환",file:"나의기록.html"},
+      {id:"mr06",name:"출석/방문 기록",desc:"연속 출석 배너",file:"나의기록.html"},
+      {id:"mr07",name:"검진 히스토리",desc:"3탭(골프검진/SFMA/CSMI)",file:"나의기록.html"},
+      {id:"mr08",name:"재활운동 수행 기록",desc:"요약 3개(진행중·완료회차·수행일)",file:"나의기록.html"},
+    ]
+  },
+  {
+    id:"mypage", icon:"👤", title:"마이페이지", color:"#76E4F7",
+    screens:[
+      {id:"s41",name:"프로필 관리",desc:"프로필 사진·이름·회원권 요약",file:null},
+      {id:"s54",name:"인바디 · 체성분",desc:"인바디 API 연동 예정",file:null},
+      {id:"s34",name:"결제 수단 관리",desc:"등록된 카드 목록 & 기본 카드 설정",file:null},
+      {id:"s37",name:"결제 내역",desc:"날짜별 결제 이력 목록",file:null},
+      {id:"s39",name:"환불 · 해지",desc:"환불 정책 및 절차 안내",file:null},
+      {id:"s43",name:"알림 설정",desc:"항목별 푸시 알림 ON/OFF",file:null},
+      {id:"s44",name:"연동 관리",desc:"카카오/애플 소셜 연동 상태",file:null},
+      {id:"s45",name:"약관",desc:"개인정보 처리방침 · 이용약관",file:null},
+      {id:"s47",name:"앱 정보 · 고객센터",desc:"앱 버전 정보",file:null},
+      {id:"s48",name:"계정 관리",desc:"로그아웃 확인 다이얼로그",file:null},
+      {id:"s53",name:"공지사항",desc:"앱 내 공지 목록 & 상세",file:null},
+      {id:"s55",name:"자주 묻는 질문 (FAQ)",desc:"Q/A 아코디언 목록",file:null},
+      {id:"lku01",name:"내 락카 현황",desc:"현재 배정된 락카 번호·지점·이용 기간·만료일 표시",file:null},
+    ]
+  },
+  {
+    id:"common", icon:"🔧", title:"공통 / 기타", color:"#FC8181",
+    screens:[
+      {id:"s50",name:"에러 페이지",desc:"네트워크 오류, 서버 오류 안내",file:null},
+      {id:"s51",name:"로딩 / 스켈레톤",desc:"데이터 로딩 중 UI",file:null},
+      {id:"s52",name:"빈 상태 화면",desc:"데이터 없을 때 Empty State",file:null},
+    ]
+  },
+];
+
+const adminData = [
+  {
+    id:"a-auth", icon:"🔑", title:"관리자 인증", color:"#667EEA",
+    screens:[
+      {id:"a01",name:"관리자 로그인",desc:"전화번호 + 비밀번호 (2FA 포함)",file:null},
+      {id:"a02",name:"비밀번호 재설정",desc:"관리자 비밀번호 변경",file:null},
+    ]
+  },
+  {
+    id:"a-dashboard", icon:"📊", title:"대시보드", color:"#4299E1",
+    screens:[
+      {id:"a03",name:"메인 대시보드",desc:"상단 헤더 (날짜·미처리 건수 요약)",file:null},
+      {id:"a04",name:"팝업 알림 패널",desc:"탭 필터 (전체·처방 신청·SFMA·레슨)",file:null},
+      {id:"a05",name:"미처리 업무 패널",desc:"팝업 알림의 미완료 건과 연동",file:null},
+      {id:"a06",name:"매출 통계 / 회원 현황",desc:"월별 매출 바 차트",file:null},
+    ]
+  },
+  {
+    id:"a-home", icon:"🏠", title:"홈 화면 관리", color:"#38B2AC",
+    screens:[
+      {id:"ah01",name:"홈 메뉴 구성",desc:"홈 화면에 노출할 메뉴 섹션 ON/OFF",file:null},
+      {id:"ah02",name:"알림 센터 관리",desc:"앱 내 알림 목록 조회",file:null},
+    ]
+  },
+  {
+    id:"a-banner", icon:"📢", title:"광고 / 배너 관리", color:"#FF6B35",
+    screens:[
+      {id:"ab01",name:"배너 목록",desc:"등록된 메인 배너 전체 조회",file:null},
+      {id:"ab02",name:"배너 등록 / 수정",desc:"배너 이미지/동영상 업로드",file:null},
+      {id:"ab03",name:"배너 삭제",desc:"배너 삭제 확인 다이얼로그",file:null},
+    ]
+  },
+  {
+    id:"a-user", icon:"👥", title:"회원 관리", color:"#38B2AC",
+    screens:[
+      {id:"a05u",name:"회원 목록",desc:"전체 회원 검색 & 필터",file:null},
+      {id:"a06u",name:"회원 상세",desc:"개인정보, 가입일, 이용 현황",file:null},
+      {id:"a07",name:"회원 정지 / 탈퇴 처리",desc:"계정 상태 변경",file:null},
+      {id:"a07b",name:"회원 지역 분포 / 가입경로",desc:"전체 / 지점별 전환 탭",file:null},
+      {id:"a07c",name:"입장 이력",desc:"회원별·날짜별 QR 입장 기록 조회",file:null},
+      {id:"lk01u",name:"락카 현황판",desc:"전체 락카 번호 격자(그리드) 뷰",file:null},
+      {id:"lk02u",name:"락카 배정 / 변경",desc:"회원 검색 → 락카 번호 선택",file:null},
+      {id:"lk03u",name:"락카 기간 연장 / 해지",desc:"배정된 락카 이용 기간 연장",file:null},
+      {id:"lk04u",name:"락카 이용 이력",desc:"락카 번호별 역대 사용 회원 이력",file:null},
+      {id:"lk05u",name:"만료 임박 / 미반납 관리",desc:"만료 D-7 이내 락카 목록",file:null},
+    ]
+  },
+  {
+    id:"a-crm", icon:"🤝", title:"CRM 관리", color:"#E53E8C",
+    screens:[
+      {id:"c01",name:"회원 태그 / 분류",desc:"회원별 태그 부여 & 그룹 분류",file:null},
+      {id:"c02",name:"상담 이력",desc:"전화번호 또는 주민번호로 회원 검색",file:null},
+      {id:"c03",name:"메모 / 특이사항",desc:"회원별 관리자 메모 작성 & 수정",file:null},
+      {id:"c04",name:"재방문 / 이탈 분석",desc:"최근 방문일 기준 활성·휴면·이탈 회원 현황",file:null},
+      {id:"c05",name:"타겟 메시지 발송",desc:"설정에서 체크된 회원의 검사일·방문일 기준 자동 발송",file:null},
+      {id:"c05c",name:"부서별 메시지 템플릿 관리",desc:"부서별 자주 쓰는 메시지 등록·수정·삭제",file:null},
+      {id:"c05b",name:"발송 메시지 관리",desc:"부서별 탭 · 발송 이력 & 수신 대상",file:null},
+      {id:"c06",name:"이벤트 / 프로모션 관리",desc:"할인 쿠폰·이벤트 생성 및 대상 회원 지정",file:null},
+    ]
+  },
+  {
+    id:"a-payment", icon:"💰", title:"결제 / 정산 관리", color:"#48BB78",
+    screens:[
+      {id:"a12",name:"결제 내역 목록",desc:"전체 결제 이력 검색 & 필터",file:null},
+      {id:"a13",name:"결제 상세",desc:"단건 결제 상세 & 영수증",file:null},
+      {id:"a14",name:"환불 관리",desc:"환불 신청 목록 & 처리",file:null},
+      {id:"a15",name:"매출 통계",desc:"기간별 매출 합계 & 차트",file:null},
+    ]
+  },
+  {
+    id:"a-content", icon:"📋", title:"콘텐츠 관리", color:"#9F7AEA",
+    screens:[
+      {id:"a16",name:"공지사항 목록",desc:"공지 목록 확인",file:null},
+      {id:"a17",name:"공지사항 등록 / 수정",desc:"제목 · 내용 · 노출 기간 설정",file:null},
+      {id:"a18b",name:"FAQ 관리",desc:"FAQ CRUD",file:null},
+      {id:"a16b",name:"배너 광고 관리",desc:"메인 배너 이미지/동영상 등록·수정·삭제",file:null},
+      {id:"a19",name:"루틴 템플릿 관리",desc:"추천 루틴 템플릿 등록 & 수정",file:null},
+    ]
+  },
+  {
+    id:"a-store", icon:"🎟️", title:"이용권 관리", color:"#2B6CB0",
+    screens:[
+      {id:"ast01",name:"이용권 관리",desc:"전체 이용권 목록",file:"관리자-이용권.html"},
+      {id:"ast02",name:"이용권 등록 / 수정",desc:"모달: 이용권명·카테고리·가격·이용 기간 옵션",file:"관리자-이용권.html"},
+      {id:"ast03",name:"주문 / 결제 관리",desc:"전체 주문 목록",file:"관리자-이용권.html"},
+      {id:"ast04",name:"매출 통계",desc:"월 선택(◀▶) · 서브 탭",file:"관리자-이용권.html"},
+      {id:"ast05",name:"카테고리 관리",desc:"카테고리별 기본 설정",file:"관리자-이용권.html"},
+    ]
+  },
+  {
+    id:"a-locker", icon:"🔐", title:"락커 관리", color:"#805AD5",
+    screens:[
+      {id:"lk01a",name:"락커 현황",desc:"그리드(격자) 뷰로 전체 락커 표시",file:null},
+      {id:"lk02a",name:"락커 배정 / 결제 (모달)",desc:"lk01 락커 현황에서 모달로 진입",file:null},
+      {id:"lk03a",name:"락커 설정",desc:"락커 번호·구역 추가 & 삭제",file:null},
+    ]
+  },
+  {
+    id:"a-myrecord", icon:"📈", title:"나의기록 관리", color:"#4ECDC4",
+    screens:[
+      {id:"amr01",name:"회원별 신체 기록 조회",desc:"회원 검색 → 신체 기록 이력",file:null},
+      {id:"amr02",name:"회원별 운동 기록 조회",desc:"회원 검색 → 운동 기록 캘린더 및 목록",file:null},
+      {id:"amr03",name:"전체 회원 기록 현황",desc:"기록 입력 활성 회원 현황",file:null},
+    ]
+  },
+  {
+    id:"a-routine", icon:"🔄", title:"마이루틴 관리", color:"#9B6DFF",
+    screens:[
+      {id:"art01",name:"회원별 루틴 현황",desc:"회원 검색 → 해당 회원이 저장한 루틴 목록 조회",file:null},
+      {id:"art02",name:"회원별 최근 운동 이력",desc:"회원이 수행한 운동 이력 전체 조회",file:null},
+      {id:"art03",name:"루틴 달성 현황 통계",desc:"전체·지점별 루틴 수행 완료 회원 현황",file:null},
+      {id:"art04",name:"루틴 템플릿 관리",desc:"추천 루틴 템플릿 등록·수정·삭제",file:null},
+    ]
+  },
+  {
+    id:"a-my-prescription", icon:"💊", title:"My 운동처방 관리", color:"#E67E22",
+    screens:[
+      {id:"amp01",name:"회원별 My 운동처방 현황",desc:"회원 검색 → 해당 회원의 처방 내역 목록 조회",file:"관리자-My운동처방.html"},
+      {id:"amp02",name:"처방 상세 조회",desc:"특정 처방의 운동 목록·순서·세트·횟수 확인",file:"관리자-My운동처방.html"},
+      {id:"amp03",name:"운동 진행 / 완료 이력",desc:"회원이 해당 처방으로 운동 진행한 이력",file:"관리자-My운동처방.html"},
+      {id:"amp04",name:"처방 신청 접수 관리",desc:"회원이 신청한 처방 요청 목록",file:"관리자-My운동처방.html"},
+    ]
+  },
+  {
+    id:"a-prescription", icon:"📝", title:"처방운동 동작 구성관리", color:"#5A67D8",
+    screens:[
+      {id:"ap01",name:"운동 동작 목록",desc:"요약 카드 4개",file:"관리자-처방운동동작구성관리.html"},
+      {id:"ap02",name:"운동 동작 등록 / 수정",desc:"운동명(한/영) · 운동 설명",file:"관리자-처방운동동작구성관리.html"},
+      {id:"ap03",name:"운동 부위 관리",desc:"부위 목록 관리",file:"관리자-처방운동동작구성관리.html"},
+      {id:"ap04",name:"부위별 현황 통계",desc:"부위별 운동 수 도넛 차트",file:"관리자-처방운동동작구성관리.html"},
+    ]
+  },
+  {
+    id:"a-sfma", icon:"🧠", title:"검사측정관리 - SFMA", color:"#7B61FF",
+    screens:[
+      {id:"as01",name:"SFMA 현황 대시보드",desc:"요약 카드 4개",file:"관리자-SFMA.html"},
+      {id:"as02",name:"SFMA 결과 조회",desc:"회원 검색·등급·트레이너 필터",file:"관리자-SFMA.html"},
+      {id:"as03",name:"SFMA 결과 입력 / 수정",desc:"회원 자동완성 검색",file:"관리자-SFMA.html"},
+      {id:"as04",name:"SFMA 결과 비교",desc:"회원 선택 → 비교 회차 2개 선택",file:"관리자-SFMA.html"},
+      {id:"as05",name:"SFMA 알림 설정",desc:"재측정 알림 ON/OFF",file:"관리자-SFMA.html"},
+    ]
+  },
+  {
+    id:"a-csmi", icon:"💪", title:"검사측정관리 - CSMI", color:"#2C7A7B",
+    screens:[
+      {id:"ac01",name:"CSMI 현황 대시보드",desc:"요약 카드 4개",file:"관리자-CSMI.html"},
+      {id:"ac02",name:"CSMI 결과 조회",desc:"회원 검색·그룹 필터",file:"관리자-CSMI.html"},
+      {id:"ac03",name:"CSMI 결과 입력",desc:"회원 자동완성 검색 → 측정일·회차 설정",file:"관리자-CSMI.html"},
+      {id:"ac04",name:"CSMI 결과 비교",desc:"회원 선택 → 비교 회차 2개 선택",file:"관리자-CSMI.html"},
+      {id:"ac05",name:"CSMI 알림 설정",desc:"재측정 알림 ON/OFF",file:"관리자-CSMI.html"},
+    ]
+  },
+  {
+    id:"a-golf", icon:"⛳", title:"골프검진 관리", color:"#2F855A",
+    screens:[
+      {id:"ag01a",name:"골프검진 대시보드",desc:"통계 카드 4개",file:"관리자-골프.html"},
+      {id:"ag02a",name:"골프검진 결과 조회",desc:"회원 목록 테이블",file:"관리자-골프.html"},
+      {id:"ag03a",name:"골프검진 결과 입력",desc:"회원 자동완성",file:"관리자-골프.html"},
+      {id:"ag04a",name:"골프검진 결과 수정",desc:"결과 조회 상세 패널 [수정] 버튼",file:"관리자-골프.html"},
+      {id:"ag05a",name:"회차 비교",desc:"회원 검색 자동완성 + 회차1/회차2 선택",file:"관리자-골프.html"},
+      {id:"ag06a",name:"알림 설정",desc:"재검진 알림 ON/OFF 토글",file:"관리자-골프.html"},
+      {id:"ag07a",name:"점수 로직 관리",desc:"등급 기준 편집",file:"관리자-골프.html"},
+    ]
+  },
+  {
+    id:"a-lesson", icon:"🎓", title:"레슨 관리", color:"#F6AD55",
+    screens:[
+      {id:"al01",name:"레슨 일정 관리",desc:"전체 레슨 일정 목록",file:"관리자-레슨.html"},
+      {id:"al02",name:"레슨 상세",desc:"레슨 날짜·시간·종류·담당 트레이너",file:"관리자-레슨.html"},
+      {id:"al03",name:"레슨 등록",desc:"레슨 종류·담당 트레이너·요일·시간",file:"관리자-레슨.html"},
+      {id:"al04",name:"주간 스케줄",desc:"트레이너별 주간 레슨 스케줄 뷰",file:"관리자-레슨.html"},
+    ]
+  },
+  {
+    id:"a-rehab", icon:"🩺", title:"재활운동 관리", color:"#E53E3E",
+    screens:[
+      {id:"ar01",name:"재활운동 대시보드",desc:"재활 프로그램 현황 요약",file:"관리자-재활운동.html"},
+      {id:"ar02",name:"재활 프로그램 관리",desc:"시술·수술 카테고리별 탭",file:"관리자-재활운동.html"},
+      {id:"ar03",name:"동작 DB 관리",desc:"재활 동작 데이터베이스",file:"관리자-재활운동.html"},
+      {id:"ar04",name:"통계 / 리포트",desc:"재활운동 이용 통계",file:"관리자-재활운동.html"},
+      {id:"ar05",name:"재활 처방 템플릿 관리",desc:"트레이너가 사용하는 재활 처방 템플릿",file:"관리자-재활운동.html"},
+    ]
+  },
+  {
+    id:"a-exercise-guide", icon:"📚", title:"운동법 관리", color:"#00B894",
+    screens:[
+      {id:"ag01g",name:"운동 목록",desc:"부위별 탭 · 등록된 운동 목록 조회 & 검색",file:"관리자-운동법관리.html"},
+      {id:"ag02g",name:"운동 등록 / 수정",desc:"부위 선택",file:"관리자-운동법관리.html"},
+      {id:"ag03g",name:"부위별 통계",desc:"부위별 운동 수",file:"관리자-운동법관리.html"},
+    ]
+  },
+  {
+    id:"a-push", icon:"🔔", title:"푸시 알림 관리", color:"#F687B3",
+    screens:[
+      {id:"a20",name:"푸시 발송",desc:"전체 or 특정 유저 대상 푸시 발송",file:null},
+      {id:"a21",name:"푸시 발송 이력",desc:"발송 목록 & 수신율 확인",file:null},
+    ]
+  },
+  {
+    id:"a-branch", icon:"🏢", title:"지점 관리", color:"#2D9CDB",
+    screens:[
+      {id:"br01",name:"지점 목록",desc:"전체 지점 목록 조회",file:null},
+      {id:"br02",name:"지점 등록 / 수정",desc:"지점명·주소·연락처",file:null},
+      {id:"br03",name:"지점 비활성화 / 삭제",desc:"지점 운영 중단 처리",file:null},
+      {id:"br04",name:"지점별 회원 현황",desc:"지점 선택 → 소속 회원 수",file:null},
+      {id:"br05",name:"지점별 입장 현황",desc:"지점별 일별·주별 입장 횟수",file:null},
+      {id:"br06",name:"지점별 매출 현황",desc:"지점별 기간 매출 합계",file:null},
+      {id:"br07",name:"지점 전체 비교",desc:"전체 지점 나란히 비교",file:null},
+    ]
+  },
+  {
+    id:"a-qr", icon:"📷", title:"QR 기기 관리", color:"#00B894",
+    screens:[
+      {id:"q01",name:"QR 기기 목록",desc:"등록된 QR 스캔 기기 목록",file:null},
+      {id:"q02",name:"QR 기기 등록 / 수정",desc:"기기명·설치 지점·고유 식별코드",file:null},
+      {id:"q03",name:"QR 기기 삭제 / 비활성화",desc:"기기 삭제 또는 일시 비활성화",file:null},
+    ]
+  },
+  {
+    id:"a-setting", icon:"⚙️", title:"시스템 설정", color:"#718096",
+    screens:[
+      {id:"a22",name:"관리자 계정 관리",desc:"관리자 추가 / 권한 설정",file:null},
+      {id:"a23",name:"약관 / 개인정보처리방침 관리",desc:"내용 수정 & 버전 관리",file:null},
+      {id:"a24",name:"앱 설정",desc:"점검 모드, 최소 버전 등 설정",file:null},
+    ]
+  },
+];
+
+// ── Firebase ──
+const firebaseConfig = {
+  apiKey: "AIzaSyCiqM2RiCiOGcen01gS4dDV8hJK0-oB4MI",
+  authDomain: "dangol-checklist.firebaseapp.com",
+  projectId: "dangol-checklist",
+  storageBucket: "dangol-checklist.firebasestorage.app",
+  messagingSenderId: "41914009789",
+  appId: "1:41914009789:web:87349b225f5e4b278a8fd4"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+const checkRef  = db.collection("checkboxes").doc("state");
+const qaRef     = db.collection("qa").doc("state");
+
+let checked = {};  // 완료 체크 상태 (전체앱에서)
+let qa = {};       // QA 상태 {screenId: {status:'pass'|'fix'|'add'|null, memo:''}}
+let activeTab = "user";
+let activeSubTab = "all";
+let openCats = {};
+let saveTimer = null;
+
+// 실시간 체크 상태 수신
+checkRef.onSnapshot(doc => {
+  checked = doc.exists ? doc.data() : {};
+  render();
+});
+
+// 실시간 QA 상태 수신
+qaRef.onSnapshot(doc => {
+  qa = doc.exists ? doc.data() : {};
+  render();
+});
+
+function getSubItems(s) {
+  const parts = s.desc.split(' · ');
+  return parts.length >= 2 ? parts : [];
+}
+function isScreenDone(s) {
+  const subs = getSubItems(s);
+  if (subs.length === 0) return !!checked[s.id];
+  return subs.every((_, i) => !!checked[s.id + '_' + i]);
+}
+
+function getQA(id) {
+  return qa[id] || {status: null, memo: ''};
+}
+
+function setStatus(id, status) {
+  if (!qa[id]) qa[id] = {status: null, memo: ''};
+  qa[id].status = qa[id].status === status ? null : status; // 토글
+  saveQA();
+  render();
+}
+
+function setMemo(id, memo) {
+  if (!qa[id]) qa[id] = {status: null, memo: ''};
+  qa[id].memo = memo;
+  // 디바운스 저장
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(() => saveQA(), 800);
+}
+
+function saveQA() {
+  qaRef.set(qa);
+}
+
+function setTab(t) { activeTab = t; activeSubTab = "all"; render(); }
+function setSubTab(id) { activeSubTab = id; render(); }
+function toggleCat(id) { openCats[id] = !openCats[id]; render(); }
+
+function completedScreens(cats) {
+  return cats.flatMap(c => c.screens.filter(s => isScreenDone(s)));
+}
+
+function renderStats() {
+  const userDone = completedScreens(userData);
+  const adminDone = completedScreens(adminData);
+  const allDone = [...userDone, ...adminDone];
+
+  const passCount = allDone.filter(s => getQA(s.id).status === 'pass').length;
+  const fixCount  = allDone.filter(s => getQA(s.id).status === 'fix').length;
+  const addCount  = allDone.filter(s => getQA(s.id).status === 'add').length;
+  const noneCount = allDone.filter(s => !getQA(s.id).status).length;
+
+  document.getElementById('stats').innerHTML = `
+    <div class="stat-box">
+      <div class="stat-num" style="color:#4F9CF9">${allDone.length}</div>
+      <div class="stat-label">QA 대상</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-num" style="color:#38A169">${passCount}</div>
+      <div class="stat-label">✅ 통과</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-num" style="color:#C05621">${fixCount}</div>
+      <div class="stat-label">🔧 수정</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-num" style="color:#2B6CB0">${addCount}</div>
+      <div class="stat-label">➕ 추가</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-num" style="color:#A0AEC0">${noneCount}</div>
+      <div class="stat-label">미검토</div>
+    </div>
+  `;
+
+  const userPass = userDone.filter(s => getQA(s.id).status === 'pass').length;
+  const adminPass = adminDone.filter(s => getQA(s.id).status === 'pass').length;
+  const userPct = userDone.length ? Math.round(userPass / userDone.length * 100) : 0;
+  const adminPct = adminDone.length ? Math.round(adminPass / adminDone.length * 100) : 0;
+  const totalPct = allDone.length ? Math.round((passCount + fixCount + addCount) / allDone.length * 100) : 0;
+
+  document.getElementById('progress-wrap').innerHTML = `
+    <div class="progress-top">
+      <span class="progress-label">QA 진행률 (통과+수정+추가)</span>
+      <span class="progress-val">${passCount + fixCount + addCount} / ${allDone.length} (${totalPct}%)</span>
+    </div>
+    <div class="progress-bar">
+      <div class="progress-fill" style="width:${totalPct}%;background:linear-gradient(90deg,#48BB78,#68D391)"></div>
+    </div>
+    <div class="progress-row">
+      <div class="progress-col">
+        <div class="progress-sub-top">
+          <span class="progress-sub-label">🙍 사용자 앱</span>
+          <span class="progress-sub-val" style="color:#4F9CF9">${userDone.filter(s=>getQA(s.id).status).length} / ${userDone.length}</span>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" style="width:${userPct}%;background:linear-gradient(90deg,#4F9CF9,#63B3ED)"></div></div>
+      </div>
+      <div class="progress-col">
+        <div class="progress-sub-top">
+          <span class="progress-sub-label">🖥️ 관리자</span>
+          <span class="progress-sub-val" style="color:#9B6DFF">${adminDone.filter(s=>getQA(s.id).status).length} / ${adminDone.length}</span>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" style="width:${adminPct}%;background:linear-gradient(90deg,#9B6DFF,#B794F4)"></div></div>
+      </div>
+    </div>
+  `;
+}
+
+function renderCats(cats) {
+  const doneCats = cats.map(cat => ({
+    ...cat,
+    doneScreens: cat.screens.filter(s => isScreenDone(s))
+  })).filter(cat => cat.doneScreens.length > 0);
+
+  // 서브탭 필터
+  const filteredCats = activeSubTab === "all"
+    ? doneCats
+    : doneCats.filter(c => c.id === activeSubTab);
+
+  if (filteredCats.every(c => c.doneScreens.length === 0)) {
+    return `<div class="empty-state"><div class="empty-icon">📋</div><p>완료된 화면이 없습니다.<br>전체앱 관리에서 화면을 체크하면 자동으로 나타납니다.</p></div>`;
+  }
+
+  return filteredCats.map(cat => {
+    if (!cat.doneScreens.length) return '';
+    if (!(cat.id in openCats)) openCats[cat.id] = true;
+    const isOpen = openCats[cat.id];
+
+    const passC = cat.doneScreens.filter(s => getQA(s.id).status === 'pass').length;
+    const fixC  = cat.doneScreens.filter(s => getQA(s.id).status === 'fix').length;
+    const addC  = cat.doneScreens.filter(s => getQA(s.id).status === 'add').length;
+
+    const items = isOpen ? cat.doneScreens.map(s => {
+      const q = getQA(s.id);
+      const statusBadge = q.status === 'pass' ? '<span class="badge-pass">✅ 통과</span>'
+        : q.status === 'fix' ? '<span class="badge-fix">🔧 수정</span>'
+        : q.status === 'add' ? '<span class="badge-add">➕ 추가</span>'
+        : '<span class="badge-none">미검토</span>';
+
+      return `
+        <div class="qa-item">
+          <div class="qa-item-header">
+            <span class="qa-screen-name">${s.name}</span>
+            ${statusBadge}
+            ${s.file ? `<a href="${s.file}" target="_blank" class="qa-file-link" style="background:${cat.color}">🔗 열기</a>` : ''}
+          </div>
+          <div class="qa-status-row">
+            <button class="status-btn${q.status==='pass'?' pass':''}" onclick="setStatus('${s.id}','pass')">✅ 통과</button>
+            <button class="status-btn${q.status==='fix'?' fix':''}"  onclick="setStatus('${s.id}','fix')">🔧 수정</button>
+            <button class="status-btn${q.status==='add'?' add':''}"  onclick="setStatus('${s.id}','add')">➕ 추가</button>
+          </div>
+          <textarea
+            class="qa-memo"
+            placeholder="메모 입력 (수정/추가 사항, 특이사항 등)"
+            oninput="setMemo('${s.id}', this.value)"
+          >${q.memo || ''}</textarea>
+        </div>`;
+    }).join('') : '';
+
+    return `
+      <div class="category">
+        <div class="cat-header" style="border-color:${cat.color}" onclick="toggleCat('${cat.id}')">
+          <span class="cat-icon">${cat.icon}</span>
+          <span class="cat-title">${cat.title}</span>
+          <span class="cat-count-badge" style="background:${cat.color}18;color:${cat.color}">${cat.doneScreens.length}건</span>
+          ${passC ? `<span class="badge-pass">${passC}통과</span>` : ''}
+          ${fixC  ? `<span class="badge-fix">${fixC}수정</span>` : ''}
+          ${addC  ? `<span class="badge-add">${addC}추가</span>` : ''}
+          <span class="cat-toggle">${isOpen?'▲':'▼'}</span>
+        </div>
+        ${items}
+      </div>`;
+  }).join('');
+}
+
+function render() {
+  renderStats();
+
+  const curCats = activeTab === "user" ? userData : adminData;
+  const doneCats = curCats.map(c => ({...c, doneScreens: c.screens.filter(s => isScreenDone(s))})).filter(c => c.doneScreens.length > 0);
+  const userDoneCount = completedScreens(userData).length;
+  const adminDoneCount = completedScreens(adminData).length;
+
+  document.getElementById('tabs').innerHTML = [
+    {id:"user", label:"🙍 사용자 앱", count: userDoneCount},
+    {id:"admin", label:"🖥️ 관리자", count: adminDoneCount}
+  ].map(t => `
+    <button class="tab-btn ${activeTab===t.id?'active':''}" onclick="setTab('${t.id}')">
+      ${t.label}
+      <div class="tab-count">${t.count}개 완료</div>
+    </button>`
+  ).join('');
+
+  // 서브탭
+  const subtabAll = {id:"all", icon:"📋", title:"전체"};
+  document.getElementById('subtabs').innerHTML = [subtabAll, ...doneCats].map(c => {
+    const cls = ['subtab-btn', activeSubTab === c.id ? 'active' : ''].filter(Boolean).join(' ');
+    return `<button class="${cls}" onclick="setSubTab('${c.id}')">${c.icon||'📋'} ${c.title}</button>`;
+  }).join('');
+
+  document.getElementById('content').innerHTML = renderCats(curCats);
+}
+</script>
+</body>
+</html>
