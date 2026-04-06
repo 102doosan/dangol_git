@@ -712,7 +712,7 @@ function renderCats(cats) {
       return `
         <div class="qa-item">
           <div class="qa-item-header">
-            <span class="qa-screen-name">${s.name}</span>
+            <span class="qa-screen-name">${s.name}${s.desc ? `<span style="font-weight:400;color:#A0AEC0;font-size:12px;margin-left:6px">(${s.desc})</span>` : ''}</span>
             ${statusBadge}
           </div>
           <div class="qa-status-row">
