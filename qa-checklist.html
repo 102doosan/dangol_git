@@ -87,6 +87,15 @@
     .save-indicator { font-size: 11px; color: #A0AEC0; text-align: right; margin-top: 4px; height: 16px; }
     .save-indicator.saved { color: #48BB78; }
 
+    .memo-wrap { background: #fff; border-radius: 14px; padding: 16px 20px; box-shadow: 0 1px 6px rgba(0,0,0,0.07); margin-bottom: 16px; }
+    .memo-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+    .memo-label { font-size: 13px; font-weight: 800; color: #4A5568; }
+    .memo-saved { font-size: 11px; color: #A0AEC0; transition: color 0.3s; }
+    .memo-saved.saved { color: #48BB78; }
+    .global-memo { width: 100%; border: 1.5px solid #E2E8F0; border-radius: 10px; padding: 10px 14px; font-size: 13px; font-family: 'Noto Sans KR', sans-serif; color: #2D3748; background: #F7F9FC; resize: vertical; min-height: 80px; transition: border-color 0.2s; }
+    .global-memo:focus { outline: none; border-color: #4F9CF9; background: #fff; }
+    .global-memo::placeholder { color: #CBD5E0; }
+
     .section-label { font-size: 11px; font-weight: 800; color: #A0AEC0; letter-spacing: 1.5px; margin: 20px 0 10px; padding-left: 4px; }
 
     .subtabs { display: flex; gap: 6px; margin-bottom: 16px; flex-wrap: wrap; }
@@ -131,6 +140,14 @@
   <div class="stats" id="stats"></div>
 
   <div class="progress-wrap" id="progress-wrap"></div>
+
+  <div class="memo-wrap">
+    <div class="memo-header">
+      <span class="memo-label">📝 통합 메모</span>
+      <span class="memo-saved" id="global-memo-saved"></span>
+    </div>
+    <textarea id="global-memo" class="global-memo" placeholder="전체 QA에 관한 메모, 공유 사항, 특이사항 등을 자유롭게 입력하세요..." oninput="onGlobalMemoInput(this.value)"></textarea>
+  </div>
 
   <div class="tabs" id="tabs"></div>
   <div class="subtabs" id="subtabs"></div>
@@ -558,6 +575,7 @@ let activeTab = "user";
 let activeSubTab = "all";
 let openCats = {};
 let saveTimer = null;
+let globalMemoTimer = null;
 
 // 실시간 체크 상태 수신
 checkRef.onSnapshot(doc => {
@@ -568,6 +586,11 @@ checkRef.onSnapshot(doc => {
 // 실시간 QA 상태 수신
 qaRef.onSnapshot(doc => {
   qa = doc.exists ? doc.data() : {};
+  // 통합 메모 동기화 (포커스 중일 때는 덮어쓰지 않음)
+  const el = document.getElementById('global-memo');
+  if (el && document.activeElement !== el) {
+    el.value = qa.__globalMemo || '';
+  }
   render();
 });
 
@@ -602,6 +625,19 @@ function setMemo(id, memo) {
 
 function saveQA() {
   qaRef.set(qa);
+}
+
+function onGlobalMemoInput(val) {
+  qa.__globalMemo = val;
+  clearTimeout(globalMemoTimer);
+  const saved = document.getElementById('global-memo-saved');
+  if (saved) saved.textContent = '저장 중...';
+  globalMemoTimer = setTimeout(() => {
+    qaRef.set(qa).then(() => {
+      if (saved) { saved.textContent = '✓ 저장됨'; saved.className = 'memo-saved saved'; }
+      setTimeout(() => { if (saved) { saved.textContent = ''; saved.className = 'memo-saved'; } }, 2000);
+    });
+  }, 800);
 }
 
 function setTab(t) { activeTab = t; activeSubTab = "all"; render(); }
