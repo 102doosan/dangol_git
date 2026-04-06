@@ -714,7 +714,6 @@ function renderCats(cats) {
           <div class="qa-item-header">
             <span class="qa-screen-name">${s.name}</span>
             ${statusBadge}
-            ${s.file ? `<a href="${s.file}" target="_blank" class="qa-file-link" style="background:${cat.color}">🔗 열기</a>` : ''}
           </div>
           <div class="qa-status-row">
             <button class="status-btn${q.status==='pass'?' pass':''}" onclick="setStatus('${s.id}','pass')">✅ 통과</button>
