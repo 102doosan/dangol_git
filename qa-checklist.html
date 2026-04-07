@@ -98,7 +98,26 @@
 
     .section-label { font-size: 11px; font-weight: 800; color: #A0AEC0; letter-spacing: 1.5px; margin: 20px 0 10px; padding-left: 4px; }
 
-    .subtabs { display: flex; gap: 6px; margin-bottom: 16px; flex-wrap: wrap; }
+    .subtabs { display: flex; gap: 6px; margin-bottom: 10px; flex-wrap: wrap; }
+
+    .filter-row { display: flex; align-items: center; gap: 8px; margin-bottom: 16px; }
+    .filter-toggle {
+      padding: 5px 14px; border-radius: 99px; border: 2px solid #E2E8F0; cursor: pointer;
+      font-size: 12px; font-weight: 700; font-family: 'Noto Sans KR', sans-serif;
+      background: #fff; color: #718096; transition: all 0.2s;
+    }
+    .filter-toggle.on { background: #FFF5F5; color: #C53030; border-color: #FC8181; }
+    .filter-count { font-size: 12px; color: #A0AEC0; font-weight: 600; }
+
+    .simple-list { background: #fff; border-radius: 14px; box-shadow: 0 1px 6px rgba(0,0,0,0.07); overflow: hidden; margin-bottom: 12px; }
+    .simple-list-header { padding: 12px 20px; font-size: 12px; font-weight: 800; color: #A0AEC0; border-bottom: 1px solid #EDF2F7; display: flex; align-items: center; gap: 8px; }
+    .simple-item { display: flex; align-items: center; padding: 10px 20px; border-bottom: 1px solid #F7F9FC; gap: 10px; }
+    .simple-item:last-child { border-bottom: none; }
+    .simple-item-name { font-size: 13px; font-weight: 700; color: #2D3748; flex: 1; }
+    .simple-item-cat { font-size: 11px; color: #A0AEC0; font-weight: 600; }
+    .badge-none-sm { background: #EDF2F7; color: #718096; padding: 1px 7px; border-radius: 99px; font-size: 10px; font-weight: 800; }
+    .badge-fix-sm  { background: #FFFAF0; color: #C05621; padding: 1px 7px; border-radius: 99px; font-size: 10px; font-weight: 800; }
+    .badge-add-sm  { background: #EBF8FF; color: #2B6CB0; padding: 1px 7px; border-radius: 99px; font-size: 10px; font-weight: 800; }
     .subtab-btn {
       padding: 5px 12px; border-radius: 99px; border: none; cursor: pointer;
       font-size: 12px; font-weight: 700; font-family: 'Noto Sans KR', sans-serif;
@@ -151,6 +170,10 @@
 
   <div class="tabs" id="tabs"></div>
   <div class="subtabs" id="subtabs"></div>
+  <div class="filter-row">
+    <button class="filter-toggle" id="nonpass-toggle" onclick="toggleNonPass()">🔴 미통과만 보기</button>
+    <span class="filter-count" id="nonpass-count"></span>
+  </div>
   <div id="content"></div>
 
 </div>
@@ -576,6 +599,7 @@ let activeSubTab = "all";
 let openCats = {};
 let saveTimer = null;
 let globalMemoTimer = null;
+let showNonPassOnly = false;
 
 // 실시간 체크 상태 수신
 checkRef.onSnapshot(doc => {
@@ -643,6 +667,54 @@ function onGlobalMemoInput(val) {
 function setTab(t) { activeTab = t; activeSubTab = "all"; render(); }
 function setSubTab(id) { activeSubTab = id; render(); }
 function toggleCat(id) { openCats[id] = !openCats[id]; render(); }
+function toggleNonPass() { showNonPassOnly = !showNonPassOnly; render(); }
+
+function renderNonPassList(cats) {
+  const nonPassItems = cats.flatMap(cat =>
+    cat.screens
+      .filter(s => isScreenDone(s) && getQA(s.id).status !== 'pass')
+      .map(s => ({ s, cat }))
+  );
+
+  const btn = document.getElementById('nonpass-toggle');
+  const cnt = document.getElementById('nonpass-count');
+  if (btn) btn.className = 'filter-toggle' + (showNonPassOnly ? ' on' : '');
+  if (cnt) cnt.textContent = showNonPassOnly ? `총 ${nonPassItems.length}개` : '';
+
+  if (!showNonPassOnly) return null;
+
+  if (nonPassItems.length === 0) {
+    return `<div class="simple-list"><div class="simple-list-header">✅ 미통과 항목 없음 — 모두 통과 처리됐습니다</div></div>`;
+  }
+
+  // 카테고리별로 묶기
+  const byCat = {};
+  nonPassItems.forEach(({ s, cat }) => {
+    if (!byCat[cat.id]) byCat[cat.id] = { cat, items: [] };
+    byCat[cat.id].items.push(s);
+  });
+
+  return Object.values(byCat).map(({ cat, items }) => `
+    <div class="simple-list">
+      <div class="simple-list-header">
+        <span>${cat.icon} ${cat.title}</span>
+        <span style="margin-left:auto;color:${cat.color};font-weight:800">${items.length}건</span>
+      </div>
+      ${items.map(s => {
+        const q = getQA(s.id);
+        const badge = q.status === 'fix'
+          ? '<span class="badge-fix-sm">🔧 수정</span>'
+          : q.status === 'add'
+          ? '<span class="badge-add-sm">➕ 추가</span>'
+          : '<span class="badge-none-sm">미검토</span>';
+        return `<div class="simple-item">
+          <span class="simple-item-name">${s.name}</span>
+          ${badge}
+        </div>`;
+      }).join('')}
+    </div>`
+  ).join('');
+}
 
 function completedScreens(cats) {
   return cats.flatMap(c => c.screens.filter(s => isScreenDone(s)));
@@ -806,7 +878,8 @@ function render() {
     return `<button class="${cls}" onclick="setSubTab('${c.id}')">${c.icon||'📋'} ${c.title}</button>`;
   }).join('');
 
-  document.getElementById('content').innerHTML = renderCats(curCats);
+  const nonPassHtml = renderNonPassList(curCats);
+  document.getElementById('content').innerHTML = nonPassHtml !== null ? nonPassHtml : renderCats(curCats);
 }
 </script>
 </body>
