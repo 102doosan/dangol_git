@@ -26,7 +26,9 @@
     .header-link:hover { background: #BEE3F8; }
 
     .stats { display: flex; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; }
-    .stat-box { background: #fff; border-radius: 12px; padding: 12px 18px; box-shadow: 0 1px 4px rgba(0,0,0,0.07); flex: 1; min-width: 90px; text-align: center; }
+    .stat-box { background: #fff; border-radius: 12px; padding: 12px 18px; box-shadow: 0 1px 4px rgba(0,0,0,0.07); flex: 1; min-width: 90px; text-align: center; cursor: pointer; transition: all 0.2s; border: 2px solid transparent; }
+    .stat-box:hover { transform: translateY(-1px); box-shadow: 0 2px 8px rgba(0,0,0,0.12); }
+    .stat-box.active { border-color: currentColor; transform: translateY(-1px); box-shadow: 0 2px 10px rgba(0,0,0,0.15); }
     .stat-num { font-size: 24px; font-weight: 900; }
     .stat-label { font-size: 11px; color: #A0AEC0; margin-top: 2px; font-weight: 600; }
 
@@ -600,6 +602,7 @@ let openCats = {};
 let saveTimer = null;
 let globalMemoTimer = null;
 let showNonPassOnly = false;
+let statFilter = null; // null|'all'|'pass'|'fix'|'add'|'none'
 
 // 실시간 체크 상태 수신
 checkRef.onSnapshot(doc => {
@@ -667,7 +670,8 @@ function onGlobalMemoInput(val) {
 function setTab(t) { activeTab = t; activeSubTab = "all"; render(); }
 function setSubTab(id) { activeSubTab = id; render(); }
 function toggleCat(id) { openCats[id] = !openCats[id]; render(); }
-function toggleNonPass() { showNonPassOnly = !showNonPassOnly; render(); }
+function toggleNonPass() { showNonPassOnly = !showNonPassOnly; statFilter = null; render(); }
+function setStatFilter(f) { statFilter = statFilter === f ? null : f; showNonPassOnly = false; render(); }
 
 function renderNonPassList(cats) {
   const nonPassItems = cats.flatMap(cat =>
@@ -731,23 +735,23 @@ function renderStats() {
   const noneCount = allDone.filter(s => !getQA(s.id).status).length;
 
   document.getElementById('stats').innerHTML = `
-    <div class="stat-box">
+    <div class="stat-box${statFilter==='all'?' active':''}" onclick="setStatFilter('all')" style="${statFilter==='all'?'border-color:#4F9CF9':''}">
       <div class="stat-num" style="color:#4F9CF9">${allDone.length}</div>
       <div class="stat-label">QA 대상</div>
     </div>
-    <div class="stat-box">
+    <div class="stat-box${statFilter==='pass'?' active':''}" onclick="setStatFilter('pass')" style="${statFilter==='pass'?'border-color:#38A169':''}">
       <div class="stat-num" style="color:#38A169">${passCount}</div>
       <div class="stat-label">✅ 통과</div>
     </div>
-    <div class="stat-box">
+    <div class="stat-box${statFilter==='fix'?' active':''}" onclick="setStatFilter('fix')" style="${statFilter==='fix'?'border-color:#C05621':''}">
       <div class="stat-num" style="color:#C05621">${fixCount}</div>
       <div class="stat-label">🔧 수정</div>
     </div>
-    <div class="stat-box">
+    <div class="stat-box${statFilter==='add'?' active':''}" onclick="setStatFilter('add')" style="${statFilter==='add'?'border-color:#2B6CB0':''}">
       <div class="stat-num" style="color:#2B6CB0">${addCount}</div>
       <div class="stat-label">➕ 추가</div>
     </div>
-    <div class="stat-box">
+    <div class="stat-box${statFilter==='none'?' active':''}" onclick="setStatFilter('none')" style="${statFilter==='none'?'border-color:#A0AEC0':''}">
       <div class="stat-num" style="color:#A0AEC0">${noneCount}</div>
       <div class="stat-label">미검토</div>
     </div>
@@ -786,10 +790,21 @@ function renderStats() {
   `;
 }
 
+function matchStatFilter(s) {
+  if (!statFilter) return true;
+  if (statFilter === 'all') return true;
+  const q = getQA(s.id);
+  if (statFilter === 'pass') return q.status === 'pass';
+  if (statFilter === 'fix')  return q.status === 'fix';
+  if (statFilter === 'add')  return q.status === 'add';
+  if (statFilter === 'none') return !q.status;
+  return true;
+}
+
 function renderCats(cats) {
   const doneCats = cats.map(cat => ({
     ...cat,
-    doneScreens: cat.screens.filter(s => isScreenDone(s))
+    doneScreens: cat.screens.filter(s => isScreenDone(s) && matchStatFilter(s))
   })).filter(cat => cat.doneScreens.length > 0);
 
   // 서브탭 필터
