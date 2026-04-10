@@ -671,7 +671,20 @@ function setTab(t) { activeTab = t; activeSubTab = "all"; render(); }
 function setSubTab(id) { activeSubTab = id; render(); }
 function toggleCat(id) { openCats[id] = !openCats[id]; render(); }
 function toggleNonPass() { showNonPassOnly = !showNonPassOnly; statFilter = null; render(); }
-function setStatFilter(f) { statFilter = statFilter === f ? null : f; showNonPassOnly = false; render(); }
+function setStatFilter(f) {
+  statFilter = statFilter === f ? null : f;
+  showNonPassOnly = false;
+  // 현재 탭에 매칭 항목이 없고 다른 탭에 있으면 자동 전환
+  if (statFilter) {
+    const curHas = completedScreens(activeTab === 'user' ? userData : adminData).some(matchStatFilter);
+    const otherHas = completedScreens(activeTab === 'user' ? adminData : userData).some(matchStatFilter);
+    if (!curHas && otherHas) {
+      activeTab = activeTab === 'user' ? 'admin' : 'user';
+      activeSubTab = 'all';
+    }
+  }
+  render();
+}
 
 function renderNonPassList(cats) {
   const nonPassItems = cats.flatMap(cat =>
