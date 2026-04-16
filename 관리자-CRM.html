@@ -445,11 +445,76 @@
       <table class="tbl">
         <thead><tr><th>날짜/시간</th><th>회원명</th><th>담당자</th><th>상담 내용</th><th>결과</th><th>녹취</th><th></th></tr></thead>
         <tbody>
-          <tr><td>04/16 14:32</td><td><strong>김지훈</strong></td><td>김상담</td><td>골프검진 재예약 문의</td><td><span class="bdg bdg-green">예약완료</span></td><td><button class="topbar-btn btn-ghost" style="padding:4px 10px;font-size:11px">▶ 재생</button></td><td><button class="topbar-btn btn-ghost" style="padding:4px 10px;font-size:11px">상세</button></td></tr>
-          <tr><td>04/16 11:15</td><td><strong>박서연</strong></td><td>최물리</td><td>재활치료 일정 변경 요청</td><td><span class="bdg bdg-blue">재연락</span></td><td><span style="font-size:11px;color:#CBD5E0">없음</span></td><td><button class="topbar-btn btn-ghost" style="padding:4px 10px;font-size:11px">상세</button></td></tr>
-          <tr><td>04/15 16:44</td><td><strong>이수진</strong></td><td>김상담</td><td>장기 미방문 재유입 콜</td><td><span class="bdg bdg-gray">미예약</span></td><td><button class="topbar-btn btn-ghost" style="padding:4px 10px;font-size:11px">▶ 재생</button></td><td><button class="topbar-btn btn-ghost" style="padding:4px 10px;font-size:11px">상세</button></td></tr>
-          <tr><td>04/15 10:05</td><td><strong>정현우</strong></td><td>이트레이너</td><td>TPI 검진 결과 안내</td><td><span class="bdg bdg-green">예약완료</span></td><td><span style="font-size:11px;color:#CBD5E0">없음</span></td><td><button class="topbar-btn btn-ghost" style="padding:4px 10px;font-size:11px">상세</button></td></tr>
-          <tr><td>04/14 09:20</td><td><strong>최민준</strong></td><td>김상담</td><td>이용권 만료 안내 아웃바운드</td><td><span class="bdg bdg-orange">검토중</span></td><td><button class="topbar-btn btn-ghost" style="padding:4px 10px;font-size:11px">▶ 재생</button></td><td><button class="topbar-btn btn-ghost" style="padding:4px 10px;font-size:11px">상세</button></td></tr>
+          <tr>
+            <td>04/16 14:32</td><td><strong>김지훈</strong></td><td>김상담</td><td>골프검진 재예약 문의</td>
+            <td><span class="bdg bdg-green">예약완료</span></td>
+            <td><button class="topbar-btn btn-ghost" style="padding:4px 10px;font-size:11px">▶ 재생</button></td>
+            <td><button class="topbar-btn btn-ghost" style="padding:4px 10px;font-size:11px" onclick="openConsultDetail({
+              id:'c001', date:'2026-04-16', time:'14:32', type:'전화 (수신)',
+              member:'김지훈', phone:'010-3821-7042', staff:'김상담', duration:'8분 24초',
+              subject:'골프검진 재예약 문의',
+              result:'예약완료', nextDate:'2026-04-22',
+              memo:'회원이 지난 검진 결과에 만족하며 재예약 요청함.\n• 4월 22일 오전 10시로 예약 완료\n• TPI 검진 + Trackman 측정 동시 진행 희망\n• 이트레이너 담당자 배정 확인',
+              followup:'예약 확인 문자 발송 완료. 04/21 D-1 리마인더 예정.',
+              hasRecord: true
+            })">상세</button></td>
+          </tr>
+          <tr>
+            <td>04/16 11:15</td><td><strong>박서연</strong></td><td>최물리</td><td>재활치료 일정 변경 요청</td>
+            <td><span class="bdg bdg-blue">재연락</span></td>
+            <td><span style="font-size:11px;color:#CBD5E0">없음</span></td>
+            <td><button class="topbar-btn btn-ghost" style="padding:4px 10px;font-size:11px" onclick="openConsultDetail({
+              id:'c002', date:'2026-04-16', time:'11:15', type:'전화 (수신)',
+              member:'박서연', phone:'010-5512-8834', staff:'최물리', duration:'4분 11초',
+              subject:'재활치료 일정 변경 요청',
+              result:'재연락', nextDate:'2026-04-17',
+              memo:'4월 18일(금) 오후 3시 예약 → 오전 10시로 변경 요청.\n• 직장 일정 변경으로 인한 요청\n• 오전 10시 슬롯 확인 후 재연락 약속',
+              followup:'오전 10시 슬롯 확인 필요. 내일 오전 중 재연락 예정.',
+              hasRecord: false
+            })">상세</button></td>
+          </tr>
+          <tr>
+            <td>04/15 16:44</td><td><strong>이수진</strong></td><td>김상담</td><td>장기 미방문 재유입 콜</td>
+            <td><span class="bdg bdg-gray">미예약</span></td>
+            <td><button class="topbar-btn btn-ghost" style="padding:4px 10px;font-size:11px">▶ 재생</button></td>
+            <td><button class="topbar-btn btn-ghost" style="padding:4px 10px;font-size:11px" onclick="openConsultDetail({
+              id:'c003', date:'2026-04-15', time:'16:44', type:'전화 (발신)',
+              member:'이수진', phone:'010-2298-6641', staff:'김상담', duration:'2분 58초',
+              subject:'장기 미방문 재유입 아웃바운드',
+              result:'미예약', nextDate:'',
+              memo:'95일 미방문 이탈위험 회원 아웃바운드 콜.\n• 개인 사정(육아) 으로 방문이 어려웠다고 함\n• 온라인/홈트 프로그램 안내 → 관심 있음\n• 직접 방문 예약은 거절, 추후 연락 희망',
+              followup:'5월 초 재연락 예정. 홈트 프로그램 안내 문자 발송 검토.',
+              hasRecord: true
+            })">상세</button></td>
+          </tr>
+          <tr>
+            <td>04/15 10:05</td><td><strong>정현우</strong></td><td>이트레이너</td><td>TPI 검진 결과 안내</td>
+            <td><span class="bdg bdg-green">예약완료</span></td>
+            <td><span style="font-size:11px;color:#CBD5E0">없음</span></td>
+            <td><button class="topbar-btn btn-ghost" style="padding:4px 10px;font-size:11px" onclick="openConsultDetail({
+              id:'c004', date:'2026-04-15', time:'10:05', type:'방문',
+              member:'정현우', phone:'010-9901-2255', staff:'이트레이너', duration:'35분',
+              subject:'TPI 검진 결과 상담',
+              result:'예약완료', nextDate:'2026-07-10',
+              memo:'04/10 TPI 검진 결과 상세 안내 (방문 상담).\n• 35/38 통과 → 이전(32/38) 대비 3항목 개선\n• 개선 항목: S자형 자세, 골반 회전, 체중 이동\n• 미통과 항목 3개 집중 운동처방 설명\n• 클럽스피드 98mph 달성 축하, 목표 100mph 설정\n• 다음 TPI 검진 3개월 후(7월) 예약 완료',
+              followup:'운동처방서 이메일 발송 완료. 7월 검진 D-7 리마인더 설정.',
+              hasRecord: false
+            })">상세</button></td>
+          </tr>
+          <tr>
+            <td>04/14 09:20</td><td><strong>최민준</strong></td><td>김상담</td><td>이용권 만료 안내 아웃바운드</td>
+            <td><span class="bdg bdg-orange">검토중</span></td>
+            <td><button class="topbar-btn btn-ghost" style="padding:4px 10px;font-size:11px">▶ 재생</button></td>
+            <td><button class="topbar-btn btn-ghost" style="padding:4px 10px;font-size:11px" onclick="openConsultDetail({
+              id:'c005', date:'2026-04-14', time:'09:20', type:'전화 (발신)',
+              member:'최민준', phone:'010-7743-9182', staff:'김상담', duration:'6분 32초',
+              subject:'이용권 만료 D-7 안내 아웃바운드',
+              result:'검토중', nextDate:'2026-04-18',
+              memo:'이용권 만료 7일 전 안내 아웃바운드.\n• 현재 헬스&골프 12개월권 04/21 만료 예정\n• 재등록 의향 있으나 가격 부담 언급\n• 장기 회원 할인 쿠폰(15%) 안내 → 긍정적 반응\n• 가족과 상의 후 결정하겠다고 함',
+              followup:'04/18까지 결정 요청. 쿠폰 문자 발송 완료. 재연락 예정.',
+              hasRecord: true
+            })">상세</button></td>
+          </tr>
         </tbody>
       </table>
     </div>
@@ -1335,6 +1400,111 @@ VIP 회원 전용 특별 혜택을 안내드립니다.
   </div>
 </div>
 
+<!-- 상담 상세 모달 -->
+<div class="modal-back" id="m-consult-detail" onclick="closeModalByBack(event,'m-consult-detail')">
+  <div class="modal" style="width:580px;max-width:96vw">
+
+    <!-- 헤더 -->
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:18px">
+      <div>
+        <div style="font-size:17px;font-weight:900;color:#1A202C" id="cd-title">상담 상세</div>
+        <div style="font-size:12px;color:#A0AEC0;margin-top:3px" id="cd-id-label">#c001 · 2026-04-16 14:32</div>
+      </div>
+      <button onclick="closeModal('m-consult-detail')" style="border:none;background:#EDF2F7;border-radius:10px;width:32px;height:32px;cursor:pointer;font-size:16px;flex-shrink:0">✕</button>
+    </div>
+
+    <!-- 기본 정보 그리드 -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px">
+      <div class="modal-field" style="margin:0">
+        <div class="modal-label">회원명</div>
+        <div style="font-size:14px;font-weight:800;color:#1A202C;padding:6px 0" id="cd-member">김지훈</div>
+      </div>
+      <div class="modal-field" style="margin:0">
+        <div class="modal-label">연락처</div>
+        <div style="font-size:13px;font-weight:600;color:#4A5568;padding:6px 0" id="cd-phone">010-3821-****</div>
+      </div>
+      <div class="modal-field" style="margin:0">
+        <div class="modal-label">상담 유형</div>
+        <select class="modal-input" id="cd-type" style="padding:7px 10px;font-size:13px">
+          <option>전화 (수신)</option><option>전화 (발신)</option><option>방문</option><option>온라인 문의</option>
+        </select>
+      </div>
+      <div class="modal-field" style="margin:0">
+        <div class="modal-label">담당자</div>
+        <select class="modal-input" id="cd-staff" style="padding:7px 10px;font-size:13px">
+          <option>김상담</option><option>이트레이너</option><option>최물리</option>
+        </select>
+      </div>
+      <div class="modal-field" style="margin:0">
+        <div class="modal-label">통화 시간</div>
+        <div style="font-size:13px;color:#718096;padding:6px 0" id="cd-duration">8분 24초</div>
+      </div>
+      <div class="modal-field" style="margin:0">
+        <div class="modal-label">녹취 파일</div>
+        <div id="cd-record-wrap">
+          <button class="topbar-btn btn-ghost" style="padding:5px 12px;font-size:12px" id="cd-record-btn">▶ 녹취 재생</button>
+        </div>
+      </div>
+    </div>
+
+    <hr style="border:none;border-top:1px solid #EDF2F7;margin:4px 0 14px">
+
+    <!-- 상담 주제 -->
+    <div class="modal-field">
+      <div class="modal-label">상담 주제</div>
+      <input class="modal-input" id="cd-subject" style="font-size:13px" placeholder="상담 주제를 입력하세요">
+    </div>
+
+    <!-- 상담 내용 메모 -->
+    <div class="modal-field">
+      <div class="modal-label" style="display:flex;align-items:center;justify-content:space-between">
+        <span>상담 내용 / 메모</span>
+        <span style="font-size:10px;color:#A0AEC0;font-weight:600">· 저장됨</span>
+      </div>
+      <textarea class="modal-input" id="cd-memo" style="min-height:130px;resize:vertical;line-height:1.7;font-size:13px" placeholder="상담 내용을 상세히 기록하세요&#10;&#10;예) 회원 요청사항, 안내한 내용, 회원 반응, 특이사항 등"></textarea>
+    </div>
+
+    <!-- 결과 & 후속 조치 -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
+      <div class="modal-field" style="margin:0">
+        <div class="modal-label">상담 결과</div>
+        <select class="modal-input" id="cd-result" style="padding:7px 10px;font-size:13px">
+          <option>예약완료</option><option>재연락</option><option>미예약</option>
+          <option>검토중</option><option>정보제공</option><option>취소</option>
+        </select>
+      </div>
+      <div class="modal-field" style="margin:0">
+        <div class="modal-label">다음 연락 예정일</div>
+        <input class="modal-input" id="cd-next-date" type="date" style="padding:7px 10px;font-size:13px">
+      </div>
+    </div>
+
+    <!-- 후속 조치 메모 -->
+    <div class="modal-field">
+      <div class="modal-label">후속 조치 / 액션</div>
+      <textarea class="modal-input" id="cd-followup" style="min-height:70px;resize:vertical;font-size:13px" placeholder="후속 조치 내용을 입력하세요&#10;예) 문자 발송 예정, 재연락 일정, 담당자 전달 사항 등"></textarea>
+    </div>
+
+    <!-- 빠른 액션 -->
+    <div style="background:#F7F9FC;border-radius:10px;padding:10px 14px;margin-bottom:16px">
+      <div style="font-size:11px;font-weight:800;color:#A0AEC0;letter-spacing:1px;margin-bottom:8px">빠른 액션</div>
+      <div style="display:flex;gap:7px;flex-wrap:wrap">
+        <button class="topbar-btn btn-ghost" style="font-size:12px;padding:6px 12px" onclick="showToast('📨 메시지 발송 화면으로 이동')">📨 문자 발송</button>
+        <button class="topbar-btn btn-ghost" style="font-size:12px;padding:6px 12px" onclick="openModal('m-add-reserve');closeModal('m-consult-detail')">📅 예약 등록</button>
+        <button class="topbar-btn btn-ghost" style="font-size:12px;padding:6px 12px" onclick="showToast('회원 상세 드로어를 열었습니다');closeModal('m-consult-detail');openDrawer('d-member')">👤 회원 카드</button>
+        <button class="topbar-btn btn-ghost" style="font-size:12px;padding:6px 12px" onclick="showToast('✅ 메모를 공유 메모로 복사했습니다')">📝 메모 공유</button>
+      </div>
+    </div>
+
+    <!-- 저장 버튼 -->
+    <div style="display:flex;gap:8px">
+      <button style="flex:1;padding:11px;border-radius:10px;border:none;background:#EDF2F7;color:#4A5568;font-size:14px;font-weight:700;cursor:pointer;font-family:'Noto Sans KR',sans-serif" onclick="closeModal('m-consult-detail')">닫기</button>
+      <button style="flex:2;padding:11px;border-radius:10px;border:none;background:#4299E1;color:#fff;font-size:14px;font-weight:700;cursor:pointer;font-family:'Noto Sans KR',sans-serif" onclick="saveConsultDetail()">💾 저장하기</button>
+    </div>
+
+  </div>
+</div>
+
 <!-- 상담 등록 -->
 <div class="modal-back" id="m-add-consult" onclick="closeModalByBack(event,'m-add-consult')">
   <div class="modal">
@@ -1455,6 +1625,54 @@ VIP 회원 전용 특별 혜택을 안내드립니다.
   function openModal(id) { document.getElementById(id).classList.add('open'); }
   function closeModal(id) { document.getElementById(id).classList.remove('open'); }
   function closeModalByBack(e, id) { if (e.target === document.getElementById(id)) closeModal(id); }
+
+  /* ── 상담 상세 모달 ── */
+  const resultMap = { '예약완료':'예약완료','재연락':'재연락','미예약':'미예약','검토중':'검토중','정보제공':'정보제공','취소':'취소' };
+
+  function openConsultDetail(d) {
+    // 기본 정보 채우기
+    document.getElementById('cd-title').textContent = '💬 ' + d.subject;
+    document.getElementById('cd-id-label').textContent = '#' + d.id + ' · ' + d.date + ' ' + d.time;
+    document.getElementById('cd-member').textContent = d.member;
+    document.getElementById('cd-phone').textContent = d.phone;
+    document.getElementById('cd-duration').textContent = d.duration || '—';
+
+    // 선택박스 값 설정
+    setSelectVal('cd-type',   d.type);
+    setSelectVal('cd-staff',  d.staff);
+    setSelectVal('cd-result', d.result);
+
+    // 입력값 설정
+    document.getElementById('cd-subject').value  = d.subject   || '';
+    document.getElementById('cd-memo').value      = d.memo      || '';
+    document.getElementById('cd-followup').value  = d.followup  || '';
+    document.getElementById('cd-next-date').value = d.nextDate  || '';
+
+    // 녹취 버튼
+    const recWrap = document.getElementById('cd-record-wrap');
+    recWrap.innerHTML = d.hasRecord
+      ? '<button class="topbar-btn btn-ghost" style="padding:5px 12px;font-size:12px" onclick="showToast(\'▶ 녹취 파일 재생 중...\')">▶ 녹취 재생</button>'
+      : '<span style="font-size:12px;color:#CBD5E0">녹취 없음</span>';
+
+    openModal('m-consult-detail');
+  }
+
+  function setSelectVal(id, val) {
+    const sel = document.getElementById(id);
+    if (!sel) return;
+    for (let i = 0; i < sel.options.length; i++) {
+      if (sel.options[i].text === val || sel.options[i].value === val) { sel.selectedIndex = i; break; }
+    }
+  }
+
+  function saveConsultDetail() {
+    const member  = document.getElementById('cd-member').textContent;
+    const subject = document.getElementById('cd-subject').value.trim();
+    const result  = document.getElementById('cd-result').value;
+    if (!subject) { showToast('⚠️ 상담 주제를 입력하세요'); return; }
+    closeModal('m-consult-detail');
+    showToast('✅ ' + member + ' 상담 내용이 저장되었습니다');
+  }
 
   /* ── 드로어 ── */
   function openDrawer(id) {
