@@ -1506,9 +1506,10 @@
     }
 
     /* ── 목표 설정 모달 ── */
-    const goals = { exercise: 20, duration: 45, kcal: 300 };
     const goalMin = { exercise: 1, duration: 10, kcal: 50 };
     const goalMax = { exercise: 31, duration: 180, kcal: 1000 };
+    const _savedGoals = (() => { try { return JSON.parse(localStorage.getItem('myrecord_goals')); } catch(e) { return null; } })();
+    const goals = _savedGoals || { exercise: 20, duration: 45, kcal: 300 };
 
     function openGoalModal() {
       document.getElementById('goal-exercise-val').textContent = goals.exercise;
@@ -1527,6 +1528,7 @@
     }
     function saveGoal() {
       document.getElementById('goal-modal').classList.remove('open');
+      try { localStorage.setItem('myrecord_goals', JSON.stringify(goals)); } catch(e) {}
       // 운동 목표 반영
       const current = 16;
       const pct = Math.min(100, Math.round(current / goals.exercise * 100));
@@ -1714,7 +1716,17 @@
       }
     }
 
-    document.addEventListener('DOMContentLoaded', () => {});
+    document.addEventListener('DOMContentLoaded', () => {
+      // 저장된 목표값 UI 초기 반영
+      const current = 16;
+      const pct = Math.min(100, Math.round(current / goals.exercise * 100));
+      document.getElementById('display-exercise-goal').textContent = goals.exercise;
+      document.getElementById('exercise-goal-bar').style.width = pct + '%';
+      const remain = goals.exercise - current;
+      document.getElementById('exercise-goal-hint').textContent =
+        remain > 0 ? `목표까지 ${remain}일 남음` : '이번 달 목표 달성! 🎉';
+      document.getElementById('display-duration-goal').textContent = goals.duration;
+    });
     // 달력 날짜에 클릭 이벤트 바인딩
     setTimeout(() => {
       document.querySelectorAll('#exercise-cal .cal-date:not(.empty)').forEach(cell => {
