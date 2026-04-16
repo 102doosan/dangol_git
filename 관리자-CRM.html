@@ -1543,14 +1543,63 @@ VIP 회원 전용 특별 혜택을 안내드립니다.
 
 <!-- 메모 작성 -->
 <div class="modal-back" id="m-add-memo" onclick="closeModalByBack(event,'m-add-memo')">
-  <div class="modal">
+  <div class="modal" style="width:520px">
     <div class="modal-title">📝 메모 작성</div>
-    <div class="modal-field"><div class="modal-label">회원 검색</div><input class="modal-input" placeholder="이름/전화번호"></div>
-    <div class="modal-field"><div class="modal-label">메모 종류</div><select class="modal-input"><option>일반 메모</option><option>알레르기/금기</option><option>VIP 케어</option><option>직원 공유 (내부)</option></select></div>
-    <div class="modal-field"><div class="modal-label">내용</div><textarea class="modal-input" style="min-height:100px" placeholder="메모 내용을 입력하세요"></textarea></div>
+
+    <!-- 회원 검색 -->
+    <div class="modal-field" style="position:relative">
+      <div class="modal-label">회원 검색<span style="color:#E53E3E">*</span></div>
+      <input class="modal-input" id="memo-member-search"
+        placeholder="이름 또는 전화번호 입력..."
+        autocomplete="off"
+        oninput="searchMemoMember(this.value)"
+        onkeydown="memoSearchKey(event)">
+      <!-- 자동완성 드롭다운 -->
+      <div id="memo-member-dropdown" style="
+        display:none; position:absolute; left:0; right:0; top:100%; z-index:300;
+        background:#fff; border:1.5px solid #4299E1; border-radius:10px;
+        box-shadow:0 4px 16px rgba(0,0,0,0.12); overflow:hidden; margin-top:3px;">
+      </div>
+    </div>
+
+    <!-- 선택된 회원 카드 -->
+    <div id="memo-selected-member" style="display:none;background:#EBF8FF;border-radius:10px;padding:10px 14px;margin-bottom:14px;display:none;align-items:center;gap:10px;border:1.5px solid #BEE3F8">
+      <div style="font-size:22px">👤</div>
+      <div style="flex:1">
+        <div style="font-size:13px;font-weight:800;color:#1A202C" id="memo-sel-name">—</div>
+        <div style="font-size:12px;color:#4A90D9;margin-top:1px" id="memo-sel-info">—</div>
+      </div>
+      <button onclick="clearMemoMember()" style="background:#FED7D7;color:#C53030;border:none;border-radius:8px;padding:4px 10px;font-size:11px;font-weight:700;cursor:pointer">✕ 해제</button>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <div class="modal-field" style="margin:0">
+        <div class="modal-label">메모 종류</div>
+        <select class="modal-input" id="memo-type-modal">
+          <option>일반 메모</option>
+          <option>알레르기/금기</option>
+          <option>VIP 케어</option>
+          <option>상담 내용</option>
+          <option>직원 공유 (내부)</option>
+        </select>
+      </div>
+      <div class="modal-field" style="margin:0">
+        <div class="modal-label">고정 여부</div>
+        <select class="modal-input" id="memo-pin-modal">
+          <option value="0">일반</option>
+          <option value="1">📌 고정 메모</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="modal-field">
+      <div class="modal-label" style="margin-top:12px">내용<span style="color:#E53E3E">*</span></div>
+      <textarea class="modal-input" id="memo-content-modal" style="min-height:110px;resize:vertical;line-height:1.7" placeholder="메모 내용을 입력하세요&#10;&#10;예) 알레르기 정보, 케어 특이사항, 상담 내용 요약 등"></textarea>
+    </div>
+
     <div class="modal-btns">
-      <button style="background:#EDF2F7;color:#4A5568" onclick="closeModal('m-add-memo')">취소</button>
-      <button style="background:#4299E1;color:#fff" onclick="closeModal('m-add-memo');showToast('✅ 메모가 저장되었습니다')">저장하기</button>
+      <button style="background:#EDF2F7;color:#4A5568;font-family:'Noto Sans KR',sans-serif" onclick="clearMemoModal();closeModal('m-add-memo')">취소</button>
+      <button style="background:#4299E1;color:#fff;font-family:'Noto Sans KR',sans-serif" onclick="saveMemoModal()">💾 저장하기</button>
     </div>
   </div>
 </div>
@@ -1904,6 +1953,148 @@ VIP 회원 전용 특별 혜택을 안내드립니다.
 
   /* ── 태그 토글 ── */
   function toggleTargetTag(el) { el.classList.toggle('on'); }
+
+  /* ── 메모 작성 모달 — 회원 검색 ── */
+  const MEMBERS_DB = [
+    { name:'김지훈', phone:'010-3821-7042', grade:'VIP',    tags:['골프회원','헬스'] },
+    { name:'박서연', phone:'010-5512-8834', grade:'신규',   tags:['재활','수술후'] },
+    { name:'최민준', phone:'010-7743-9182', grade:'휴면',   tags:['골프회원','만성통증'] },
+    { name:'이수진', phone:'010-2298-6641', grade:'이탈위험', tags:['헬스'] },
+    { name:'정현우', phone:'010-9901-2255', grade:'일반',   tags:['골프회원'] },
+    { name:'한미래', phone:'010-4433-1122', grade:'VIP',    tags:['TPI','피트니스'] },
+    { name:'윤지성', phone:'010-6677-8899', grade:'일반',   tags:['재활'] },
+    { name:'강소희', phone:'010-1234-5678', grade:'신규',   tags:['다이어트'] },
+  ];
+
+  let _memoSearchIdx = -1;    // 키보드 포커스 인덱스
+  let _memoFiltered  = [];    // 현재 필터 결과
+  let _memoSelected  = null;  // 선택된 회원 객체
+
+  const GRADE_COLOR = { 'VIP':'#6B46C1', '신규':'#38A169', '휴면':'#A0AEC0', '이탈위험':'#E53E3E', '일반':'#3182CE' };
+
+  function searchMemoMember(q) {
+    _memoSearchIdx = -1;
+    const kw = q.trim();
+    if (!kw) { hideMemoDropdown(); return; }
+    _memoFiltered = MEMBERS_DB.filter(m =>
+      m.name.includes(kw) || m.phone.replace(/-/g,'').includes(kw.replace(/-/g,''))
+    );
+    renderMemoDropdown(_memoFiltered);
+  }
+
+  function renderMemoDropdown(items) {
+    const dd = document.getElementById('memo-member-dropdown');
+    if (!items.length) {
+      dd.innerHTML = '<div style="padding:12px 16px;font-size:13px;color:#A0AEC0;text-align:center">검색 결과 없음</div>';
+      dd.style.display = 'block'; return;
+    }
+    dd.innerHTML = items.map((m, i) => `
+      <div class="memo-dd-item" data-idx="${i}"
+        onmousedown="selectMemoMember(${i})"
+        onmouseenter="highlightMemoItem(${i})"
+        style="display:flex;align-items:center;gap:10px;padding:9px 14px;cursor:pointer;transition:background 0.12s;">
+        <div style="width:32px;height:32px;border-radius:50%;background:#EBF8FF;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0">👤</div>
+        <div style="flex:1;min-width:0">
+          <span style="font-size:13px;font-weight:800;color:#1A202C">${m.name}</span>
+          <span style="margin-left:6px;font-size:11px;font-weight:700;color:${GRADE_COLOR[m.grade]||'#3182CE'};background:#EDF2F7;padding:1px 7px;border-radius:99px">${m.grade}</span>
+          <div style="font-size:11.5px;color:#718096;margin-top:1px">${m.phone}</div>
+        </div>
+      </div>`).join('<div style="height:1px;background:#F0F4F8;margin:0 14px"></div>');
+    dd.style.display = 'block';
+  }
+
+  function highlightMemoItem(idx) {
+    _memoSearchIdx = idx;
+    document.querySelectorAll('.memo-dd-item').forEach((el, i) => {
+      el.style.background = i === idx ? '#EBF8FF' : '';
+    });
+  }
+
+  function selectMemoMember(idx) {
+    const m = _memoFiltered[idx];
+    if (!m) return;
+    _memoSelected = m;
+    // 검색 인풋 감추고 선택 카드 표시
+    const inp = document.getElementById('memo-member-search');
+    inp.value = '';
+    inp.style.display = 'none';
+    hideMemoDropdown();
+    const card = document.getElementById('memo-selected-member');
+    document.getElementById('memo-sel-name').textContent = m.name + ' (' + m.grade + ')';
+    document.getElementById('memo-sel-info').textContent = m.phone + (m.tags.length ? '  ·  ' + m.tags.join(', ') : '');
+    card.style.display = 'flex';
+  }
+
+  function clearMemoMember() {
+    _memoSelected = null;
+    const inp = document.getElementById('memo-member-search');
+    inp.value = '';
+    inp.style.display = '';
+    document.getElementById('memo-selected-member').style.display = 'none';
+    hideMemoDropdown();
+    inp.focus();
+  }
+
+  function hideMemoDropdown() {
+    document.getElementById('memo-member-dropdown').style.display = 'none';
+    _memoFiltered = [];
+  }
+
+  function memoSearchKey(e) {
+    const items = document.querySelectorAll('.memo-dd-item');
+    if (!items.length) return;
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      _memoSearchIdx = Math.min(_memoSearchIdx + 1, _memoFiltered.length - 1);
+      highlightMemoItem(_memoSearchIdx);
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      _memoSearchIdx = Math.max(_memoSearchIdx - 1, 0);
+      highlightMemoItem(_memoSearchIdx);
+    } else if (e.key === 'Enter') {
+      e.preventDefault();
+      if (_memoSearchIdx >= 0) selectMemoMember(_memoSearchIdx);
+      else if (_memoFiltered.length === 1) selectMemoMember(0);
+    } else if (e.key === 'Escape') {
+      hideMemoDropdown();
+    }
+  }
+
+  function saveMemoModal() {
+    if (!_memoSelected) {
+      alert('회원을 선택해주세요.');
+      document.getElementById('memo-member-search').focus();
+      return;
+    }
+    const content = document.getElementById('memo-content-modal').value.trim();
+    if (!content) {
+      alert('메모 내용을 입력해주세요.');
+      document.getElementById('memo-content-modal').focus();
+      return;
+    }
+    // 저장 성공 처리 (실제 DB 연동 전 UI 피드백)
+    alert('메모가 저장되었습니다.\n회원: ' + _memoSelected.name + '\n내용: ' + content.slice(0,30) + (content.length>30?'…':''));
+    clearMemoModal();
+    closeModal('m-add-memo');
+  }
+
+  function clearMemoModal() {
+    clearMemoMember();
+    document.getElementById('memo-type-modal').selectedIndex = 0;
+    document.getElementById('memo-pin-modal').selectedIndex = 0;
+    document.getElementById('memo-content-modal').value = '';
+    _memoSelected = null;
+    // 인풋 복원
+    const inp = document.getElementById('memo-member-search');
+    inp.style.display = '';
+  }
+
+  // 모달 바깥 클릭 시 드롭다운 닫기
+  document.addEventListener('click', function(e) {
+    if (!e.target.closest('#memo-member-search') && !e.target.closest('#memo-member-dropdown')) {
+      hideMemoDropdown();
+    }
+  });
 </script>
 </body>
 </html>
