@@ -2168,15 +2168,19 @@ VIP 회원 전용 특별 혜택을 안내드립니다.
           <span class="bdg ${d.badgeCls} today-sec-badge" id="badge-${key}"></span>
         </div>
         <div class="today-tabs">
-          <button class="today-tab on" id="tab-pending-${key}" onclick="switchTaskTab('${key}','pending')">
+          <button class="today-tab on" id="tab-all-${key}" onclick="switchTaskTab('${key}','all')">
+            전체 <span class="today-tab-cnt" id="tab-cnt-all-${key}">0</span>
+          </button>
+          <button class="today-tab" id="tab-pending-${key}" onclick="switchTaskTab('${key}','pending')">
             미처리 <span class="today-tab-cnt urgent" id="tab-cnt-pending-${key}">0</span>
           </button>
           <button class="today-tab" id="tab-done-${key}" onclick="switchTaskTab('${key}','done')">
             처리완료 <span class="today-tab-cnt" id="tab-cnt-done-${key}">0</span>
           </button>
         </div>
-        <div class="today-pending-list" id="pending-${key}"></div>
-        <div class="today-done-list" id="done-${key}" style="display:none"></div>
+        <div class="today-all-list"   id="all-${key}"></div>
+        <div class="today-pending-list" id="pending-${key}" style="display:none"></div>
+        <div class="today-done-list"   id="done-${key}"    style="display:none"></div>
       </div>`;
     }).join('');
     refreshTodayLists();
@@ -2184,17 +2188,20 @@ VIP 회원 전용 특별 혜택을 안내드립니다.
 
   function switchTaskTab(key, tab) {
     _taskActiveTab[key] = tab;
+    const aList = document.getElementById('all-'     + key);
     const pList = document.getElementById('pending-' + key);
-    const dList = document.getElementById('done-' + key);
+    const dList = document.getElementById('done-'    + key);
+    const aTab  = document.getElementById('tab-all-'     + key);
     const pTab  = document.getElementById('tab-pending-' + key);
-    const dTab  = document.getElementById('tab-done-' + key);
-    if (tab === 'pending') {
-      pList.style.display = ''; dList.style.display = 'none';
-      pTab.classList.add('on'); dTab.classList.remove('on');
-    } else {
-      pList.style.display = 'none'; dList.style.display = '';
-      pTab.classList.remove('on'); dTab.classList.add('on');
-    }
+    const dTab  = document.getElementById('tab-done-'    + key);
+    // 모두 숨김 후 활성 탭만 표시
+    if (aList) aList.style.display = 'none';
+    if (pList) pList.style.display = 'none';
+    if (dList) dList.style.display = 'none';
+    [aTab, pTab, dTab].forEach(t => t && t.classList.remove('on'));
+    if (tab === 'all')     { if (aList) aList.style.display = ''; if (aTab) aTab.classList.add('on'); }
+    if (tab === 'pending') { if (pList) pList.style.display = ''; if (pTab) pTab.classList.add('on'); }
+    if (tab === 'done')    { if (dList) dList.style.display = ''; if (dTab) dTab.classList.add('on'); }
   }
 
   function refreshTodayLists() {
@@ -2205,41 +2212,57 @@ VIP 회원 전용 특별 혜택을 안내드립니다.
       const done    = d.items.filter(i =>  _todayDone[i.id]);
       totalPending += pending.length;
 
-      // 미처리 목록
+      // 항목 HTML 생성 헬퍼
+      function pendingHTML(item) {
+        return `<div class="tti clickable" onclick="openTaskDetail('${item.id}','${key}')">
+          <div class="tti-av" style="background:${d.bg}">${d.icon}</div>
+          <div class="tti-info"><div class="tti-name">${item.name}</div><div class="tti-sub">${item.info}</div></div>
+          <span style="font-size:11px;color:#A0AEC0;margin-right:4px">처리하기 ›</span>
+        </div>`;
+      }
+      function doneHTML(item) {
+        return `<div class="tti done clickable" onclick="openTaskDetail('${item.id}','${key}')">
+          <div class="tti-av" style="background:#F0FFF4">✅</div>
+          <div class="tti-info">
+            <div class="tti-name" style="text-decoration:line-through;color:#A0AEC0">${item.name}</div>
+            <div class="tti-sub">${item.info}</div>
+          </div>
+          <button class="tti-undo-btn" onclick="event.stopPropagation();undoTask('${item.id}','${key}')">↩ 미처리로</button>
+        </div>`;
+      }
+
+      // 전체 탭
+      const aEl = document.getElementById('all-' + key);
+      if (aEl) {
+        const allHtml = [
+          ...pending.map(pendingHTML),
+          ...(done.length ? [`<div style="height:1px;background:#E2E8F0;margin:4px 20px"></div>`] : []),
+          ...done.map(doneHTML)
+        ].join('');
+        aEl.innerHTML = allHtml || '<div class="tti-empty">항목이 없습니다.</div>';
+      }
+
+      // 미처리 탭
       const pEl = document.getElementById('pending-' + key);
       if (pEl) {
         pEl.innerHTML = pending.length
-          ? pending.map(item => `
-            <div class="tti clickable" id="tti-${item.id}" onclick="openTaskDetail('${item.id}','${key}')">
-              <div class="tti-av" style="background:${d.bg}">${d.icon}</div>
-              <div class="tti-info">
-                <div class="tti-name">${item.name}</div>
-                <div class="tti-sub">${item.info}</div>
-              </div>
-              <span style="font-size:11px;color:#A0AEC0;margin-right:4px">처리하기 ›</span>
-            </div>`).join('')
+          ? pending.map(pendingHTML).join('')
           : '<div class="tti-empty">🎉 모든 항목 처리 완료!</div>';
       }
 
-      // 처리완료 목록
+      // 처리완료 탭
       const dEl = document.getElementById('done-' + key);
       if (dEl) {
         dEl.innerHTML = done.length
-          ? done.map(item => `
-              <div class="tti done clickable" id="tti-done-${item.id}" onclick="openTaskDetail('${item.id}','${key}')">
-                <div class="tti-av" style="background:#F0FFF4">✅</div>
-                <div class="tti-info">
-                  <div class="tti-name" style="text-decoration:line-through;color:#A0AEC0">${item.name}</div>
-                  <div class="tti-sub">${item.info}</div>
-                </div>
-                <button class="tti-undo-btn" onclick="event.stopPropagation();undoTask('${item.id}','${key}')">↩ 미처리로</button>
-              </div>`).join('')
-          : '<div class="tti-empty" style="color:#A0AEC0">아직 처리완료된 항목이 없습니다.</div>';
+          ? done.map(doneHTML).join('')
+          : '<div class="tti-empty" style="color:#A0AEC0">처리완료된 항목이 없습니다.</div>';
       }
 
       // 탭 카운트 배지 업데이트
+      const cntA = document.getElementById('tab-cnt-all-'     + key);
       const cntP = document.getElementById('tab-cnt-pending-' + key);
-      const cntD = document.getElementById('tab-cnt-done-' + key);
+      const cntD = document.getElementById('tab-cnt-done-'    + key);
+      if (cntA) { cntA.textContent = d.items.length; }
       if (cntP) { cntP.textContent = pending.length; cntP.className = 'today-tab-cnt' + (pending.length ? ' urgent' : ''); }
       if (cntD) { cntD.textContent = done.length; }
 
@@ -2257,14 +2280,9 @@ VIP 회원 전용 특별 혜택을 안내드립니다.
       const prog = document.getElementById('prog-' + key);
       if (prog) prog.textContent = done.length + ' / ' + d.items.length + ' 완료';
 
-      // 현재 탭 표시 상태 유지 (없으면 미처리 탭 기본)
-      const curTab = _taskActiveTab[key] || 'pending';
+      // 현재 탭 상태 유지 (기본: 전체 탭)
+      const curTab = _taskActiveTab[key] || 'all';
       switchTaskTab(key, curTab);
-
-      // 미처리가 0이 되면 처리완료 탭으로 자동 전환
-      if (pending.length === 0 && done.length > 0 && !_taskActiveTab[key]) {
-        switchTaskTab(key, 'done');
-      }
     });
 
     const countEl = document.getElementById('today-pending-count');
@@ -2277,9 +2295,6 @@ VIP 회원 전용 특별 혜택을 안내드립니다.
     _todayDone[itemId] = true;
     saveTodayState();
     refreshTodayLists();
-    // 처리완료 탭으로 이동
-    _taskActiveTab[taskKey] = 'done';
-    switchTaskTab(taskKey, 'done');
     showToast('✅ 처리 완료!');
   }
 
@@ -2287,9 +2302,6 @@ VIP 회원 전용 특별 혜택을 안내드립니다.
     delete _todayDone[itemId];
     saveTodayState();
     refreshTodayLists();
-    // 미처리 탭으로 이동
-    _taskActiveTab[taskKey] = 'pending';
-    switchTaskTab(taskKey, 'pending');
     showToast('↩ 미처리로 되돌렸습니다');
   }
 
@@ -2443,8 +2455,6 @@ VIP 회원 전용 특별 혜택을 안내드립니다.
     _todayDone[_detailCurrentId] = true;
     saveTodayState();
     refreshTodayLists();
-    _taskActiveTab[_detailCurrentKey] = 'done';
-    switchTaskTab(_detailCurrentKey, 'done');
     closeModal('m-task-detail');
     showToast('✅ 처리 완료!');
   }
@@ -2454,8 +2464,6 @@ VIP 회원 전용 특별 혜택을 안내드립니다.
     delete _todayDone[_detailCurrentId];
     saveTodayState();
     refreshTodayLists();
-    _taskActiveTab[_detailCurrentKey] = 'pending';
-    switchTaskTab(_detailCurrentKey, 'pending');
     closeModal('m-task-detail');
     showToast('↩ 미처리로 되돌렸습니다');
   }
