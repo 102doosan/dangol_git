@@ -252,6 +252,25 @@
     /* 홈 할 일 클릭 커서 */
     .list-item.clickable-task { cursor:pointer; transition:background 0.15s; }
     .list-item.clickable-task:hover { background:#F0F7FF; }
+
+    /* 태스크 행 클릭 가능 */
+    .tti.clickable { cursor:pointer; }
+    .tti.clickable:hover { background:#EBF8FF; }
+    .tti.done.clickable:hover { background:#F0FFF4; }
+
+    /* 태스크 상세 모달 전용 스타일 */
+    .td-member-card { border-radius:12px; padding:14px 16px; margin-bottom:16px; display:flex; align-items:center; gap:12px; }
+    .td-avatar { width:44px; height:44px; border-radius:50%; background:rgba(255,255,255,0.7); display:flex; align-items:center; justify-content:center; font-size:20px; flex-shrink:0; }
+    .td-info-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-bottom:14px; }
+    .td-info-cell { background:#F7F9FC; border-radius:8px; padding:8px 12px; }
+    .td-ic-label { font-size:10px; font-weight:700; color:#A0AEC0; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:2px; }
+    .td-ic-val { font-size:13px; font-weight:800; color:#1A202C; }
+    .td-action-row { display:flex; gap:8px; margin-bottom:14px; flex-wrap:wrap; }
+    .td-action-btn { flex:1; min-width:80px; padding:9px 12px; border-radius:10px; border:1.5px solid #E2E8F0; background:#fff; cursor:pointer; font-size:12px; font-weight:700; font-family:'Noto Sans KR',sans-serif; text-align:center; transition:all 0.15s; }
+    .td-action-btn:hover { border-color:#4299E1; background:#EBF8FF; color:#2B6CB0; }
+    .td-msg-preview { background:#FFFBEB; border:1px solid #F6E05E; border-radius:10px; padding:12px 14px; font-size:12.5px; line-height:1.8; color:#2D3748; margin-bottom:14px; }
+    .td-inquiry-box { background:#F7F9FC; border-radius:10px; padding:12px 14px; font-size:13px; line-height:1.7; color:#2D3748; margin-bottom:14px; border-left:3px solid #4299E1; }
+    .td-done-banner { background:#F0FFF4; border:1.5px solid #C6F6D5; border-radius:10px; padding:10px 14px; display:flex; align-items:center; gap:8px; font-size:13px; font-weight:700; color:#276749; margin-bottom:14px; }
   </style>
 </head>
 <body>
@@ -1652,6 +1671,13 @@ VIP 회원 전용 특별 혜택을 안내드립니다.
   </div>
 </div>
 
+<!-- 오늘 할 일 — 태스크 상세 처리 모달 -->
+<div class="modal-back" id="m-task-detail" onclick="closeModalByBack(event,'m-task-detail')">
+  <div class="modal" id="task-detail-inner" style="width:520px;max-height:88vh;overflow-y:auto">
+    <!-- JS로 동적 렌더 -->
+  </div>
+</div>
+
 <!-- 이벤트 등록 -->
 <div class="modal-back" id="m-add-event" onclick="closeModalByBack(event,'m-add-event')">
   <div class="modal">
@@ -2011,53 +2037,94 @@ VIP 회원 전용 특별 혜택을 안내드립니다.
       icon:'⚠️', bg:'#FED7D7', color:'#C53030', badgeCls:'bdg-red',
       title:'이탈 위험 회원 연락', sub:'60일 이상 미방문 · 즉시 연락 필요', urgency:'긴급',
       items:[
-        {id:'ch1', name:'이수진', info:'95일 미방문 · 이탈위험 HIGH · 헬스 · 010-2298-****'},
-        {id:'ch2', name:'최민준', info:'68일 미방문 · 이탈위험 MED · 골프/헬스 · 010-7743-****'},
-        {id:'ch3', name:'윤미래', info:'45일 미방문 · 이탈위험 MED · 재활 · 010-4411-****'},
-        {id:'ch4', name:'강현석', info:'62일 미방문 · 이탈위험 MED · TPI · 010-8832-****'},
-        {id:'ch5', name:'오지현', info:'71일 미방문 · 이탈위험 HIGH · 피트니스 · 010-5521-****'},
+        {id:'ch1', name:'이수진', info:'95일 미방문 · 이탈위험 HIGH · 헬스 · 010-2298-****',
+          phone:'010-2298-6641', lastVisit:'95일 전', risk:'HIGH 87점', pass:'만료됨', grade:'이탈위험', service:'헬스', memo:'육아로 방문 어렵다고 함. 온라인 프로그램 관심 있음.'},
+        {id:'ch2', name:'최민준', info:'68일 미방문 · 이탈위험 MED · 골프/헬스 · 010-7743-****',
+          phone:'010-7743-9182', lastVisit:'68일 전', risk:'MED 72점', pass:'D-5 만료임박', grade:'휴면', service:'골프/헬스', memo:'이용권 만료 임박. 가격 부담 언급.'},
+        {id:'ch3', name:'윤미래', info:'45일 미방문 · 이탈위험 MED · 재활 · 010-4411-****',
+          phone:'010-4411-3382', lastVisit:'45일 전', risk:'MED 58점', pass:'8회 잔여', grade:'이탈위험', service:'재활', memo:'개인 사정으로 방문 중단. 복귀 의사 있음.'},
+        {id:'ch4', name:'강현석', info:'62일 미방문 · 이탈위험 MED · TPI · 010-8832-****',
+          phone:'010-8832-4471', lastVisit:'62일 전', risk:'MED 65점', pass:'12개월권 잔여', grade:'일반', service:'TPI', memo:'직장 변경으로 시간 조율 필요.'},
+        {id:'ch5', name:'오지현', info:'71일 미방문 · 이탈위험 HIGH · 피트니스 · 010-5521-****',
+          phone:'010-5521-7743', lastVisit:'71일 전', risk:'HIGH 79점', pass:'만료됨', grade:'이탈위험', service:'피트니스', memo:'미응답 1회. 재연락 필요.'},
       ]
     },
     'task-remind': {
       icon:'📅', bg:'#FEEBC8', color:'#C05621', badgeCls:'bdg-orange',
       title:'예약 리마인더 발송', sub:'내일 예약자 · D-1 알림 미발송', urgency:'4건',
       items:[
-        {id:'rm1', name:'김지훈', info:'내일 11:00 · 개인레슨 · 이트레이너 · 010-3821-****'},
-        {id:'rm2', name:'한미래', info:'내일 10:00 · TPI 검진 · 이트레이너 · 010-4433-****'},
-        {id:'rm3', name:'장수현', info:'내일 14:30 · SFMA · 최물리 · 010-6622-****'},
-        {id:'rm4', name:'배준호', info:'내일 16:00 · 골프검진 · 이트레이너 · 010-9974-****'},
+        {id:'rm1', name:'김지훈', info:'내일 11:00 · 개인레슨 · 이트레이너 · 010-3821-****',
+          phone:'010-3821-7042', apptTime:'내일(4/17) 11:00', apptType:'개인레슨', staff:'이트레이너',
+          msgPreview:'[예약 알림]\n김지훈 회원님, 내일(4/17) 11:00 개인레슨 예약이 있습니다.\n담당: 이트레이너\n📍 센터 1층 레슨실\n문의: 02-1234-5678'},
+        {id:'rm2', name:'한미래', info:'내일 10:00 · TPI 검진 · 이트레이너 · 010-4433-****',
+          phone:'010-4433-1122', apptTime:'내일(4/17) 10:00', apptType:'TPI 검진', staff:'이트레이너',
+          msgPreview:'[예약 알림]\n한미래 회원님, 내일(4/17) 10:00 TPI 검진 예약이 있습니다.\n담당: 이트레이너\n편한 복장으로 내원해 주세요.\n문의: 02-1234-5678'},
+        {id:'rm3', name:'장수현', info:'내일 14:30 · SFMA · 최물리 · 010-6622-****',
+          phone:'010-6622-8891', apptTime:'내일(4/17) 14:30', apptType:'SFMA 검진', staff:'최물리',
+          msgPreview:'[예약 알림]\n장수현 회원님, 내일(4/17) 14:30 SFMA 검진 예약이 있습니다.\n담당: 최물리\n문의: 02-1234-5678'},
+        {id:'rm4', name:'배준호', info:'내일 16:00 · 골프검진 · 이트레이너 · 010-9974-****',
+          phone:'010-9974-2231', apptTime:'내일(4/17) 16:00', apptType:'골프 검진', staff:'이트레이너',
+          msgPreview:'[예약 알림]\n배준호 회원님, 내일(4/17) 16:00 골프 검진 예약이 있습니다.\n담당: 이트레이너\n골프화/장갑 지참 권장\n문의: 02-1234-5678'},
       ]
     },
     'task-inquiry': {
       icon:'💬', bg:'#BEE3F8', color:'#2C5282', badgeCls:'bdg-blue',
       title:'미답변 온라인 문의', sub:'홈페이지 문의 · 24시간 초과', urgency:'3건',
       items:[
-        {id:'iq1', name:'(비회원)', info:'04/15 09:22 · "TPI 검진 가격 문의" · 이메일 문의'},
-        {id:'iq2', name:'(비회원)', info:'04/15 11:44 · "골프레슨 등록 문의" · 010-3322-****'},
-        {id:'iq3', name:'박서연', info:'04/15 18:05 · "재활치료 일정 변경 재문의" · 앱 문의'},
+        {id:'iq1', name:'(비회원)', info:'04/15 09:22 · "TPI 검진 가격 문의" · 이메일 문의',
+          channel:'이메일', contact:'guest1@email.com', receivedAt:'04/15 09:22',
+          content:'안녕하세요. TPI 검진 비용이 어떻게 되나요? 처음 방문인데 패키지 상품도 있는지 궁금합니다. 연락 부탁드립니다.'},
+        {id:'iq2', name:'(비회원)', info:'04/15 11:44 · "골프레슨 등록 문의" · 010-3322-****',
+          channel:'전화', contact:'010-3322-7788', receivedAt:'04/15 11:44',
+          content:'골프 레슨 등록하고 싶은데 초보도 가능한지, 요금은 어떻게 되는지 알고 싶습니다. 주말 레슨도 있는지도 궁금합니다.'},
+        {id:'iq3', name:'박서연', info:'04/15 18:05 · "재활치료 일정 변경 재문의" · 앱 문의',
+          channel:'앱 문의', contact:'010-5512-8834', receivedAt:'04/15 18:05',
+          content:'아까 전화로 일정 변경 요청드렸는데 아직 답장이 없어서요. 4월 18일 오전 10시 가능한지 확인 부탁드립니다.'},
       ]
     },
     'task-birthday': {
       icon:'🎂', bg:'#C6F6D5', color:'#276749', badgeCls:'bdg-green',
       title:'오늘 생일 회원 문자 발송', sub:'생일 축하 문자 · 쿠폰 동봉 발송 예정', urgency:'4명',
       items:[
-        {id:'bd1', name:'김○○', info:'VIP · 골프회원 · 생일 축하 + 10% 쿠폰 발송 예정'},
-        {id:'bd2', name:'박○○', info:'신규 · 재활 · 생일 축하 메시지 발송 예정'},
-        {id:'bd3', name:'최○○', info:'일반 · 헬스 · 생일 축하 메시지 발송 예정'},
-        {id:'bd4', name:'이○○', info:'일반 · TPI · 생일 축하 메시지 발송 예정'},
+        {id:'bd1', name:'김○○', info:'VIP · 골프회원 · 생일 축하 + 10% 쿠폰 발송 예정',
+          phone:'010-3821-****', grade:'VIP', coupon:'10% 할인 쿠폰',
+          msgPreview:'🎂 생일 축하드립니다!\n김○○ 회원님, 오늘 생일을 축하드립니다 🎉\n감사한 마음을 담아 VIP 특별 10% 할인 쿠폰을 드립니다.\n쿠폰 유효기간: 04/16 ~ 05/16\n항상 건강하게 함께해요 💙\n- ○○ 피트니스 센터 드림'},
+        {id:'bd2', name:'박○○', info:'신규 · 재활 · 생일 축하 메시지 발송 예정',
+          phone:'010-5512-****', grade:'신규', coupon:'없음',
+          msgPreview:'🎂 생일 축하드립니다!\n박○○ 회원님, 오늘 생일을 진심으로 축하드립니다 🎉\n건강하고 행복한 하루 보내세요!\n- ○○ 피트니스 센터 드림'},
+        {id:'bd3', name:'최○○', info:'일반 · 헬스 · 생일 축하 메시지 발송 예정',
+          phone:'010-7743-****', grade:'일반', coupon:'없음',
+          msgPreview:'🎂 생일 축하드립니다!\n최○○ 회원님, 생일 축하드립니다 🎉\n앞으로도 건강한 몸과 마음을 위해 함께해요!\n- ○○ 피트니스 센터 드림'},
+        {id:'bd4', name:'이○○', info:'일반 · TPI · 생일 축하 메시지 발송 예정',
+          phone:'010-2298-****', grade:'일반', coupon:'없음',
+          msgPreview:'🎂 생일 축하드립니다!\n이○○ 회원님, 생일 축하드립니다 🎉\n항상 센터에서 함께해 주셔서 감사합니다!\n- ○○ 피트니스 센터 드림'},
       ]
     },
     'task-expire': {
       icon:'💳', bg:'#E9D8FD', color:'#553C9A', badgeCls:'bdg-purple',
       title:'이용권 만료 임박 안내', sub:'7일 이내 만료 · 재구매 유도 문자 미발송', urgency:'11명',
       items:[
-        {id:'ex1', name:'최민준', info:'D-5 · 헬스&골프 12개월권 · 010-7743-****'},
-        {id:'ex2', name:'강소희', info:'D-3 · 피트니스 6개월권 · 010-1234-****'},
-        {id:'ex3', name:'한미래', info:'D-7 · TPI 패키지 · 010-4433-****'},
-        {id:'ex4', name:'윤지성', info:'D-2 · 재활 10회권 · 010-6677-****'},
-        {id:'ex5', name:'정민서', info:'D-6 · 헬스 3개월권 · 010-8866-****'},
-        {id:'ex6', name:'배준호', info:'D-4 · 골프검진 5회권 · 010-9974-****'},
-        {id:'ex7', name:'서민지', info:'D-1 · 헬스 월권 · 010-3344-****'},
+        {id:'ex1', name:'최민준', info:'D-5 · 헬스&골프 12개월권 · 010-7743-****',
+          phone:'010-7743-9182', dday:'D-5', passType:'헬스&골프 12개월권', expDate:'2026-04-21', discount:'장기회원 15% 할인',
+          msgPreview:'[이용권 만료 안내]\n최민준 회원님, 이용권이 5일 후(4/21) 만료됩니다.\n\n재등록 시 장기회원 15% 할인 혜택을 드립니다!\n📞 예약: 02-1234-5678\n유효기간: 04/21까지'},
+        {id:'ex2', name:'강소희', info:'D-3 · 피트니스 6개월권 · 010-1234-****',
+          phone:'010-1234-5678', dday:'D-3', passType:'피트니스 6개월권', expDate:'2026-04-19', discount:'신규 재등록 10% 할인',
+          msgPreview:'[이용권 만료 안내]\n강소희 회원님, 이용권이 3일 후(4/19) 만료됩니다.\n\n재등록 시 10% 할인 혜택이 있습니다!\n📞 예약: 02-1234-5678'},
+        {id:'ex3', name:'한미래', info:'D-7 · TPI 패키지 · 010-4433-****',
+          phone:'010-4433-1122', dday:'D-7', passType:'TPI 패키지', expDate:'2026-04-23', discount:'VIP 전용 15% 할인',
+          msgPreview:'[이용권 만료 안내]\n한미래 회원님, TPI 패키지가 7일 후(4/23) 만료됩니다.\n\nVIP 전용 15% 할인 혜택을 드립니다!\n📞 예약: 02-1234-5678'},
+        {id:'ex4', name:'윤지성', info:'D-2 · 재활 10회권 · 010-6677-****',
+          phone:'010-6677-8899', dday:'D-2', passType:'재활 10회권', expDate:'2026-04-18', discount:'재등록 5% 할인',
+          msgPreview:'[이용권 만료 안내]\n윤지성 회원님, 재활 이용권이 2일 후(4/18) 만료됩니다.\n\n지금 재등록 시 5% 할인 혜택!\n📞 예약: 02-1234-5678'},
+        {id:'ex5', name:'정민서', info:'D-6 · 헬스 3개월권 · 010-8866-****',
+          phone:'010-8866-2233', dday:'D-6', passType:'헬스 3개월권', expDate:'2026-04-22', discount:'재등록 5% 할인',
+          msgPreview:'[이용권 만료 안내]\n정민서 회원님, 헬스 이용권이 6일 후(4/22) 만료됩니다.\n\n재등록 혜택 안내드립니다!\n📞 예약: 02-1234-5678'},
+        {id:'ex6', name:'배준호', info:'D-4 · 골프검진 5회권 · 010-9974-****',
+          phone:'010-9974-2231', dday:'D-4', passType:'골프검진 5회권', expDate:'2026-04-20', discount:'패키지 업그레이드 특가',
+          msgPreview:'[이용권 만료 안내]\n배준호 회원님, 골프검진 5회권이 4일 후(4/20) 만료됩니다.\n\n10회권 패키지 업그레이드 특가 안내!\n📞 예약: 02-1234-5678'},
+        {id:'ex7', name:'서민지', info:'D-1 · 헬스 월권 · 010-3344-****',
+          phone:'010-3344-5566', dday:'D-1', passType:'헬스 월권', expDate:'2026-04-17', discount:'즉시 재등록 10% 할인',
+          msgPreview:'[긴급] 서민지 회원님, 헬스 이용권이 내일(4/17) 만료됩니다!\n\n지금 바로 재등록 시 10% 할인!\n📞 예약: 02-1234-5678'},
       ]
     }
   };
@@ -2108,13 +2175,13 @@ VIP 회원 전용 특별 혜택을 안내드립니다.
       if (pEl) {
         pEl.innerHTML = pending.length
           ? pending.map(item => `
-            <div class="tti" id="tti-${item.id}">
+            <div class="tti clickable" id="tti-${item.id}" onclick="openTaskDetail('${item.id}','${key}')">
               <div class="tti-av" style="background:${d.bg}">${d.icon}</div>
               <div class="tti-info">
                 <div class="tti-name">${item.name}</div>
                 <div class="tti-sub">${item.info}</div>
               </div>
-              <button class="tti-done-btn" onclick="completeTask('${item.id}','${key}')">✓ 완료 처리</button>
+              <span style="font-size:11px;color:#A0AEC0;margin-right:4px">처리하기 ›</span>
             </div>`).join('')
           : '<div class="tti-empty">🎉 모든 항목 처리 완료!</div>';
       }
@@ -2122,17 +2189,15 @@ VIP 회원 전용 특별 혜택을 안내드립니다.
       const dEl = document.getElementById('done-' + key);
       if (dEl) {
         if (done.length) {
-          // 처리완료 헤더는 고정, 그 뒤에 아이템 추가
-          const existHeader = dEl.querySelector('.today-done-header');
           dEl.innerHTML = '<div class="today-done-header">✅ 처리완료</div>' +
             done.map(item => `
-              <div class="tti done" id="tti-done-${item.id}">
+              <div class="tti done clickable" id="tti-done-${item.id}" onclick="openTaskDetail('${item.id}','${key}')">
                 <div class="tti-av" style="background:#F0FFF4">✅</div>
                 <div class="tti-info">
                   <div class="tti-name" style="text-decoration:line-through;color:#A0AEC0">${item.name}</div>
                   <div class="tti-sub">${item.info}</div>
                 </div>
-                <button class="tti-undo-btn" onclick="undoTask('${item.id}','${key}')">↩ 미처리로</button>
+                <button class="tti-undo-btn" onclick="event.stopPropagation();undoTask('${item.id}','${key}')">↩ 미처리로</button>
               </div>`).join('');
           dEl.style.display = 'block';
         } else {
@@ -2181,6 +2246,161 @@ VIP 회원 전용 특별 혜택을 안내드립니다.
     saveTodayState();
     refreshTodayLists();
     showToast('↩ 전체 초기화 완료');
+  }
+
+  /* ── 태스크 상세 처리 모달 ── */
+  let _detailCurrentId = null, _detailCurrentKey = null;
+
+  function openTaskDetail(itemId, taskKey) {
+    _detailCurrentId  = itemId;
+    _detailCurrentKey = taskKey;
+    const d    = TODAY_DATA[taskKey];
+    const item = d.items.find(i => i.id === itemId);
+    if (!item) return;
+    const isDone = !!_todayDone[itemId];
+
+    const inner = document.getElementById('task-detail-inner');
+    inner.innerHTML = buildTaskDetailHTML(item, taskKey, d, isDone);
+    openModal('m-task-detail');
+  }
+
+  function buildTaskDetailHTML(item, taskKey, d, isDone) {
+    const doneBanner = isDone
+      ? `<div class="td-done-banner">✅ 이미 처리 완료된 항목입니다. 내용을 확인하거나 미처리로 되돌릴 수 있습니다.</div>`
+      : '';
+    const actionBody = getTaskActionBody(item, taskKey);
+    const footerBtns = isDone
+      ? `<button style="background:#EDF2F7;color:#4A5568;font-family:'Noto Sans KR',sans-serif" onclick="closeModal('m-task-detail')">닫기</button>
+         <button style="background:#E53E3E;color:#fff;font-family:'Noto Sans KR',sans-serif" onclick="undoTaskFromDetail()">↩ 미처리로 되돌리기</button>`
+      : `<button style="background:#EDF2F7;color:#4A5568;font-family:'Noto Sans KR',sans-serif" onclick="closeModal('m-task-detail')">취소</button>
+         <button style="background:#38A169;color:#fff;font-family:'Noto Sans KR',sans-serif" onclick="completeTaskFromDetail()">✓ 처리 완료</button>`;
+
+    return `
+      <div class="modal-title" style="color:${d.color}">${d.icon} ${d.title}</div>
+      ${doneBanner}
+      <div class="td-member-card" style="background:${d.bg}">
+        <div class="td-avatar">${d.icon}</div>
+        <div style="flex:1">
+          <div style="font-size:15px;font-weight:900;color:#1A202C">${item.name}</div>
+          <div style="font-size:12px;color:#4A5568;margin-top:2px">${item.info}</div>
+        </div>
+      </div>
+      ${actionBody}
+      <div class="modal-field">
+        <div class="modal-label">처리 메모 <span style="color:#A0AEC0;font-weight:400">(선택)</span></div>
+        <textarea class="modal-input" id="task-detail-note" style="min-height:64px;resize:vertical" placeholder="처리 내용, 특이사항 등을 기록하세요..."></textarea>
+      </div>
+      <div class="modal-btns">${footerBtns}</div>`;
+  }
+
+  function getTaskActionBody(item, taskKey) {
+    if (taskKey === 'task-churn') {
+      return `
+        <div class="td-info-grid">
+          <div class="td-info-cell"><div class="td-ic-label">마지막 방문</div><div class="td-ic-val">${item.lastVisit}</div></div>
+          <div class="td-info-cell"><div class="td-ic-label">위험도</div><div class="td-ic-val" style="color:#E53E3E">${item.risk}</div></div>
+          <div class="td-info-cell"><div class="td-ic-label">이용권 상태</div><div class="td-ic-val" style="color:#C05621">${item.pass}</div></div>
+        </div>
+        ${item.memo ? `<div class="td-inquiry-box" style="border-left-color:#E53E3E;margin-bottom:14px">📋 이전 상담 메모: ${item.memo}</div>` : ''}
+        <div class="td-action-row">
+          <button class="td-action-btn" onclick="showToast('📞 ${item.name} (${item.phone}) 전화 발신')">📞 전화 발신<div style="font-size:10px;color:#A0AEC0;margin-top:2px">${item.phone}</div></button>
+          <button class="td-action-btn" onclick="showToast('💬 ${item.name} 문자 발송')">💬 문자 발송</button>
+          <button class="td-action-btn" onclick="showToast('💛 ${item.name} 카카오 발송')">💛 카카오</button>
+        </div>
+        <div class="modal-field" style="margin-bottom:14px">
+          <div class="modal-label">연락 결과</div>
+          <select class="modal-input" id="td-churn-result">
+            <option value="">선택하세요</option>
+            <option>연락 완료 · 재방문 예약</option>
+            <option>연락 완료 · 추후 방문 예정</option>
+            <option>부재 · 재연락 예정</option>
+            <option>수신 거부 · 이탈 처리</option>
+            <option>이탈 의사 확인</option>
+          </select>
+        </div>`;
+    }
+    if (taskKey === 'task-remind') {
+      return `
+        <div class="td-info-grid">
+          <div class="td-info-cell"><div class="td-ic-label">예약 시간</div><div class="td-ic-val">${item.apptTime}</div></div>
+          <div class="td-info-cell"><div class="td-ic-label">예약 종류</div><div class="td-ic-val">${item.apptType}</div></div>
+          <div class="td-info-cell"><div class="td-ic-label">담당자</div><div class="td-ic-val">${item.staff}</div></div>
+        </div>
+        <div class="modal-label" style="margin-bottom:6px">발송 메시지 미리보기</div>
+        <div class="td-msg-preview" style="white-space:pre-line">${item.msgPreview}</div>
+        <div class="td-action-row">
+          <button class="td-action-btn" onclick="showToast('💬 ${item.name} 리마인더 문자 발송 완료!')">💬 문자 발송</button>
+          <button class="td-action-btn" onclick="showToast('💛 ${item.name} 카카오 알림톡 발송 완료!')">💛 카카오 알림톡</button>
+          <button class="td-action-btn" onclick="showToast('🔔 ${item.name} 앱 푸시 발송 완료!')">🔔 앱 푸시</button>
+        </div>`;
+    }
+    if (taskKey === 'task-inquiry') {
+      return `
+        <div class="td-info-grid" style="grid-template-columns:1fr 1fr;">
+          <div class="td-info-cell"><div class="td-ic-label">접수 채널</div><div class="td-ic-val">${item.channel}</div></div>
+          <div class="td-info-cell"><div class="td-ic-label">접수 시각</div><div class="td-ic-val">${item.receivedAt}</div></div>
+        </div>
+        <div class="modal-label" style="margin-bottom:6px">문의 내용</div>
+        <div class="td-inquiry-box">${item.content}</div>
+        <div class="modal-label" style="margin-bottom:6px">연락처: <strong>${item.contact}</strong></div>
+        <div class="modal-field" style="margin-bottom:14px">
+          <div class="modal-label">답변 내용</div>
+          <textarea class="modal-input" id="td-inquiry-reply" style="min-height:80px;resize:vertical" placeholder="답변을 입력하세요..."></textarea>
+        </div>
+        <div class="td-action-row">
+          <button class="td-action-btn" onclick="showToast('📧 답변 발송 완료!')">📧 이메일/문자 발송</button>
+          <button class="td-action-btn" onclick="showToast('📞 ${item.contact} 전화 발신')">📞 전화 발신</button>
+        </div>`;
+    }
+    if (taskKey === 'task-birthday') {
+      return `
+        <div class="td-info-grid" style="grid-template-columns:1fr 1fr;">
+          <div class="td-info-cell"><div class="td-ic-label">등급</div><div class="td-ic-val">${item.grade}</div></div>
+          <div class="td-info-cell"><div class="td-ic-label">발송 쿠폰</div><div class="td-ic-val" style="color:#276749">${item.coupon}</div></div>
+        </div>
+        <div class="modal-label" style="margin-bottom:6px">생일 축하 메시지 미리보기</div>
+        <div class="td-msg-preview" style="white-space:pre-line">${item.msgPreview}</div>
+        <div class="td-action-row">
+          <button class="td-action-btn" onclick="showToast('🎂 ${item.name} 생일 문자 발송 완료!')">💬 문자 발송</button>
+          <button class="td-action-btn" onclick="showToast('💛 ${item.name} 카카오 생일 메시지 발송!')">💛 카카오</button>
+          <button class="td-action-btn" onclick="showToast('🔔 ${item.name} 앱 푸시 발송!')">🔔 앱 푸시</button>
+        </div>`;
+    }
+    if (taskKey === 'task-expire') {
+      return `
+        <div class="td-info-grid">
+          <div class="td-info-cell"><div class="td-ic-label">만료까지</div><div class="td-ic-val" style="color:#E53E3E">${item.dday}</div></div>
+          <div class="td-info-cell"><div class="td-ic-label">이용권</div><div class="td-ic-val">${item.passType}</div></div>
+          <div class="td-info-cell"><div class="td-ic-label">만료일</div><div class="td-ic-val">${item.expDate}</div></div>
+        </div>
+        <div class="td-inquiry-box" style="border-left-color:#553C9A;margin-bottom:14px">🎁 재등록 혜택: ${item.discount}</div>
+        <div class="modal-label" style="margin-bottom:6px">발송 메시지 미리보기</div>
+        <div class="td-msg-preview" style="white-space:pre-line">${item.msgPreview}</div>
+        <div class="td-action-row">
+          <button class="td-action-btn" onclick="showToast('💬 ${item.name} 만료 안내 문자 발송 완료!')">💬 문자 발송</button>
+          <button class="td-action-btn" onclick="showToast('📞 ${item.phone} 전화 발신')">📞 전화 발신<div style="font-size:10px;color:#A0AEC0;margin-top:2px">${item.phone}</div></button>
+          <button class="td-action-btn" onclick="showToast('💛 ${item.name} 카카오 발송!')">💛 카카오</button>
+        </div>`;
+    }
+    return '';
+  }
+
+  function completeTaskFromDetail() {
+    if (!_detailCurrentId) return;
+    _todayDone[_detailCurrentId] = true;
+    saveTodayState();
+    refreshTodayLists();
+    closeModal('m-task-detail');
+    showToast('✅ 처리 완료!');
+  }
+
+  function undoTaskFromDetail() {
+    if (!_detailCurrentId) return;
+    delete _todayDone[_detailCurrentId];
+    saveTodayState();
+    refreshTodayLists();
+    closeModal('m-task-detail');
+    showToast('↩ 미처리로 되돌렸습니다');
   }
 
   function goTodayTask(sectionId) {
