@@ -161,17 +161,52 @@
     .tag.new  { background: #C6F6D5; color: #276749; }
 
     /* ── 상세 드로어 ── */
-    .drawer { position: fixed; right: -420px; top: 0; bottom: 0; width: 420px; background: #fff; box-shadow: -4px 0 24px rgba(0,0,0,0.12); z-index: 100; transition: right 0.3s; overflow-y: auto; }
+    .drawer { position: fixed; right: -540px; top: 0; bottom: 0; width: 540px; background: #fff; box-shadow: -4px 0 28px rgba(0,0,0,0.14); z-index: 100; transition: right 0.32s cubic-bezier(0.4,0,0.2,1); overflow: hidden; display: flex; flex-direction: column; }
     .drawer.open { right: 0; }
-    .drawer-head { padding: 20px 22px 14px; border-bottom: 1px solid #EDF2F7; display: flex; align-items: center; gap: 12px; }
-    .drawer-title { font-size: 16px; font-weight: 900; flex: 1; }
-    .drawer-close { width: 32px; height: 32px; border-radius: 10px; border: none; background: #EDF2F7; cursor: pointer; font-size: 16px; }
-    .drawer-body { padding: 20px 22px; }
+    .drawer-head { padding: 18px 22px 0; border-bottom: 1px solid #EDF2F7; flex-shrink: 0; }
+    .drawer-head-top { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 12px; }
+    .drawer-title { font-size: 18px; font-weight: 900; flex: 1; }
+    .drawer-close { width: 32px; height: 32px; border-radius: 10px; border: none; background: #EDF2F7; cursor: pointer; font-size: 16px; flex-shrink: 0; }
+    .drawer-tabs { display: flex; gap: 0; }
+    .drawer-tab { padding: 9px 16px; font-size: 13px; font-weight: 700; color: #A0AEC0; cursor: pointer; border-bottom: 3px solid transparent; transition: all 0.18s; white-space: nowrap; font-family: 'Noto Sans KR', sans-serif; border: none; background: transparent; }
+    .drawer-tab.on { color: #4299E1; border-bottom: 3px solid #4299E1; }
+    .drawer-body { padding: 20px 22px; overflow-y: auto; flex: 1; }
+    .drawer-pane { display: none; }
+    .drawer-pane.on { display: block; }
     .drawer-field { margin-bottom: 16px; }
-    .drawer-label { font-size: 11px; font-weight: 800; color: #A0AEC0; letter-spacing: 1px; margin-bottom: 5px; }
-    .drawer-val { font-size: 14px; font-weight: 600; color: #1A202C; }
+    .drawer-label { font-size: 11px; font-weight: 800; color: #A0AEC0; letter-spacing: 1px; margin-bottom: 6px; display: flex; align-items: center; justify-content: space-between; }
+    .drawer-val { font-size: 13px; font-weight: 600; color: #1A202C; }
+    .drawer-input { width: 100%; padding: 8px 11px; border: 1.5px solid #E2E8F0; border-radius: 9px; font-size: 13px; font-family: 'Noto Sans KR', sans-serif; outline: none; background: #F7F9FC; color: #1A202C; transition: border-color 0.2s, background 0.2s; }
+    .drawer-input:focus { border-color: #4299E1; background: #fff; }
+    .drawer-input[readonly] { background: #F7F9FC; color: #718096; cursor: default; border-color: transparent; }
+    .drawer-textarea { width: 100%; padding: 9px 11px; border: 1.5px solid #E2E8F0; border-radius: 9px; font-size: 12px; font-family: 'Noto Sans KR', sans-serif; resize: vertical; min-height: 72px; outline: none; background: #F7F9FC; transition: border-color 0.2s, background 0.2s; }
+    .drawer-textarea:focus { border-color: #4299E1; background: #fff; }
+    .edit-btn { font-size: 11px; font-weight: 700; color: #4299E1; cursor: pointer; background: none; border: none; font-family: 'Noto Sans KR', sans-serif; padding: 0; }
     .drawer-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.3); z-index: 99; display: none; }
     .drawer-overlay.open { display: block; }
+    /* 이력 카드 */
+    .hx-card { background: #F7F9FC; border-radius: 12px; padding: 13px 14px; margin-bottom: 10px; border: 1.5px solid #EDF2F7; position: relative; }
+    .hx-card:hover { border-color: #CBD5E0; }
+    .hx-card-title { font-size: 13px; font-weight: 800; color: #2D3748; margin-bottom: 4px; }
+    .hx-card-sub { font-size: 12px; color: #718096; line-height: 1.6; }
+    .hx-card-date { font-size: 11px; color: #A0AEC0; font-weight: 600; }
+    .hx-card-actions { position: absolute; top: 10px; right: 12px; display: flex; gap: 4px; }
+    .hx-btn { font-size: 11px; font-weight: 700; padding: 3px 9px; border-radius: 7px; border: none; cursor: pointer; font-family: 'Noto Sans KR', sans-serif; }
+    .hx-btn-edit { background: #EBF8FF; color: #2B6CB0; }
+    .hx-btn-del  { background: #FFF5F5; color: #C53030; }
+    /* 메모 아이템 */
+    .memo-item-card { padding: 12px 14px; border-bottom: 1px solid #F7F9FC; }
+    .memo-item-card:last-child { border-bottom: none; }
+    .memo-item-header { display: flex; align-items: center; gap: 8px; margin-bottom: 5px; }
+    .memo-item-who { font-size: 11px; font-weight: 800; color: #4A5568; }
+    .memo-item-time { font-size: 11px; color: #A0AEC0; flex: 1; }
+    .memo-item-type { font-size: 10px; font-weight: 700; padding: 1px 7px; border-radius: 99px; }
+    .memo-item-text { font-size: 12.5px; color: #2D3748; line-height: 1.6; }
+    /* 추가 버튼 */
+    .add-row-btn { width: 100%; padding: 10px; border: 2px dashed #CBD5E0; border-radius: 10px; background: none; cursor: pointer; font-size: 13px; font-weight: 700; color: #A0AEC0; font-family: 'Noto Sans KR', sans-serif; transition: all 0.15s; margin-top: 4px; }
+    .add-row-btn:hover { border-color: #4299E1; color: #4299E1; background: #EBF8FF; }
+    /* 드로어 하단 고정 바 */
+    .drawer-footer { padding: 14px 22px; border-top: 1px solid #EDF2F7; display: flex; gap: 8px; flex-shrink: 0; background: #fff; }
 
     /* ── 타임라인 ── */
     .timeline { position: relative; padding-left: 20px; }
@@ -893,51 +928,380 @@ VIP 회원 전용 특별 혜택을 안내드립니다.
 <!-- ═══════════════ 회원 상세 드로어 ═══════════════ -->
 <div class="drawer-overlay" id="dOverlay" onclick="closeDrawer()"></div>
 <div class="drawer" id="d-member">
+
+  <!-- 헤더 -->
   <div class="drawer-head">
-    <div>
-      <div class="drawer-title">김지훈</div>
-      <span class="bdg bdg-purple">VIP</span> <span class="bdg bdg-teal">골프회원</span> <span class="bdg bdg-blue">헬스</span>
+    <div class="drawer-head-top">
+      <div style="flex:1">
+        <div class="drawer-title" id="dw-name">김지훈</div>
+        <div style="display:flex;gap:5px;margin-top:6px;flex-wrap:wrap" id="dw-badges">
+          <span class="bdg bdg-purple">VIP</span>
+          <span class="bdg bdg-teal">골프회원</span>
+          <span class="bdg bdg-blue">헬스</span>
+        </div>
+      </div>
+      <button class="drawer-close" onclick="closeDrawer()">✕</button>
     </div>
-    <button class="drawer-close" onclick="closeDrawer()">✕</button>
+    <!-- 탭 -->
+    <div class="drawer-tabs">
+      <button class="drawer-tab on" onclick="dwTab(this,'pane-basic')">기본 정보</button>
+      <button class="drawer-tab" onclick="dwTab(this,'pane-surgery')">수술 이력</button>
+      <button class="drawer-tab" onclick="dwTab(this,'pane-treat')">치료 이력</button>
+      <button class="drawer-tab" onclick="dwTab(this,'pane-memo')">메모</button>
+    </div>
   </div>
+
+  <!-- 스크롤 영역 -->
   <div class="drawer-body">
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">
-      <div class="drawer-field"><div class="drawer-label">생년월일</div><div class="drawer-val">1989년 · 남성</div></div>
-      <div class="drawer-field"><div class="drawer-label">연락처</div><div class="drawer-val">010-3821-****</div></div>
-      <div class="drawer-field"><div class="drawer-label">마지막 방문</div><div class="drawer-val" style="color:#38A169">2일 전</div></div>
-      <div class="drawer-field"><div class="drawer-label">담당자</div><div class="drawer-val">이트레이너</div></div>
-    </div>
-    <div class="drawer-field">
-      <div class="drawer-label">마케팅 동의</div>
-      <div style="display:flex;gap:6px;margin-top:4px">
-        <span class="bdg bdg-green">SMS ✓</span>
-        <span class="bdg bdg-green">카카오 ✓</span>
-        <span class="bdg bdg-red">앱푸시 ✗</span>
+
+    <!-- ── 탭1: 기본 정보 ── -->
+    <div class="drawer-pane on" id="pane-basic">
+
+      <div style="display:flex;justify-content:flex-end;margin-bottom:10px">
+        <button class="topbar-btn btn-ghost" style="font-size:12px;padding:6px 14px" id="basicEditBtn" onclick="toggleBasicEdit()">✏️ 수정</button>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div class="drawer-field">
+          <div class="drawer-label">이름</div>
+          <input class="drawer-input" id="fi-name" value="김지훈" readonly>
+        </div>
+        <div class="drawer-field">
+          <div class="drawer-label">생년월일</div>
+          <input class="drawer-input" id="fi-birth" value="1989-05-14" type="date" readonly>
+        </div>
+        <div class="drawer-field">
+          <div class="drawer-label">성별</div>
+          <select class="drawer-input" id="fi-gender" disabled>
+            <option selected>남성</option><option>여성</option>
+          </select>
+        </div>
+        <div class="drawer-field">
+          <div class="drawer-label">연락처</div>
+          <input class="drawer-input" id="fi-phone" value="010-3821-7042" readonly>
+        </div>
+        <div class="drawer-field">
+          <div class="drawer-label">담당자</div>
+          <select class="drawer-input" id="fi-staff" disabled>
+            <option selected>이트레이너</option><option>최물리</option><option>김상담</option>
+          </select>
+        </div>
+        <div class="drawer-field">
+          <div class="drawer-label">회원 등급</div>
+          <select class="drawer-input" id="fi-grade" disabled>
+            <option selected>VIP</option><option>일반</option><option>신규</option><option>휴면</option><option>이탈위험</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="drawer-field">
+        <div class="drawer-label">주소</div>
+        <input class="drawer-input" id="fi-addr" value="서울 강남구 역삼동 123-4" readonly>
+      </div>
+
+      <div class="drawer-field">
+        <div class="drawer-label">태그</div>
+        <div class="tag-group" id="fi-tags" style="margin-top:4px">
+          <span class="tag on" onclick="editModeOnly(this)">골프회원</span>
+          <span class="tag on" onclick="editModeOnly(this)">헬스</span>
+          <span class="tag" onclick="editModeOnly(this)">재활</span>
+          <span class="tag" onclick="editModeOnly(this)">수술후</span>
+          <span class="tag" onclick="editModeOnly(this)">만성통증</span>
+        </div>
+      </div>
+
+      <div class="drawer-field">
+        <div class="drawer-label">마케팅 동의</div>
+        <div style="display:flex;gap:8px;margin-top:4px">
+          <label style="display:flex;align-items:center;gap:5px;font-size:12px;font-weight:700;cursor:pointer">
+            <input type="checkbox" id="ag-sms" checked disabled style="width:14px;height:14px"> SMS
+          </label>
+          <label style="display:flex;align-items:center;gap:5px;font-size:12px;font-weight:700;cursor:pointer">
+            <input type="checkbox" id="ag-kako" checked disabled style="width:14px;height:14px"> 카카오
+          </label>
+          <label style="display:flex;align-items:center;gap:5px;font-size:12px;font-weight:700;cursor:pointer">
+            <input type="checkbox" id="ag-push" disabled style="width:14px;height:14px"> 앱 푸시
+          </label>
+        </div>
+      </div>
+
+      <div class="drawer-field">
+        <div class="drawer-label">⚠️ 알레르기 / 금기사항</div>
+        <textarea class="drawer-textarea" id="fi-allergy" readonly>NSAIDs 계열 약물 알레르기
+과격 회전 운동 금기 (요추 불안정)</textarea>
+      </div>
+
+      <hr style="border:none;border-top:1px solid #EDF2F7;margin:16px 0">
+
+      <div class="drawer-field">
+        <div class="drawer-label">이용권 현황</div>
+        <div style="background:#F7F9FC;border-radius:10px;padding:12px 14px;margin-top:4px">
+          <div style="font-size:13px;font-weight:800;margin-bottom:3px">헬스&골프 12개월권</div>
+          <div style="font-size:12px;color:#718096">만료: 2026-09-30 · 잔여 167일</div>
+          <div class="prog-bar" style="margin-top:8px"><div class="prog-fill" style="width:54%"></div></div>
+        </div>
+      </div>
+
+      <div class="drawer-field">
+        <div class="drawer-label">최근 검진</div>
+        <div style="background:#F0FFF4;border-radius:10px;padding:10px 14px;border:1px solid #C6F6D5;margin-top:4px">
+          <div style="font-size:12px;font-weight:800;color:#276749;margin-bottom:2px">🏌️ 골프검진 · 2026-04-10</div>
+          <div style="font-size:12px;color:#718096">클럽스피드 98mph (+4mph) · 캐리거리 214m</div>
+        </div>
+      </div>
+
+      <div id="basicSaveRow" style="display:none;margin-top:4px">
+        <button class="topbar-btn btn-primary" style="width:100%;padding:11px" onclick="saveBasicEdit()">💾 저장하기</button>
       </div>
     </div>
-    <div class="drawer-field">
-      <div class="drawer-label">알레르기/금기</div>
-      <div style="background:#FFF5F5;border-radius:8px;padding:8px 12px;font-size:12px;color:#C53030;margin-top:4px">⚠️ NSAIDs 알레르기 · 과격 회전 운동 금기</div>
-    </div>
-    <div class="drawer-field">
-      <div class="drawer-label">최근 검진</div>
-      <div style="background:#F7F9FC;border-radius:8px;padding:10px 12px;font-size:12px;margin-top:4px">
-        <div style="font-weight:700;margin-bottom:4px">🏌️ 골프검진 · 04/10</div>
-        <div style="color:#718096">클럽스피드 98mph (+4mph) · 캐리 214m</div>
+
+    <!-- ── 탭2: 수술 이력 ── -->
+    <div class="drawer-pane" id="pane-surgery">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+        <div style="font-size:12px;color:#A0AEC0">수술 및 시술 이력을 기록합니다</div>
+        <button class="topbar-btn btn-primary" style="font-size:12px;padding:6px 14px" onclick="openSurgeryForm()">+ 추가</button>
+      </div>
+
+      <!-- 수술 이력 카드 목록 -->
+      <div id="surgery-list">
+        <div class="hx-card" data-id="s1">
+          <div class="hx-card-actions">
+            <button class="hx-btn hx-btn-edit" onclick="editSurgery(this)">수정</button>
+            <button class="hx-btn hx-btn-del" onclick="delCard(this)">삭제</button>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:5px">
+            <span class="bdg bdg-red">수술</span>
+            <span class="hx-card-date">2021-03-15</span>
+          </div>
+          <div class="hx-card-title">요추 추간판 탈출증 수술 (L4-L5)</div>
+          <div class="hx-card-sub">병원: 서울대학교병원 정형외과<br>집도의: 박○○ 교수<br>경과: 수술 후 6개월 재활 완료. 현재 안정적. 고충격 운동 제한 유지.</div>
+        </div>
+        <div class="hx-card" data-id="s2">
+          <div class="hx-card-actions">
+            <button class="hx-btn hx-btn-edit" onclick="editSurgery(this)">수정</button>
+            <button class="hx-btn hx-btn-del" onclick="delCard(this)">삭제</button>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:5px">
+            <span class="bdg bdg-orange">시술</span>
+            <span class="hx-card-date">2023-08-22</span>
+          </div>
+          <div class="hx-card-title">우측 무릎 관절 주사 (히알루론산)</div>
+          <div class="hx-card-sub">병원: 강남세브란스 정형외과<br>경과: 2회 시술 후 통증 50% 감소. 6개월마다 재시술 예정.</div>
+        </div>
+      </div>
+
+      <!-- 수술 추가 폼 (숨김) -->
+      <div id="surgery-form" style="display:none;background:#EBF8FF;border-radius:12px;padding:16px;margin-top:4px;border:1.5px solid #BEE3F8">
+        <div style="font-size:13px;font-weight:900;margin-bottom:12px;color:#2B6CB0">✚ 수술/시술 이력 추가</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+          <div class="drawer-field" style="margin:0">
+            <div class="drawer-label">구분</div>
+            <select class="drawer-input" id="sf-type"><option>수술</option><option>시술</option><option>입원</option><option>응급처치</option></select>
+          </div>
+          <div class="drawer-field" style="margin:0">
+            <div class="drawer-label">날짜</div>
+            <input class="drawer-input" id="sf-date" type="date">
+          </div>
+        </div>
+        <div class="drawer-field" style="margin:10px 0 0">
+          <div class="drawer-label">수술/시술명</div>
+          <input class="drawer-input" id="sf-name" placeholder="예: 요추 디스크 수술 (L4-L5)">
+        </div>
+        <div class="drawer-field" style="margin:10px 0 0">
+          <div class="drawer-label">병원 / 집도의</div>
+          <input class="drawer-input" id="sf-hospital" placeholder="예: 서울대학교병원 · 박○○ 교수">
+        </div>
+        <div class="drawer-field" style="margin:10px 0 0">
+          <div class="drawer-label">경과 및 메모</div>
+          <textarea class="drawer-textarea" id="sf-memo" placeholder="수술 후 경과, 합병증, 주의사항 등"></textarea>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:12px">
+          <button class="topbar-btn btn-ghost" style="flex:1" onclick="closeSurgeryForm()">취소</button>
+          <button class="topbar-btn btn-primary" style="flex:1" onclick="saveSurgery()">저장</button>
+        </div>
       </div>
     </div>
-    <div class="drawer-field">
-      <div class="drawer-label">이용권</div>
-      <div style="background:#F7F9FC;border-radius:8px;padding:10px 12px;font-size:12px;margin-top:4px">
-        <div style="font-weight:700">헬스&골프 12개월권</div>
-        <div style="color:#718096">만료: 2026-09-30 · 잔여 167일</div>
-        <div class="prog-bar" style="margin-top:6px"><div class="prog-fill" style="width:54%"></div></div>
+
+    <!-- ── 탭3: 치료 이력 ── -->
+    <div class="drawer-pane" id="pane-treat">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+        <div style="font-size:12px;color:#A0AEC0">치료, 재활, 검진 이력을 기록합니다</div>
+        <button class="topbar-btn btn-primary" style="font-size:12px;padding:6px 14px" onclick="openTreatForm()">+ 추가</button>
+      </div>
+
+      <!-- 필터 탭 -->
+      <div style="display:flex;gap:5px;margin-bottom:12px;flex-wrap:wrap">
+        <button class="filter-pill on" style="font-size:11px;padding:4px 12px" onclick="filterTreat('all',this)">전체</button>
+        <button class="filter-pill" style="font-size:11px;padding:4px 12px" onclick="filterTreat('물리치료',this)">물리치료</button>
+        <button class="filter-pill" style="font-size:11px;padding:4px 12px" onclick="filterTreat('재활',this)">재활운동</button>
+        <button class="filter-pill" style="font-size:11px;padding:4px 12px" onclick="filterTreat('검진',this)">검진</button>
+        <button class="filter-pill" style="font-size:11px;padding:4px 12px" onclick="filterTreat('처방',this)">운동처방</button>
+      </div>
+
+      <div id="treat-list">
+        <div class="hx-card" data-cat="재활">
+          <div class="hx-card-actions">
+            <button class="hx-btn hx-btn-edit" onclick="editTreat(this)">수정</button>
+            <button class="hx-btn hx-btn-del" onclick="delCard(this)">삭제</button>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:5px">
+            <span class="bdg bdg-blue">재활운동</span>
+            <span class="hx-card-date">2026-04-01 ~ 진행중</span>
+          </div>
+          <div class="hx-card-title">요추 재활 프로그램 (12주)</div>
+          <div class="hx-card-sub">담당: 최물리 치료사<br>내용: McKenzie 운동, 코어 안정화, 하지 강화<br>진행: 8회 완료 / 24회 총 · 회당 60분<br>평가: 통증 VAS 6→3점, 요추 굴곡 +20° 개선</div>
+        </div>
+        <div class="hx-card" data-cat="검진">
+          <div class="hx-card-actions">
+            <button class="hx-btn hx-btn-edit" onclick="editTreat(this)">수정</button>
+            <button class="hx-btn hx-btn-del" onclick="delCard(this)">삭제</button>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:5px">
+            <span class="bdg bdg-teal">검진</span>
+            <span class="hx-card-date">2026-04-10</span>
+          </div>
+          <div class="hx-card-title">TPI 검진 (3차)</div>
+          <div class="hx-card-sub">담당: 이트레이너<br>결과: 32/38 → 35/38 (3항목 개선)<br>주요 개선: S자형 자세, 골반 회전, 체중 이동<br>다음 검진: 2026-07-10 예정</div>
+        </div>
+        <div class="hx-card" data-cat="물리치료">
+          <div class="hx-card-actions">
+            <button class="hx-btn hx-btn-edit" onclick="editTreat(this)">수정</button>
+            <button class="hx-btn hx-btn-del" onclick="delCard(this)">삭제</button>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:5px">
+            <span class="bdg bdg-purple">물리치료</span>
+            <span class="hx-card-date">2025-11-05 ~ 2026-01-20</span>
+          </div>
+          <div class="hx-card-title">요추부 물리치료 (온열, 전기치료)</div>
+          <div class="hx-card-sub">담당: 최물리 치료사 · 20회 완료<br>경과: 통증 완화 확인, 재활운동으로 전환</div>
+        </div>
+        <div class="hx-card" data-cat="처방">
+          <div class="hx-card-actions">
+            <button class="hx-btn hx-btn-edit" onclick="editTreat(this)">수정</button>
+            <button class="hx-btn hx-btn-del" onclick="delCard(this)">삭제</button>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:5px">
+            <span class="bdg bdg-green">운동처방</span>
+            <span class="hx-card-date">2026-03-01</span>
+          </div>
+          <div class="hx-card-title">골프 특화 근력 강화 처방</div>
+          <div class="hx-card-sub">처방자: 이트레이너<br>내용: 회전근 강화, 코어 파워, 하체 안정성<br>주 3회 · 회당 50분 · 8주 프로그램</div>
+        </div>
+      </div>
+
+      <!-- 치료 추가 폼 -->
+      <div id="treat-form" style="display:none;background:#F0FFF4;border-radius:12px;padding:16px;margin-top:4px;border:1.5px solid #C6F6D5">
+        <div style="font-size:13px;font-weight:900;margin-bottom:12px;color:#276749">✚ 치료/검진 이력 추가</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+          <div class="drawer-field" style="margin:0">
+            <div class="drawer-label">구분</div>
+            <select class="drawer-input" id="tf-type"><option>물리치료</option><option>재활운동</option><option>검진</option><option>운동처방</option><option>기타</option></select>
+          </div>
+          <div class="drawer-field" style="margin:0">
+            <div class="drawer-label">날짜</div>
+            <input class="drawer-input" id="tf-date" type="date">
+          </div>
+        </div>
+        <div class="drawer-field" style="margin:10px 0 0">
+          <div class="drawer-label">치료/검진명</div>
+          <input class="drawer-input" id="tf-name" placeholder="예: 요추 재활 프로그램">
+        </div>
+        <div class="drawer-field" style="margin:10px 0 0">
+          <div class="drawer-label">담당자</div>
+          <select class="drawer-input" id="tf-staff"><option>이트레이너</option><option>최물리</option><option>김상담</option></select>
+        </div>
+        <div class="drawer-field" style="margin:10px 0 0">
+          <div class="drawer-label">내용 및 경과</div>
+          <textarea class="drawer-textarea" id="tf-memo" placeholder="치료 내용, 담당자, 경과, 다음 일정 등"></textarea>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:12px">
+          <button class="topbar-btn btn-ghost" style="flex:1" onclick="closeTreatForm()">취소</button>
+          <button class="topbar-btn btn-primary" style="flex:1" onclick="saveTreat()">저장</button>
+        </div>
       </div>
     </div>
-    <div style="display:flex;gap:8px;margin-top:16px">
-      <button class="topbar-btn btn-primary" style="flex:1" onclick="showToast('메시지 작성 화면으로 이동');closeDrawer()">📨 메시지 발송</button>
-      <button class="topbar-btn btn-ghost" style="flex:1" onclick="showToast('예약 등록 화면으로 이동');closeDrawer()">📅 예약 등록</button>
+
+    <!-- ── 탭4: 메모 ── -->
+    <div class="drawer-pane" id="pane-memo">
+
+      <!-- 메모 작성 박스 -->
+      <div style="background:#F7F9FC;border-radius:12px;padding:14px;margin-bottom:16px;border:1.5px solid #E2E8F0">
+        <div style="display:flex;gap:8px;margin-bottom:8px">
+          <select class="drawer-input" id="memo-type-sel" style="flex:1;background:#fff">
+            <option>일반 메모</option>
+            <option>알레르기/금기</option>
+            <option>VIP 케어</option>
+            <option>상담 내용</option>
+            <option>직원 공유 (내부)</option>
+          </select>
+          <select class="drawer-input" id="memo-pin-sel" style="width:90px;background:#fff">
+            <option>일반</option>
+            <option>📌 고정</option>
+          </select>
+        </div>
+        <textarea class="drawer-textarea" id="memo-input" placeholder="메모 내용을 입력하세요…" style="background:#fff;margin-bottom:8px"></textarea>
+        <button class="topbar-btn btn-primary" style="width:100%;padding:9px" onclick="addMemo()">메모 저장</button>
+      </div>
+
+      <!-- 메모 목록 -->
+      <div id="memo-list" style="background:#fff;border-radius:12px;border:1.5px solid #EDF2F7;overflow:hidden">
+
+        <!-- 고정 메모 -->
+        <div style="padding:8px 14px;background:#FFFBEB;font-size:10px;font-weight:900;color:#D69E2E;letter-spacing:1px;border-bottom:1px solid #EDF2F7">📌 고정 메모</div>
+        <div class="memo-item-card">
+          <div class="memo-item-header">
+            <span class="memo-item-type" style="background:#E9D8FD;color:#6B46C1">VIP 케어</span>
+            <span class="memo-item-who">이트레이너</span>
+            <span class="memo-item-time">2026-04-01</span>
+            <button class="hx-btn hx-btn-del" onclick="delMemo(this)" style="padding:2px 7px;font-size:10px">삭제</button>
+          </div>
+          <div class="memo-item-text">담당 트레이너 이트레이너 선호 강함. 오전 10시 이후 예약 선호. 아메리카노 블랙 준비 필요. 기업 대표 신분으로 개인정보 노출 주의.</div>
+        </div>
+
+        <!-- 일반 메모 -->
+        <div style="padding:8px 14px;background:#F7F9FC;font-size:10px;font-weight:900;color:#A0AEC0;letter-spacing:1px;border-bottom:1px solid #EDF2F7;border-top:1px solid #EDF2F7">최근 메모</div>
+
+        <div class="memo-item-card">
+          <div class="memo-item-header">
+            <span class="memo-item-type" style="background:#FED7E2;color:#97266D">알레르기</span>
+            <span class="memo-item-who">김상담</span>
+            <span class="memo-item-time">2026-03-20</span>
+            <button class="hx-btn hx-btn-del" onclick="delMemo(this)" style="padding:2px 7px;font-size:10px">삭제</button>
+          </div>
+          <div class="memo-item-text">NSAIDs 계열(이부프로펜, 나프록센 등) 복용 후 위장장애 및 두드러기 확인됨. 처방 운동 전 약물 복용 여부 반드시 확인 요망.</div>
+        </div>
+
+        <div class="memo-item-card">
+          <div class="memo-item-header">
+            <span class="memo-item-type" style="background:#BEE3F8;color:#2B6CB0">상담 내용</span>
+            <span class="memo-item-who">김상담</span>
+            <span class="memo-item-time">2026-04-16</span>
+            <button class="hx-btn hx-btn-del" onclick="delMemo(this)" style="padding:2px 7px;font-size:10px">삭제</button>
+          </div>
+          <div class="memo-item-text">골프 검진 재예약 완료 (04/22 오전 10시). 회원 만족도 높음. 추가 레슨 문의 있었으며 이트레이너와 연결 예정.</div>
+        </div>
+
+        <div class="memo-item-card">
+          <div class="memo-item-header">
+            <span class="memo-item-type" style="background:#EDF2F7;color:#718096">직원 공유</span>
+            <span class="memo-item-who">이트레이너</span>
+            <span class="memo-item-time">2026-04-10</span>
+            <button class="hx-btn hx-btn-del" onclick="delMemo(this)" style="padding:2px 7px;font-size:10px">삭제</button>
+          </div>
+          <div class="memo-item-text">TPI 3차 검진 완료. 이번 달 클럽스피드 98mph 달성 (전회 94mph 대비 +4mph). 드라이버 캐리 214m. 다음 목표: 100mph. 3개월 후 4차 검진 예약 권유.</div>
+        </div>
+
+        <div id="memo-added-area"></div>
+      </div>
     </div>
+
+  </div><!-- /drawer-body -->
+
+  <!-- 하단 고정 버튼 -->
+  <div class="drawer-footer">
+    <button class="topbar-btn btn-primary" style="flex:1" onclick="showToast('📨 메시지 발송 화면으로 이동');closeDrawer()">📨 메시지 발송</button>
+    <button class="topbar-btn btn-ghost" style="flex:1" onclick="openModal('m-add-reserve');closeDrawer()">📅 예약 등록</button>
+    <button class="topbar-btn btn-ghost" style="flex:1" onclick="showToast('🔬 검진 이력으로 이동');closeDrawer()">🔬 검진 이력</button>
   </div>
 </div>
 
@@ -1096,10 +1460,208 @@ VIP 회원 전용 특별 혜택을 안내드립니다.
   function openDrawer(id) {
     document.getElementById(id)?.classList.add('open');
     document.getElementById('dOverlay').classList.add('open');
+    // 기본 탭으로 초기화
+    dwTab(document.querySelector('.drawer-tab'), 'pane-basic');
   }
   function closeDrawer() {
     document.querySelectorAll('.drawer').forEach(d => d.classList.remove('open'));
     document.getElementById('dOverlay').classList.remove('open');
+  }
+
+  /* ── 드로어 탭 전환 ── */
+  function dwTab(btn, paneId) {
+    document.querySelectorAll('.drawer-tab').forEach(t => t.classList.remove('on'));
+    document.querySelectorAll('.drawer-pane').forEach(p => p.classList.remove('on'));
+    btn.classList.add('on');
+    document.getElementById(paneId)?.classList.add('on');
+  }
+
+  /* ── 기본정보 편집 토글 ── */
+  let basicEditing = false;
+  function toggleBasicEdit() {
+    basicEditing = !basicEditing;
+    const inputs = ['fi-name','fi-birth','fi-phone','fi-addr'];
+    const selects = ['fi-gender','fi-staff','fi-grade'];
+    inputs.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.readOnly = !basicEditing;
+    });
+    selects.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.disabled = !basicEditing;
+    });
+    document.getElementById('fi-allergy').readOnly = !basicEditing;
+    // 마케팅 동의 체크박스
+    ['ag-sms','ag-kako','ag-push'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.disabled = !basicEditing;
+    });
+    document.getElementById('basicEditBtn').textContent = basicEditing ? '✕ 취소' : '✏️ 수정';
+    document.getElementById('basicSaveRow').style.display = basicEditing ? 'block' : 'none';
+    if (!basicEditing) showToast('수정이 취소되었습니다');
+  }
+  function saveBasicEdit() {
+    basicEditing = false;
+    const inputs = ['fi-name','fi-birth','fi-phone','fi-addr'];
+    const selects = ['fi-gender','fi-staff','fi-grade'];
+    inputs.forEach(id => { const el = document.getElementById(id); if (el) el.readOnly = true; });
+    selects.forEach(id => { const el = document.getElementById(id); if (el) el.disabled = true; });
+    document.getElementById('fi-allergy').readOnly = true;
+    ['ag-sms','ag-kako','ag-push'].forEach(id => { const el = document.getElementById(id); if (el) el.disabled = true; });
+    document.getElementById('basicEditBtn').textContent = '✏️ 수정';
+    document.getElementById('basicSaveRow').style.display = 'none';
+    // 이름 업데이트
+    const newName = document.getElementById('fi-name').value;
+    document.getElementById('dw-name').textContent = newName;
+    showToast('✅ 회원 정보가 저장되었습니다');
+  }
+  function editModeOnly(el) {
+    if (!basicEditing) { showToast('수정 버튼을 눌러 편집 모드로 전환하세요'); return; }
+    el.classList.toggle('on');
+  }
+
+  /* ── 수술 이력 ── */
+  function openSurgeryForm() {
+    document.getElementById('surgery-form').style.display = 'block';
+    document.getElementById('surgery-form').scrollIntoView({ behavior: 'smooth' });
+  }
+  function closeSurgeryForm() { document.getElementById('surgery-form').style.display = 'none'; }
+  function saveSurgery() {
+    const type = document.getElementById('sf-type').value;
+    const date = document.getElementById('sf-date').value;
+    const name = document.getElementById('sf-name').value.trim();
+    const hospital = document.getElementById('sf-hospital').value.trim();
+    const memo = document.getElementById('sf-memo').value.trim();
+    if (!name) { showToast('⚠️ 수술/시술명을 입력하세요'); return; }
+    const colors = { '수술':'bdg-red','시술':'bdg-orange','입원':'bdg-purple','응급처치':'bdg-red' };
+    const card = document.createElement('div');
+    card.className = 'hx-card';
+    card.innerHTML = `
+      <div class="hx-card-actions">
+        <button class="hx-btn hx-btn-edit" onclick="editSurgery(this)">수정</button>
+        <button class="hx-btn hx-btn-del" onclick="delCard(this)">삭제</button>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:5px">
+        <span class="bdg ${colors[type]||'bdg-gray'}">${type}</span>
+        <span class="hx-card-date">${date||'날짜 미입력'}</span>
+      </div>
+      <div class="hx-card-title">${name}</div>
+      <div class="hx-card-sub">${hospital ? '병원/담당: '+hospital+'<br>' : ''}${memo}</div>`;
+    document.getElementById('surgery-list').prepend(card);
+    closeSurgeryForm();
+    document.getElementById('sf-name').value=''; document.getElementById('sf-hospital').value=''; document.getElementById('sf-memo').value='';
+    showToast('✅ 수술 이력이 추가되었습니다');
+  }
+  function editSurgery(btn) {
+    const card = btn.closest('.hx-card');
+    const title = card.querySelector('.hx-card-title').textContent;
+    const memo  = card.querySelector('.hx-card-sub').textContent;
+    card.innerHTML = `
+      <div class="drawer-field"><div class="drawer-label">수술/시술명</div><input class="drawer-input" value="${title}" id="esf-name"></div>
+      <div class="drawer-field"><div class="drawer-label">내용/경과</div><textarea class="drawer-textarea" id="esf-memo">${memo}</textarea></div>
+      <div style="display:flex;gap:8px;margin-top:8px">
+        <button class="topbar-btn btn-ghost" style="flex:1" onclick="this.closest('.hx-card').remove();showToast('취소')">취소</button>
+        <button class="topbar-btn btn-primary" style="flex:1" onclick="
+          const c=this.closest('.hx-card');
+          c.innerHTML='<div class=\\'hx-card-actions\\'><button class=\\'hx-btn hx-btn-edit\\' onclick=\\'editSurgery(this)\\'>수정</button><button class=\\'hx-btn hx-btn-del\\' onclick=\\'delCard(this)\\'>삭제</button></div><div class=\\'hx-card-title\\'>'+document.getElementById('esf-name').value+'</div><div class=\\'hx-card-sub\\'>'+document.getElementById('esf-memo').value+'</div>';
+          showToast('✅ 수정되었습니다');">저장</button>
+      </div>`;
+  }
+
+  /* ── 치료 이력 ── */
+  function openTreatForm() {
+    document.getElementById('treat-form').style.display = 'block';
+    document.getElementById('treat-form').scrollIntoView({ behavior: 'smooth' });
+  }
+  function closeTreatForm() { document.getElementById('treat-form').style.display = 'none'; }
+  function saveTreat() {
+    const type  = document.getElementById('tf-type').value;
+    const date  = document.getElementById('tf-date').value;
+    const name  = document.getElementById('tf-name').value.trim();
+    const staff = document.getElementById('tf-staff').value;
+    const memo  = document.getElementById('tf-memo').value.trim();
+    if (!name) { showToast('⚠️ 치료/검진명을 입력하세요'); return; }
+    const colors = { '물리치료':'bdg-purple','재활운동':'bdg-blue','검진':'bdg-teal','운동처방':'bdg-green','기타':'bdg-gray' };
+    const card = document.createElement('div');
+    card.className = 'hx-card';
+    card.dataset.cat = type;
+    card.innerHTML = `
+      <div class="hx-card-actions">
+        <button class="hx-btn hx-btn-edit" onclick="editTreat(this)">수정</button>
+        <button class="hx-btn hx-btn-del" onclick="delCard(this)">삭제</button>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:5px">
+        <span class="bdg ${colors[type]||'bdg-gray'}">${type}</span>
+        <span class="hx-card-date">${date||'날짜 미입력'}</span>
+      </div>
+      <div class="hx-card-title">${name}</div>
+      <div class="hx-card-sub">담당: ${staff}<br>${memo}</div>`;
+    document.getElementById('treat-list').prepend(card);
+    closeTreatForm();
+    document.getElementById('tf-name').value=''; document.getElementById('tf-memo').value='';
+    showToast('✅ 치료 이력이 추가되었습니다');
+  }
+  function editTreat(btn) {
+    const card = btn.closest('.hx-card');
+    const title = card.querySelector('.hx-card-title').textContent;
+    const sub   = card.querySelector('.hx-card-sub').innerHTML.replace(/<br>/g,'\n');
+    card.innerHTML = `
+      <div class="drawer-field"><div class="drawer-label">치료/검진명</div><input class="drawer-input" value="${title}" id="etf-name"></div>
+      <div class="drawer-field"><div class="drawer-label">내용/경과</div><textarea class="drawer-textarea" id="etf-memo">${sub}</textarea></div>
+      <div style="display:flex;gap:8px;margin-top:8px">
+        <button class="topbar-btn btn-ghost" style="flex:1" onclick="this.closest('.hx-card').remove();showToast('취소')">취소</button>
+        <button class="topbar-btn btn-primary" style="flex:1" onclick="
+          const c=this.closest('.hx-card');
+          c.innerHTML='<div class=\\'hx-card-actions\\'><button class=\\'hx-btn hx-btn-edit\\' onclick=\\'editTreat(this)\\'>수정</button><button class=\\'hx-btn hx-btn-del\\' onclick=\\'delCard(this)\\'>삭제</button></div><div class=\\'hx-card-title\\'>'+document.getElementById('etf-name').value+'</div><div class=\\'hx-card-sub\\'>'+document.getElementById('etf-memo').value+'</div>';
+          showToast('✅ 수정되었습니다');">저장</button>
+      </div>`;
+  }
+  function filterTreat(cat, btn) {
+    document.querySelectorAll('#pane-treat .filter-pill').forEach(b => b.classList.remove('on'));
+    btn.classList.add('on');
+    document.querySelectorAll('#treat-list .hx-card').forEach(c => {
+      c.style.display = (cat === 'all' || c.dataset.cat === cat) ? '' : 'none';
+    });
+  }
+
+  /* ── 이력 카드 삭제 ── */
+  function delCard(btn) {
+    if (!confirm('삭제하시겠습니까?')) return;
+    btn.closest('.hx-card').remove();
+    showToast('삭제되었습니다');
+  }
+
+  /* ── 메모 추가 ── */
+  function addMemo() {
+    const text = document.getElementById('memo-input').value.trim();
+    if (!text) { showToast('⚠️ 메모 내용을 입력하세요'); return; }
+    const type = document.getElementById('memo-type-sel').value;
+    const typeColors = {
+      '일반 메모':'background:#EDF2F7;color:#718096',
+      '알레르기/금기':'background:#FED7E2;color:#97266D',
+      'VIP 케어':'background:#E9D8FD;color:#6B46C1',
+      '상담 내용':'background:#BEE3F8;color:#2B6CB0',
+      '직원 공유 (내부)':'background:#EDF2F7;color:#718096'
+    };
+    const today = new Date().toISOString().slice(0,10);
+    const item = document.createElement('div');
+    item.className = 'memo-item-card';
+    item.innerHTML = `
+      <div class="memo-item-header">
+        <span class="memo-item-type" style="${typeColors[type]||''}">${type}</span>
+        <span class="memo-item-who">현재 사용자</span>
+        <span class="memo-item-time">${today}</span>
+        <button class="hx-btn hx-btn-del" onclick="delMemo(this)" style="padding:2px 7px;font-size:10px">삭제</button>
+      </div>
+      <div class="memo-item-text">${text}</div>`;
+    document.getElementById('memo-added-area').prepend(item);
+    document.getElementById('memo-input').value = '';
+    showToast('✅ 메모가 저장되었습니다');
+  }
+  function delMemo(btn) {
+    if (!confirm('메모를 삭제하시겠습니까?')) return;
+    btn.closest('.memo-item-card').remove();
+    showToast('삭제되었습니다');
   }
 
   /* ── 토스트 ── */
