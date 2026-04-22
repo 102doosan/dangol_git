@@ -2048,15 +2048,20 @@ VIP 회원 전용 특별 혜택을 안내드립니다.
       title:'이탈 위험 회원 연락', sub:'60일 이상 미방문 · 즉시 연락 필요', urgency:'긴급',
       items:[
         {id:'ch1', name:'이수진', info:'95일 미방문 · 이탈위험 HIGH · 헬스 · 010-2298-****',
-          phone:'010-2298-6641', lastVisit:'95일 전', risk:'HIGH 87점', pass:'만료됨', grade:'이탈위험', service:'헬스', memo:'육아로 방문 어렵다고 함. 온라인 프로그램 관심 있음.'},
+          phone:'010-2298-6641', lastVisit:'95일 전', risk:'HIGH 87점', pass:'만료됨', grade:'이탈위험', service:'헬스', memo:'육아로 방문 어렵다고 함. 온라인 프로그램 관심 있음.',
+          churnReasons:['이용권 만료 후 미갱신', '육아로 인한 시간 부족', '장기 미방문 (90일+)']},
         {id:'ch2', name:'최민준', info:'68일 미방문 · 이탈위험 MED · 골프/헬스 · 010-7743-****',
-          phone:'010-7743-9182', lastVisit:'68일 전', risk:'MED 72점', pass:'D-5 만료임박', grade:'휴면', service:'골프/헬스', memo:'이용권 만료 임박. 가격 부담 언급.'},
+          phone:'010-7743-9182', lastVisit:'68일 전', risk:'MED 72점', pass:'D-5 만료임박', grade:'휴면', service:'골프/헬스', memo:'이용권 만료 임박. 가격 부담 언급.',
+          churnReasons:['이용권 만료 임박 (D-5)', '가격 부담 언급', '방문 빈도 감소 추세']},
         {id:'ch3', name:'윤미래', info:'45일 미방문 · 이탈위험 MED · 재활 · 010-4411-****',
-          phone:'010-4411-3382', lastVisit:'45일 전', risk:'MED 58점', pass:'8회 잔여', grade:'이탈위험', service:'재활', memo:'개인 사정으로 방문 중단. 복귀 의사 있음.'},
+          phone:'010-4411-3382', lastVisit:'45일 전', risk:'MED 58점', pass:'8회 잔여', grade:'이탈위험', service:'재활', memo:'개인 사정으로 방문 중단. 복귀 의사 있음.',
+          churnReasons:['개인 사정 (일정 변경)', '재활 치료 중단 패턴', '잔여 횟수 미사용']},
         {id:'ch4', name:'강현석', info:'62일 미방문 · 이탈위험 MED · TPI · 010-8832-****',
-          phone:'010-8832-4471', lastVisit:'62일 전', risk:'MED 65점', pass:'12개월권 잔여', grade:'일반', service:'TPI', memo:'직장 변경으로 시간 조율 필요.'},
+          phone:'010-8832-4471', lastVisit:'62일 전', risk:'MED 65점', pass:'12개월권 잔여', grade:'일반', service:'TPI', memo:'직장 변경으로 시간 조율 필요.',
+          churnReasons:['직장 변경으로 일정 불일치', '방문 시간대 제한', '담당 트레이너 매칭 재필요']},
         {id:'ch5', name:'오지현', info:'71일 미방문 · 이탈위험 HIGH · 피트니스 · 010-5521-****',
-          phone:'010-5521-7743', lastVisit:'71일 전', risk:'HIGH 79점', pass:'만료됨', grade:'이탈위험', service:'피트니스', memo:'미응답 1회. 재연락 필요.'},
+          phone:'010-5521-7743', lastVisit:'71일 전', risk:'HIGH 79점', pass:'만료됨', grade:'이탈위험', service:'피트니스', memo:'미응답 1회. 재연락 필요.',
+          churnReasons:['이용권 만료 후 미갱신', '연락 미응답 (1회)', '대안 센터 이용 가능성']},
       ]
     },
     'task-remind': {
@@ -2360,12 +2365,20 @@ VIP 회원 전용 특별 혜택을 안내드립니다.
 
   function getTaskActionBody(item, taskKey) {
     if (taskKey === 'task-churn') {
+      const reasonTags = (item.churnReasons || []).map(r =>
+        `<span style="display:inline-flex;align-items:center;gap:4px;background:#FFF5F5;border:1px solid #FEB2B2;color:#C53030;font-size:11.5px;font-weight:700;border-radius:99px;padding:3px 10px;margin:3px 4px 3px 0">⚠ ${r}</span>`
+      ).join('');
       return `
         <div class="td-info-grid">
           <div class="td-info-cell"><div class="td-ic-label">마지막 방문</div><div class="td-ic-val">${item.lastVisit}</div></div>
           <div class="td-info-cell"><div class="td-ic-label">위험도</div><div class="td-ic-val" style="color:#E53E3E">${item.risk}</div></div>
           <div class="td-info-cell"><div class="td-ic-label">이용권 상태</div><div class="td-ic-val" style="color:#C05621">${item.pass}</div></div>
         </div>
+        ${reasonTags ? `
+        <div style="margin-bottom:14px">
+          <div style="font-size:11px;font-weight:700;color:#718096;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px">📊 예상 이탈 사유</div>
+          <div style="line-height:1.4">${reasonTags}</div>
+        </div>` : ''}
         ${item.memo ? `<div class="td-inquiry-box" style="border-left-color:#E53E3E;margin-bottom:14px">📋 이전 상담 메모: ${item.memo}</div>` : ''}
         <div class="td-action-row">
           <button class="td-action-btn" onclick="showToast('📞 ${item.name} (${item.phone}) 전화 발신')">📞 전화 발신<div style="font-size:10px;color:#A0AEC0;margin-top:2px">${item.phone}</div></button>
