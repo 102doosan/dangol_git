@@ -298,12 +298,15 @@
 
   <div class="sb-section">회원</div>
   <div class="sb-item" onclick="goScreen('s-member',this)"><span class="sb-item-icon">👤</span>회원 관리</div>
+  <div class="sb-item" onclick="goScreen('s-consent',this)"><span class="sb-item-icon">🔒</span>개인정보 동의</div>
   <div class="sb-item" onclick="goScreen('s-consult',this)"><span class="sb-item-icon">💬</span>상담 이력<span class="sb-badge">3</span></div>
   <div class="sb-item" onclick="goScreen('s-memo',this)"><span class="sb-item-icon">📝</span>메모/특이사항</div>
 
   <div class="sb-section">예약 & 검진</div>
   <div class="sb-item" onclick="goScreen('s-reserve',this)"><span class="sb-item-icon">📅</span>예약 관리<span class="sb-badge">4</span></div>
+  <div class="sb-item" onclick="goScreen('s-calendar',this)"><span class="sb-item-icon">🗓️</span>캘린더 뷰</div>
   <div class="sb-item" onclick="goScreen('s-exam',this)"><span class="sb-item-icon">🔬</span>검진 이력</div>
+  <div class="sb-item" onclick="goScreen('s-body',this)"><span class="sb-item-icon">📊</span>체성분 추이</div>
 
   <div class="sb-section">재방문</div>
   <div class="sb-item" onclick="goScreen('s-churn',this)"><span class="sb-item-icon">📉</span>이탈 분석<span class="sb-badge">12</span></div>
@@ -312,6 +315,7 @@
   <div class="sb-item" onclick="goScreen('s-msg',this)"><span class="sb-item-icon">📨</span>메시지 발송</div>
   <div class="sb-item" onclick="goScreen('s-tpl',this)"><span class="sb-item-icon">📋</span>템플릿 관리</div>
   <div class="sb-item" onclick="goScreen('s-history',this)"><span class="sb-item-icon">📬</span>발송 이력</div>
+  <div class="sb-item" onclick="goScreen('s-auto-msg',this)"><span class="sb-item-icon">⚡</span>자동 발송 설정</div>
 
   <div class="sb-section">마케팅</div>
   <div class="sb-item" onclick="goScreen('s-event',this)"><span class="sb-item-icon">🎁</span>이벤트/쿠폰</div>
@@ -505,6 +509,70 @@
 </div>
 
 <!-- ──────────────────────────────────────
+     S-CONSENT: 개인정보 동의 관리
+────────────────────────────────────── -->
+<div id="s-consent" class="screen">
+  <div class="topbar">
+    <div><div class="topbar-title">🔒 개인정보 동의 관리</div><div class="topbar-sub">총 1,284명 · 법규 필수 관리 항목</div></div>
+    <button class="topbar-btn btn-ghost" style="font-size:12px" onclick="showToast('동의 현황 PDF 출력 완료')">📄 PDF 출력</button>
+  </div>
+  <div class="content">
+    <div class="stat-row col4">
+      <div class="stat-card" style="--c:#38A169"><div class="sc-top"><span class="sc-label">전체 동의</span><span class="sc-icon">✅</span></div><div class="sc-val">892</div><div class="sc-change gray">전체 69.5%</div></div>
+      <div class="stat-card" style="--c:#E67E22"><div class="sc-top"><span class="sc-label">부분 동의</span><span class="sc-icon">⚠️</span></div><div class="sc-val">247</div><div class="sc-change gray">마케팅 미동의</div></div>
+      <div class="stat-card" style="--c:#E53E3E"><div class="sc-top"><span class="sc-label">미동의</span><span class="sc-icon">❌</span></div><div class="sc-val">89</div><div class="sc-change gray">메시지 발송 제한</div></div>
+      <div class="stat-card" style="--c:#A0AEC0"><div class="sc-top"><span class="sc-label">수신 거부</span><span class="sc-icon">🚫</span></div><div class="sc-val">56</div><div class="sc-change dn">즉시 자동 제외</div></div>
+    </div>
+    <div class="panel" style="margin-bottom:16px">
+      <div class="panel-head"><span class="panel-title">채널별 수신 동의 현황</span></div>
+      <div class="panel-body">
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px">
+          <div style="background:#F0FFF4;border-radius:12px;padding:16px 18px">
+            <div style="font-size:12px;font-weight:700;color:#276749;margin-bottom:8px">💬 SMS</div>
+            <div style="font-size:26px;font-weight:900;color:#1A202C">1,139</div>
+            <div style="font-size:11px;color:#718096;margin-top:4px">동의율 88.7%</div>
+            <div style="background:#E2E8F0;border-radius:99px;height:6px;margin-top:8px"><div style="width:88.7%;height:100%;background:#38A169;border-radius:99px"></div></div>
+          </div>
+          <div style="background:#FFFBEB;border-radius:12px;padding:16px 18px">
+            <div style="font-size:12px;font-weight:700;color:#744210;margin-bottom:8px">💛 카카오 알림톡</div>
+            <div style="font-size:26px;font-weight:900;color:#1A202C">1,052</div>
+            <div style="font-size:11px;color:#718096;margin-top:4px">동의율 81.9%</div>
+            <div style="background:#E2E8F0;border-radius:99px;height:6px;margin-top:8px"><div style="width:81.9%;height:100%;background:#D69E2E;border-radius:99px"></div></div>
+          </div>
+          <div style="background:#EBF8FF;border-radius:12px;padding:16px 18px">
+            <div style="font-size:12px;font-weight:700;color:#2C5282;margin-bottom:8px">🔔 앱 푸시 (FCM)</div>
+            <div style="font-size:26px;font-weight:900;color:#1A202C">967</div>
+            <div style="font-size:11px;color:#718096;margin-top:4px">동의율 75.3%</div>
+            <div style="background:#E2E8F0;border-radius:99px;height:6px;margin-top:8px"><div style="width:75.3%;height:100%;background:#4299E1;border-radius:99px"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="panel">
+      <div class="panel-head">
+        <span class="panel-title">회원별 동의 현황</span>
+        <div style="display:flex;gap:6px">
+          <button class="filter-pill on" style="font-size:11px;padding:4px 12px">전체</button>
+          <button class="filter-pill" style="font-size:11px;padding:4px 12px" onclick="this.classList.toggle('on')">미동의</button>
+          <button class="filter-pill" style="font-size:11px;padding:4px 12px" onclick="this.classList.toggle('on')">수신거부</button>
+        </div>
+      </div>
+      <table class="tbl">
+        <thead><tr><th>회원명</th><th>SMS 동의</th><th>카카오 동의</th><th>앱 푸시 동의</th><th>개인정보 수집</th><th>동의 일시</th><th>동의 방법</th><th></th></tr></thead>
+        <tbody>
+          <tr><td><strong>김지훈</strong></td><td><span class="bdg bdg-green">동의</span></td><td><span class="bdg bdg-green">동의</span></td><td><span class="bdg bdg-green">동의</span></td><td><span class="bdg bdg-green">동의</span></td><td>2025.12.03</td><td><span class="bdg bdg-blue">앱</span></td><td><button class="topbar-btn btn-ghost" style="padding:4px 10px;font-size:11px" onclick="showToast('김지훈 동의이력 PDF 출력')">📄 이력</button></td></tr>
+          <tr><td><strong>박서연</strong></td><td><span class="bdg bdg-green">동의</span></td><td><span class="bdg bdg-green">동의</span></td><td><span class="bdg bdg-gray">미동의</span></td><td><span class="bdg bdg-green">동의</span></td><td>2026.01.15</td><td><span class="bdg bdg-gray">서면</span></td><td><button class="topbar-btn btn-ghost" style="padding:4px 10px;font-size:11px" onclick="showToast('박서연 동의이력 PDF 출력')">📄 이력</button></td></tr>
+          <tr><td><strong>최민준</strong></td><td><span class="bdg bdg-orange">부분동의</span></td><td><span class="bdg bdg-gray">미동의</span></td><td><span class="bdg bdg-gray">미동의</span></td><td><span class="bdg bdg-green">동의</span></td><td>2024.08.22</td><td><span class="bdg bdg-purple">구두</span></td><td><button class="topbar-btn btn-ghost" style="padding:4px 10px;font-size:11px" onclick="showToast('최민준 동의이력 PDF 출력')">📄 이력</button></td></tr>
+          <tr><td><strong>이수진</strong></td><td><span class="bdg bdg-red">수신거부</span></td><td><span class="bdg bdg-red">수신거부</span></td><td><span class="bdg bdg-gray">미동의</span></td><td><span class="bdg bdg-green">동의</span></td><td>2025.03.07</td><td><span class="bdg bdg-blue">앱</span></td><td><button class="topbar-btn btn-ghost" style="padding:4px 10px;font-size:11px" onclick="showToast('이수진 동의이력 PDF 출력')">📄 이력</button></td></tr>
+          <tr><td><strong>정현우</strong></td><td><span class="bdg bdg-green">동의</span></td><td><span class="bdg bdg-green">동의</span></td><td><span class="bdg bdg-green">동의</span></td><td><span class="bdg bdg-green">동의</span></td><td>2025.09.18</td><td><span class="bdg bdg-blue">앱</span></td><td><button class="topbar-btn btn-ghost" style="padding:4px 10px;font-size:11px" onclick="showToast('정현우 동의이력 PDF 출력')">📄 이력</button></td></tr>
+          <tr><td><strong>한미래</strong></td><td><span class="bdg bdg-green">동의</span></td><td><span class="bdg bdg-gray">미동의</span></td><td><span class="bdg bdg-gray">미동의</span></td><td><span class="bdg bdg-green">동의</span></td><td>2026.02.28</td><td><span class="bdg bdg-blue">앱</span></td><td><button class="topbar-btn btn-ghost" style="padding:4px 10px;font-size:11px" onclick="showToast('한미래 동의이력 PDF 출력')">📄 이력</button></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ──────────────────────────────────────
      S-CONSULT: 상담 이력
 ────────────────────────────────────── -->
 <div id="s-consult" class="screen">
@@ -676,6 +744,56 @@
 </div>
 
 <!-- ──────────────────────────────────────
+     S-CALENDAR: 예약 캘린더 뷰
+────────────────────────────────────── -->
+<div id="s-calendar" class="screen">
+  <div class="topbar">
+    <div><div class="topbar-title">🗓️ 예약 캘린더</div><div class="topbar-sub">2026년 4월 14일 (월) ~ 19일 (토)</div></div>
+    <div style="display:flex;gap:8px;align-items:center">
+      <button class="topbar-btn btn-ghost" style="font-size:13px" onclick="showToast('이전 주')">◀</button>
+      <button class="topbar-btn btn-ghost" style="font-size:12px" onclick="showToast('오늘로 이동')">오늘</button>
+      <button class="topbar-btn btn-ghost" style="font-size:13px" onclick="showToast('다음 주')">▶</button>
+      <button class="topbar-btn btn-primary" onclick="openModal('m-add-reserve')">+ 예약 등록</button>
+    </div>
+  </div>
+  <div class="content" style="padding-top:12px">
+    <!-- 필터 -->
+    <div class="search-bar" style="margin-bottom:12px">
+      <button class="filter-pill on" onclick="this.classList.toggle('on')">전체</button>
+      <button class="filter-pill" onclick="this.classList.toggle('on')">TPI 검진</button>
+      <button class="filter-pill" onclick="this.classList.toggle('on')">재활치료</button>
+      <button class="filter-pill" onclick="this.classList.toggle('on')">개인레슨</button>
+      <button class="filter-pill" onclick="this.classList.toggle('on')">골프검진</button>
+      <button class="filter-pill" onclick="this.classList.toggle('on')">SFMA</button>
+    </div>
+    <div style="display:flex;gap:10px;margin-bottom:12px;font-size:11px;font-weight:700">
+      <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;border-radius:3px;background:#4299E1;display:inline-block"></span>TPI</span>
+      <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;border-radius:3px;background:#38A169;display:inline-block"></span>재활</span>
+      <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;border-radius:3px;background:#9B59B6;display:inline-block"></span>레슨</span>
+      <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;border-radius:3px;background:#E67E22;display:inline-block"></span>골프검진</span>
+      <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;border-radius:3px;background:#E53E3E;display:inline-block"></span>노쇼</span>
+    </div>
+    <!-- 캘린더 그리드 -->
+    <div class="panel" style="overflow-x:auto">
+      <div style="min-width:700px">
+        <!-- 헤더 행 -->
+        <div style="display:grid;grid-template-columns:60px repeat(6,1fr);border-bottom:2px solid #E2E8F0">
+          <div style="padding:10px;font-size:11px;color:#A0AEC0"></div>
+          <div style="padding:10px;text-align:center;font-size:12px;font-weight:800;color:#4A5568">월 14</div>
+          <div style="padding:10px;text-align:center;font-size:12px;font-weight:800;color:#4A5568">화 15</div>
+          <div style="padding:10px;text-align:center;font-size:12px;font-weight:800;color:#E53E3E;background:#FFF5F5">수 16 <span style="font-size:10px;background:#E53E3E;color:#fff;border-radius:99px;padding:1px 5px">오늘</span></div>
+          <div style="padding:10px;text-align:center;font-size:12px;font-weight:800;color:#4A5568">목 17</div>
+          <div style="padding:10px;text-align:center;font-size:12px;font-weight:800;color:#4A5568">금 18</div>
+          <div style="padding:10px;text-align:center;font-size:12px;font-weight:800;color:#4A5568">토 19</div>
+        </div>
+        <!-- 시간 슬롯 -->
+        <div id="cal-body" style="max-height:520px;overflow-y:auto"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ──────────────────────────────────────
      S-EXAM: 검진 이력
 ────────────────────────────────────── -->
 <div id="s-exam" class="screen">
@@ -698,6 +816,108 @@
           <tr><td>04/10</td><td><strong>김지훈</strong></td><td><span class="bdg bdg-orange">골프검진</span></td><td>클럽스피드 98mph</td><td>이트레이너</td><td><span class="bdg bdg-green">+4mph</span></td><td><button class="topbar-btn btn-ghost" style="padding:4px 10px;font-size:11px">리포트</button></td></tr>
           <tr><td>04/08</td><td><strong>최민준</strong></td><td><span class="bdg bdg-teal">TPI</span></td><td>28/38</td><td>이트레이너</td><td><span class="bdg bdg-red">-2 악화</span></td><td><button class="topbar-btn btn-ghost" style="padding:4px 10px;font-size:11px">리포트</button></td></tr>
           <tr><td>04/05</td><td><strong>이수진</strong></td><td><span class="bdg bdg-purple">CSMI</span></td><td>72점</td><td>최물리</td><td><span class="bdg bdg-green">+8점</span></td><td><button class="topbar-btn btn-ghost" style="padding:4px 10px;font-size:11px">리포트</button></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ──────────────────────────────────────
+     S-BODY: 체성분 추이 & 레이더 차트
+────────────────────────────────────── -->
+<div id="s-body" class="screen">
+  <div class="topbar">
+    <div><div class="topbar-title">📊 체성분 추이 & 검진 분석</div></div>
+    <button class="topbar-btn btn-ghost" style="font-size:12px" onclick="showToast('리포트 PDF 출력')">📄 PDF 출력</button>
+  </div>
+  <div class="content">
+    <div class="search-bar" style="margin-bottom:16px">
+      <input class="search-input" placeholder="🔍 회원명 검색..." style="max-width:260px">
+      <button class="filter-pill on">전체</button>
+      <button class="filter-pill" onclick="this.classList.toggle('on')">TPI</button>
+      <button class="filter-pill" onclick="this.classList.toggle('on')">SFMA</button>
+      <button class="filter-pill" onclick="this.classList.toggle('on')">CSMI</button>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+      <!-- 체성분 추이 -->
+      <div class="panel">
+        <div class="panel-head"><span class="panel-title">체성분 추이 — 김지훈</span>
+          <div style="display:flex;gap:6px">
+            <button class="filter-pill on" style="font-size:10px;padding:3px 10px">3개월</button>
+            <button class="filter-pill" style="font-size:10px;padding:3px 10px">6개월</button>
+            <button class="filter-pill" style="font-size:10px;padding:3px 10px">1년</button>
+          </div>
+        </div>
+        <div class="panel-body">
+          <!-- 체성분 수치 -->
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px">
+            <div style="background:#EBF8FF;border-radius:10px;padding:10px;text-align:center"><div style="font-size:10px;color:#718096;font-weight:700">체중</div><div style="font-size:18px;font-weight:900;margin-top:4px">78.2<span style="font-size:11px">kg</span></div><div style="font-size:10px;color:#38A169">▼ 1.2</div></div>
+            <div style="background:#F0FFF4;border-radius:10px;padding:10px;text-align:center"><div style="font-size:10px;color:#718096;font-weight:700">체지방률</div><div style="font-size:18px;font-weight:900;margin-top:4px">19.4<span style="font-size:11px">%</span></div><div style="font-size:10px;color:#38A169">▼ 0.8</div></div>
+            <div style="background:#FFFBEB;border-radius:10px;padding:10px;text-align:center"><div style="font-size:10px;color:#718096;font-weight:700">골격근량</div><div style="font-size:18px;font-weight:900;margin-top:4px">32.8<span style="font-size:11px">kg</span></div><div style="font-size:10px;color:#E53E3E">▲ 0.3</div></div>
+            <div style="background:#FAF5FF;border-radius:10px;padding:10px;text-align:center"><div style="font-size:10px;color:#718096;font-weight:700">BMI</div><div style="font-size:18px;font-weight:900;margin-top:4px">24.1</div><div style="font-size:10px;color:#A0AEC0">정상</div></div>
+          </div>
+          <!-- 추이 그래프 (SVG 바 차트) -->
+          <div style="font-size:11px;font-weight:700;color:#718096;margin-bottom:8px">월별 체중 추이</div>
+          <div style="display:flex;align-items:flex-end;gap:8px;height:80px;padding-bottom:4px">
+            <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px"><div style="flex:1;width:100%;background:#BEE3F8;border-radius:4px 4px 0 0;height:65%"></div><div style="font-size:10px;color:#718096">1월</div></div>
+            <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px"><div style="flex:1;width:100%;background:#BEE3F8;border-radius:4px 4px 0 0;height:70%"></div><div style="font-size:10px;color:#718096">2월</div></div>
+            <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px"><div style="flex:1;width:100%;background:#BEE3F8;border-radius:4px 4px 0 0;height:68%"></div><div style="font-size:10px;color:#718096">3월</div></div>
+            <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px"><div style="flex:1;width:100%;background:#4299E1;border-radius:4px 4px 0 0;height:62%"></div><div style="font-size:10px;color:#4299E1;font-weight:800">4월</div></div>
+          </div>
+        </div>
+      </div>
+      <!-- 검진 점수 레이더 -->
+      <div class="panel">
+        <div class="panel-head"><span class="panel-title">검진 종합 점수 — 김지훈</span></div>
+        <div class="panel-body" style="display:flex;flex-direction:column;align-items:center">
+          <!-- SVG 레이더 차트 -->
+          <svg width="200" height="200" viewBox="0 0 200 200" style="margin-bottom:12px">
+            <!-- 배경 육각형들 -->
+            <polygon points="100,20 170,60 170,140 100,180 30,140 30,60" fill="none" stroke="#EDF2F7" stroke-width="1.5"/>
+            <polygon points="100,40 155,70 155,130 100,160 45,130 45,70" fill="none" stroke="#EDF2F7" stroke-width="1.5"/>
+            <polygon points="100,60 140,80 140,120 100,140 60,120 60,80" fill="none" stroke="#EDF2F7" stroke-width="1.5"/>
+            <!-- 축선 -->
+            <line x1="100" y1="20" x2="100" y2="180" stroke="#EDF2F7" stroke-width="1"/>
+            <line x1="100" y1="100" x2="170" y2="60" stroke="#EDF2F7" stroke-width="1"/>
+            <line x1="100" y1="100" x2="170" y2="140" stroke="#EDF2F7" stroke-width="1"/>
+            <line x1="100" y1="100" x2="100" y2="180" stroke="#EDF2F7" stroke-width="1"/>
+            <line x1="100" y1="100" x2="30" y2="140" stroke="#EDF2F7" stroke-width="1"/>
+            <line x1="100" y1="100" x2="30" y2="60" stroke="#EDF2F7" stroke-width="1"/>
+            <!-- 데이터 영역 -->
+            <polygon points="100,32 162,68 158,136 100,168 44,132 38,64" fill="rgba(66,153,225,0.2)" stroke="#4299E1" stroke-width="2"/>
+            <!-- 데이터 점 -->
+            <circle cx="100" cy="32" r="4" fill="#4299E1"/>
+            <circle cx="162" cy="68" r="4" fill="#4299E1"/>
+            <circle cx="158" cy="136" r="4" fill="#4299E1"/>
+            <circle cx="100" cy="168" r="4" fill="#4299E1"/>
+            <circle cx="44" cy="132" r="4" fill="#4299E1"/>
+            <circle cx="38" cy="64" r="4" fill="#4299E1"/>
+            <!-- 라벨 -->
+            <text x="100" y="14" text-anchor="middle" font-size="10" font-weight="700" fill="#4A5568">TPI</text>
+            <text x="176" y="62" text-anchor="start" font-size="10" font-weight="700" fill="#4A5568">SFMA</text>
+            <text x="176" y="144" text-anchor="start" font-size="10" font-weight="700" fill="#4A5568">CSMI</text>
+            <text x="100" y="192" text-anchor="middle" font-size="10" font-weight="700" fill="#4A5568">체지방</text>
+            <text x="24" y="144" text-anchor="end" font-size="10" font-weight="700" fill="#4A5568">근육량</text>
+            <text x="24" y="62" text-anchor="end" font-size="10" font-weight="700" fill="#4A5568">심폐</text>
+          </svg>
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;width:100%">
+            <div style="text-align:center;background:#EBF8FF;border-radius:8px;padding:8px"><div style="font-size:10px;color:#718096">TPI</div><div style="font-size:15px;font-weight:900;color:#4299E1">35/38</div></div>
+            <div style="text-align:center;background:#F0FFF4;border-radius:8px;padding:8px"><div style="font-size:10px;color:#718096">SFMA</div><div style="font-size:15px;font-weight:900;color:#38A169">FN 10</div></div>
+            <div style="text-align:center;background:#FAF5FF;border-radius:8px;padding:8px"><div style="font-size:10px;color:#718096">CSMI</div><div style="font-size:15px;font-weight:900;color:#9B59B6">78점</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- 전체 회원 체성분 순위 -->
+    <div class="panel" style="margin-top:16px">
+      <div class="panel-head"><span class="panel-title">검진 점수 현황 목록</span></div>
+      <table class="tbl">
+        <thead><tr><th>회원명</th><th>체중</th><th>체지방률</th><th>골격근량</th><th>TPI</th><th>SFMA</th><th>CSMI</th><th>최근 검진</th><th></th></tr></thead>
+        <tbody>
+          <tr><td><strong>김지훈</strong></td><td>78.2kg</td><td>19.4%</td><td>32.8kg</td><td><span class="bdg bdg-teal">35/38</span></td><td><span class="bdg bdg-green">FN 10</span></td><td>78점</td><td>04/10</td><td><button class="topbar-btn btn-ghost" style="padding:4px 10px;font-size:11px">상세</button></td></tr>
+          <tr><td><strong>박서연</strong></td><td>62.1kg</td><td>28.3%</td><td>22.4kg</td><td>—</td><td><span class="bdg bdg-blue">DN 4</span></td><td>65점</td><td>04/14</td><td><button class="topbar-btn btn-ghost" style="padding:4px 10px;font-size:11px">상세</button></td></tr>
+          <tr><td><strong>정현우</strong></td><td>82.5kg</td><td>22.1%</td><td>35.2kg</td><td><span class="bdg bdg-teal">38/38</span></td><td>—</td><td>—</td><td>04/16</td><td><button class="topbar-btn btn-ghost" style="padding:4px 10px;font-size:11px">상세</button></td></tr>
+          <tr><td><strong>최민준</strong></td><td>88.7kg</td><td>31.2%</td><td>31.8kg</td><td><span class="bdg bdg-red">28/38</span></td><td>—</td><td>—</td><td>04/08</td><td><button class="topbar-btn btn-ghost" style="padding:4px 10px;font-size:11px">상세</button></td></tr>
         </tbody>
       </table>
     </div>
@@ -934,6 +1154,126 @@ VIP 회원 전용 특별 혜택을 안내드립니다.
           <tr><td>04/14 14:00</td><td>재활치료 일정 안내</td><td><span class="bdg bdg-blue">SMS</span></td><td>32명</td><td style="color:#38A169;font-weight:700">31</td><td>1</td><td>0</td></tr>
         </tbody>
       </table>
+    </div>
+  </div>
+</div>
+
+<!-- ──────────────────────────────────────
+     S-AUTO-MSG: 자동 발송 설정
+────────────────────────────────────── -->
+<div id="s-auto-msg" class="screen">
+  <div class="topbar"><div><div class="topbar-title">⚡ 자동 발송 설정</div><div class="topbar-sub">조건 기반 메시지를 자동으로 발송합니다</div></div></div>
+  <div class="content">
+    <!-- 자동 발송 규칙 카드들 -->
+    <div class="panel" style="margin-bottom:14px">
+      <div style="font-size:14px;font-weight:800;color:#2D3748;margin-bottom:14px">📅 예약 리마인더</div>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <!-- D-7 -->
+        <div style="display:flex;align-items:center;justify-content:space-between;background:#F7FAFC;border-radius:10px;padding:12px 14px">
+          <div>
+            <div style="font-size:13px;font-weight:700;color:#2D3748">D-7 리마인더 <span style="font-size:11px;font-weight:600;color:#4299E1;background:#EBF8FF;border-radius:99px;padding:2px 8px;margin-left:4px">SMS</span></div>
+            <div style="font-size:11.5px;color:#718096;margin-top:3px">예약 7일 전 자동 발송 · 매일 오전 9시</div>
+          </div>
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer">
+            <span style="font-size:11px;color:#38A169;font-weight:700" id="lbl-d7">ON</span>
+            <div style="position:relative;width:40px;height:22px" onclick="toggleAutoMsg('d7',this)">
+              <div id="track-d7" style="width:40px;height:22px;background:#38A169;border-radius:99px;transition:.2s"></div>
+              <div id="thumb-d7" style="position:absolute;top:3px;left:21px;width:16px;height:16px;background:#fff;border-radius:99px;transition:.2s;box-shadow:0 1px 3px rgba(0,0,0,.3)"></div>
+            </div>
+          </label>
+        </div>
+        <!-- D-3 -->
+        <div style="display:flex;align-items:center;justify-content:space-between;background:#F7FAFC;border-radius:10px;padding:12px 14px">
+          <div>
+            <div style="font-size:13px;font-weight:700;color:#2D3748">D-3 리마인더 <span style="font-size:11px;font-weight:600;color:#4299E1;background:#EBF8FF;border-radius:99px;padding:2px 8px;margin-left:4px">SMS</span></div>
+            <div style="font-size:11.5px;color:#718096;margin-top:3px">예약 3일 전 자동 발송 · 매일 오전 9시</div>
+          </div>
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer">
+            <span style="font-size:11px;color:#38A169;font-weight:700" id="lbl-d3">ON</span>
+            <div style="position:relative;width:40px;height:22px" onclick="toggleAutoMsg('d3',this)">
+              <div id="track-d3" style="width:40px;height:22px;background:#38A169;border-radius:99px;transition:.2s"></div>
+              <div id="thumb-d3" style="position:absolute;top:3px;left:21px;width:16px;height:16px;background:#fff;border-radius:99px;transition:.2s;box-shadow:0 1px 3px rgba(0,0,0,.3)"></div>
+            </div>
+          </label>
+        </div>
+        <!-- D-1 -->
+        <div style="display:flex;align-items:center;justify-content:space-between;background:#F7FAFC;border-radius:10px;padding:12px 14px">
+          <div>
+            <div style="font-size:13px;font-weight:700;color:#2D3748">D-1 리마인더 <span style="font-size:11px;font-weight:600;color:#9B59B6;background:#FAF5FF;border-radius:99px;padding:2px 8px;margin-left:4px">카카오</span></div>
+            <div style="font-size:11.5px;color:#718096;margin-top:3px">예약 전날 자동 발송 · 오후 5시</div>
+          </div>
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer">
+            <span style="font-size:11px;color:#38A169;font-weight:700" id="lbl-d1">ON</span>
+            <div style="position:relative;width:40px;height:22px" onclick="toggleAutoMsg('d1',this)">
+              <div id="track-d1" style="width:40px;height:22px;background:#38A169;border-radius:99px;transition:.2s"></div>
+              <div id="thumb-d1" style="position:absolute;top:3px;left:21px;width:16px;height:16px;background:#fff;border-radius:99px;transition:.2s;box-shadow:0 1px 3px rgba(0,0,0,.3)"></div>
+            </div>
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel" style="margin-bottom:14px">
+      <div style="font-size:14px;font-weight:800;color:#2D3748;margin-bottom:14px">🎂 생일 축하 / 이용권 만료</div>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div style="display:flex;align-items:center;justify-content:space-between;background:#F7FAFC;border-radius:10px;padding:12px 14px">
+          <div>
+            <div style="font-size:13px;font-weight:700;color:#2D3748">생일 축하 메시지 <span style="font-size:11px;font-weight:600;color:#9B59B6;background:#FAF5FF;border-radius:99px;padding:2px 8px;margin-left:4px">카카오</span></div>
+            <div style="font-size:11.5px;color:#718096;margin-top:3px">생일 당일 오전 8시 발송</div>
+          </div>
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer">
+            <span style="font-size:11px;color:#38A169;font-weight:700" id="lbl-bday">ON</span>
+            <div style="position:relative;width:40px;height:22px" onclick="toggleAutoMsg('bday',this)">
+              <div id="track-bday" style="width:40px;height:22px;background:#38A169;border-radius:99px;transition:.2s"></div>
+              <div id="thumb-bday" style="position:absolute;top:3px;left:21px;width:16px;height:16px;background:#fff;border-radius:99px;transition:.2s;box-shadow:0 1px 3px rgba(0,0,0,.3)"></div>
+            </div>
+          </label>
+        </div>
+        <div style="display:flex;align-items:center;justify-content:space-between;background:#F7FAFC;border-radius:10px;padding:12px 14px">
+          <div>
+            <div style="font-size:13px;font-weight:700;color:#2D3748">이용권 만료 D-7 안내 <span style="font-size:11px;font-weight:600;color:#4299E1;background:#EBF8FF;border-radius:99px;padding:2px 8px;margin-left:4px">SMS</span></div>
+            <div style="font-size:11.5px;color:#718096;margin-top:3px">만료 7일 전 자동 발송</div>
+          </div>
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer">
+            <span style="font-size:11px;color:#A0AEC0;font-weight:700" id="lbl-expire">OFF</span>
+            <div style="position:relative;width:40px;height:22px" onclick="toggleAutoMsg('expire',this)">
+              <div id="track-expire" style="width:40px;height:22px;background:#CBD5E0;border-radius:99px;transition:.2s"></div>
+              <div id="thumb-expire" style="position:absolute;top:3px;left:3px;width:16px;height:16px;background:#fff;border-radius:99px;transition:.2s;box-shadow:0 1px 3px rgba(0,0,0,.3)"></div>
+            </div>
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <!-- 오늘 발송 예정 시뮬레이션 -->
+    <div class="panel">
+      <div style="font-size:14px;font-weight:800;color:#2D3748;margin-bottom:14px">📋 오늘 자동 발송 예정 <span style="font-size:12px;font-weight:600;color:#718096">(2026-04-23)</span></div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:#EBF8FF;border-radius:8px;border-left:3px solid #4299E1">
+          <span style="font-size:18px">📅</span>
+          <div style="flex:1">
+            <div style="font-size:12.5px;font-weight:700;color:#2D3748">D-7 리마인더</div>
+            <div style="font-size:11.5px;color:#718096">김지훈 외 2명 · 오전 9:00 발송 예정</div>
+          </div>
+          <span style="font-size:11px;font-weight:700;color:#4299E1">3건</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:#FAF5FF;border-radius:8px;border-left:3px solid #9B59B6">
+          <span style="font-size:18px">📅</span>
+          <div style="flex:1">
+            <div style="font-size:12.5px;font-weight:700;color:#2D3748">D-1 리마인더</div>
+            <div style="font-size:11.5px;color:#718096">박서연 · 오후 5:00 발송 예정</div>
+          </div>
+          <span style="font-size:11px;font-weight:700;color:#9B59B6">1건</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:#F0FFF4;border-radius:8px;border-left:3px solid #38A169">
+          <span style="font-size:18px">🎂</span>
+          <div style="flex:1">
+            <div style="font-size:12.5px;font-weight:700;color:#2D3748">생일 축하</div>
+            <div style="font-size:11.5px;color:#718096">최민준 · 오전 8:00 발송 완료</div>
+          </div>
+          <span style="font-size:11px;font-weight:700;color:#38A169">✓ 발송완료</span>
+        </div>
+      </div>
     </div>
   </div>
 </div>
@@ -1743,8 +2083,8 @@ VIP 회원 전용 특별 혜택을 안내드립니다.
       's-home':'📊 CRM 홈','s-member':'👤 회원 관리','s-consult':'💬 상담 이력',
       's-memo':'📝 메모/특이사항','s-reserve':'📅 예약 관리','s-exam':'🔬 검진 이력',
       's-churn':'📉 이탈 분석','s-msg':'📨 메시지 발송','s-tpl':'📋 템플릿 관리',
-      's-history':'📬 발송 이력','s-event':'🎁 이벤트/쿠폰','s-stats':'📈 통계 리포트','s-setting':'⚙️ 설정/권한',
-      's-today':'✅ 오늘 처리할 일'
+      's-history':'📬 발송 이력','s-auto-msg':'⚡ 자동 발송 설정','s-event':'🎁 이벤트/쿠폰','s-stats':'📈 통계 리포트','s-setting':'⚙️ 설정/권한',
+      's-today':'✅ 오늘 처리할 일','s-consent':'🔒 개인정보 동의','s-calendar':'🗓️ 예약 캘린더','s-body':'📊 체성분 추이'
     };
   }
 
@@ -2642,6 +2982,56 @@ VIP 회원 전용 특별 혜택을 안내드립니다.
       hideMemoDropdown();
     }
   });
+
+  // ── 캘린더 시간 슬롯 렌더링 ──
+  const CAL_EVENTS = [
+    { day:0, start:9,  end:10, name:'김지훈', type:'TPI',   color:'#4299E1' },
+    { day:0, start:11, end:12, name:'이수진', type:'재활',   color:'#38A169' },
+    { day:1, start:10, end:11, name:'박서연', type:'레슨',   color:'#9B59B6' },
+    { day:1, start:14, end:15, name:'최민준', type:'골프검진',color:'#E67E22' },
+    { day:2, start:9,  end:10, name:'정현우', type:'TPI',   color:'#4299E1' },
+    { day:2, start:13, end:14, name:'홍민지', type:'재활',   color:'#38A169' },
+    { day:2, start:15, end:16, name:'오준혁', type:'노쇼',   color:'#E53E3E' },
+    { day:3, start:10, end:11, name:'김지훈', type:'레슨',   color:'#9B59B6' },
+    { day:4, start:11, end:12, name:'이수진', type:'골프검진',color:'#E67E22' },
+    { day:5, start:9,  end:10, name:'박서연', type:'TPI',   color:'#4299E1' },
+    { day:5, start:14, end:15, name:'최민준', type:'재활',   color:'#38A169' },
+  ];
+  function renderCalendar() {
+    const body = document.getElementById('cal-body');
+    if (!body) return;
+    let html = '';
+    for (let h = 9; h <= 19; h++) {
+      const cells = Array(6).fill('').map((_, d) => {
+        const ev = CAL_EVENTS.find(e => e.day === d && e.start === h);
+        if (ev) {
+          return `<div style="padding:6px 4px">
+            <div style="background:${ev.color};color:#fff;border-radius:6px;padding:5px 7px;font-size:11px;font-weight:700;line-height:1.4;cursor:pointer" onclick="showToast('${ev.name} · ${ev.type}')">
+              ${ev.name}<br><span style="font-size:10px;opacity:.85">${ev.type}</span>
+            </div></div>`;
+        }
+        return `<div style="padding:6px 4px;min-height:52px;border-top:1px solid #F0F0F0"></div>`;
+      }).join('');
+      html += `<div style="display:grid;grid-template-columns:60px repeat(6,1fr);${h===9?'border-top:1px solid #E2E8F0':''}">
+        <div style="padding:8px 6px;font-size:11px;color:#A0AEC0;font-weight:700;text-align:right;border-top:1px solid #F0F0F0">${h}:00</div>
+        ${cells}
+      </div>`;
+    }
+    body.innerHTML = html;
+  }
+  document.addEventListener('DOMContentLoaded', renderCalendar);
+
+  // ── 자동 발송 토글 ──
+  const _autoMsgState = { d7:true, d3:true, d1:true, bday:true, expire:false };
+  function toggleAutoMsg(key) {
+    _autoMsgState[key] = !_autoMsgState[key];
+    const on = _autoMsgState[key];
+    document.getElementById('track-'+key).style.background = on ? '#38A169' : '#CBD5E0';
+    document.getElementById('thumb-'+key).style.left = on ? '21px' : '3px';
+    document.getElementById('lbl-'+key).textContent = on ? 'ON' : 'OFF';
+    document.getElementById('lbl-'+key).style.color = on ? '#38A169' : '#A0AEC0';
+    showToast((key.toUpperCase()) + ' 자동발송 ' + (on ? '활성화' : '비활성화'));
+  }
 </script>
 </body>
 </html>
