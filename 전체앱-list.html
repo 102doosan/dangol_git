@@ -606,7 +606,7 @@ const priorityStyle = {
   "선택":{bg:"#F0FFF4",color:"#38A169",border:"#C6F6D5"},
 };
 
-// ── Firebase 초기화 ──
+// ── Firebase 초기화 (실패해도 화면은 렌더링) ──
 const firebaseConfig = {
   apiKey: "AIzaSyCiqM2RiCiOGcen01gS4dDV8hJK0-oB4MI",
   authDomain: "dangol-checklist.firebaseapp.com",
@@ -615,9 +615,19 @@ const firebaseConfig = {
   messagingSenderId: "41914009789",
   appId: "1:41914009789:web:87349b225f5e4b278a8fd4"
 };
-firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();
-const checkRef = db.collection("checkboxes").doc("state");
+let db = null, checkRef = null, firebaseReady = false;
+try {
+  if (typeof firebase !== 'undefined') {
+    firebase.initializeApp(firebaseConfig);
+    db = firebase.firestore();
+    checkRef = db.collection("checkboxes").doc("state");
+    firebaseReady = true;
+  } else {
+    console.warn('Firebase SDK 로드 실패 — 오프라인 모드로 동작');
+  }
+} catch (e) {
+  console.warn('Firebase 초기화 실패 — 오프라인 모드로 동작:', e);
+}
 
 let checked = {};
 let activeFilter = "전체";
@@ -626,18 +636,26 @@ let activeSubTab = "all";
 let openCats = {};
 allData.forEach(c => openCats[c.id] = true);
 
-// Firestore 실시간 동기화
-checkRef.onSnapshot(doc => {
-  if (doc.exists) {
-    checked = doc.data();
-  } else {
-    checked = {};
-  }
+// Firestore 실시간 동기화 (실패하면 로컬 상태로 fallback)
+if (firebaseReady) {
+  checkRef.onSnapshot(
+    doc => {
+      checked = doc.exists ? doc.data() : {};
+      render();
+    },
+    err => {
+      console.warn('Firestore 연결 오류 — 오프라인 모드:', err);
+      render();
+    }
+  );
+  // 안전망: 3초 안에 onSnapshot 콜백이 안 오면 일단 렌더
+  setTimeout(() => { if (!window.__rendered) render(); }, 3000);
+} else {
   render();
-});
+}
 
 function saveToFirestore() {
-  checkRef.set(checked);
+  if (firebaseReady && checkRef) checkRef.set(checked);
 }
 
 function allScreens() { return allData.flatMap(c => c.screens); }
@@ -759,6 +777,7 @@ function renderCats(cats) {
 }
 
 function render() {
+  window.__rendered = true;
   updateStats();
   document.getElementById('filters').innerHTML = '';
   document.getElementById('tabs').innerHTML = [

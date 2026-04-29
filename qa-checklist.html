@@ -580,7 +580,7 @@ const adminData = [
   },
 ];
 
-// ── Firebase ──
+// ── Firebase (실패해도 화면 렌더) ──
 const firebaseConfig = {
   apiKey: "AIzaSyCiqM2RiCiOGcen01gS4dDV8hJK0-oB4MI",
   authDomain: "dangol-checklist.firebaseapp.com",
@@ -589,10 +589,18 @@ const firebaseConfig = {
   messagingSenderId: "41914009789",
   appId: "1:41914009789:web:87349b225f5e4b278a8fd4"
 };
-firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();
-const checkRef  = db.collection("checkboxes").doc("state");
-const qaRef     = db.collection("qa").doc("state");
+let db = null, checkRef = null, qaRef = null, firebaseReady = false;
+try {
+  if (typeof firebase !== 'undefined') {
+    firebase.initializeApp(firebaseConfig);
+    db = firebase.firestore();
+    checkRef = db.collection("checkboxes").doc("state");
+    qaRef    = db.collection("qa").doc("state");
+    firebaseReady = true;
+  }
+} catch (e) {
+  console.warn('Firebase 초기화 실패 — 오프라인 모드:', e);
+}
 
 let checked = {};  // 완료 체크 상태 (전체앱에서)
 let qa = {};       // QA 상태 {screenId: {status:'pass'|'fix'|'add'|null, memo:''}}
@@ -604,22 +612,25 @@ let globalMemoTimer = null;
 let showNonPassOnly = false;
 let statFilter = null; // null|'all'|'pass'|'fix'|'add'|'none'
 
-// 실시간 체크 상태 수신
-checkRef.onSnapshot(doc => {
-  checked = doc.exists ? doc.data() : {};
+// 실시간 체크/QA 상태 수신 (실패해도 화면은 렌더)
+if (firebaseReady) {
+  checkRef.onSnapshot(
+    doc => { checked = doc.exists ? doc.data() : {}; render(); },
+    err => { console.warn('checkRef 오류:', err); render(); }
+  );
+  qaRef.onSnapshot(
+    doc => {
+      qa = doc.exists ? doc.data() : {};
+      const el = document.getElementById('global-memo');
+      if (el && document.activeElement !== el) el.value = qa.__globalMemo || '';
+      render();
+    },
+    err => { console.warn('qaRef 오류:', err); render(); }
+  );
+  setTimeout(() => { if (!window.__rendered) render(); }, 3000);
+} else {
   render();
-});
-
-// 실시간 QA 상태 수신
-qaRef.onSnapshot(doc => {
-  qa = doc.exists ? doc.data() : {};
-  // 통합 메모 동기화 (포커스 중일 때는 덮어쓰지 않음)
-  const el = document.getElementById('global-memo');
-  if (el && document.activeElement !== el) {
-    el.value = qa.__globalMemo || '';
-  }
-  render();
-});
+}
 
 function getSubItems(s) {
   const parts = s.desc.split(' · ');
@@ -651,7 +662,7 @@ function setMemo(id, memo) {
 }
 
 function saveQA() {
-  qaRef.set(qa);
+  if (firebaseReady && qaRef) qaRef.set(qa);
 }
 
 function onGlobalMemoInput(val) {
@@ -660,6 +671,10 @@ function onGlobalMemoInput(val) {
   const saved = document.getElementById('global-memo-saved');
   if (saved) saved.textContent = '저장 중...';
   globalMemoTimer = setTimeout(() => {
+    if (!firebaseReady || !qaRef) {
+      if (saved) { saved.textContent = '⚠ 오프라인'; saved.className = 'memo-saved'; }
+      return;
+    }
     qaRef.set(qa).then(() => {
       if (saved) { saved.textContent = '✓ 저장됨'; saved.className = 'memo-saved saved'; }
       setTimeout(() => { if (saved) { saved.textContent = ''; saved.className = 'memo-saved'; } }, 2000);
@@ -882,6 +897,7 @@ function renderCats(cats) {
 }
 
 function render() {
+  window.__rendered = true;
   renderStats();
 
   const curCats = activeTab === "user" ? userData : adminData;
