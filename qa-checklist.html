@@ -153,7 +153,12 @@
     <div class="header-row">
       <span style="font-size:26px">🔍</span>
       <h1>QA 체크리스트</h1>
-      <a href="전체앱-list.html" style="margin-left:auto;display:inline-flex;align-items:center;gap:6px;padding:8px 16px;background:#4F9CF9;color:#fff;border-radius:99px;font-size:13px;font-weight:700;text-decoration:none;box-shadow:0 2px 8px rgba(79,156,249,0.35);">📱 전체앱 화면 목록</a>
+      <div style="margin-left:auto;display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
+        <button onclick="backupData()" style="padding:6px 12px;background:#fff;color:#4A5568;border:1.5px solid #E2E8F0;border-radius:99px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">💾 백업</button>
+        <button onclick="document.getElementById('restore-file').click()" style="padding:6px 12px;background:#fff;color:#4A5568;border:1.5px solid #E2E8F0;border-radius:99px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">📥 복원</button>
+        <input type="file" id="restore-file" accept=".json" onchange="restoreData(this.files[0])" style="display:none">
+        <a href="전체앱-list.html" style="display:inline-flex;align-items:center;gap:6px;padding:8px 16px;background:#4F9CF9;color:#fff;border-radius:99px;font-size:13px;font-weight:700;text-decoration:none;box-shadow:0 2px 8px rgba(79,156,249,0.35);">📱 전체앱 화면 목록</a>
+      </div>
     </div>
     <p>완료 처리된 화면을 검증 · 통과 / 수정 / 추가 항목을 기록</p>
   </div>
@@ -663,6 +668,53 @@ function setMemo(id, memo) {
 
 function saveQA() {
   if (firebaseReady && qaRef) qaRef.set(qa);
+}
+
+// ── 백업/복원 ──
+async function backupData() {
+  if (!firebaseReady || !db) { alert('Firebase 연결이 안 돼서 백업 불가'); return; }
+  try {
+    const [chk, qaSnap] = await Promise.all([
+      db.collection('checkboxes').doc('state').get(),
+      db.collection('qa').doc('state').get()
+    ]);
+    const backup = {
+      version: 1,
+      timestamp: new Date().toISOString(),
+      checkboxes: chk.exists ? chk.data() : {},
+      qa: qaSnap.exists ? qaSnap.data() : {}
+    };
+    const blob = new Blob([JSON.stringify(backup, null, 2)], {type:'application/json'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    const d = new Date();
+    const stamp = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}_${String(d.getHours()).padStart(2,'0')}${String(d.getMinutes()).padStart(2,'0')}`;
+    a.download = `dangol-checklist-backup-${stamp}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  } catch (e) {
+    alert('백업 실패: ' + e.message);
+  }
+}
+
+async function restoreData(file) {
+  if (!file) return;
+  if (!firebaseReady || !db) { alert('Firebase 연결이 안 돼서 복원 불가'); return; }
+  if (!confirm('⚠️ 현재 Firestore 데이터를 백업 파일로 덮어씁니다.\n진행하시겠습니까? (되돌리려면 먼저 현재 상태를 백업해두세요)')) return;
+  try {
+    const text = await file.text();
+    const data = JSON.parse(text);
+    if (!data.checkboxes && !data.qa) { alert('올바른 백업 파일이 아닙니다.'); return; }
+    const tasks = [];
+    if (data.checkboxes) tasks.push(db.collection('checkboxes').doc('state').set(data.checkboxes));
+    if (data.qa)         tasks.push(db.collection('qa').doc('state').set(data.qa));
+    await Promise.all(tasks);
+    alert('✅ 복원 완료! (' + (data.timestamp ? '백업 시점: ' + data.timestamp : '시점 정보 없음') + ')');
+    document.getElementById('restore-file').value = '';
+  } catch (e) {
+    alert('복원 실패: ' + e.message);
+  }
 }
 
 function onGlobalMemoInput(val) {
