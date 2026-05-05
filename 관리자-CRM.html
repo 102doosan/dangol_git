@@ -1926,6 +1926,43 @@ VIP 회원 전용 특별 혜택을 안내드립니다.
   #callSimBtn:hover { transform: scale(1.08); }
 </style>
 
+<!-- 상담 이력 수정 -->
+<div class="modal-back" id="m-edit-consult" onclick="closeModalByBack(event,'m-edit-consult')">
+  <div class="modal" style="max-width:560px">
+    <div class="modal-title">✏️ 상담 이력 수정</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div class="modal-field"><div class="modal-label">상담 일자</div><input class="modal-input" type="date" id="ec-date"></div>
+      <div class="modal-field"><div class="modal-label">상담 시각</div><input class="modal-input" type="time" id="ec-time"></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div class="modal-field"><div class="modal-label">회원명</div><input class="modal-input" id="ec-member"></div>
+      <div class="modal-field"><div class="modal-label">담당자</div><input class="modal-input" id="ec-staff"></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div class="modal-field"><div class="modal-label">제목</div><input class="modal-input" id="ec-subject"></div>
+      <div class="modal-field"><div class="modal-label">상담 결과</div>
+        <select class="modal-input" id="ec-result">
+          <option>예약완료</option><option>재연락</option><option>미예약</option>
+          <option>정보 제공</option><option>검토중</option><option>취소</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-field"><div class="modal-label">📝 상담 내용 / 메모</div>
+      <textarea class="modal-input" id="ec-memo" style="min-height:100px"></textarea>
+    </div>
+    <div class="modal-field"><div class="modal-label">🔁 후속 조치</div>
+      <textarea class="modal-input" id="ec-followup" style="min-height:60px"></textarea>
+    </div>
+    <div class="modal-field"><div class="modal-label">📌 다음 약속</div>
+      <input class="modal-input" type="date" id="ec-nextdate">
+    </div>
+    <div class="modal-btns">
+      <button style="background:#EDF2F7;color:#4A5568" onclick="closeModal('m-edit-consult')">취소</button>
+      <button style="background:#4299E1;color:#fff" onclick="saveEditConsult()">저장하기</button>
+    </div>
+  </div>
+</div>
+
 <!-- 상담 등록 -->
 <div class="modal-back" id="m-add-consult" onclick="closeModalByBack(event,'m-add-consult')">
   <div class="modal">
@@ -6362,7 +6399,7 @@ VIP 회원 전용 특별 혜택을 안내드립니다.
         </div>` : ''}
 
         <div style="display:flex;gap:8px;margin-top:18px;padding-top:14px;border-top:1px solid #EDF2F7">
-          <button class="topbar-btn btn-ghost" style="flex:1" onclick="showToast('상담 수정 화면')">✏️ 수정</button>
+          <button class="topbar-btn btn-ghost" style="flex:1" onclick="openEditConsult('${c.id}')">✏️ 수정</button>
           <button class="topbar-btn btn-ghost" style="flex:1" onclick="showToast('PDF 출력 완료')">📄 PDF 출력</button>
           <button class="topbar-btn btn-ghost" style="flex:1;color:#C53030" onclick="deleteConsult('${c.id}')">🗑 삭제</button>
         </div>
@@ -6396,6 +6433,43 @@ VIP 회원 전용 특별 혜택을 안내드립니다.
     renderConsultList();
     renderConsultDetail();
     showToast('🗑️ 상담 이력이 삭제되었습니다');
+  }
+
+  // 상담 이력 수정
+  let _editingConsultId = null;
+  function openEditConsult(id) {
+    const c = CONSULTS.find(x => x.id === id);
+    if (!c) return;
+    _editingConsultId = id;
+    document.getElementById('ec-date').value     = c.date || '';
+    document.getElementById('ec-time').value     = c.time || '';
+    document.getElementById('ec-member').value   = c.member || '';
+    document.getElementById('ec-staff').value    = c.staff || '';
+    document.getElementById('ec-subject').value  = c.subject || '';
+    document.getElementById('ec-result').value   = c.result || '예약완료';
+    document.getElementById('ec-memo').value     = c.memo || '';
+    document.getElementById('ec-followup').value = c.followup || '';
+    document.getElementById('ec-nextdate').value = c.nextDate || '';
+    openModal('m-edit-consult');
+  }
+
+  function saveEditConsult() {
+    if (!_editingConsultId) return;
+    const c = CONSULTS.find(x => x.id === _editingConsultId);
+    if (!c) { closeModal('m-edit-consult'); return; }
+    c.date     = document.getElementById('ec-date').value || c.date;
+    c.time     = document.getElementById('ec-time').value || c.time;
+    c.member   = document.getElementById('ec-member').value.trim() || c.member;
+    c.staff    = document.getElementById('ec-staff').value.trim() || c.staff;
+    c.subject  = document.getElementById('ec-subject').value.trim() || c.subject;
+    c.result   = document.getElementById('ec-result').value;
+    c.memo     = document.getElementById('ec-memo').value;
+    c.followup = document.getElementById('ec-followup').value;
+    c.nextDate = document.getElementById('ec-nextdate').value || '';
+    renderConsultList();
+    renderConsultDetail();
+    closeModal('m-edit-consult');
+    showToast('✅ 상담 이력이 수정되었습니다');
   }
 
   // ── 채널 설정(설정 화면) ──
