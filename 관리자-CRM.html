@@ -4584,6 +4584,63 @@ VIP 회원 전용 특별 혜택을 안내드립니다.
     lsSave(STORAGE_KEYS.consults, CONSULTS);
   }
 
+  /* ── 상담 → 예약관리 자동 연계 ──
+     - 다음약속(nextDate)이 있으면 RESERVATIONS에 연결된 항목을 생성/갱신
+     - nextDate가 없으면 연결된 예약 제거
+     - 결과가 "예약완료"면 type=검진, 그 외는 type=상담(콜백)
+  */
+  function syncConsultReservation(c) {
+    if (!c || !c.id) return;
+    const idx = RESERVATIONS.findIndex(r => r.consultId === c.id);
+    const hasNext = !!(c.nextDate && c.nextDate.trim());
+
+    if (!hasNext) {
+      if (idx >= 0) RESERVATIONS.splice(idx, 1);
+    } else {
+      const time = (c.nextTime && c.nextTime.trim()) || '10:00';
+      const isBooked = (c.result === '예약완료');
+      const type = isBooked ? '검진' : '상담';
+      if (idx >= 0) {
+        const r = RESERVATIONS[idx];
+        r.date = c.nextDate;
+        r.time = time;
+        r.member = c.member;
+        r.staff = c.staff || r.staff || '김상담';
+        r.type = type;
+        r.consultSubject = c.subject || '';
+      } else {
+        RESERVATIONS.push({
+          id: 'r-c-' + Date.now() + Math.random().toString(36).slice(2,6),
+          date: c.nextDate,
+          time,
+          member: c.member,
+          type,
+          staff: c.staff || '김상담',
+          status: '대기',
+          reminder: '미발송',
+          consultId: c.id,
+          consultSubject: c.subject || ''
+        });
+      }
+    }
+    RESERVATIONS.sort((a,b) => (a.date + a.time).localeCompare(b.date + b.time));
+    persistAll();
+    if (typeof renderReservations === 'function') renderReservations();
+    if (typeof renderHomeCalendar === 'function') renderHomeCalendar();
+    if (typeof renderFullCalendar === 'function') renderFullCalendar();
+    if (typeof renderHomeStatRow === 'function') renderHomeStatRow();
+  }
+  function unlinkConsultReservation(consultId) {
+    const idx = RESERVATIONS.findIndex(r => r.consultId === consultId);
+    if (idx >= 0) {
+      RESERVATIONS.splice(idx, 1);
+      persistAll();
+      if (typeof renderReservations === 'function') renderReservations();
+      if (typeof renderHomeCalendar === 'function') renderHomeCalendar();
+      if (typeof renderFullCalendar === 'function') renderFullCalendar();
+    }
+  }
+
   /* ── 예약 관리 렌더 ── */
   let _resvType = 'all';
   function renderReservationsStatRow() {
@@ -4663,9 +4720,10 @@ VIP 회원 전용 특별 혜택을 안내드립니다.
     body.innerHTML = list.map(r => {
       const m = MEMBERS.find(mm => mm.name === r.member);
       const black = m ? isBlacklistedMember(m.name) : false;
+      const fromConsult = r.consultId ? `<span style="font-size:10px;color:#9B59B6;background:#FAF5FF;border-radius:4px;padding:1px 5px;margin-left:4px;font-weight:700">💬 상담연계</span>` : '';
       return `<tr class="clickable" onclick="${m ? `openDrawer('d-member')` : `showToast('미등록 회원')`}" style="${black?'background:#FFF5F5':''}">
         <td>${r.date.slice(5)} ${r.time}</td>
-        <td>${black?'<span style="color:#E53E3E;margin-right:3px">🚫</span>':''}<strong>${escapeHtml(r.member)}</strong>${m?` <span style="font-size:10px;color:#A0AEC0">${m.phone}</span>`:''}</td>
+        <td>${black?'<span style="color:#E53E3E;margin-right:3px">🚫</span>':''}<strong>${escapeHtml(r.member)}</strong>${m?` <span style="font-size:10px;color:#A0AEC0">${m.phone}</span>`:''}${fromConsult}</td>
         <td><span class="bdg bdg-${typeColor[r.type]||'blue'}">${escapeHtml(r.type)}</span></td>
         <td>${escapeHtml(r.staff)}</td>
         <td><select class="modal-input" style="padding:4px 8px;font-size:11px;width:auto" onclick="event.stopPropagation()" onchange="updateResvStatus('${r.id}', this.value)">
@@ -6150,6 +6208,7 @@ VIP 회원 전용 특별 혜택을 안내드립니다.
     renderConsultList();
     renderConsultDetail();
     try { refreshTodayLists(); } catch(_) {}
+    try { syncConsultReservation(newConsult); } catch(_) {}
 
     // 폼 초기화
     document.getElementById('ac-member').value = '';
@@ -6537,11 +6596,16 @@ VIP 회원 전용 특별 혜택을 안내드립니다.
           <div style="background:#F0FFF4;border-radius:8px;padding:12px 14px;font-size:13px;line-height:1.7;color:#2D3748">${escapeHtml(c.followup)}</div>
         </div>
 
-        ${c.nextDate ? `
-        <div class="modal-field">
-          <div class="modal-label">📌 다음 약속</div>
-          <div style="background:#EBF8FF;border-radius:8px;padding:10px 14px;font-size:13px;font-weight:700;color:#2B6CB0">${c.nextDate}</div>
-        </div>` : ''}
+        ${c.nextDate ? (() => {
+          const linked = RESERVATIONS.find(r => r.consultId === c.id);
+          const reservationInfo = linked
+            ? `<div style="margin-top:6px;font-size:11.5px;color:#276749;font-weight:700">📅 예약관리 등록됨 — ${linked.date} ${linked.time} · ${escapeHtml(linked.type)} · ${escapeHtml(linked.status)}</div>`
+            : '';
+          return `<div class="modal-field">
+            <div class="modal-label">📌 다음 약속</div>
+            <div style="background:#EBF8FF;border-radius:8px;padding:10px 14px;font-size:13px;font-weight:700;color:#2B6CB0">${c.nextDate}${reservationInfo}</div>
+          </div>`;
+        })() : ''}
 
         <div style="display:flex;gap:8px;margin-top:18px;padding-top:14px;border-top:1px solid #EDF2F7">
           <button class="topbar-btn btn-ghost" style="flex:1" onclick="openEditConsult('${c.id}')">✏️ 수정</button>
@@ -6571,9 +6635,11 @@ VIP 회원 전용 특별 혜택을 안내드립니다.
   function deleteConsult(id) {
     const i = CONSULTS.findIndex(c => c.id === id);
     if (i < 0) return;
-    if (!confirm('이 상담 이력을 삭제하시겠습니까?')) return;
+    if (!confirm('이 상담 이력을 삭제하시겠습니까? 연결된 예약(있을 경우)도 함께 제거됩니다.')) return;
     CONSULTS.splice(i, 1);
     _consultSelectedId = null;
+    try { unlinkConsultReservation(id); } catch(_) {}
+    try { refreshTodayLists(); } catch(_) {}
     renderConsultTabs();
     renderConsultList();
     renderConsultDetail();
@@ -6673,8 +6739,9 @@ VIP 회원 전용 특별 혜택을 안내드립니다.
     renderConsultList();
     renderConsultDetail();
     try { refreshTodayLists(); } catch(_) {}
+    try { syncConsultReservation(c); } catch(_) {}
     closeModal('m-edit-consult');
-    const taskNote = (c.followup || c.nextDate) ? ' · 처리할 일 갱신' : '';
+    const taskNote = (c.followup || c.nextDate) ? ' · 처리할 일/예약 갱신' : '';
     showToast('✅ 상담 이력이 수정되었습니다' + taskNote);
   }
 
@@ -7093,7 +7160,8 @@ VIP 회원 전용 특별 혜택을 안내드립니다.
       renderConsultList();
       renderConsultDetail();
       try { refreshTodayLists(); } catch(_) {}
-      const taskNote = (followup || nextDate) ? ' · 처리할 일에 등록됨' : '';
+      try { syncConsultReservation(newConsult); } catch(_) {}
+      const taskNote = (followup || nextDate) ? ' · 처리할 일/예약 등록됨' : '';
       showToast(`✅ ${memberName} 상담 이력이 저장되었습니다 (${dur})${taskNote}`);
     } else {
       showToast('통화가 취소되었습니다');
