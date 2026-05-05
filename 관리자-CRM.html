@@ -2470,7 +2470,7 @@ VIP 회원 전용 특별 혜택을 안내드립니다.
     // 녹취 버튼
     const recWrap = document.getElementById('cd-record-wrap');
     recWrap.innerHTML = d.hasRecord
-      ? '<button class="topbar-btn btn-ghost" style="padding:5px 12px;font-size:12px" onclick="showToast(\'▶ 녹취 파일 재생 중...\')">▶ 녹취 재생</button>'
+      ? `<button class="topbar-btn btn-ghost" style="padding:5px 12px;font-size:12px" onclick="toggleRecPlay('${d.id}')">▶ 녹취 재생</button>`
       : '<span style="font-size:12px;color:#CBD5E0">녹취 없음</span>';
 
     openModal('m-consult-detail');
@@ -6302,7 +6302,7 @@ VIP 회원 전용 특별 혜택을 안내드립니다.
       <div style="background:#FFF5F5;border-left:4px solid #E53E3E;border-radius:8px;padding:12px 14px;margin-bottom:14px">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
           <div style="font-size:12px;font-weight:900;color:#C53030">🎙 통화 녹취 + 자동 텍스트화</div>
-          <button class="topbar-btn btn-ghost" style="font-size:11px;padding:4px 10px" onclick="showToast('녹취 재생')">▶ 재생</button>
+          <button id="recPlayBtn" class="topbar-btn btn-ghost" style="font-size:11px;padding:4px 10px" onclick="toggleRecPlay('${c.id}')">▶ 재생</button>
         </div>
         <div style="background:#fff;border-radius:6px;padding:10px;font-size:12px;line-height:1.7;color:#2D3748;max-height:200px;overflow-y:auto;white-space:pre-wrap">${escapeHtml(c.transcript)}</div>
       </div>` : '';
@@ -6433,6 +6433,65 @@ VIP 회원 전용 특별 혜택을 안내드립니다.
     renderConsultList();
     renderConsultDetail();
     showToast('🗑️ 상담 이력이 삭제되었습니다');
+  }
+
+  // 통화 녹취 재생 (음성합성 — 한국어 TTS)
+  let _recUttering = null;
+  let _recPlayingId = null;
+  function toggleRecPlay(id) {
+    const btn = document.getElementById('recPlayBtn');
+    const synth = window.speechSynthesis;
+    if (!synth) { showToast('⚠️ 이 브라우저는 음성 재생을 지원하지 않습니다'); return; }
+
+    // 이미 재생 중이면 정지
+    if (synth.speaking || synth.pending) {
+      synth.cancel();
+      _recUttering = null;
+      _recPlayingId = null;
+      if (btn) { btn.textContent = '▶ 재생'; btn.style.background = ''; btn.style.color = ''; }
+      return;
+    }
+
+    const c = CONSULTS.find(x => x.id === id);
+    if (!c || !c.transcript) { showToast('재생할 녹취가 없습니다'); return; }
+
+    const u = new SpeechSynthesisUtterance(c.transcript);
+    u.lang = 'ko-KR';
+    u.rate = 1.0;
+    u.pitch = 1.0;
+
+    // 한국어 음성 우선 선택
+    const voices = synth.getVoices();
+    const koVoice = voices.find(v => v.lang && v.lang.toLowerCase().startsWith('ko'));
+    if (koVoice) u.voice = koVoice;
+
+    u.onstart = () => {
+      _recPlayingId = id;
+      const b = document.getElementById('recPlayBtn');
+      if (b) { b.textContent = '⏸ 정지'; b.style.background = '#E53E3E'; b.style.color = '#fff'; }
+      showToast('🎙 녹취 재생 중...');
+    };
+    u.onend = () => {
+      _recUttering = null;
+      _recPlayingId = null;
+      const b = document.getElementById('recPlayBtn');
+      if (b) { b.textContent = '▶ 재생'; b.style.background = ''; b.style.color = ''; }
+    };
+    u.onerror = () => {
+      _recUttering = null;
+      _recPlayingId = null;
+      const b = document.getElementById('recPlayBtn');
+      if (b) { b.textContent = '▶ 재생'; b.style.background = ''; b.style.color = ''; }
+      showToast('⚠️ 음성 재생 오류');
+    };
+
+    _recUttering = u;
+    synth.speak(u);
+  }
+
+  // 음성 목록 비동기 로딩 대비 (Chrome)
+  if (window.speechSynthesis) {
+    window.speechSynthesis.onvoiceschanged = () => {};
   }
 
   // 상담 이력 수정
