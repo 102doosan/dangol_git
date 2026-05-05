@@ -6924,8 +6924,42 @@ VIP 회원 전용 특별 혜택을 안내드립니다.
     if (_call.recognition) { _call.recognition.onend = null; try { _call.recognition.stop(); } catch(_){} _call.recognition = null; }
     closeModal('m-active-call');
     if (save) {
-      const memberName = _call.member ? _call.member.name : '미등록 발신자';
-      const dur = document.getElementById('acTimer').textContent;
+      const m = _call.member;
+      const memberName = m ? m.name : '미등록 발신자';
+      const dur = document.getElementById('acTimer').textContent || '00:00';
+      const transcript = (_call.transcript || '').trim();
+      const memo = (document.getElementById('acQuickMemo').value || '').trim();
+      const result = document.getElementById('acResult').value || (CONSULT_RESULTS[0]?.label || '예약완료');
+      const now = new Date();
+      const dateStr = now.toISOString().slice(0,10);
+      const timeStr = now.toTimeString().slice(0,5);
+      const summary = (memo || transcript || '').split(/\n/)[0].slice(0,60) || '통화 상담';
+
+      const newConsult = {
+        id: 'c-' + Date.now(),
+        channel: 'phone',
+        date: dateStr,
+        time: timeStr,
+        type: '전화 (수신)',
+        member: memberName,
+        phone: _call.phone || (m && m.phone) || '',
+        staff: '김상담',
+        duration: dur,
+        subject: memo ? memo.split(/\n/)[0].slice(0,40) : (transcript ? transcript.slice(0,40) : '전화 상담'),
+        summary,
+        result,
+        nextDate: '',
+        memo: memo || '(메모 없음)',
+        followup: '',
+        hasRecord: !!transcript,
+        transcript: transcript || '(녹취 없음)'
+      };
+      CONSULTS.unshift(newConsult);
+      _consultChannel = 'phone';
+      _consultSelectedId = newConsult.id;
+      renderConsultTabs();
+      renderConsultList();
+      renderConsultDetail();
       showToast(`✅ ${memberName} 상담 이력이 저장되었습니다 (${dur})`);
     } else {
       showToast('통화가 취소되었습니다');
