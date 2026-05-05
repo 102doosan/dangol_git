@@ -1933,11 +1933,15 @@ VIP 회원 전용 특별 혜택을 안내드립니다.
         <textarea class="modal-input" id="acFollowup" style="min-height:50px;resize:vertical" placeholder="예) 오전 10시 슬롯 확인 후 재연락, 결과 안내 문자 발송 등"></textarea>
       </div>
 
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px">
         <!-- 다음 약속 -->
         <div class="modal-field">
-          <div class="modal-label">📌 다음 약속</div>
+          <div class="modal-label">📌 다음 약속 날짜</div>
           <input class="modal-input" id="acNextDate" type="date">
+        </div>
+        <div class="modal-field">
+          <div class="modal-label">⏰ 다음 약속 시간</div>
+          <input class="modal-input" id="acNextTime" type="time">
         </div>
         <!-- 상담 결과 -->
         <div class="modal-field">
@@ -1985,8 +1989,13 @@ VIP 회원 전용 특별 혜택을 안내드립니다.
     <div class="modal-field"><div class="modal-label">🔁 후속 조치</div>
       <textarea class="modal-input" id="ec-followup" style="min-height:60px"></textarea>
     </div>
-    <div class="modal-field"><div class="modal-label">📌 다음 약속</div>
-      <input class="modal-input" type="date" id="ec-nextdate">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div class="modal-field"><div class="modal-label">📌 다음 약속 날짜</div>
+        <input class="modal-input" type="date" id="ec-nextdate">
+      </div>
+      <div class="modal-field"><div class="modal-label">⏰ 다음 약속 시간</div>
+        <input class="modal-input" type="time" id="ec-nexttime">
+      </div>
     </div>
     <div class="modal-btns">
       <button style="background:#EDF2F7;color:#4A5568" onclick="closeModal('m-edit-consult')">취소</button>
@@ -2038,8 +2047,13 @@ VIP 회원 전용 특별 혜택을 안내드립니다.
     <div class="modal-field"><div class="modal-label">🔁 후속 조치 <span style="font-size:11px;color:#A0AEC0">입력하면 "오늘 처리할 일"에 자동 등록</span></div>
       <textarea class="modal-input" id="ac-followup" style="min-height:55px" placeholder="예) 오전 10시 슬롯 확인 후 재연락, 결과 안내 문자 발송 등"></textarea>
     </div>
-    <div class="modal-field"><div class="modal-label">📌 다음 약속</div>
-      <input class="modal-input" type="date" id="ac-nextdate">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div class="modal-field"><div class="modal-label">📌 다음 약속 날짜</div>
+        <input class="modal-input" type="date" id="ac-nextdate">
+      </div>
+      <div class="modal-field"><div class="modal-label">⏰ 다음 약속 시간</div>
+        <input class="modal-input" type="time" id="ac-nexttime">
+      </div>
     </div>
     <div class="modal-btns">
       <button style="background:#EDF2F7;color:#4A5568" onclick="closeModal('m-add-consult')">취소</button>
@@ -3072,8 +3086,9 @@ VIP 회원 전용 특별 혜택을 안내드립니다.
       .sort((a,b) => (a.nextDate || '9999').localeCompare(b.nextDate || '9999'))
       .map(c => {
         const fupText = (c.followup || '').trim();
+        const nextTimePart = c.nextTime ? ` ${c.nextTime}` : '';
         const due = c.nextDate
-          ? `다음 약속 ${c.nextDate}`
+          ? `다음 약속 ${c.nextDate}${nextTimePart}`
           : (fupText ? fupText.split(/\n/)[0].slice(0,30) : '회신 대기');
         return {
           id: c.id,
@@ -6195,6 +6210,7 @@ VIP 회원 전용 특별 혜택을 안내드립니다.
     const memo     = document.getElementById('ac-memo').value.trim();
     const followup = document.getElementById('ac-followup').value.trim();
     const nextDate = document.getElementById('ac-nextdate').value || '';
+    const nextTime = document.getElementById('ac-nexttime').value || '';
 
     if (!member) { showToast('⚠️ 회원명을 입력해주세요'); return; }
     if (!date)   { showToast('⚠️ 상담 일자를 입력해주세요'); return; }
@@ -6216,6 +6232,7 @@ VIP 회원 전용 특별 혜택을 안내드립니다.
       summary,
       result,
       nextDate,
+      nextTime,
       memo: memo || '(메모 없음)',
       followup,
       hasRecord: false,
@@ -6238,6 +6255,7 @@ VIP 회원 전용 특별 혜택을 안내드립니다.
     document.getElementById('ac-memo').value = '';
     document.getElementById('ac-followup').value = '';
     document.getElementById('ac-nextdate').value = '';
+    document.getElementById('ac-nexttime').value = '';
 
     closeModal('m-add-consult');
     const taskNote = (followup || nextDate) ? ' · 처리할 일에 등록됨' : '';
@@ -6618,12 +6636,13 @@ VIP 회원 전용 특별 혜택을 안내드립니다.
 
         ${c.nextDate ? (() => {
           const linked = RESERVATIONS.find(r => r.consultId === c.id);
+          const timePart = c.nextTime ? ` ${c.nextTime}` : '';
           const reservationInfo = linked
             ? `<div style="margin-top:6px;font-size:11.5px;color:#276749;font-weight:700">📅 예약관리 등록됨 — ${linked.date} ${linked.time} · ${escapeHtml(linked.type)} · ${escapeHtml(linked.status)}</div>`
             : '';
           return `<div class="modal-field">
             <div class="modal-label">📌 다음 약속</div>
-            <div style="background:#EBF8FF;border-radius:8px;padding:10px 14px;font-size:13px;font-weight:700;color:#2B6CB0">${c.nextDate}${reservationInfo}</div>
+            <div style="background:#EBF8FF;border-radius:8px;padding:10px 14px;font-size:13px;font-weight:700;color:#2B6CB0">${c.nextDate}${timePart}${reservationInfo}</div>
           </div>`;
         })() : ''}
 
@@ -6740,6 +6759,7 @@ VIP 회원 전용 특별 혜택을 안내드립니다.
     document.getElementById('ec-memo').value     = c.memo || '';
     document.getElementById('ec-followup').value = c.followup || '';
     document.getElementById('ec-nextdate').value = c.nextDate || '';
+    document.getElementById('ec-nexttime').value = c.nextTime || '';
     openModal('m-edit-consult');
   }
 
@@ -6756,6 +6776,7 @@ VIP 회원 전용 특별 혜택을 안내드립니다.
     c.memo     = document.getElementById('ec-memo').value;
     c.followup = document.getElementById('ec-followup').value;
     c.nextDate = document.getElementById('ec-nextdate').value || '';
+    c.nextTime = document.getElementById('ec-nexttime').value || '';
     renderConsultList();
     renderConsultDetail();
     try { refreshTodayLists(); } catch(_) {}
@@ -7018,6 +7039,7 @@ VIP 회원 전용 특별 혜택을 안내드립니다.
     document.getElementById('acQuickMemo').value = '';
     document.getElementById('acFollowup').value = '';
     document.getElementById('acNextDate').value = '';
+    document.getElementById('acNextTime').value = '';
     _call.transcript = '';
     _call.interim = '';
     _call.paused = false;
@@ -7148,6 +7170,7 @@ VIP 회원 전용 특별 혜택을 안내드립니다.
       const memo = (document.getElementById('acQuickMemo').value || '').trim();
       const followup = (document.getElementById('acFollowup').value || '').trim();
       const nextDate = document.getElementById('acNextDate').value || '';
+      const nextTime = document.getElementById('acNextTime').value || '';
       const result = document.getElementById('acResult').value || (CONSULT_RESULTS[0]?.label || '예약완료');
       const now = new Date();
       const dateStr = now.toISOString().slice(0,10);
@@ -7168,6 +7191,7 @@ VIP 회원 전용 특별 혜택을 안내드립니다.
         summary,
         result,
         nextDate,
+        nextTime,
         memo: memo || '(메모 없음)',
         followup,
         hasRecord: !!transcript,
