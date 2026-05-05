@@ -1941,7 +1941,7 @@ VIP 회원 전용 특별 혜택을 안내드립니다.
         </div>
         <div class="modal-field">
           <div class="modal-label">⏰ 다음 약속 시간</div>
-          <input class="modal-input" id="acNextTime" type="time">
+          <input class="modal-input" id="acNextTime" type="time" step="600">
         </div>
         <!-- 상담 결과 -->
         <div class="modal-field">
@@ -1994,7 +1994,7 @@ VIP 회원 전용 특별 혜택을 안내드립니다.
         <input class="modal-input" type="date" id="ec-nextdate">
       </div>
       <div class="modal-field"><div class="modal-label">⏰ 다음 약속 시간</div>
-        <input class="modal-input" type="time" id="ec-nexttime">
+        <input class="modal-input" type="time" id="ec-nexttime" step="600">
       </div>
     </div>
     <div class="modal-btns">
@@ -2052,7 +2052,7 @@ VIP 회원 전용 특별 혜택을 안내드립니다.
         <input class="modal-input" type="date" id="ac-nextdate">
       </div>
       <div class="modal-field"><div class="modal-label">⏰ 다음 약속 시간</div>
-        <input class="modal-input" type="time" id="ac-nexttime">
+        <input class="modal-input" type="time" id="ac-nexttime" step="600">
       </div>
     </div>
     <div class="modal-btns">
@@ -2071,7 +2071,7 @@ VIP 회원 전용 특별 혜택을 안내드립니다.
       <div class="modal-field"><div class="modal-label">예약 종류</div><select class="modal-input" id="newResvType"><option>TPI 검진</option><option>SFMA</option><option>CSMI</option><option>골프검진</option><option>재활치료</option><option>개인레슨</option><option>그룹운동</option><option>외래진료</option></select></div>
       <div class="modal-field"><div class="modal-label">담당자</div><select class="modal-input" id="newResvStaff"><option>이트레이너</option><option>최물리</option><option>김상담</option></select></div>
       <div class="modal-field"><div class="modal-label">예약 날짜</div><input class="modal-input" id="newResvDate" type="date"></div>
-      <div class="modal-field"><div class="modal-label">예약 시간</div><input class="modal-input" id="newResvTime" type="time" value="10:00"></div>
+      <div class="modal-field"><div class="modal-label">예약 시간</div><input class="modal-input" id="newResvTime" type="time" value="10:00" step="600"></div>
     </div>
     <div class="modal-field"><div class="modal-label">리마인더 발송</div><select class="modal-input" id="newResvReminder"><option>D-7 + D-1 자동 발송</option><option>D-1만 발송</option><option>발송 안함</option></select></div>
     <div class="modal-btns">
@@ -7363,6 +7363,21 @@ VIP 회원 전용 특별 혜택을 안내드립니다.
   }
   document.addEventListener('input', e => {
     if (e.target && e.target.id === 'auto-content') updateAutoCharCount();
+  });
+
+  // step="600" 시간 입력 — 입력값을 10분 단위로 강제 스냅
+  document.addEventListener('change', e => {
+    const el = e.target;
+    if (!(el && el.tagName === 'INPUT' && el.type === 'time' && el.step === '600')) return;
+    const v = el.value;
+    if (!v || v.length < 4) return;
+    const [h, m] = v.split(':').map(n => parseInt(n, 10));
+    if (Number.isNaN(h) || Number.isNaN(m)) return;
+    const snapped = Math.round(m / 10) * 10;
+    if (snapped === m) return;
+    const nm = snapped === 60 ? 0 : snapped;
+    const nh = snapped === 60 ? Math.min(h + 1, 23) : h;
+    el.value = String(nh).padStart(2,'0') + ':' + String(nm).padStart(2,'0');
   });
 
   function onAutoImgPick(ev) {
