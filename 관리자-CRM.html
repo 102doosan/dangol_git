@@ -1927,10 +1927,23 @@ VIP 회원 전용 특별 혜택을 안내드립니다.
         <textarea class="modal-input" id="acQuickMemo" style="min-height:70px;resize:vertical" placeholder="상담 결과, 약속 사항 등 메모"></textarea>
       </div>
 
-      <!-- 상담 결과 -->
+      <!-- 후속 조치 -->
       <div class="modal-field">
-        <div class="modal-label">상담 결과</div>
-        <select class="modal-input result-select" id="acResult"></select>
+        <div class="modal-label">🔁 후속 조치 <span style="font-size:11px;color:#A0AEC0">입력하면 "오늘 처리할 일"에 자동 등록</span></div>
+        <textarea class="modal-input" id="acFollowup" style="min-height:50px;resize:vertical" placeholder="예) 오전 10시 슬롯 확인 후 재연락, 결과 안내 문자 발송 등"></textarea>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <!-- 다음 약속 -->
+        <div class="modal-field">
+          <div class="modal-label">📌 다음 약속</div>
+          <input class="modal-input" id="acNextDate" type="date">
+        </div>
+        <!-- 상담 결과 -->
+        <div class="modal-field">
+          <div class="modal-label">상담 결과</div>
+          <select class="modal-input result-select" id="acResult"></select>
+        </div>
       </div>
     </div>
 
@@ -3015,15 +3028,19 @@ VIP 회원 전용 특별 혜택을 안내드립니다.
   }
 
   // 상담 이력 → 후속 처리 task 자동 생성
+  // 결과가 followup이거나, 다음약속/후속조치가 입력된 상담은 모두 task로 등록
   function regenerateConsultTasks() {
     const followupResults = CONSULT_RESULTS.filter(r => r.followup).map(r => r.label);
     const items = CONSULTS
-      .filter(c => followupResults.includes(c.result))
+      .filter(c => followupResults.includes(c.result) || (c.nextDate && c.nextDate.trim()) || (c.followup && c.followup.trim()))
       .sort((a,b) => (a.nextDate || '9999').localeCompare(b.nextDate || '9999'))
       .map(c => {
-        const due = c.nextDate ? `다음 약속 ${c.nextDate}` : '회신 대기';
+        const fupText = (c.followup || '').trim();
+        const due = c.nextDate
+          ? `다음 약속 ${c.nextDate}`
+          : (fupText ? fupText.split(/\n/)[0].slice(0,30) : '회신 대기');
         return {
-          id: c.id,                           // 상담 id를 그대로 task id로 사용 (c001, c002...)
+          id: c.id,
           name: c.member,
           info: `${c.date} ${c.time} · ${c.subject} · ${c.result} · ${due}`,
           consultRef: c
@@ -6546,8 +6563,10 @@ VIP 회원 전용 특별 혜택을 안내드립니다.
     c.nextDate = document.getElementById('ec-nextdate').value || '';
     renderConsultList();
     renderConsultDetail();
+    try { refreshTodayLists(); } catch(_) {}
     closeModal('m-edit-consult');
-    showToast('✅ 상담 이력이 수정되었습니다');
+    const taskNote = (c.followup || c.nextDate) ? ' · 처리할 일 갱신' : '';
+    showToast('✅ 상담 이력이 수정되었습니다' + taskNote);
   }
 
   // ═══ 상담 결과 분류 (설정 가능) ═══
@@ -6801,6 +6820,8 @@ VIP 회원 전용 특별 혜택을 안내드립니다.
 
     document.getElementById('acTranscript').innerHTML = `<div style="color:#A0AEC0;font-size:12px">🎤 마이크 권한을 허용하면 통화 내용이 자동으로 텍스트로 변환됩니다.</div>`;
     document.getElementById('acQuickMemo').value = '';
+    document.getElementById('acFollowup').value = '';
+    document.getElementById('acNextDate').value = '';
     _call.transcript = '';
     _call.interim = '';
     _call.paused = false;
@@ -6929,6 +6950,8 @@ VIP 회원 전용 특별 혜택을 안내드립니다.
       const dur = document.getElementById('acTimer').textContent || '00:00';
       const transcript = (_call.transcript || '').trim();
       const memo = (document.getElementById('acQuickMemo').value || '').trim();
+      const followup = (document.getElementById('acFollowup').value || '').trim();
+      const nextDate = document.getElementById('acNextDate').value || '';
       const result = document.getElementById('acResult').value || (CONSULT_RESULTS[0]?.label || '예약완료');
       const now = new Date();
       const dateStr = now.toISOString().slice(0,10);
@@ -6948,9 +6971,9 @@ VIP 회원 전용 특별 혜택을 안내드립니다.
         subject: memo ? memo.split(/\n/)[0].slice(0,40) : (transcript ? transcript.slice(0,40) : '전화 상담'),
         summary,
         result,
-        nextDate: '',
+        nextDate,
         memo: memo || '(메모 없음)',
-        followup: '',
+        followup,
         hasRecord: !!transcript,
         transcript: transcript || '(녹취 없음)'
       };
@@ -6960,7 +6983,9 @@ VIP 회원 전용 특별 혜택을 안내드립니다.
       renderConsultTabs();
       renderConsultList();
       renderConsultDetail();
-      showToast(`✅ ${memberName} 상담 이력이 저장되었습니다 (${dur})`);
+      try { refreshTodayLists(); } catch(_) {}
+      const taskNote = (followup || nextDate) ? ' · 처리할 일에 등록됨' : '';
+      showToast(`✅ ${memberName} 상담 이력이 저장되었습니다 (${dur})${taskNote}`);
     } else {
       showToast('통화가 취소되었습니다');
     }
