@@ -1231,6 +1231,40 @@ VIP 회원 전용 특별 혜택을 안내드립니다.
         </div>
       </div>
 
+      <!-- 대상 회원 그룹 관리 -->
+      <div class="panel" style="grid-column:1 / -1">
+        <div class="panel-head">
+          <span class="panel-title">🎯 대상 회원 그룹 관리</span>
+          <span style="font-size:11px;color:#A0AEC0;font-weight:600">자동 발송·메시지 발송에서 사용할 회원 그룹을 자유롭게 정의합니다.</span>
+        </div>
+        <div class="panel-body" style="display:flex;flex-direction:column;gap:10px">
+          <div style="display:flex;gap:6px;align-items:flex-end;flex-wrap:wrap">
+            <div style="flex:1 1 180px"><div class="modal-label">그룹명</div><input class="modal-input" id="newTargetLabel" placeholder="예: 가입 3일 이내, 30일 미방문" onkeydown="if(event.key==='Enter'){addTargetGroup();event.preventDefault();}"></div>
+            <div style="flex:0 0 180px"><div class="modal-label">조건</div>
+              <select class="modal-input" id="newTargetType" onchange="onNewTargetTypeChange()">
+                <option value="all">전체 회원</option>
+                <option value="join_within">가입 N일 이내</option>
+                <option value="last_visit_within">최근 N일 이내 방문</option>
+                <option value="last_visit_over">N일 이상 미방문</option>
+                <option value="pass_expire_within">이용권 만료 D-N 이내</option>
+                <option value="birthday_month">이번 달 생일자</option>
+                <option value="category">회원 분류 (VIP/신규 등)</option>
+              </select>
+            </div>
+            <div style="flex:0 0 90px;display:none" id="newTargetDaysWrap">
+              <div class="modal-label">N일</div>
+              <input class="modal-input" id="newTargetDays" type="number" min="1" max="365" value="3">
+            </div>
+            <div style="flex:0 0 140px;display:none" id="newTargetCatWrap">
+              <div class="modal-label">분류</div>
+              <select class="modal-input" id="newTargetCat"></select>
+            </div>
+            <button class="topbar-btn btn-primary" onclick="addTargetGroup()" style="flex:0 0 auto">+ 추가</button>
+          </div>
+          <div id="targetGroupList" style="display:flex;flex-direction:column;gap:6px;padding:6px;background:#F7FAFC;border-radius:10px;max-height:300px;overflow-y:auto"></div>
+        </div>
+      </div>
+
       <!-- 상담 결과 분류 관리 -->
       <div class="panel" style="grid-column:1 / -1">
         <div class="panel-head">
@@ -2470,13 +2504,8 @@ VIP 회원 전용 특별 혜택을 안내드립니다.
     </div>
 
     <div class="modal-field">
-      <div class="modal-label">대상 회원</div>
-      <select class="modal-input" id="auto-target">
-        <option value="all">전체 회원</option>
-        <option value="vip">VIP</option>
-        <option value="new">신규</option>
-        <option value="churn">이탈위험</option>
-      </select>
+      <div class="modal-label">대상 회원 <span style="font-size:11px;color:#A0AEC0">⚙️ 설정 → 🎯 대상 회원 그룹 관리에서 추가/수정</span></div>
+      <select class="modal-input" id="auto-target"></select>
     </div>
 
     <div class="modal-field">
@@ -6915,6 +6944,161 @@ VIP 회원 전용 특별 혜택을 안내드립니다.
     showToast('✅ 상담 이력이 수정되었습니다' + taskNote);
   }
 
+  // ═══ 대상 회원 그룹 (설정 가능) ═══
+  const TARGET_GROUPS_KEY = 'crm_target_groups_v1';
+  let TARGET_GROUPS = [
+    { id:'all',           label:'전체 회원',         type:'all',                removable:false },
+    { id:'cat-vip',       label:'VIP',               type:'category', cat:'vip',  removable:false },
+    { id:'cat-new',       label:'신규',              type:'category', cat:'new',  removable:false },
+    { id:'cat-risk',      label:'이탈위험',          type:'category', cat:'risk', removable:false },
+    { id:'join-3',        label:'가입 3일 이내',     type:'join_within',         days:3,  removable:true },
+    { id:'join-7',        label:'가입 7일 이내',     type:'join_within',         days:7,  removable:true },
+    { id:'visit-30-over', label:'30일 이상 미방문',  type:'last_visit_over',     days:30, removable:true },
+    { id:'pass-7',        label:'이용권 만료 D-7',   type:'pass_expire_within',  days:7,  removable:true },
+    { id:'bday-month',    label:'이번 달 생일자',    type:'birthday_month',      removable:true },
+  ];
+  function loadTargetGroups() {
+    try {
+      const raw = localStorage.getItem(TARGET_GROUPS_KEY);
+      if (raw) TARGET_GROUPS = JSON.parse(raw);
+    } catch(e) {}
+  }
+  function saveTargetGroupsLS() {
+    try { localStorage.setItem(TARGET_GROUPS_KEY, JSON.stringify(TARGET_GROUPS)); } catch(e){}
+  }
+  function getTargetGroup(id) { return TARGET_GROUPS.find(g => g.id === id); }
+
+  // 대상 그룹의 회원 매칭 — MEMBERS 배열에서 조건에 맞는 멤버 반환
+  function matchTargetGroup(group) {
+    if (!group || typeof MEMBERS === 'undefined') return [];
+    const today = new Date(TODAY_DATE);
+    const dayDiff = (dStr) => {
+      if (!dStr) return Infinity;
+      return Math.round((today - new Date(dStr)) / 86400000);
+    };
+    return MEMBERS.filter(m => {
+      switch (group.type) {
+        case 'all': return true;
+        case 'category': return (m.categories || []).includes(group.cat);
+        case 'join_within': {
+          const d = dayDiff(m.registeredAt);
+          return d >= 0 && d <= (group.days || 0);
+        }
+        case 'last_visit_within':
+          return (m.lastVisitDays != null) && m.lastVisitDays <= (group.days || 0);
+        case 'last_visit_over':
+          return (m.lastVisitDays != null) && m.lastVisitDays >= (group.days || 0);
+        case 'pass_expire_within': {
+          if (!m.passExpDate) return false;
+          const d = -dayDiff(m.passExpDate);  // 만료까지 남은 일
+          return d >= 0 && d <= (group.days || 0);
+        }
+        case 'birthday_month': {
+          if (!m.birthday) return false;
+          return (new Date(m.birthday)).getMonth() === today.getMonth();
+        }
+      }
+      return false;
+    });
+  }
+
+  function targetGroupSummary(group) {
+    const cnt = matchTargetGroup(group).length;
+    let cond = '';
+    switch (group.type) {
+      case 'all': cond = '전체'; break;
+      case 'category': {
+        const c = getCategory(group.cat);
+        cond = '분류: ' + (c ? c.label : group.cat);
+        break;
+      }
+      case 'join_within':         cond = `가입 ${group.days}일 이내`; break;
+      case 'last_visit_within':   cond = `최근 ${group.days}일 이내 방문`; break;
+      case 'last_visit_over':     cond = `${group.days}일 이상 미방문`; break;
+      case 'pass_expire_within':  cond = `이용권 만료 D-${group.days} 이내`; break;
+      case 'birthday_month':      cond = '이번 달 생일자'; break;
+    }
+    return `${cond} · 현재 ${cnt}명`;
+  }
+
+  function fillAutoTargetSelect() {
+    const sel = document.getElementById('auto-target');
+    if (!sel) return;
+    const cur = sel.value;
+    sel.innerHTML = TARGET_GROUPS.map(g =>
+      `<option value="${g.id}">${escapeHtml(g.label)}</option>`
+    ).join('');
+    if (cur && TARGET_GROUPS.some(g => g.id === cur)) sel.value = cur;
+  }
+
+  function onNewTargetTypeChange() {
+    const t = document.getElementById('newTargetType').value;
+    const needDays = ['join_within','last_visit_within','last_visit_over','pass_expire_within'].includes(t);
+    const needCat  = (t === 'category');
+    document.getElementById('newTargetDaysWrap').style.display = needDays ? 'block' : 'none';
+    document.getElementById('newTargetCatWrap').style.display  = needCat ? 'block' : 'none';
+    if (needCat) {
+      const sel = document.getElementById('newTargetCat');
+      sel.innerHTML = MEMBER_CATEGORIES.map(c =>
+        `<option value="${c.id}">${escapeHtml(c.label)}</option>`
+      ).join('');
+    }
+  }
+
+  function renderTargetGroupSettings() {
+    const list = document.getElementById('targetGroupList');
+    if (!list) return;
+    list.innerHTML = TARGET_GROUPS.map(g => {
+      const removeBtn = g.removable
+        ? `<button class="topbar-btn btn-ghost" style="padding:5px 12px;font-size:11px;color:#C53030" onclick="removeTargetGroup('${g.id}')">삭제</button>`
+        : `<span style="font-size:11px;color:#A0AEC0;padding:0 8px">기본</span>`;
+      return `<div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:#fff;border-radius:8px;border:1px solid #E2E8F0">
+        <div style="flex:1">
+          <div style="font-size:13px;font-weight:800;color:#1A202C">${escapeHtml(g.label)}</div>
+          <div style="font-size:11px;color:#718096;margin-top:2px">${escapeHtml(targetGroupSummary(g))}</div>
+        </div>
+        ${removeBtn}
+      </div>`;
+    }).join('');
+  }
+
+  function addTargetGroup() {
+    const labelEl = document.getElementById('newTargetLabel');
+    const typeEl  = document.getElementById('newTargetType');
+    const daysEl  = document.getElementById('newTargetDays');
+    const catEl   = document.getElementById('newTargetCat');
+    const label = (labelEl.value || '').trim();
+    const type  = typeEl.value;
+    if (!label) { showToast('그룹명을 입력하세요'); return; }
+    if (TARGET_GROUPS.some(g => g.label === label)) { showToast('이미 존재하는 그룹명입니다'); return; }
+    const g = { id: 'tg-' + Date.now(), label, type, removable: true };
+    if (['join_within','last_visit_within','last_visit_over','pass_expire_within'].includes(type)) {
+      g.days = parseInt(daysEl.value || '0', 10);
+      if (!g.days || g.days < 1) { showToast('일수를 1 이상 입력하세요'); return; }
+    }
+    if (type === 'category') {
+      g.cat = catEl.value;
+      if (!g.cat) { showToast('분류를 선택하세요'); return; }
+    }
+    TARGET_GROUPS.push(g);
+    saveTargetGroupsLS();
+    labelEl.value = '';
+    renderTargetGroupSettings();
+    fillAutoTargetSelect();
+    showToast(`✅ "${label}" 그룹이 추가되었습니다`);
+  }
+
+  function removeTargetGroup(id) {
+    const g = getTargetGroup(id);
+    if (!g || !g.removable) return;
+    if (!confirm(`"${g.label}" 그룹을 삭제하시겠습니까?`)) return;
+    TARGET_GROUPS = TARGET_GROUPS.filter(x => x.id !== id);
+    saveTargetGroupsLS();
+    renderTargetGroupSettings();
+    fillAutoTargetSelect();
+    showToast(`🗑️ "${g.label}" 그룹이 삭제되었습니다`);
+  }
+
   // ═══ 상담 결과 분류 (설정 가능) ═══
   const RESULTS_KEY = 'crm_consult_results_v1';
   let CONSULT_RESULTS = [
@@ -7057,6 +7241,9 @@ VIP 회원 전용 특별 혜택을 안내드립니다.
     loadConsultResults();
     fillResultSelects();
     renderConsultResultSettings();
+    loadTargetGroups();
+    fillAutoTargetSelect();
+    renderTargetGroupSettings();
     renderConsultTabs();
     renderConsultList();
     renderConsultDetail();
@@ -7384,7 +7571,7 @@ VIP 회원 전용 특별 혜택을 안내드립니다.
         id: 'seed-' + Date.now(),
         name: '신규회원 환영 메시지',
         trigger: 'new', days: 0, channel: 'KAKAO',
-        time: '10:00', target: 'new',
+        time: '10:00', target: 'cat-new',
         content: '{이름}님, {병원명}에 가입해주셔서 감사합니다.\n첫 검진 10% 할인 쿠폰을 드립니다. 건강한 일상을 응원합니다 🌿',
         image: null, active: true, createdAt: Date.now()
       });
@@ -7426,7 +7613,7 @@ VIP 회원 전용 특별 혜택을 안내드립니다.
               <span style="font-size:11px;font-weight:600;color:${ch.c};background:${ch.bg};border-radius:99px;padding:2px 8px">${r.channel}</span>
               ${imgBadge}
             </div>
-            <div style="font-size:11.5px;color:#718096;margin-top:3px">${trig}${dInfo} · ${r.time}</div>
+            <div style="font-size:11.5px;color:#718096;margin-top:3px">${trig}${dInfo} · ${r.time} · 🎯 ${escapeHtml((getTargetGroup(r.target)||{label:r.target||'전체'}).label)}</div>
           </div>
           <label style="display:flex;align-items:center;gap:8px;cursor:pointer" onclick="event.stopPropagation()">
             <span style="font-size:11px;color:${onColor};font-weight:700">${r.active?'ON':'OFF'}</span>
@@ -7450,6 +7637,7 @@ VIP 회원 전용 특별 혜택을 안내드립니다.
   }
 
   function openAutoMsgModal(id) {
+    fillAutoTargetSelect();
     _editingAutoId = id || null;
     _autoImgData = null;
     _autoImgType = null;
@@ -7469,7 +7657,8 @@ VIP 회원 전용 특별 혜택을 안내드립니다.
     document.getElementById('auto-d-days').value = r ? r.days : 3;
     document.getElementById('auto-channel').value = r ? r.channel : 'SMS';
     document.getElementById('auto-time').value = r ? r.time : '09:00';
-    document.getElementById('auto-target').value = r ? r.target : 'all';
+    const targetVal = r ? (TARGET_GROUPS.some(g => g.id === r.target) ? r.target : 'all') : 'all';
+    document.getElementById('auto-target').value = targetVal;
     document.getElementById('auto-content').value = r ? r.content : '';
     document.getElementById('auto-active').checked = r ? r.active : true;
 
