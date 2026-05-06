@@ -817,11 +817,31 @@
           <div class="panel-head"><span class="panel-title">발송 채널</span></div>
           <div class="panel-body">
             <div class="channel-btns">
-              <div class="ch-btn on" style="--c:#3182CE;--bg:#EBF8FF" onclick="selectChannel(this)">📱 SMS<div style="font-size:10px;margin-top:3px">90자 이하</div></div>
-              <div class="ch-btn" style="--c:#3182CE;--bg:#EBF8FF" onclick="selectChannel(this)">📄 LMS<div style="font-size:10px;margin-top:3px">2000자</div></div>
-              <div class="ch-btn" style="--c:#F5A623;--bg:#FFFAF0" onclick="selectChannel(this)">💛 카카오<div style="font-size:10px;margin-top:3px">알림톡</div></div>
-              <div class="ch-btn" style="--c:#38A169;--bg:#F0FFF4" onclick="selectChannel(this)">🔔 앱 푸시<div style="font-size:10px;margin-top:3px">FCM</div></div>
+              <div class="ch-btn on" data-ch="SMS" style="--c:#3182CE;--bg:#EBF8FF" onclick="selectChannel(this)">📱 SMS<div style="font-size:10px;margin-top:3px">90자 이하</div></div>
+              <div class="ch-btn" data-ch="LMS" style="--c:#3182CE;--bg:#EBF8FF" onclick="selectChannel(this)">📄 LMS<div style="font-size:10px;margin-top:3px">2000자</div></div>
+              <div class="ch-btn" data-ch="MMS" style="--c:#E67E22;--bg:#FFFAF0" onclick="selectChannel(this)">📷 MMS<div style="font-size:10px;margin-top:3px">이미지/영상</div></div>
+              <div class="ch-btn" data-ch="KAKAO" style="--c:#F5A623;--bg:#FFFAF0" onclick="selectChannel(this)">💛 카카오<div style="font-size:10px;margin-top:3px">알림톡</div></div>
+              <div class="ch-btn" data-ch="PUSH" style="--c:#38A169;--bg:#F0FFF4" onclick="selectChannel(this)">🔔 앱 푸시<div style="font-size:10px;margin-top:3px">FCM</div></div>
             </div>
+          </div>
+        </div>
+
+        <!-- 첨부파일 (이미지/영상) -->
+        <div class="panel">
+          <div class="panel-head">
+            <span class="panel-title">📎 첨부파일</span>
+            <span style="font-size:11px;color:#A0AEC0;font-weight:600">이미지·영상 (MMS/카카오/앱푸시) · 이미지 3MB · 영상 30MB · 최대 5개</span>
+          </div>
+          <div class="panel-body">
+            <div style="display:flex;gap:10px;align-items:center;margin-bottom:10px;flex-wrap:wrap">
+              <label for="msgAttachInput" style="display:inline-flex;align-items:center;gap:6px;padding:8px 14px;background:#EDF2F7;color:#4A5568;border-radius:8px;font-size:12.5px;font-weight:700;cursor:pointer">
+                📎 이미지 / 영상 선택
+              </label>
+              <input id="msgAttachInput" type="file" accept="image/*,video/*" multiple style="display:none" onchange="onMsgAttachPick(event)">
+              <span style="font-size:11.5px;color:#718096" id="msgAttachInfo">선택된 파일 없음</span>
+              <button class="topbar-btn btn-ghost" id="msgAttachClearBtn" style="font-size:11px;padding:5px 12px;display:none;color:#C53030" onclick="clearMsgAttachments()">전체 삭제</button>
+            </div>
+            <div id="msgAttachPreview" style="display:flex;flex-wrap:wrap;gap:8px"></div>
           </div>
         </div>
 
@@ -2795,6 +2815,105 @@ VIP 회원 전용 특별 혜택을 안내드립니다.
   function selectChannel(el) {
     el.closest('.channel-btns').querySelectorAll('.ch-btn').forEach(b => b.classList.remove('on'));
     el.classList.add('on');
+    const ch = el.dataset.ch || '';
+    if (_msgAttachments.length && (ch === 'SMS' || ch === 'LMS')) {
+      showToast('⚠️ ' + ch + '는 첨부파일을 보낼 수 없습니다. MMS/카카오/앱푸시를 선택하세요.');
+    }
+  }
+  function getCurrentChannel() {
+    const on = document.querySelector('.channel-btns .ch-btn.on');
+    return on ? (on.dataset.ch || '') : '';
+  }
+  function setChannel(ch) {
+    const btn = document.querySelector(`.channel-btns .ch-btn[data-ch="${ch}"]`);
+    if (!btn) return;
+    document.querySelectorAll('.channel-btns .ch-btn').forEach(b => b.classList.remove('on'));
+    btn.classList.add('on');
+  }
+
+  /* ── 메시지 첨부 (이미지/영상) ── */
+  let _msgAttachments = []; // [{type:'image'|'video', name, size, dataUrl}]
+  const MSG_IMG_LIMIT = 3 * 1024 * 1024;
+  const MSG_VID_LIMIT = 30 * 1024 * 1024;
+  const MSG_MAX_FILES = 5;
+
+  function onMsgAttachPick(ev) {
+    const files = Array.from(ev.target.files || []);
+    ev.target.value = '';
+    let added = 0, autoSwitched = false;
+    files.forEach(f => {
+      const isImg = f.type.startsWith('image/');
+      const isVid = f.type.startsWith('video/');
+      if (!isImg && !isVid) { showToast(`⚠️ ${f.name} — 이미지/영상만 가능`); return; }
+      const limit = isImg ? MSG_IMG_LIMIT : MSG_VID_LIMIT;
+      if (f.size > limit) {
+        showToast(`⚠️ ${f.name} (${(f.size/1024/1024).toFixed(1)}MB) — ${isImg?'3MB':'30MB'} 초과`);
+        return;
+      }
+      if (_msgAttachments.length >= MSG_MAX_FILES) {
+        showToast(`⚠️ 최대 ${MSG_MAX_FILES}개까지 첨부 가능합니다`);
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = e => {
+        _msgAttachments.push({
+          type: isImg ? 'image' : 'video',
+          name: f.name,
+          size: f.size,
+          dataUrl: e.target.result
+        });
+        added++;
+        renderMsgAttachments();
+      };
+      reader.readAsDataURL(f);
+    });
+    setTimeout(() => {
+      const ch = getCurrentChannel();
+      if (_msgAttachments.length && (ch === 'SMS' || ch === 'LMS')) {
+        setChannel('MMS');
+        showToast('첨부파일이 있어 MMS로 자동 전환되었습니다');
+      }
+    }, 200);
+  }
+
+  function removeMsgAttach(idx) {
+    _msgAttachments.splice(idx, 1);
+    renderMsgAttachments();
+  }
+  function clearMsgAttachments() {
+    _msgAttachments = [];
+    renderMsgAttachments();
+  }
+  function renderMsgAttachments() {
+    const wrap = document.getElementById('msgAttachPreview');
+    const info = document.getElementById('msgAttachInfo');
+    const clearBtn = document.getElementById('msgAttachClearBtn');
+    if (!wrap) return;
+    if (!_msgAttachments.length) {
+      wrap.innerHTML = '';
+      info.textContent = '선택된 파일 없음';
+      if (clearBtn) clearBtn.style.display = 'none';
+      return;
+    }
+    const totalMB = (_msgAttachments.reduce((s,a)=>s+a.size,0) / 1024 / 1024).toFixed(1);
+    const imgCnt = _msgAttachments.filter(a => a.type === 'image').length;
+    const vidCnt = _msgAttachments.filter(a => a.type === 'video').length;
+    info.textContent = `이미지 ${imgCnt} · 영상 ${vidCnt} · 총 ${totalMB}MB`;
+    if (clearBtn) clearBtn.style.display = 'inline-block';
+    wrap.innerHTML = _msgAttachments.map((a, i) => {
+      const media = a.type === 'image'
+        ? `<img src="${a.dataUrl}" style="width:100%;height:100%;object-fit:cover;display:block">`
+        : `<video src="${a.dataUrl}" style="width:100%;height:100%;object-fit:cover;display:block" muted playsinline></video>`;
+      const badge = a.type === 'video'
+        ? '<div style="position:absolute;bottom:4px;left:4px;background:rgba(0,0,0,0.65);color:#fff;font-size:10px;border-radius:4px;padding:1px 5px;font-weight:700">▶ 영상</div>'
+        : '';
+      const sizeKB = a.size > 1024*1024 ? (a.size/1024/1024).toFixed(1)+'MB' : Math.round(a.size/1024)+'KB';
+      return `<div style="position:relative;width:104px;height:104px;border-radius:8px;overflow:hidden;border:1.5px solid #E2E8F0;background:#F7FAFC" title="${escapeHtml(a.name)} · ${sizeKB}">
+        ${media}
+        ${badge}
+        <button onclick="removeMsgAttach(${i})" title="삭제" style="position:absolute;top:3px;right:3px;width:22px;height:22px;border-radius:50%;background:rgba(229,62,62,0.95);color:#fff;border:none;cursor:pointer;font-weight:700;font-size:12px;line-height:1">×</button>
+      </div>`;
+    }).join('');
   }
 
   /* ── 글자 수 카운팅 ── */
@@ -5292,9 +5411,18 @@ VIP 회원 전용 특별 혜택을 안내드립니다.
     if (!recipients.length) { showToast('발송 대상이 없습니다'); return; }
     const blackForced = recipients.filter(m => getMsgLevel(m) === 'black').length;
     const txt = document.getElementById('msgBox').value.trim();
-    if (!txt) { showToast('메시지 내용을 입력하세요'); return; }
+    const ch = getCurrentChannel();
+    const hasAttach = _msgAttachments.length > 0;
+    if (!txt && !hasAttach) { showToast('메시지 내용 또는 첨부파일을 입력하세요'); return; }
+    if (hasAttach && (ch === 'SMS' || ch === 'LMS')) {
+      showToast('⚠️ ' + ch + '는 첨부파일을 보낼 수 없습니다. MMS/카카오/앱푸시로 변경하세요.');
+      return;
+    }
     if (blackForced > 0 && !confirm(`⚠️ 블랙 등급 회원 ${blackForced}명이 강제 포함되었습니다. 그래도 발송하시겠습니까?`)) return;
-    showToast(`📤 ${recipients.length}명에게 발송 완료${blackForced ? ` (블랙 ${blackForced}명 강제 포함)` : ''}`);
+    const imgCnt = _msgAttachments.filter(a => a.type === 'image').length;
+    const vidCnt = _msgAttachments.filter(a => a.type === 'video').length;
+    const attachNote = hasAttach ? ` · 첨부 ${imgCnt?`이미지${imgCnt}`:''}${imgCnt&&vidCnt?'/':''}${vidCnt?`영상${vidCnt}`:''}` : '';
+    showToast(`📤 ${recipients.length}명에게 ${ch||''} 발송 완료${attachNote}${blackForced ? ` (블랙 ${blackForced}명 강제 포함)` : ''}`);
   }
 
   /* ═══════════════════════════════════════════════
