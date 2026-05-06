@@ -2485,17 +2485,18 @@ VIP 회원 전용 특별 혜택을 안내드립니다.
       <div style="margin-top:6px;font-size:11px;color:#718096">글자수 <span id="auto-char-count">0</span>자</div>
     </div>
 
-    <!-- 이미지 첨부 -->
+    <!-- 이미지/영상 첨부 -->
     <div class="modal-field" id="auto-img-field">
-      <div class="modal-label">이미지 첨부 <span style="font-size:11px;color:#A0AEC0">MMS·카카오 가능 · 최대 3MB</span></div>
-      <div style="display:flex;gap:10px;align-items:center">
-        <label for="auto-img-file" style="display:inline-block;padding:8px 14px;background:#EDF2F7;color:#4A5568;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer">📎 이미지 선택</label>
-        <input id="auto-img-file" type="file" accept="image/*" style="display:none" onchange="onAutoImgPick(event)">
+      <div class="modal-label">미디어 첨부 <span style="font-size:11px;color:#A0AEC0">MMS·카카오·앱푸시 가능 · 이미지 3MB / 영상 30MB</span></div>
+      <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+        <label for="auto-img-file" style="display:inline-block;padding:8px 14px;background:#EDF2F7;color:#4A5568;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer">📎 이미지 / 영상 선택</label>
+        <input id="auto-img-file" type="file" accept="image/*,video/*" style="display:none" onchange="onAutoImgPick(event)">
         <span id="auto-img-name" style="font-size:11.5px;color:#A0AEC0">선택된 파일 없음</span>
       </div>
       <div id="auto-img-preview-wrap" style="display:none;margin-top:10px;position:relative;width:fit-content">
-        <img id="auto-img-preview" style="max-width:200px;max-height:160px;border-radius:8px;border:1px solid #E2E8F0">
-        <button onclick="removeAutoImg()" style="position:absolute;top:-8px;right:-8px;width:24px;height:24px;border-radius:50%;background:#E53E3E;color:#fff;border:none;cursor:pointer;font-weight:700;font-size:12px">×</button>
+        <img id="auto-img-preview" style="max-width:220px;max-height:160px;border-radius:8px;border:1px solid #E2E8F0;display:none">
+        <video id="auto-vid-preview" style="max-width:220px;max-height:160px;border-radius:8px;border:1px solid #E2E8F0;display:none;background:#000" controls muted playsinline></video>
+        <button onclick="removeAutoImg()" style="position:absolute;top:-8px;right:-8px;width:24px;height:24px;border-radius:50%;background:#E53E3E;color:#fff;border:none;cursor:pointer;font-weight:700;font-size:12px;z-index:2">×</button>
       </div>
     </div>
 
@@ -7360,6 +7361,7 @@ VIP 회원 전용 특별 혜택을 안내드립니다.
   let _autoRules = [];
   let _editingAutoId = null;
   let _autoImgData = null;
+  let _autoImgType = null; // 'image' | 'video' | null
 
   const TRIG_LABEL = {
     new:'🆕 신규 가입', reserve_d:'📅 예약 D-N', birthday:'🎂 생일',
@@ -7392,7 +7394,8 @@ VIP 회원 전용 특별 혜택을 안내드립니다.
     renderAutoRules();
   }
   function saveAutoRules() {
-    try { localStorage.setItem(AUTO_RULES_KEY, JSON.stringify(_autoRules)); } catch(e){}
+    try { localStorage.setItem(AUTO_RULES_KEY, JSON.stringify(_autoRules)); return true; }
+    catch(e) { return false; }
   }
   function renderAutoRules() {
     const list = document.getElementById('auto-custom-list');
@@ -7410,7 +7413,11 @@ VIP 회원 전용 특별 혜택을 안내드립니다.
       const onColor = r.active ? '#38A169' : '#A0AEC0';
       const trackBg = r.active ? '#38A169' : '#CBD5E0';
       const thumbL = r.active ? '21px' : '3px';
-      const imgBadge = r.image ? `<span style="font-size:10px;color:#E67E22;background:#FFFAF0;border-radius:99px;padding:2px 6px;margin-left:4px">📎 이미지</span>` : '';
+      const imgBadge = r.image
+        ? (r.imageType === 'video'
+            ? `<span style="font-size:10px;color:#9B59B6;background:#FAF5FF;border-radius:99px;padding:2px 6px;margin-left:4px">🎬 영상</span>`
+            : `<span style="font-size:10px;color:#E67E22;background:#FFFAF0;border-radius:99px;padding:2px 6px;margin-left:4px">📎 이미지</span>`)
+        : '';
       return `
         <div style="display:flex;align-items:center;justify-content:space-between;background:#F7FAFC;border-radius:10px;padding:12px 14px;cursor:pointer" onclick="openAutoMsgModal('${r.id}')">
           <div style="flex:1;min-width:0">
@@ -7445,8 +7452,12 @@ VIP 회원 전용 특별 혜택을 안내드립니다.
   function openAutoMsgModal(id) {
     _editingAutoId = id || null;
     _autoImgData = null;
+    _autoImgType = null;
     document.getElementById('auto-img-name').textContent = '선택된 파일 없음';
     document.getElementById('auto-img-preview-wrap').style.display = 'none';
+    document.getElementById('auto-img-preview').style.display = 'none';
+    document.getElementById('auto-vid-preview').style.display = 'none';
+    document.getElementById('auto-vid-preview').src = '';
     document.getElementById('auto-img-file').value = '';
 
     const r = id ? _autoRules.find(x => x.id === id) : null;
@@ -7464,14 +7475,32 @@ VIP 회원 전용 특별 혜택을 안내드립니다.
 
     if (r && r.image) {
       _autoImgData = r.image;
-      document.getElementById('auto-img-name').textContent = '저장된 이미지';
-      document.getElementById('auto-img-preview').src = r.image;
-      document.getElementById('auto-img-preview-wrap').style.display = 'block';
+      _autoImgType = r.imageType || 'image';
+      showAutoMediaPreview(_autoImgType, _autoImgData, _autoImgType === 'video' ? '저장된 영상' : '저장된 이미지');
     }
     onAutoTriggerChange();
     onAutoChannelChange();
     updateAutoCharCount();
     openModal('m-auto-msg');
+  }
+
+  function showAutoMediaPreview(type, dataUrl, label) {
+    const img = document.getElementById('auto-img-preview');
+    const vid = document.getElementById('auto-vid-preview');
+    const wrap = document.getElementById('auto-img-preview-wrap');
+    document.getElementById('auto-img-name').textContent = label;
+    if (type === 'video') {
+      img.style.display = 'none';
+      img.src = '';
+      vid.src = dataUrl;
+      vid.style.display = 'block';
+    } else {
+      vid.style.display = 'none';
+      vid.src = '';
+      img.src = dataUrl;
+      img.style.display = 'block';
+    }
+    wrap.style.display = 'block';
   }
 
   function onAutoTriggerChange() {
@@ -7481,7 +7510,7 @@ VIP 회원 전용 특별 혜택을 안내드립니다.
   }
   function onAutoChannelChange() {
     const ch = document.getElementById('auto-channel').value;
-    const allowImg = (ch==='MMS' || ch==='KAKAO');
+    const allowImg = (ch==='MMS' || ch==='KAKAO' || ch==='PUSH');
     document.getElementById('auto-img-field').style.opacity = allowImg ? '1' : '0.45';
     document.getElementById('auto-img-field').style.pointerEvents = allowImg ? 'auto' : 'none';
   }
@@ -7511,21 +7540,32 @@ VIP 회원 전용 특별 혜택을 안내드립니다.
   function onAutoImgPick(ev) {
     const f = ev.target.files && ev.target.files[0];
     if (!f) return;
-    if (f.size > 3 * 1024 * 1024) { showToast('⚠️ 이미지가 3MB를 초과합니다'); ev.target.value=''; return; }
+    const isImg = f.type.startsWith('image/');
+    const isVid = f.type.startsWith('video/');
+    if (!isImg && !isVid) { showToast('⚠️ 이미지 또는 영상 파일만 첨부 가능합니다'); ev.target.value=''; return; }
+    const limit = isImg ? 3 * 1024 * 1024 : 30 * 1024 * 1024;
+    if (f.size > limit) {
+      showToast(`⚠️ ${isImg?'이미지':'영상'}이 ${isImg?'3MB':'30MB'}를 초과합니다 (${(f.size/1024/1024).toFixed(1)}MB)`);
+      ev.target.value = ''; return;
+    }
     const reader = new FileReader();
     reader.onload = e => {
       _autoImgData = e.target.result;
-      document.getElementById('auto-img-name').textContent = f.name;
-      document.getElementById('auto-img-preview').src = _autoImgData;
-      document.getElementById('auto-img-preview-wrap').style.display = 'block';
+      _autoImgType = isVid ? 'video' : 'image';
+      showAutoMediaPreview(_autoImgType, _autoImgData, f.name);
     };
     reader.readAsDataURL(f);
   }
   function removeAutoImg() {
     _autoImgData = null;
+    _autoImgType = null;
     document.getElementById('auto-img-file').value = '';
     document.getElementById('auto-img-name').textContent = '선택된 파일 없음';
     document.getElementById('auto-img-preview-wrap').style.display = 'none';
+    const img = document.getElementById('auto-img-preview');
+    const vid = document.getElementById('auto-vid-preview');
+    img.src = ''; img.style.display = 'none';
+    vid.src = ''; vid.style.display = 'none';
   }
 
   function saveAutoRule() {
@@ -7535,7 +7575,7 @@ VIP 회원 전용 특별 혜택을 안내드립니다.
     if (!content) { showToast('⚠️ 메시지 내용을 입력해주세요'); return; }
 
     const channel = document.getElementById('auto-channel').value;
-    const allowImg = (channel === 'MMS' || channel === 'KAKAO');
+    const allowImg = (channel === 'MMS' || channel === 'KAKAO' || channel === 'PUSH');
     const data = {
       id: _editingAutoId || ('rule-' + Date.now()),
       name,
@@ -7546,6 +7586,7 @@ VIP 회원 전용 특별 혜택을 안내드립니다.
       target: document.getElementById('auto-target').value,
       content,
       image: allowImg ? _autoImgData : null,
+      imageType: allowImg ? (_autoImgType || (_autoImgData ? 'image' : null)) : null,
       active: document.getElementById('auto-active').checked,
       createdAt: _editingAutoId ? (_autoRules.find(x=>x.id===_editingAutoId)?.createdAt || Date.now()) : Date.now()
     };
@@ -7556,9 +7597,13 @@ VIP 회원 전용 특별 혜택을 안내드립니다.
     } else {
       _autoRules.push(data);
     }
-    saveAutoRules(); renderAutoRules();
+    const persisted = saveAutoRules();
+    renderAutoRules();
     closeModal('m-auto-msg');
     showToast(_editingAutoId ? '✅ 규칙이 수정되었습니다' : '✅ 규칙이 등록되었습니다');
+    if (!persisted && data.imageType === 'video') {
+      setTimeout(() => showToast('⚠️ 영상 용량이 커서 새로고침 후 사라질 수 있습니다 (브라우저 저장 한도 초과)'), 1500);
+    }
   }
 
   function deleteAutoRule() {
