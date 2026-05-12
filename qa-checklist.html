@@ -46,6 +46,8 @@
     .empty-state p { font-size: 14px; }
 
     .category { background: #fff; border-radius: 16px; box-shadow: 0 1px 6px rgba(0,0,0,0.07); margin-bottom: 12px; overflow: hidden; }
+    .category.all-done { box-shadow: 0 0 0 2px #48BB78, 0 1px 6px rgba(0,0,0,0.07); background: #F0FFF4; }
+    .category.all-done .cat-header { background: #F0FFF4; }
     .cat-header {
       display: flex; align-items: center; padding: 12px 20px;
       cursor: pointer; user-select: none; border-left: 4px solid;
@@ -127,6 +129,8 @@
       box-shadow: 0 1px 3px rgba(0,0,0,0.08); white-space: nowrap;
     }
     .subtab-btn.active { background: #4F9CF9; color: #fff; }
+    .subtab-btn.all-done { border: 2px solid #48BB78; color: #38A169; background: #F0FFF4; }
+    .subtab-btn.all-done.active { background: #4F9CF9; color: #fff; border-color: #4F9CF9; }
 
     .progress-wrap { background: #fff; border-radius: 14px; padding: 14px 18px; box-shadow: 0 1px 6px rgba(0,0,0,0.07); margin-bottom: 16px; }
     .progress-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
@@ -926,8 +930,11 @@ function renderCats(cats) {
     const passC = cat.doneScreens.filter(s => getQA(s.id).status === 'pass').length;
     const fixC  = cat.doneScreens.filter(s => getQA(s.id).status === 'fix').length;
     const addC  = cat.doneScreens.filter(s => getQA(s.id).status === 'add').length;
+    const noneC = cat.doneScreens.filter(s => !getQA(s.id).status).length;
     const fixDoneC = cat.doneScreens.filter(s => { const q=getQA(s.id); return q.status==='fix' && q.done; }).length;
     const addDoneC = cat.doneScreens.filter(s => { const q=getQA(s.id); return q.status==='add' && q.done; }).length;
+    // 카테고리 완료 = 미검토 0, 수정/추가가 모두 작업완료
+    const isAllDone = cat.doneScreens.length > 0 && noneC === 0 && fixC === fixDoneC && addC === addDoneC;
 
     const items = isOpen ? cat.doneScreens.map(s => {
       const q = getQA(s.id);
@@ -961,7 +968,7 @@ function renderCats(cats) {
             <label class="done-row" style="display:flex;align-items:center;gap:8px;margin-top:10px;padding:8px 12px;background:${isDone ? '#C6F6D5' : '#F7F9FC'};border-radius:8px;cursor:pointer;transition:background 0.2s;">
               <input type="checkbox" ${isDone ? 'checked' : ''} onchange="toggleDone('${s.id}')" style="width:16px;height:16px;cursor:pointer;accent-color:#48BB78;">
               <span style="font-size:13px;font-weight:700;color:${isDone ? '#22543D' : '#4A5568'};">
-                ${isDone ? `✓ 작업 완료 (${doneAtStr})` : '작업 완료로 표시'}
+                ${isDone ? '✓ 작업 완료' : '작업 완료로 표시'}
               </span>
             </label>
           ` : ''}
@@ -969,14 +976,15 @@ function renderCats(cats) {
     }).join('') : '';
 
     return `
-      <div class="category">
-        <div class="cat-header" style="border-color:${cat.color}" onclick="toggleCat('${cat.id}')">
-          <span class="cat-icon">${cat.icon}</span>
+      <div class="category${isAllDone ? ' all-done' : ''}">
+        <div class="cat-header" style="border-color:${isAllDone ? '#48BB78' : cat.color}" onclick="toggleCat('${cat.id}')">
+          <span class="cat-icon">${isAllDone ? '✅' : cat.icon}</span>
           <span class="cat-title">${cat.title}</span>
-          <span class="cat-count-badge" style="background:${cat.color}18;color:${cat.color}">${cat.doneScreens.length}건</span>
+          <span class="cat-count-badge" style="background:${isAllDone ? '#C6F6D5' : cat.color+'18'};color:${isAllDone ? '#22543D' : cat.color}">${cat.doneScreens.length}건</span>
           ${passC ? `<span class="badge-pass">${passC}통과</span>` : ''}
-          ${fixC  ? `<span class="badge-fix">${fixC}수정${fixDoneC ? `(${fixDoneC}완료)` : ''}</span>` : ''}
-          ${addC  ? `<span class="badge-add">${addC}추가${addDoneC ? `(${addDoneC}완료)` : ''}</span>` : ''}
+          ${fixC  ? `<span class="badge-fix">수정 ${fixDoneC}/${fixC}</span>` : ''}
+          ${addC  ? `<span class="badge-add">추가 ${addDoneC}/${addC}</span>` : ''}
+          ${noneC ? `<span class="badge-none">미검토 ${noneC}</span>` : ''}
           <span class="cat-toggle">${isOpen?'▲':'▼'}</span>
         </div>
         ${items}
@@ -1003,11 +1011,24 @@ function render() {
     </button>`
   ).join('');
 
-  // 서브탭
+  // 서브탭 — 카테고리 별 all-done 여부 계산
+  const isCatAllDone = (catId) => {
+    if (catId === 'all') return false;
+    const cat = curCats.find(c => c.id === catId);
+    if (!cat) return false;
+    const ds = cat.screens.filter(s => isScreenDone(s));
+    if (!ds.length) return false;
+    const hasNone = ds.some(s => !getQA(s.id).status);
+    if (hasNone) return false;
+    const allFixDone = ds.filter(s => getQA(s.id).status==='fix').every(s => getQA(s.id).done);
+    const allAddDone = ds.filter(s => getQA(s.id).status==='add').every(s => getQA(s.id).done);
+    return allFixDone && allAddDone;
+  };
   const subtabAll = {id:"all", icon:"📋", title:"전체"};
   document.getElementById('subtabs').innerHTML = [subtabAll, ...doneCats].map(c => {
-    const cls = ['subtab-btn', activeSubTab === c.id ? 'active' : ''].filter(Boolean).join(' ');
-    return `<button class="${cls}" onclick="setSubTab('${c.id}')">${c.icon||'📋'} ${c.title}</button>`;
+    const allDone = isCatAllDone(c.id);
+    const cls = ['subtab-btn', activeSubTab === c.id ? 'active' : '', allDone ? 'all-done' : ''].filter(Boolean).join(' ');
+    return `<button class="${cls}" onclick="setSubTab('${c.id}')">${allDone && c.id!=='all' ? '✅ ' : (c.icon ? c.icon+' ' : '')}${c.title}</button>`;
   }).join('');
 
   const nonPassHtml = renderNonPassList(curCats);
