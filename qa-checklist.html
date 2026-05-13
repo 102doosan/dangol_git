@@ -163,6 +163,49 @@
     .merged-user-chip.fix  { background: #FFFAF0; border-color: #ED8936; color: #C05621; }
     .merged-user-chip.add  { background: #EBF8FF; border-color: #4299E1; color: #2B6CB0; }
     .merged-memo { font-size: 12px; color: #4A5568; padding: 6px 10px; background: #fff; border-left: 3px solid #CBD5E0; margin-top: 4px; border-radius: 4px; }
+
+    .modal-overlay {
+      position: fixed; inset: 0; background: rgba(26, 32, 44, 0.55);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 1000; padding: 16px; backdrop-filter: blur(2px);
+      animation: fadeIn 0.15s ease-out;
+    }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    .modal-card {
+      background: #fff; border-radius: 16px; padding: 28px 28px 20px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.25); width: 100%; max-width: 380px;
+      animation: slideUp 0.2s ease-out;
+    }
+    @keyframes slideUp { from { transform: translateY(10px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+    .modal-icon { font-size: 36px; text-align: center; margin-bottom: 8px; }
+    .modal-title { font-size: 18px; font-weight: 900; color: #1A202C; text-align: center; margin-bottom: 6px; }
+    .modal-desc { font-size: 13px; color: #718096; text-align: center; margin-bottom: 18px; line-height: 1.5; }
+    .modal-input {
+      width: 100%; padding: 12px 16px; border: 2px solid #E2E8F0;
+      border-radius: 10px; font-size: 15px; font-family: inherit;
+      color: #1A202C; transition: border-color 0.2s;
+    }
+    .modal-input:focus { outline: none; border-color: #4F9CF9; }
+    .modal-input::placeholder { color: #CBD5E0; }
+    .modal-buttons { display: flex; gap: 8px; margin-top: 16px; }
+    .modal-btn {
+      flex: 1; padding: 11px; border: none; border-radius: 10px;
+      font-size: 14px; font-weight: 700; cursor: pointer; font-family: inherit;
+      transition: all 0.15s;
+    }
+    .modal-btn.primary { background: #4F9CF9; color: #fff; box-shadow: 0 2px 8px rgba(79,156,249,0.3); }
+    .modal-btn.primary:hover { background: #3182CE; }
+    .modal-btn.primary:disabled { background: #CBD5E0; cursor: not-allowed; box-shadow: none; }
+    .modal-btn.secondary { background: #EDF2F7; color: #4A5568; }
+    .modal-btn.secondary:hover { background: #E2E8F0; }
+    .modal-recent { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+    .modal-recent-chip {
+      padding: 4px 10px; background: #EBF8FF; color: #2B6CB0;
+      border: none; border-radius: 99px; font-size: 12px; font-weight: 700;
+      cursor: pointer; font-family: inherit;
+    }
+    .modal-recent-chip:hover { background: #BEE3F8; }
+    .modal-recent-label { font-size: 11px; color: #A0AEC0; font-weight: 700; margin-bottom: 4px; display: block; }
   </style>
 </head>
 <body>
@@ -209,6 +252,8 @@
   <div id="content"></div>
 
 </div>
+
+<div id="user-modal" style="display:none"></div>
 
 <script>
 // ── 앱 데이터 (전체앱-list.html 과 동일) ──
@@ -635,20 +680,103 @@ try {
 function sanitizeUser(name) {
   return (name || '').trim().replace(/[\/\.\#\$\[\]]/g, '_');
 }
-let currentUser = sanitizeUser(localStorage.getItem('qa_user') || '');
-if (!currentUser) {
-  let name = '';
-  while (!name) {
-    name = sanitizeUser(prompt('QA 검토자 이름을 입력하세요 (예: 김나현)') || '');
-  }
-  currentUser = name;
-  localStorage.setItem('qa_user', currentUser);
-}
-if (firebaseReady) qaRef = db.collection('qa').doc(currentUser);
 
-function changeUser() {
-  const name = sanitizeUser(prompt('새 검토자 이름을 입력하세요:', currentUser) || '');
+function getRecentUsers() {
+  try { return JSON.parse(localStorage.getItem('qa_recent_users') || '[]'); }
+  catch { return []; }
+}
+function pushRecentUser(name) {
+  let list = getRecentUsers().filter(u => u !== name);
+  list.unshift(name);
+  list = list.slice(0, 5);
+  localStorage.setItem('qa_recent_users', JSON.stringify(list));
+}
+
+function showUserModal({title, desc, current, allowCancel}) {
+  return new Promise(resolve => {
+    const modal = document.getElementById('user-modal');
+    const recent = getRecentUsers().filter(u => u !== current);
+    modal.innerHTML = `
+      <div class="modal-overlay" id="modal-bg">
+        <div class="modal-card" onclick="event.stopPropagation()">
+          <div class="modal-icon">👤</div>
+          <div class="modal-title">${title}</div>
+          <div class="modal-desc">${desc}</div>
+          <input class="modal-input" id="modal-input" type="text" placeholder="예: 김나현" value="${current || ''}" maxlength="20" autocomplete="off">
+          ${recent.length ? `
+            <span class="modal-recent-label">최근 사용자</span>
+            <div class="modal-recent">
+              ${recent.map(u => `<button type="button" class="modal-recent-chip" data-name="${u}">${u}</button>`).join('')}
+            </div>
+          ` : ''}
+          <div class="modal-buttons">
+            ${allowCancel ? '<button type="button" class="modal-btn secondary" id="modal-cancel">취소</button>' : ''}
+            <button type="button" class="modal-btn primary" id="modal-ok">확인</button>
+          </div>
+        </div>
+      </div>
+    `;
+    modal.style.display = 'block';
+    const input = document.getElementById('modal-input');
+    const okBtn = document.getElementById('modal-ok');
+    const cancelBtn = document.getElementById('modal-cancel');
+    const validate = () => { okBtn.disabled = !sanitizeUser(input.value); };
+    validate();
+    input.focus();
+    input.select();
+    input.addEventListener('input', validate);
+    input.addEventListener('keydown', e => {
+      if (e.key === 'Enter' && !okBtn.disabled) okBtn.click();
+      if (e.key === 'Escape' && allowCancel) cancelBtn?.click();
+    });
+    okBtn.addEventListener('click', () => {
+      const name = sanitizeUser(input.value);
+      if (!name) return;
+      modal.style.display = 'none';
+      modal.innerHTML = '';
+      resolve(name);
+    });
+    if (cancelBtn) cancelBtn.addEventListener('click', () => {
+      modal.style.display = 'none';
+      modal.innerHTML = '';
+      resolve(null);
+    });
+    modal.querySelectorAll('.modal-recent-chip').forEach(btn => {
+      btn.addEventListener('click', () => {
+        input.value = btn.dataset.name;
+        validate();
+        input.focus();
+      });
+    });
+  });
+}
+
+let currentUser = sanitizeUser(localStorage.getItem('qa_user') || '');
+
+async function ensureUser() {
+  if (!currentUser) {
+    const name = await showUserModal({
+      title: 'QA 검토자 등록',
+      desc: '이름을 입력하면 본인 데이터가 따로 저장돼요.<br>다른 검토자와 결과는 통합 보기로 비교할 수 있어요.',
+      current: '',
+      allowCancel: false
+    });
+    currentUser = name;
+    localStorage.setItem('qa_user', currentUser);
+  }
+  pushRecentUser(currentUser);
+  if (firebaseReady) qaRef = db.collection('qa').doc(currentUser);
+}
+
+async function changeUser() {
+  const name = await showUserModal({
+    title: '검토자 전환',
+    desc: '다른 검토자로 전환하거나 새 검토자를 추가합니다.',
+    current: currentUser,
+    allowCancel: true
+  });
   if (!name || name === currentUser) return;
+  pushRecentUser(name);
   localStorage.setItem('qa_user', name);
   location.reload();
 }
@@ -680,25 +808,28 @@ let globalMemoTimer = null;
 let showNonPassOnly = false;
 let statFilter = null;
 
-// 실시간 체크/QA 상태 수신 (실패해도 화면은 렌더)
-if (firebaseReady) {
-  checkRef.onSnapshot(
-    doc => { checked = doc.exists ? doc.data() : {}; render(); },
-    err => { console.warn('checkRef 오류:', err); render(); }
-  );
-  qaRef.onSnapshot(
-    doc => {
-      qa = doc.exists ? doc.data() : {};
-      const el = document.getElementById('global-memo');
-      if (el && document.activeElement !== el) el.value = qa.__globalMemo || '';
-      render();
-    },
-    err => { console.warn('qaRef 오류:', err); render(); }
-  );
-  setTimeout(() => { if (!window.__rendered) render(); }, 3000);
-} else {
-  render();
-}
+// 사용자 확정 후 실시간 동기화 시작 (모달 → ensureUser → 구독)
+(async () => {
+  await ensureUser();
+  if (firebaseReady) {
+    checkRef.onSnapshot(
+      doc => { checked = doc.exists ? doc.data() : {}; render(); },
+      err => { console.warn('checkRef 오류:', err); render(); }
+    );
+    qaRef.onSnapshot(
+      doc => {
+        qa = doc.exists ? doc.data() : {};
+        const el = document.getElementById('global-memo');
+        if (el && document.activeElement !== el) el.value = qa.__globalMemo || '';
+        render();
+      },
+      err => { console.warn('qaRef 오류:', err); render(); }
+    );
+    setTimeout(() => { if (!window.__rendered) render(); }, 3000);
+  } else {
+    render();
+  }
+})();
 
 async function toggleMergedView() {
   if (!firebaseReady) { alert('Firebase 연결 안됨'); return; }
