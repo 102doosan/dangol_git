@@ -148,6 +148,21 @@
     .badge-fix  { background: #FFFAF0; color: #C05621; padding: 2px 8px; border-radius: 99px; font-size: 10px; font-weight: 800; }
     .badge-add  { background: #EBF8FF; color: #2B6CB0; padding: 2px 8px; border-radius: 99px; font-size: 10px; font-weight: 800; }
     .badge-none { background: #EDF2F7; color: #718096; padding: 2px 8px; border-radius: 99px; font-size: 10px; font-weight: 800; }
+
+    .user-bar { display: flex; align-items: center; gap: 10px; margin-top: 8px; padding: 8px 14px; background: #F7F9FC; border-radius: 10px; flex-wrap: wrap; }
+    .user-info { font-size: 13px; color: #4A5568; font-weight: 600; }
+    .user-info strong { color: #4F9CF9; font-weight: 800; }
+    .user-btn { padding: 4px 12px; background: #fff; color: #4A5568; border: 1.5px solid #E2E8F0; border-radius: 99px; font-size: 11px; font-weight: 700; cursor: pointer; font-family: inherit; }
+    .user-btn:hover { background: #EDF2F7; }
+    .user-btn.merge-btn.on { background: #FAF5FF; color: #6B46C1; border-color: #B794F4; }
+
+    .merged-row { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; padding: 8px 10px; background: #F7F9FC; border-radius: 8px; }
+    .merged-user-chip { display: inline-flex; align-items: center; gap: 4px; padding: 3px 9px; border-radius: 99px; font-size: 11px; font-weight: 700; background: #fff; border: 1.5px solid #E2E8F0; }
+    .merged-user-chip .un { color: #4A5568; font-weight: 800; }
+    .merged-user-chip.pass { background: #F0FFF4; border-color: #48BB78; color: #38A169; }
+    .merged-user-chip.fix  { background: #FFFAF0; border-color: #ED8936; color: #C05621; }
+    .merged-user-chip.add  { background: #EBF8FF; border-color: #4299E1; color: #2B6CB0; }
+    .merged-memo { font-size: 12px; color: #4A5568; padding: 6px 10px; background: #fff; border-left: 3px solid #CBD5E0; margin-top: 4px; border-radius: 4px; }
   </style>
 </head>
 <body>
@@ -165,6 +180,11 @@
       </div>
     </div>
     <p>완료 처리된 화면을 검증 · 통과 / 수정 / 추가 항목을 기록</p>
+    <div class="user-bar">
+      <span class="user-info">👤 현재 검토자: <strong id="current-user-name"></strong></span>
+      <button class="user-btn" onclick="changeUser()">🔄 사용자 전환</button>
+      <button class="user-btn merge-btn" id="merge-btn" onclick="toggleMergedView()">📊 통합 보기</button>
+    </div>
   </div>
 
   <div class="stats" id="stats"></div>
@@ -173,7 +193,7 @@
 
   <div class="memo-wrap">
     <div class="memo-header">
-      <span class="memo-label">📝 통합 메모</span>
+      <span class="memo-label">📝 내 메모</span>
       <span class="memo-saved" id="global-memo-saved"></span>
     </div>
     <textarea id="global-memo" class="global-memo" placeholder="전체 QA에 관한 메모, 공유 사항, 특이사항 등을 자유롭게 입력하세요..." oninput="onGlobalMemoInput(this.value)"></textarea>
@@ -604,22 +624,45 @@ try {
     firebase.initializeApp(firebaseConfig);
     db = firebase.firestore();
     checkRef = db.collection("checkboxes").doc("state");
-    qaRef    = db.collection("qa").doc("state");
     firebaseReady = true;
   }
 } catch (e) {
   console.warn('Firebase 초기화 실패 — 오프라인 모드:', e);
 }
 
+// ── 사용자 식별 ──
+function sanitizeUser(name) {
+  return (name || '').trim().replace(/[\/\.\#\$\[\]]/g, '_');
+}
+let currentUser = sanitizeUser(localStorage.getItem('qa_user') || '');
+if (!currentUser) {
+  let name = '';
+  while (!name) {
+    name = sanitizeUser(prompt('QA 검토자 이름을 입력하세요 (예: 김나현)') || '');
+  }
+  currentUser = name;
+  localStorage.setItem('qa_user', currentUser);
+}
+if (firebaseReady) qaRef = db.collection('qa').doc(currentUser);
+
+function changeUser() {
+  const name = sanitizeUser(prompt('새 검토자 이름을 입력하세요:', currentUser) || '');
+  if (!name || name === currentUser) return;
+  localStorage.setItem('qa_user', name);
+  location.reload();
+}
+
 let checked = {};  // 완료 체크 상태 (전체앱에서)
-let qa = {};       // QA 상태 {screenId: {status:'pass'|'fix'|'add'|null, memo:''}}
+let qa = {};       // 본인 QA 상태
+let allUsersQA = {}; // 통합 보기용 {userName: data}
+let mergedView = false;
 let activeTab = "user";
 let activeSubTab = "all";
 let openCats = {};
 let saveTimer = null;
 let globalMemoTimer = null;
 let showNonPassOnly = false;
-let statFilter = null; // null|'all'|'pass'|'fix'|'add'|'none'
+let statFilter = null;
 
 // 실시간 체크/QA 상태 수신 (실패해도 화면은 렌더)
 if (firebaseReady) {
@@ -638,6 +681,22 @@ if (firebaseReady) {
   );
   setTimeout(() => { if (!window.__rendered) render(); }, 3000);
 } else {
+  render();
+}
+
+async function toggleMergedView() {
+  if (!firebaseReady) { alert('Firebase 연결 안됨'); return; }
+  mergedView = !mergedView;
+  if (mergedView) {
+    try {
+      const snap = await db.collection('qa').get();
+      allUsersQA = {};
+      snap.forEach(d => { if (d.id !== 'state') allUsersQA[d.id] = d.data(); });
+    } catch (e) {
+      console.warn('통합 데이터 로드 실패', e);
+      mergedView = false;
+    }
+  }
   render();
 }
 
@@ -695,16 +754,24 @@ function saveQA() {
 // ── 백업/복원 ──
 async function backupData() {
   if (!firebaseReady || !db) { alert('Firebase 연결이 안 돼서 백업 불가'); return; }
+  const all = confirm('전체 검토자 데이터를 백업하시겠습니까?\n[확인] 전체 검토자 / [취소] 본인(' + currentUser + ') 데이터만');
   try {
-    const [chk, qaSnap] = await Promise.all([
-      db.collection('checkboxes').doc('state').get(),
-      db.collection('qa').doc('state').get()
-    ]);
+    const chk = await db.collection('checkboxes').doc('state').get();
+    let qaDocs = {};
+    if (all) {
+      const snap = await db.collection('qa').get();
+      snap.forEach(d => { qaDocs[d.id] = d.data(); });
+    } else {
+      const my = await db.collection('qa').doc(currentUser).get();
+      qaDocs[currentUser] = my.exists ? my.data() : {};
+    }
     const backup = {
-      version: 1,
+      version: 2,
       timestamp: new Date().toISOString(),
+      scope: all ? 'all' : 'user',
+      user: all ? null : currentUser,
       checkboxes: chk.exists ? chk.data() : {},
-      qa: qaSnap.exists ? qaSnap.data() : {}
+      qa: qaDocs  // {userName: data}
     };
     const blob = new Blob([JSON.stringify(backup, null, 2)], {type:'application/json'});
     const url = URL.createObjectURL(blob);
@@ -712,7 +779,7 @@ async function backupData() {
     a.href = url;
     const d = new Date();
     const stamp = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}_${String(d.getHours()).padStart(2,'0')}${String(d.getMinutes()).padStart(2,'0')}`;
-    a.download = `dangol-checklist-backup-${stamp}.json`;
+    a.download = `dangol-checklist-backup-${all ? 'all' : currentUser}-${stamp}.json`;
     a.click();
     URL.revokeObjectURL(url);
   } catch (e) {
@@ -727,10 +794,22 @@ async function restoreData(file) {
   try {
     const text = await file.text();
     const data = JSON.parse(text);
-    if (!data.checkboxes && !data.qa) { alert('올바른 백업 파일이 아닙니다.'); return; }
     const tasks = [];
     if (data.checkboxes) tasks.push(db.collection('checkboxes').doc('state').set(data.checkboxes));
-    if (data.qa)         tasks.push(db.collection('qa').doc('state').set(data.qa));
+    if (data.qa) {
+      // v2 format: {userName: {...}}
+      if (typeof data.qa === 'object' && !Array.isArray(data.qa)) {
+        // 사용자별 묶음인지 확인 (값이 객체)
+        const keys = Object.keys(data.qa);
+        const isMultiUser = data.version >= 2 || (keys.length > 0 && typeof data.qa[keys[0]] === 'object' && !data.qa[keys[0]].status);
+        if (isMultiUser) {
+          keys.forEach(u => tasks.push(db.collection('qa').doc(u).set(data.qa[u])));
+        } else {
+          // v1 형식: 단일 사용자 데이터 (어떤 사용자로? → 현재 사용자로)
+          tasks.push(db.collection('qa').doc(currentUser).set(data.qa));
+        }
+      }
+    }
     await Promise.all(tasks);
     alert('✅ 복원 완료! (' + (data.timestamp ? '백업 시점: ' + data.timestamp : '시점 정보 없음') + ')');
     document.getElementById('restore-file').value = '';
@@ -937,6 +1016,42 @@ function renderCats(cats) {
     const isAllDone = cat.doneScreens.length > 0 && noneC === 0 && fixC === fixDoneC && addC === addDoneC;
 
     const items = isOpen ? cat.doneScreens.map(s => {
+      // 통합 보기 모드: 각 사용자별 결과 chip + 메모 나열, 편집 불가
+      if (mergedView) {
+        const users = Object.keys(allUsersQA);
+        if (users.length === 0) {
+          return `<div class="qa-item">
+            <div class="qa-item-header">
+              <span class="qa-screen-name">${s.name}</span>
+            </div>
+            <div style="color:#A0AEC0;font-size:12px;">아직 검토자가 없습니다.</div>
+          </div>`;
+        }
+        const chips = users.map(u => {
+          const uq = (allUsersQA[u] && allUsersQA[u][s.id]) || {};
+          const cls = uq.status === 'pass' ? 'pass' : uq.status === 'fix' ? 'fix' : uq.status === 'add' ? 'add' : '';
+          const label = uq.status === 'pass' ? '✅통과'
+            : uq.status === 'fix' ? (uq.done ? '🔧수정 ✓완료' : '🔧수정')
+            : uq.status === 'add' ? (uq.done ? '➕추가 ✓완료' : '➕추가')
+            : '미검토';
+          return `<span class="merged-user-chip ${cls}"><span class="un">${u}</span>${label}</span>`;
+        }).join('');
+        const memos = users.map(u => {
+          const uq = (allUsersQA[u] && allUsersQA[u][s.id]) || {};
+          if (!uq.memo) return '';
+          return `<div class="merged-memo"><strong style="color:#4F9CF9">[${u}]</strong> ${uq.memo.replace(/</g,'&lt;')}</div>`;
+        }).filter(Boolean).join('');
+        return `
+          <div class="qa-item">
+            <div class="qa-item-header">
+              <span class="qa-screen-name">${s.name}${s.desc ? `<span style="font-weight:400;color:#A0AEC0;font-size:12px;margin-left:6px">(${s.desc})</span>` : ''}</span>
+            </div>
+            ${s.nav ? `<div style="font-size:11px;color:#718096;margin-bottom:8px;padding:4px 8px;background:#F7F9FC;border-radius:6px;border-left:3px solid #CBD5E0;">📍 ${s.nav}</div>` : ''}
+            <div class="merged-row">${chips}</div>
+            ${memos}
+          </div>`;
+      }
+
       const q = getQA(s.id);
       const isFixAdd = q.status === 'fix' || q.status === 'add';
       const isDone = !!q.done;
@@ -944,7 +1059,6 @@ function renderCats(cats) {
         : q.status === 'fix' ? `<span class="badge-fix">🔧 수정${isDone ? ' ✓완료' : ''}</span>`
         : q.status === 'add' ? `<span class="badge-add">➕ 추가${isDone ? ' ✓완료' : ''}</span>`
         : '<span class="badge-none">미검토</span>';
-      const doneAtStr = isDone && q.doneAt ? new Date(q.doneAt).toLocaleString('ko-KR', {month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'}) : '';
 
       return `
         <div class="qa-item" style="${isDone ? 'background:#F0FFF4;' : ''}">
@@ -994,6 +1108,13 @@ function renderCats(cats) {
 
 function render() {
   window.__rendered = true;
+  const userEl = document.getElementById('current-user-name');
+  if (userEl) userEl.textContent = currentUser || '(미설정)';
+  const mergeBtn = document.getElementById('merge-btn');
+  if (mergeBtn) {
+    mergeBtn.className = 'user-btn merge-btn' + (mergedView ? ' on' : '');
+    mergeBtn.textContent = mergedView ? '✓ 통합 보기 ON' : '📊 통합 보기';
+  }
   renderStats();
 
   const curCats = activeTab === "user" ? userData : adminData;
