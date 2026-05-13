@@ -184,6 +184,7 @@
       <span class="user-info">👤 현재 검토자: <strong id="current-user-name"></strong></span>
       <button class="user-btn" onclick="changeUser()">🔄 사용자 전환</button>
       <button class="user-btn merge-btn" id="merge-btn" onclick="toggleMergedView()">📊 통합 보기</button>
+      <button class="user-btn" onclick="importLegacyData()" title="기존 qa/state 데이터를 본인 검토자로 가져옵니다">⤵ 기존 데이터 가져오기</button>
     </div>
   </div>
 
@@ -650,6 +651,21 @@ function changeUser() {
   if (!name || name === currentUser) return;
   localStorage.setItem('qa_user', name);
   location.reload();
+}
+
+async function importLegacyData() {
+  if (!firebaseReady || !db) { alert('Firebase 연결 안됨'); return; }
+  try {
+    const legacy = await db.collection('qa').doc('state').get();
+    if (!legacy.exists) { alert('가져올 기존 데이터(qa/state)가 없습니다.'); return; }
+    const data = legacy.data();
+    const keyCount = Object.keys(data).length;
+    if (!confirm(`기존 qa/state 데이터 (${keyCount}개 항목)를 [${currentUser}] 검토자로 가져옵니다.\n현재 [${currentUser}] 데이터는 덮어쓰여집니다. 진행할까요?`)) return;
+    await db.collection('qa').doc(currentUser).set(data);
+    alert(`✅ 가져오기 완료! ${currentUser} 검토자에 기존 데이터가 적용됐습니다.`);
+  } catch (e) {
+    alert('가져오기 실패: ' + e.message);
+  }
 }
 
 let checked = {};  // 완료 체크 상태 (전체앱에서)
