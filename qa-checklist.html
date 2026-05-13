@@ -206,6 +206,35 @@
     }
     .modal-recent-chip:hover { background: #BEE3F8; }
     .modal-recent-label { font-size: 11px; color: #A0AEC0; font-weight: 700; margin-bottom: 4px; display: block; }
+
+    .modal-section-label { font-size: 11px; color: #A0AEC0; font-weight: 800; letter-spacing: 0.5px; margin-bottom: 8px; }
+    .modal-user-list {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+      gap: 6px; max-height: 200px; overflow-y: auto; padding: 2px;
+    }
+    .modal-user-item {
+      display: flex; align-items: center; gap: 8px; padding: 8px 10px;
+      background: #F7F9FC; border: 1.5px solid transparent; border-radius: 10px;
+      cursor: pointer; font-family: inherit; transition: all 0.15s; text-align: left;
+    }
+    .modal-user-item:hover { background: #EBF8FF; border-color: #4F9CF9; }
+    .modal-user-avatar {
+      width: 28px; height: 28px; flex: 0 0 auto; border-radius: 50%;
+      background: linear-gradient(135deg, #4F9CF9, #9B6DFF); color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 800; font-size: 13px;
+    }
+    .modal-user-name { font-size: 13px; font-weight: 700; color: #2D3748; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+    .modal-divider {
+      display: flex; align-items: center; gap: 10px;
+      margin: 16px 0; color: #CBD5E0; font-size: 11px; font-weight: 700;
+    }
+    .modal-divider::before, .modal-divider::after {
+      content: ''; flex: 1; height: 1px; background: #E2E8F0;
+    }
+    .modal-new-row { display: flex; gap: 8px; align-items: stretch; }
+    .modal-new-row .modal-input { flex: 1; }
   </style>
 </head>
 <body>
@@ -692,38 +721,62 @@ function pushRecentUser(name) {
   localStorage.setItem('qa_recent_users', JSON.stringify(list));
 }
 
-function showUserModal({title, desc, current, allowCancel}) {
-  return new Promise(resolve => {
-    const modal = document.getElementById('user-modal');
-    const recent = getRecentUsers().filter(u => u !== current);
-    modal.innerHTML = `
-      <div class="modal-overlay" id="modal-bg">
-        <div class="modal-card" onclick="event.stopPropagation()">
-          <div class="modal-icon">👤</div>
-          <div class="modal-title">${title}</div>
-          <div class="modal-desc">${desc}</div>
-          <input class="modal-input" id="modal-input" type="text" placeholder="예: 김나현" value="${current || ''}" maxlength="20" autocomplete="off">
-          ${recent.length ? `
-            <span class="modal-recent-label">최근 사용자</span>
-            <div class="modal-recent">
-              ${recent.map(u => `<button type="button" class="modal-recent-chip" data-name="${u}">${u}</button>`).join('')}
-            </div>
-          ` : ''}
-          <div class="modal-buttons">
-            ${allowCancel ? '<button type="button" class="modal-btn secondary" id="modal-cancel">취소</button>' : ''}
-            <button type="button" class="modal-btn primary" id="modal-ok">확인</button>
-          </div>
-        </div>
+async function fetchRemoteUsers() {
+  if (!firebaseReady || !db) return [];
+  try {
+    const snap = await db.collection('qa').get();
+    return snap.docs.map(d => d.id).filter(id => id !== 'state').sort();
+  } catch (e) {
+    console.warn('검토자 목록 조회 실패', e);
+    return [];
+  }
+}
+
+async function showUserModal({title, desc, current, allowCancel}) {
+  const modal = document.getElementById('user-modal');
+  modal.innerHTML = `
+    <div class="modal-overlay">
+      <div class="modal-card" onclick="event.stopPropagation()">
+        <div class="modal-icon">👤</div>
+        <div class="modal-title">${title}</div>
+        <div class="modal-desc">${desc}</div>
+        <div id="modal-body"><div style="text-align:center;color:#A0AEC0;padding:30px 0;font-size:13px;">검토자 목록 불러오는 중...</div></div>
       </div>
+    </div>
+  `;
+  modal.style.display = 'block';
+
+  const remote = await fetchRemoteUsers();
+  const recent = getRecentUsers();
+  const all = Array.from(new Set([...remote, ...recent])).filter(u => u !== current);
+
+  return new Promise(resolve => {
+    document.getElementById('modal-body').innerHTML = `
+      ${all.length ? `
+        <div class="modal-section-label">기존 검토자 선택</div>
+        <div class="modal-user-list">
+          ${all.map(u => `<button type="button" class="modal-user-item" data-name="${u}">
+            <span class="modal-user-avatar">${u.charAt(0)}</span>
+            <span class="modal-user-name">${u}</span>
+          </button>`).join('')}
+        </div>
+        <div class="modal-divider"><span>또는</span></div>
+      ` : ''}
+      <div class="modal-section-label">신규 검토자 등록</div>
+      <div class="modal-new-row">
+        <input class="modal-input" id="modal-input" type="text" placeholder="이름 입력 (예: 김나현)" value="${current || ''}" maxlength="20" autocomplete="off">
+        <button type="button" class="modal-btn primary" id="modal-ok" style="flex:0 0 auto;padding:11px 18px;">등록</button>
+      </div>
+      ${allowCancel ? '<div class="modal-buttons"><button type="button" class="modal-btn secondary" id="modal-cancel" style="flex:1;">취소</button></div>' : ''}
     `;
-    modal.style.display = 'block';
+
     const input = document.getElementById('modal-input');
     const okBtn = document.getElementById('modal-ok');
     const cancelBtn = document.getElementById('modal-cancel');
     const validate = () => { okBtn.disabled = !sanitizeUser(input.value); };
     validate();
     input.focus();
-    input.select();
+    if (current) input.select();
     input.addEventListener('input', validate);
     input.addEventListener('keydown', e => {
       if (e.key === 'Enter' && !okBtn.disabled) okBtn.click();
@@ -741,11 +794,13 @@ function showUserModal({title, desc, current, allowCancel}) {
       modal.innerHTML = '';
       resolve(null);
     });
-    modal.querySelectorAll('.modal-recent-chip').forEach(btn => {
+    modal.querySelectorAll('.modal-user-item').forEach(btn => {
       btn.addEventListener('click', () => {
-        input.value = btn.dataset.name;
-        validate();
-        input.focus();
+        const name = sanitizeUser(btn.dataset.name);
+        if (!name) return;
+        modal.style.display = 'none';
+        modal.innerHTML = '';
+        resolve(name);
       });
     });
   });
