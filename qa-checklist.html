@@ -873,7 +873,17 @@ let statFilter = null;
     );
     qaRef.onSnapshot(
       doc => {
-        qa = doc.exists ? doc.data() : {};
+        const remote = doc.exists ? doc.data() : {};
+        // 입력 중인 textarea의 로컬 값은 보존 — 원격 데이터가 자기 자신의 디바운스 저장으로 인한 echo일 때 입력 중인 메모를 덮어쓰지 않게
+        const active = document.activeElement;
+        if (active && active.tagName === 'TEXTAREA' && active.id && active.id.startsWith('memo-')) {
+          const sid = active.id.slice(5);
+          if (qa[sid] && qa[sid].memo !== undefined) {
+            remote[sid] = remote[sid] || {};
+            remote[sid].memo = qa[sid].memo;
+          }
+        }
+        qa = remote;
         const el = document.getElementById('global-memo');
         if (el && document.activeElement !== el) el.value = qa.__globalMemo || '';
         render();
@@ -1276,6 +1286,7 @@ function renderCats(cats) {
           </div>
           <textarea
             class="qa-memo"
+            id="memo-${s.id}"
             placeholder="메모 입력 (수정/추가 사항, 특이사항 등)"
             oninput="setMemo('${s.id}', this.value)"
             style="${isDone ? 'background:#fff;' : ''}"
@@ -1309,6 +1320,18 @@ function renderCats(cats) {
 }
 
 function render() {
+  // 포커스/선택 상태 보존 — DOM 재생성으로 포커스가 날아가는 것 방지
+  const active = document.activeElement;
+  let focusInfo = null;
+  if (active && (active.tagName === 'TEXTAREA' || active.tagName === 'INPUT') && active.id) {
+    focusInfo = {
+      id: active.id,
+      start: active.selectionStart,
+      end: active.selectionEnd,
+      scrollTop: active.scrollTop
+    };
+  }
+
   window.__rendered = true;
   const userEl = document.getElementById('current-user-name');
   if (userEl) userEl.textContent = currentUser || '(미설정)';
@@ -1356,6 +1379,18 @@ function render() {
 
   const nonPassHtml = renderNonPassList(curCats);
   document.getElementById('content').innerHTML = nonPassHtml !== null ? nonPassHtml : renderCats(curCats);
+
+  // 포커스/커서 위치 복원
+  if (focusInfo) {
+    const el = document.getElementById(focusInfo.id);
+    if (el) {
+      el.focus();
+      try {
+        el.setSelectionRange(focusInfo.start, focusInfo.end);
+        el.scrollTop = focusInfo.scrollTop;
+      } catch (e) { /* type 미지원 input은 무시 */ }
+    }
+  }
 }
 </script>
 </body>
