@@ -352,22 +352,15 @@ const userData = [
     ]
   },
   {
-    id:"sfma", icon:"🧠", title:"SFMA/CSMI 검사", color:"#7B61FF",
+    id:"exam-result", icon:"📊", title:"검사측정결과", color:"#7B61FF",
     screens:[
-      {id:"sf01",name:"SFMA/CSMI 로그인 / 회원 선택",desc:"회원 선택 화면",file:"SFMA CSMI결과.html",nav:"홈 → SFMA 결과 카드"},
-      {id:"sf02",name:"SFMA 현황 탭",desc:"헤더: 총점·등급·전회차 대비 변화",file:"SFMA CSMI결과.html",nav:"SFMA 결과 → 현황 탭 (기본 탭)"},
-      {id:"sf03",name:"SFMA 결과 상세 (바텀시트)",desc:"패턴별 FN/FP/DP/DN 체크 상태",file:"SFMA CSMI결과.html",nav:"SFMA 현황 탭 → 패턴 항목 클릭 → 바텀시트 팝업"},
-      {id:"sf04",name:"SFMA 비교 탭",desc:"회차 선택(최대 3회)",file:"SFMA CSMI결과.html",nav:"SFMA 결과 → 비교 탭 선택"},
-      {id:"sf05",name:"SFMA 이력 탭",desc:"전체 측정 회차 목록",file:"SFMA CSMI결과.html",nav:"SFMA 결과 → 이력 탭 선택"},
-    ]
-  },
-  {
-    id:"csmi", icon:"💪", title:"CSMI 결과", color:"#2C7A7B",
-    screens:[
-      {id:"cs01",name:"CSMI 로그인 / 회원 선택",desc:"회원 선택 화면",file:"SFMA CSMI결과.html",nav:"홈 → SFMA 결과 카드 → CSMI 모드 전환 링크"},
-      {id:"cs02",name:"CSMI 현황 탭",desc:"헤더: 기준치 대비 평균%·등급",file:"SFMA CSMI결과.html",nav:"CSMI 결과 → 현황 탭 (기본 탭)"},
-      {id:"cs03",name:"CSMI 비교 탭",desc:"회차 선택(최대 3회)",file:"SFMA CSMI결과.html",nav:"CSMI 결과 → 비교 탭 선택"},
-      {id:"cs04",name:"CSMI 이력 탭",desc:"전체 측정 회차 목록",file:"SFMA CSMI결과.html",nav:"CSMI 결과 → 이력 탭 선택"},
+      {id:"er01",name:"검사측정결과 메인",desc:"회원 선택 + SFMA/CSMI 탭 전환 진입",file:"SFMA CSMI결과.html",nav:"홈 → 검사측정결과 카드"},
+      {id:"er02",name:"SFMA 기능검사 결과",desc:"총점·점수 추이·체크 유형별·분석·패턴 목록",file:"SFMA CSMI결과.html",nav:"검사측정결과 → SFMA 기능검사 탭"},
+      {id:"er03",name:"SFMA 패턴별 상세 결과",desc:"바텀시트로 패턴별 FN/FP/DP/DN 체크 상태",file:"SFMA CSMI결과.html",nav:"SFMA 결과 → 패턴 항목 클릭 / 패턴별 상세 결과 버튼"},
+      {id:"er04",name:"CSMI 근력측정 결과",desc:"기준치 대비·부위별 근력·좌우 균형·측정 결과지",file:"SFMA CSMI결과.html",nav:"검사측정결과 → CSMI 근력측정 탭"},
+      {id:"er05",name:"처방된 운동 보기",desc:"검사 결과 기반 처방 운동 목록",file:"SFMA CSMI결과.html",nav:"SFMA/CSMI 결과 → 처방된 운동 보기 버튼"},
+      {id:"er06",name:"과거 결과와 비교하기",desc:"회차 선택 후 측정값 변화 비교",file:"SFMA CSMI결과.html",nav:"SFMA/CSMI 결과 → 과거 결과와 비교하기 버튼"},
+      {id:"er07",name:"전체 이력 보기",desc:"전체 측정 회차 목록",file:"SFMA CSMI결과.html",nav:"SFMA/CSMI 결과 → 전체 이력 보기 버튼"},
     ]
   },
   {

@@ -248,22 +248,15 @@ const userData = [
     ]
   },
   {
-    id:"sfma", icon:"🧠", title:"SFMA/CSMI 검사", color:"#7B61FF",
+    id:"exam-result", icon:"📊", title:"검사측정결과", color:"#7B61FF",
     screens:[
-      {id:"sf01",name:"SFMA/CSMI 로그인 / 회원 선택",desc:"회원 선택 화면 · 이름·최근 측정 회차·등급 배지 표시 · SFMA/CSMI 모드 전환 링크",priority:"필수",dev:"FE/BE",file:"SFMA CSMI결과.html"},
-      {id:"sf02",name:"SFMA 현황 탭",desc:"헤더: 총점(FN×100+FP×75+DN×50+DP×25 합산÷항목수)·등급·전회차 대비 변화 · D-day 카드(다음 측정 예정일·등급별 주기) · FN/FP/DP/DN 막대차트 · 파트별 점수 바 차트 · 분석결과 카드 · 15항목 패턴 테이블",priority:"필수",dev:"FE/BE",file:"SFMA CSMI결과.html"},
-      {id:"sf03",name:"SFMA 결과 상세 (바텀시트)",desc:"패턴별 FN/FP/DP/DN 체크 상태 · 트레이너 메모 · 종합 소견",priority:"필수",dev:"FE/BE",file:"SFMA CSMI결과.html"},
-      {id:"sf04",name:"SFMA 비교 탭",desc:"회차 선택(최대 3회) · 회차별 FN/FP/DP/DN 집계 가로 바 비교 · 회차 간 변화 강조",priority:"필수",dev:"FE/BE",file:"SFMA CSMI결과.html"},
-      {id:"sf05",name:"SFMA 이력 탭",desc:"전체 측정 회차 목록 · 회차·날짜·FN/FP/DP/DN 칩·총점·등급 · 항목 클릭 시 상세 바텀시트",priority:"권장",dev:"FE/BE",file:"SFMA CSMI결과.html"},
-    ]
-  },
-  {
-    id:"csmi", icon:"💪", title:"CSMI 결과", color:"#2C7A7B",
-    screens:[
-      {id:"cs01",name:"CSMI 로그인 / 회원 선택",desc:"회원 선택 화면 · 이름·최근 측정 회차·종합 등급 배지 · SFMA 결과 화면 교차 링크",priority:"필수",dev:"FE/BE",file:"SFMA CSMI결과.html"},
-      {id:"cs02",name:"CSMI 현황 탭",desc:"헤더: 기준치 대비 평균%·등급·전회차 변화 · D-day 카드(다음 측정 예정일) · 4그룹(어깨/허리/무릎/발목) 수평 막대차트 · 기준치 비교 · 안정성/파워 체크 · 종합 분석 카드",priority:"필수",dev:"FE/BE",file:"SFMA CSMI결과.html"},
-      {id:"cs03",name:"CSMI 비교 탭",desc:"회차 선택(최대 3회) · 그룹별·항목별 측정값 변화 가로 바 비교",priority:"필수",dev:"FE/BE",file:"SFMA CSMI결과.html"},
-      {id:"cs04",name:"CSMI 이력 탭",desc:"전체 측정 회차 목록 · 회차·날짜·4그룹 요약 칩·종합 평균% · 등급 배지",priority:"권장",dev:"FE/BE",file:"SFMA CSMI결과.html"},
+      {id:"er01",name:"검사측정결과 메인",desc:"회원 선택 화면 · 이름·최근 측정 회차·등급 배지 표시 · 상단 [SFMA 기능검사] / [CSMI 근력측정] 탭 전환",priority:"필수",dev:"FE/BE",file:"SFMA CSMI결과.html"},
+      {id:"er02",name:"SFMA 기능검사 결과",desc:"최근 측정 결과 헤더(측정일·회차) · 총점(FN×100+FP×75+DN×50+DP×25 합산÷항목수)+등급 배지+다음 재측정 권고일(D-day) · 점수 추이 막대차트(최근 4회) · 체크 유형별 집계(FN/FP/DN/DP) · 분석 결과 카드 + 트레이너 소견 · 최고위평가 패턴별 15항목 목록(번호·패턴명·유형 칩)",priority:"필수",dev:"FE/BE",file:"SFMA CSMI결과.html"},
+      {id:"er03",name:"SFMA 패턴별 상세 결과",desc:"바텀시트로 진입 · 패턴별 FN/FP/DP/DN 체크 상태 · 트레이너 메모 · 종합 소견",priority:"필수",dev:"FE/BE",file:"SFMA CSMI결과.html"},
+      {id:"er04",name:"CSMI 근력측정 결과",desc:"최근 측정 결과 헤더(측정일·회차·최근 회차 칩 선택) · 기준치 대비 종합%+등급+전회 대비 변화 · 다음 측정 예정일(D-day)+담당 트레이너 · 부위별 근력 현황(어깨/허리/무릎/발목 가로 바+등급) · 좌/우 균형(부위별 좌·우 비교 바·평균 차이·15%p 이상 시 경고) · 종합 분석 텍스트+트레이너 메모 · 세부 측정값(펼치기) · 측정 결과지 이미지 갤러리(6장·탭하여 확대)",priority:"필수",dev:"FE/BE",file:"SFMA CSMI결과.html"},
+      {id:"er05",name:"처방된 운동 보기",desc:"검사 결과 기반 처방 운동 목록 · SFMA/CSMI 결과 화면에서 진입 · 운동명·세트·횟수·영상 · [시작하기] 버튼",priority:"필수",dev:"FE/BE",file:"SFMA CSMI결과.html"},
+      {id:"er06",name:"과거 결과와 비교하기",desc:"회차 선택(최대 3회) · SFMA: 회차별 FN/FP/DP/DN 집계 가로 바 비교 / CSMI: 그룹별·항목별 측정값 변화 가로 바 비교 · 회차 간 변화 ▲▼ 강조",priority:"필수",dev:"FE/BE",file:"SFMA CSMI결과.html"},
+      {id:"er07",name:"전체 이력 보기",desc:"전체 측정 회차 목록 · SFMA: 회차·날짜·FN/FP/DP/DN 칩·총점·등급 / CSMI: 회차·날짜·4그룹 요약 칩·종합 평균%·등급 · 항목 클릭 시 해당 회차 상세 진입",priority:"권장",dev:"FE/BE",file:"SFMA CSMI결과.html"},
     ]
   },
   {
