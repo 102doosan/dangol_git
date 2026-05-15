@@ -1058,9 +1058,16 @@ function setStatFilter(f) {
 }
 
 function renderNonPassList(cats) {
+  // 미통과 = 통과 아닌 항목 - 단, 수정/추가가 작업완료된 건 제외 (할 일이 없음)
   const nonPassItems = cats.flatMap(cat =>
     cat.screens
-      .filter(s => isScreenDone(s) && getQA(s.id).status !== 'pass')
+      .filter(s => {
+        if (!isScreenDone(s)) return false;
+        const q = getQA(s.id);
+        if (q.status === 'pass') return false;
+        if ((q.status === 'fix' || q.status === 'add') && q.done) return false;
+        return true;
+      })
       .map(s => ({ s, cat }))
   );
 
