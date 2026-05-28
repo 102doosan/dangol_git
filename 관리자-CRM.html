@@ -2447,6 +2447,45 @@ VIP 회원 전용 특별 혜택을 안내드립니다.
   </div>
 </div>
 
+<!-- ═══════════════ 예약 수정 ═══════════════ -->
+<div class="modal-back" id="m-edit-reserve" onclick="closeModalByBack(event,'m-edit-reserve')">
+  <div class="modal" style="width:520px">
+    <div class="modal-title">📅 예약 수정</div>
+    <div id="editResvMemberCard" style="background:#F7FAFC;border-radius:10px;padding:11px 14px;margin-bottom:14px"></div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div class="modal-field"><div class="modal-label">📅 예약 날짜</div><input class="modal-input" id="editResvDate" type="date"></div>
+      <div class="modal-field"><div class="modal-label">⏰ 예약 시간</div><input class="modal-input" id="editResvTime" type="time"></div>
+      <div class="modal-field"><div class="modal-label">예약 종류</div>
+        <select class="modal-input" id="editResvType"><option>TPI 검진</option><option>SFMA</option><option>CSMI</option><option>골프검진</option><option>재활치료</option><option>개인레슨</option><option>그룹운동</option><option>외래진료</option></select>
+      </div>
+      <div class="modal-field"><div class="modal-label">담당자</div>
+        <select class="modal-input" id="editResvStaff"><option>이트레이너</option><option>최물리</option><option>김상담</option><option>박재활</option></select>
+      </div>
+      <div class="modal-field"><div class="modal-label">상태</div>
+        <select class="modal-input" id="editResvStatus"><option>확정</option><option>대기</option><option>노쇼</option><option>취소</option><option>완료</option></select>
+      </div>
+      <div class="modal-field"><div class="modal-label">리마인더</div>
+        <select class="modal-input" id="editResvReminder"><option>완료</option><option>미발송</option><option>대기</option></select>
+      </div>
+    </div>
+
+    <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px">
+      <button class="topbar-btn btn-ghost" style="font-size:11px;padding:5px 10px" onclick="editResvShiftDate(-1)">◀ 1일 전</button>
+      <button class="topbar-btn btn-ghost" style="font-size:11px;padding:5px 10px" onclick="editResvShiftDate(1)">1일 후 ▶</button>
+      <button class="topbar-btn btn-ghost" style="font-size:11px;padding:5px 10px" onclick="editResvShiftDate(7)">+1주</button>
+      <button class="topbar-btn btn-ghost" style="font-size:11px;padding:5px 10px" onclick="editResvShiftDate(-7)">-1주</button>
+      <button class="topbar-btn btn-ghost" style="font-size:11px;padding:5px 10px;margin-left:auto" onclick="closeModal('m-edit-reserve');openDrawer('d-member')">👤 회원 상세 →</button>
+    </div>
+
+    <div class="modal-btns">
+      <button style="background:#FED7D7;color:#C53030;flex:0 0 auto;padding:11px 16px" onclick="deleteResvFromEdit()">🗑 삭제</button>
+      <button style="background:#EDF2F7;color:#4A5568" onclick="closeModal('m-edit-reserve')">취소</button>
+      <button style="background:#4299E1;color:#fff" onclick="saveResvEdit()">💾 저장</button>
+    </div>
+  </div>
+</div>
+
 <!-- 검진 등록 -->
 <div class="modal-back" id="m-add-exam" onclick="closeModalByBack(event,'m-add-exam')">
   <div class="modal">
@@ -4024,16 +4063,69 @@ VIP 회원 전용 특별 혜택을 안내드립니다.
     renderWeekCalendar('homeCalGrid', TODAY_DATE);
   }
 
-  function showReservationDetail(rid) {
+  function showReservationDetail(rid) { openResvEdit(rid); }
+
+  /* ── 예약 수정 모달 ── */
+  let _editResvId = null;
+  function openResvEdit(rid) {
     const r = (RESERVATIONS||[]).find(x => x.id === rid);
     if (!r) return;
+    _editResvId = rid;
     const m = MEMBERS.find(mm => mm.name === r.member);
-    if (m) {
-      openDrawer('d-member');
-      showToast(`📅 ${r.date} ${r.time} ${r.type} (${r.status}) — ${r.member}`);
-    } else {
-      showToast(`📅 ${r.date} ${r.time} ${r.member} - 미등록`);
-    }
+    const black = m ? isBlacklistedMember(m.name) : false;
+    document.getElementById('editResvMemberCard').innerHTML = m ? `
+      <div style="display:flex;align-items:center;gap:10px">
+        <div style="font-size:22px">${black?'🚫':'👤'}</div>
+        <div style="flex:1">
+          <div style="font-size:11px;color:#718096;font-weight:700">예약 #${r.id}</div>
+          <div style="font-size:14px;font-weight:900;color:#1A202C">${escapeHtml(r.member)} <span style="font-size:11px;color:#A0AEC0;font-weight:600">${m.age}·${m.gender} · ${escapeHtml(m.phone)}</span></div>
+          <div style="display:flex;flex-wrap:wrap;gap:3px;margin-top:4px">${
+            m.categories.map(cid => { const c = getCategory(cid); return c ? `<span class="bdg bdg-${c.color}" style="font-size:10px;padding:1px 7px">${c.label}</span>` : ''; }).join('')
+          }</div>
+          ${m.importantMemo ? `<div style="font-size:11px;color:#744210;background:#FFFBEB;border-left:3px solid #ECC94B;padding:5px 8px;border-radius:4px;margin-top:6px">📌 ${escapeHtml(m.importantMemo)}</div>` : ''}
+        </div>
+      </div>` : `<div style="font-size:13px;color:#975A16">⚠️ 미등록 회원 — ${escapeHtml(r.member)}</div>`;
+    document.getElementById('editResvDate').value     = r.date;
+    document.getElementById('editResvTime').value     = r.time;
+    setSelectVal('editResvType',     r.type);
+    setSelectVal('editResvStaff',    r.staff);
+    setSelectVal('editResvStatus',   r.status);
+    setSelectVal('editResvReminder', r.reminder);
+    openModal('m-edit-reserve');
+  }
+  function editResvShiftDate(days) {
+    const el = document.getElementById('editResvDate');
+    if (!el.value) return;
+    const d = new Date(el.value);
+    d.setDate(d.getDate() + days);
+    el.value = d.toISOString().slice(0,10);
+  }
+  function saveResvEdit() {
+    const r = (RESERVATIONS||[]).find(x => x.id === _editResvId);
+    if (!r) { closeModal('m-edit-reserve'); return; }
+    const newDate = document.getElementById('editResvDate').value;
+    const newTime = document.getElementById('editResvTime').value;
+    if (!newDate || !newTime) { showToast('날짜와 시간을 입력하세요'); return; }
+    const changed = (r.date !== newDate || r.time !== newTime);
+    r.date     = newDate;
+    r.time     = newTime;
+    r.type     = document.getElementById('editResvType').value;
+    r.staff    = document.getElementById('editResvStaff').value;
+    r.status   = document.getElementById('editResvStatus').value;
+    r.reminder = document.getElementById('editResvReminder').value;
+    persistAll();
+    closeModal('m-edit-reserve');
+    renderReservations();
+    if (typeof renderHomeCalendar === 'function') renderHomeCalendar();
+    if (typeof renderFullCalendar === 'function') renderFullCalendar();
+    if (typeof renderHomeStatRow === 'function') renderHomeStatRow();
+    if (typeof refreshTodayLists === 'function') refreshTodayLists();
+    showToast(changed ? `✅ ${r.member} 예약 일정이 ${newDate} ${newTime}로 변경되었습니다` : `✅ 예약이 업데이트되었습니다`);
+  }
+  function deleteResvFromEdit() {
+    if (!_editResvId) return;
+    closeModal('m-edit-reserve');
+    deleteReservation(_editResvId);
   }
 
   function renderHomeStatRow() {
@@ -5037,7 +5129,7 @@ VIP 회원 전용 특별 혜택을 안내드립니다.
       const m = MEMBERS.find(mm => mm.name === r.member);
       const black = m ? isBlacklistedMember(m.name) : false;
       const fromConsult = r.consultId ? `<span style="font-size:10px;color:#9B59B6;background:#FAF5FF;border-radius:4px;padding:1px 5px;margin-left:4px;font-weight:700">💬 상담연계</span>` : '';
-      return `<tr class="clickable" onclick="${m ? `openDrawer('d-member')` : `showToast('미등록 회원')`}" style="${black?'background:#FFF5F5':''}">
+      return `<tr class="clickable" onclick="openResvEdit('${r.id}')" style="${black?'background:#FFF5F5':''}">
         <td>${r.date.slice(5)} ${r.time}</td>
         <td>${black?'<span style="color:#E53E3E;margin-right:3px">🚫</span>':''}<strong>${escapeHtml(r.member)}</strong>${m?` <span style="font-size:10px;color:#A0AEC0">${m.phone}</span>`:''}${fromConsult}</td>
         <td><span class="bdg bdg-${typeColor[r.type]||'blue'}">${escapeHtml(r.type)}</span></td>
