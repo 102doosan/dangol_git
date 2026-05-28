@@ -1042,6 +1042,95 @@ VIP 회원 전용 특별 혜택을 안내드립니다.
       </div>
     </div>
 
+    <!-- 검진 알림 (운동처방 연동) -->
+    <div class="panel" style="margin-bottom:14px">
+      <div style="font-size:14px;font-weight:800;color:#2D3748;margin-bottom:14px">🔬 검진 시기 알림 <span style="font-size:11px;font-weight:600;color:#A0AEC0">— 운동처방 / 검진 이력 연동 자동 발송</span></div>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <!-- SFMA 재검진 알림 -->
+        <div style="display:flex;align-items:center;justify-content:space-between;background:#F7FAFC;border-radius:10px;padding:12px 14px">
+          <div style="flex:1">
+            <div style="font-size:13px;font-weight:700;color:#2D3748">🩺 SFMA 재검진 시기 알림 <span style="font-size:11px;font-weight:600;color:#4299E1;background:#EBF8FF;border-radius:99px;padding:2px 8px;margin-left:4px">SMS</span></div>
+            <div style="font-size:11.5px;color:#718096;margin-top:3px">마지막 SFMA 검진 후
+              <select onchange="this.blur();showToast('SFMA 주기 변경: '+this.value+'개월')" style="border:1px solid #CBD5E0;border-radius:6px;font-size:11px;padding:1px 5px;font-family:'Noto Sans KR',sans-serif">
+                <option>3</option><option selected>6</option><option>12</option>
+              </select>개월 경과 시 자동 알림 · 매주 월요일 오전 10시
+            </div>
+          </div>
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer">
+            <span style="font-size:11px;color:#38A169;font-weight:700" id="lbl-sfma">ON</span>
+            <div style="position:relative;width:40px;height:22px" onclick="toggleAutoMsg('sfma',this)">
+              <div id="track-sfma" style="width:40px;height:22px;background:#38A169;border-radius:99px;transition:.2s"></div>
+              <div id="thumb-sfma" style="position:absolute;top:3px;left:21px;width:16px;height:16px;background:#fff;border-radius:99px;transition:.2s;box-shadow:0 1px 3px rgba(0,0,0,.3)"></div>
+            </div>
+          </label>
+        </div>
+        <!-- TPI 재검진 알림 -->
+        <div style="display:flex;align-items:center;justify-content:space-between;background:#F7FAFC;border-radius:10px;padding:12px 14px">
+          <div style="flex:1">
+            <div style="font-size:13px;font-weight:700;color:#2D3748">⛳ TPI 재검진 시기 알림 <span style="font-size:11px;font-weight:600;color:#9B59B6;background:#FAF5FF;border-radius:99px;padding:2px 8px;margin-left:4px">카카오</span></div>
+            <div style="font-size:11.5px;color:#718096;margin-top:3px">마지막 TPI 검진 후
+              <select onchange="this.blur();showToast('TPI 주기 변경: '+this.value+'개월')" style="border:1px solid #CBD5E0;border-radius:6px;font-size:11px;padding:1px 5px;font-family:'Noto Sans KR',sans-serif">
+                <option selected>3</option><option>6</option><option>12</option>
+              </select>개월 경과 시 자동 알림 · 매주 월요일 오전 10시
+            </div>
+          </div>
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer">
+            <span style="font-size:11px;color:#38A169;font-weight:700" id="lbl-tpi">ON</span>
+            <div style="position:relative;width:40px;height:22px" onclick="toggleAutoMsg('tpi',this)">
+              <div id="track-tpi" style="width:40px;height:22px;background:#38A169;border-radius:99px;transition:.2s"></div>
+              <div id="thumb-tpi" style="position:absolute;top:3px;left:21px;width:16px;height:16px;background:#fff;border-radius:99px;transition:.2s;box-shadow:0 1px 3px rgba(0,0,0,.3)"></div>
+            </div>
+          </label>
+        </div>
+        <!-- CSMI 재검진 알림 -->
+        <div style="display:flex;align-items:center;justify-content:space-between;background:#F7FAFC;border-radius:10px;padding:12px 14px">
+          <div style="flex:1">
+            <div style="font-size:13px;font-weight:700;color:#2D3748">📐 CSMI 정기 검사 알림 <span style="font-size:11px;font-weight:600;color:#4299E1;background:#EBF8FF;border-radius:99px;padding:2px 8px;margin-left:4px">SMS</span></div>
+            <div style="font-size:11.5px;color:#718096;margin-top:3px">마지막 CSMI 검사 후
+              <select onchange="this.blur();showToast('CSMI 주기 변경: '+this.value+'개월')" style="border:1px solid #CBD5E0;border-radius:6px;font-size:11px;padding:1px 5px;font-family:'Noto Sans KR',sans-serif">
+                <option>3</option><option selected>6</option><option>12</option>
+              </select>개월 경과 시 자동 알림 · 매주 월요일 오전 10시
+            </div>
+          </div>
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer">
+            <span style="font-size:11px;color:#A0AEC0;font-weight:700" id="lbl-csmi">OFF</span>
+            <div style="position:relative;width:40px;height:22px" onclick="toggleAutoMsg('csmi',this)">
+              <div id="track-csmi" style="width:40px;height:22px;background:#CBD5E0;border-radius:99px;transition:.2s"></div>
+              <div id="thumb-csmi" style="position:absolute;top:3px;left:3px;width:16px;height:16px;background:#fff;border-radius:99px;transition:.2s;box-shadow:0 1px 3px rgba(0,0,0,.3)"></div>
+            </div>
+          </label>
+        </div>
+        <!-- 골프검진 시즌 알림 -->
+        <div style="display:flex;align-items:center;justify-content:space-between;background:#F7FAFC;border-radius:10px;padding:12px 14px">
+          <div style="flex:1">
+            <div style="font-size:13px;font-weight:700;color:#2D3748">🏌️ 골프검진 시즌 알림 <span style="font-size:11px;font-weight:600;color:#E67E22;background:#FFFAF0;border-radius:99px;padding:2px 8px;margin-left:4px">카카오</span></div>
+            <div style="font-size:11.5px;color:#718096;margin-top:3px">3월·9월 시즌 시작 시 골프회원 자동 안내 (라운딩 전 골프검진 권유)</div>
+          </div>
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer">
+            <span style="font-size:11px;color:#38A169;font-weight:700" id="lbl-golf">ON</span>
+            <div style="position:relative;width:40px;height:22px" onclick="toggleAutoMsg('golf',this)">
+              <div id="track-golf" style="width:40px;height:22px;background:#38A169;border-radius:99px;transition:.2s"></div>
+              <div id="thumb-golf" style="position:absolute;top:3px;left:21px;width:16px;height:16px;background:#fff;border-radius:99px;transition:.2s;box-shadow:0 1px 3px rgba(0,0,0,.3)"></div>
+            </div>
+          </label>
+        </div>
+        <!-- 운동처방 갱신 알림 -->
+        <div style="display:flex;align-items:center;justify-content:space-between;background:#F7FAFC;border-radius:10px;padding:12px 14px">
+          <div style="flex:1">
+            <div style="font-size:13px;font-weight:700;color:#2D3748">💪 운동처방 갱신 알림 <span style="font-size:11px;font-weight:600;color:#4299E1;background:#EBF8FF;border-radius:99px;padding:2px 8px;margin-left:4px">SMS</span></div>
+            <div style="font-size:11.5px;color:#718096;margin-top:3px">운동처방 발급 후 4주 경과 시 재검진/처방 갱신 안내 · 매주 화요일 오전 11시</div>
+          </div>
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer">
+            <span style="font-size:11px;color:#38A169;font-weight:700" id="lbl-rx">ON</span>
+            <div style="position:relative;width:40px;height:22px" onclick="toggleAutoMsg('rx',this)">
+              <div id="track-rx" style="width:40px;height:22px;background:#38A169;border-radius:99px;transition:.2s"></div>
+              <div id="thumb-rx" style="position:absolute;top:3px;left:21px;width:16px;height:16px;background:#fff;border-radius:99px;transition:.2s;box-shadow:0 1px 3px rgba(0,0,0,.3)"></div>
+            </div>
+          </label>
+        </div>
+      </div>
+    </div>
+
     <div class="panel" style="margin-bottom:14px">
       <div style="font-size:14px;font-weight:800;color:#2D3748;margin-bottom:14px">🎂 생일 축하 / 이용권 만료</div>
       <div style="display:flex;flex-direction:column;gap:10px">
@@ -1101,6 +1190,30 @@ VIP 회원 전용 특별 혜택을 안내드립니다.
             <div style="font-size:11.5px;color:#718096">최민준 · 오전 8:00 발송 완료</div>
           </div>
           <span style="font-size:11px;font-weight:700;color:#38A169">✓ 발송완료</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:#EBF8FF;border-radius:8px;border-left:3px solid #4299E1">
+          <span style="font-size:18px">🩺</span>
+          <div style="flex:1">
+            <div style="font-size:12.5px;font-weight:700;color:#2D3748">SFMA 재검진 시기 알림</div>
+            <div style="font-size:11.5px;color:#718096">박서연·장수현·오하은 외 4명 · 오전 10:00 발송 예정</div>
+          </div>
+          <span style="font-size:11px;font-weight:700;color:#4299E1">7건</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:#FAF5FF;border-radius:8px;border-left:3px solid #9B59B6">
+          <span style="font-size:18px">⛳</span>
+          <div style="flex:1">
+            <div style="font-size:12.5px;font-weight:700;color:#2D3748">TPI 재검진 시기 알림</div>
+            <div style="font-size:11.5px;color:#718096">김지훈·정현우·서민호 외 2명 · 오전 10:00 발송 예정</div>
+          </div>
+          <span style="font-size:11px;font-weight:700;color:#9B59B6">5건</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:#EBF8FF;border-radius:8px;border-left:3px solid #4299E1">
+          <span style="font-size:18px">💪</span>
+          <div style="flex:1">
+            <div style="font-size:12.5px;font-weight:700;color:#2D3748">운동처방 갱신 알림</div>
+            <div style="font-size:11.5px;color:#718096">박서연·윤지성·오하은 · 오전 11:00 발송 예정</div>
+          </div>
+          <span style="font-size:11px;font-weight:700;color:#4299E1">3건</span>
         </div>
       </div>
     </div>
@@ -7532,7 +7645,11 @@ VIP 회원 전용 특별 혜택을 안내드립니다.
   }
 
   // ── 자동 발송 토글 ──
-  const _autoMsgState = { d7:true, d3:true, d1:true, bday:true, expire:false };
+  const _autoMsgState = {
+    d7:true, d3:true, d1:true,
+    bday:true, expire:false,
+    sfma:true, tpi:true, csmi:false, golf:true, rx:true
+  };
   function toggleAutoMsg(key) {
     _autoMsgState[key] = !_autoMsgState[key];
     const on = _autoMsgState[key];
