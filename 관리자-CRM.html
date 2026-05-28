@@ -546,7 +546,6 @@
 <div id="s-consult" class="screen">
   <div class="topbar">
     <div style="flex:1"><div class="topbar-title">💬 상담 이력</div><div class="topbar-sub" id="consultCountSub">—</div></div>
-    <button class="topbar-btn" style="background:#38A169;color:#fff;margin-right:8px" onclick="openCallSimulator()">📞 전화 수신 테스트</button>
     <button class="topbar-btn btn-primary" onclick="openModal('m-add-consult')">+ 상담 등록</button>
   </div>
   <div class="content">
@@ -2690,8 +2689,19 @@ VIP 회원 전용 특별 혜택을 안내드립니다.
   }
 
   /* ── 모달 ── */
-  function openModal(id) { document.getElementById(id).classList.add('open'); }
-  function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+  function openModal(id) {
+    document.getElementById(id).classList.add('open');
+    const cb = document.getElementById('callSimBtn');
+    if (cb) cb.style.display = 'none';
+  }
+  function closeModal(id) {
+    document.getElementById(id).classList.remove('open');
+    // 다른 모달이 아직 열려 있지 않을 때만 다시 표시
+    if (!document.querySelector('.modal-back.open') && !document.querySelector('.drawer.open')) {
+      const cb = document.getElementById('callSimBtn');
+      if (cb) cb.style.display = '';
+    }
+  }
   function closeModalByBack(e, id) { if (e.target === document.getElementById(id)) closeModal(id); }
 
   /* ── 상담 상세 모달 ── */
@@ -2748,10 +2758,15 @@ VIP 회원 전용 특별 혜택을 안내드립니다.
     document.getElementById('dOverlay').classList.add('open');
     // 기본 탭으로 초기화
     dwTab(document.querySelector('.drawer-tab'), 'pane-basic');
+    // 플로팅 전화 버튼 숨김 (브라우저 호환성 보강)
+    const cb = document.getElementById('callSimBtn');
+    if (cb) cb.style.display = 'none';
   }
   function closeDrawer() {
     document.querySelectorAll('.drawer').forEach(d => d.classList.remove('open'));
     document.getElementById('dOverlay').classList.remove('open');
+    const cb = document.getElementById('callSimBtn');
+    if (cb) cb.style.display = '';
   }
 
   /* ── 드로어 탭 전환 ── */
