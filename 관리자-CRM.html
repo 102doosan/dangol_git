@@ -1338,6 +1338,22 @@ VIP 회원 전용 특별 혜택을 안내드립니다.
         </div>
       </div>
 
+      <!-- 예약 종류별 기본 소요시간 -->
+      <div class="panel" style="grid-column:1 / -1">
+        <div class="panel-head">
+          <span class="panel-title">⏱ 예약 종류별 기본 소요시간 설정</span>
+          <span style="font-size:11px;color:#A0AEC0;font-weight:600">예약 등록 시 종류를 선택하면 자동으로 적용됩니다</span>
+        </div>
+        <div class="panel-body">
+          <div id="resvDurationSettings" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px"></div>
+          <div style="display:flex;gap:6px;align-items:flex-end;margin-top:14px;padding-top:14px;border-top:1px solid #E2E8F0">
+            <div style="flex:1"><div class="modal-label">➕ 새 종류 추가</div><input class="modal-input" id="newResvTypeName" placeholder="예: 도수치료, 1:1 PT, 그룹 필라테스" onkeydown="if(event.key==='Enter'){addResvType();event.preventDefault();}"></div>
+            <div style="flex:0 0 110px"><div class="modal-label">기본 시간</div><select class="modal-input" id="newResvTypeDuration"><option value="15">15분</option><option value="30">30분</option><option value="45">45분</option><option value="60" selected>60분</option><option value="90">90분</option><option value="120">120분</option></select></div>
+            <button class="topbar-btn btn-primary" onclick="addResvType()" style="flex:0 0 auto">+ 추가</button>
+          </div>
+        </div>
+      </div>
+
       <!-- AI 통화 전용회선 등록 -->
       <div class="panel" style="grid-column:1 / -1">
         <div class="panel-head">
@@ -2333,10 +2349,20 @@ VIP 회원 전용 특별 혜택을 안내드립니다.
       <div id="newResvPassInfo" style="margin-top:8px"></div>
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-      <div class="modal-field"><div class="modal-label">예약 종류</div><select class="modal-input" id="newResvType"><option>TPI 검진</option><option>SFMA</option><option>CSMI</option><option>골프검진</option><option>재활치료</option><option>개인레슨</option><option>그룹운동</option><option>외래진료</option></select></div>
+      <div class="modal-field"><div class="modal-label">예약 종류</div><select class="modal-input" id="newResvType" onchange="onResvTypeChange('new')"><option>TPI 검진</option><option>SFMA</option><option>CSMI</option><option>골프검진</option><option>재활치료</option><option>개인레슨</option><option>그룹운동</option><option>외래진료</option></select></div>
       <div class="modal-field"><div class="modal-label">담당자</div><select class="modal-input" id="newResvStaff"><option>이트레이너</option><option>최물리</option><option>김상담</option></select></div>
       <div class="modal-field"><div class="modal-label">예약 날짜</div><input class="modal-input" id="newResvDate" type="date"></div>
-      <div class="modal-field"><div class="modal-label">예약 시간</div><input class="modal-input" id="newResvTime" type="time" value="10:00" step="600"></div>
+      <div class="modal-field">
+        <div class="modal-label">⏱ 소요시간 <span style="font-size:11px;color:#A0AEC0;font-weight:400">— 종류별 기본값</span></div>
+        <select class="modal-input" id="newResvDuration" onchange="onResvDurationChange('new')">
+          <option value="15">15분</option><option value="30">30분</option>
+          <option value="45">45분</option><option value="60" selected>60분 (1시간)</option>
+          <option value="75">75분</option><option value="90">90분</option>
+          <option value="120">120분 (2시간)</option>
+        </select>
+      </div>
+      <div class="modal-field"><div class="modal-label">🕐 시작 시간</div><input class="modal-input" id="newResvTime" type="time" value="10:00" step="600" onchange="onResvStartChange('new')"></div>
+      <div class="modal-field"><div class="modal-label">🕘 종료 시간 <span style="font-size:10px;color:#A0AEC0">자동 계산</span></div><input class="modal-input" id="newResvEndTime" type="time" step="600"></div>
     </div>
     <div class="modal-field"><div class="modal-label">리마인더 발송</div><select class="modal-input" id="newResvReminder"><option>D-7 + D-1 자동 발송</option><option>D-1만 발송</option><option>발송 안함</option></select></div>
     <div class="modal-btns">
@@ -2663,13 +2689,22 @@ VIP 회원 전용 특별 혜택을 안내드립니다.
 
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
       <div class="modal-field"><div class="modal-label">📅 예약 날짜</div><input class="modal-input" id="editResvDate" type="date"></div>
-      <div class="modal-field"><div class="modal-label">⏰ 예약 시간</div><input class="modal-input" id="editResvTime" type="time"></div>
       <div class="modal-field"><div class="modal-label">예약 종류</div>
-        <select class="modal-input" id="editResvType"><option>TPI 검진</option><option>SFMA</option><option>CSMI</option><option>골프검진</option><option>재활치료</option><option>개인레슨</option><option>그룹운동</option><option>외래진료</option></select>
+        <select class="modal-input" id="editResvType" onchange="onResvTypeChange('edit')"><option>TPI 검진</option><option>SFMA</option><option>CSMI</option><option>골프검진</option><option>재활치료</option><option>개인레슨</option><option>그룹운동</option><option>외래진료</option></select>
+      </div>
+      <div class="modal-field"><div class="modal-label">⏱ 소요시간</div>
+        <select class="modal-input" id="editResvDuration" onchange="onResvDurationChange('edit')">
+          <option value="15">15분</option><option value="30">30분</option>
+          <option value="45">45분</option><option value="60" selected>60분 (1시간)</option>
+          <option value="75">75분</option><option value="90">90분</option>
+          <option value="120">120분 (2시간)</option>
+        </select>
       </div>
       <div class="modal-field"><div class="modal-label">담당자</div>
         <select class="modal-input" id="editResvStaff"><option>이트레이너</option><option>최물리</option><option>김상담</option><option>박재활</option></select>
       </div>
+      <div class="modal-field"><div class="modal-label">🕐 시작 시간</div><input class="modal-input" id="editResvTime" type="time" onchange="onResvStartChange('edit')"></div>
+      <div class="modal-field"><div class="modal-label">🕘 종료 시간</div><input class="modal-input" id="editResvEndTime" type="time"></div>
       <div class="modal-field"><div class="modal-label">상태</div>
         <select class="modal-input" id="editResvStatus"><option>확정</option><option>대기</option><option>노쇼</option><option>취소</option><option>완료</option></select>
       </div>
@@ -4951,6 +4986,10 @@ VIP 회원 전용 특별 혜택을 안내드립니다.
     setSelectVal('editResvStaff',    r.staff);
     setSelectVal('editResvStatus',   r.status);
     setSelectVal('editResvReminder', r.reminder);
+    // 소요시간 / 종료시간 — 저장된 값 우선, 없으면 종류별 기본값
+    const dur = r.duration || RESV_TYPE_DURATIONS[r.type] || 60;
+    document.getElementById('editResvDuration').value = dur;
+    document.getElementById('editResvEndTime').value  = r.endTime || addMinutesToTime(r.time, dur);
     openModal('m-edit-reserve');
   }
   function editResvShiftDate(days) {
@@ -4965,10 +5004,14 @@ VIP 회원 전용 특별 혜택을 안내드립니다.
     if (!r) { closeModal('m-edit-reserve'); return; }
     const newDate = document.getElementById('editResvDate').value;
     const newTime = document.getElementById('editResvTime').value;
+    const newEnd  = document.getElementById('editResvEndTime').value;
+    const newDur  = +document.getElementById('editResvDuration').value;
     if (!newDate || !newTime) { showToast('날짜와 시간을 입력하세요'); return; }
-    const changed = (r.date !== newDate || r.time !== newTime);
+    const changed = (r.date !== newDate || r.time !== newTime || r.endTime !== newEnd);
     r.date     = newDate;
     r.time     = newTime;
+    r.endTime  = newEnd;
+    r.duration = newDur;
     r.type     = document.getElementById('editResvType').value;
     r.staff    = document.getElementById('editResvStaff').value;
     r.status   = document.getElementById('editResvStatus').value;
@@ -4980,7 +5023,7 @@ VIP 회원 전용 특별 혜택을 안내드립니다.
     if (typeof renderFullCalendar === 'function') renderFullCalendar();
     if (typeof renderHomeStatRow === 'function') renderHomeStatRow();
     if (typeof refreshTodayLists === 'function') refreshTodayLists();
-    showToast(changed ? `✅ ${r.member} 예약 일정이 ${newDate} ${newTime}로 변경되었습니다` : `✅ 예약이 업데이트되었습니다`);
+    showToast(changed ? `✅ ${r.member} 예약: ${newDate} ${newTime}~${newEnd||''}` : `✅ 예약이 업데이트되었습니다`);
   }
   function deleteResvFromEdit() {
     if (!_editResvId) return;
@@ -6060,8 +6103,9 @@ VIP 회원 전용 특별 혜택을 안내드립니다.
       const m = MEMBERS.find(mm => mm.name === r.member);
       const black = m ? isBlacklistedMember(m.name) : false;
       const fromConsult = r.consultId ? `<span style="font-size:10px;color:#9B59B6;background:#FAF5FF;border-radius:4px;padding:1px 5px;margin-left:4px;font-weight:700">💬 상담연계</span>` : '';
+      const timeRange = r.endTime ? `${r.time}~${r.endTime}` : r.time;
       return `<tr class="clickable" onclick="openResvEdit('${r.id}')" style="${black?'background:#FFF5F5':''}">
-        <td>${r.date.slice(5)} ${r.time}</td>
+        <td>${r.date.slice(5)} ${timeRange}${r.duration?` <span style="font-size:10px;color:#A0AEC0">${r.duration}분</span>`:''}</td>
         <td>${black?'<span style="color:#E53E3E;margin-right:3px">🚫</span>':''}<strong>${escapeHtml(r.member)}</strong>${m?` <span style="font-size:10px;color:#A0AEC0">${m.phone}</span>`:''}${fromConsult}</td>
         <td><span class="bdg bdg-${typeColor[r.type]||'blue'}">${escapeHtml(r.type)}</span></td>
         <td>${escapeHtml(r.staff)}</td>
@@ -7439,6 +7483,114 @@ VIP 회원 전용 특별 혜택을 안내드립니다.
     showToast(`✅ ${name} 회원이 등록되었습니다`);
   }
 
+  /* ── 예약 종류별 기본 소요시간 ── */
+  let RESV_TYPE_DURATIONS = {
+    'TPI 검진': 60, 'SFMA': 60, 'CSMI': 30, '골프검진': 90,
+    '재활치료': 60, '개인레슨': 60, '그룹운동': 60, '외래진료': 30,
+  };
+  function loadResvDurations() {
+    try {
+      const saved = JSON.parse(localStorage.getItem('crm_resv_durations') || 'null');
+      if (saved) RESV_TYPE_DURATIONS = { ...RESV_TYPE_DURATIONS, ...saved };
+    } catch(_){}
+  }
+  function saveResvDurations() {
+    try { localStorage.setItem('crm_resv_durations', JSON.stringify(RESV_TYPE_DURATIONS)); } catch(_){}
+  }
+  loadResvDurations();
+
+  function addMinutesToTime(time, minutes) {
+    if (!time) return '';
+    const [h, m] = time.split(':').map(Number);
+    const total = h * 60 + m + Number(minutes);
+    const nh = Math.floor((total % (24*60)) / 60);
+    const nm = total % 60;
+    return String(nh).padStart(2,'0') + ':' + String(nm).padStart(2,'0');
+  }
+  function diffMinutes(start, end) {
+    if (!start || !end) return 0;
+    const [sh, sm] = start.split(':').map(Number);
+    const [eh, em] = end.split(':').map(Number);
+    return (eh*60+em) - (sh*60+sm);
+  }
+  function onResvTypeChange(mode) {
+    const prefix = mode === 'edit' ? 'editResv' : 'newResv';
+    const type = document.getElementById(prefix + 'Type').value;
+    const dur = RESV_TYPE_DURATIONS[type] || 60;
+    document.getElementById(prefix + 'Duration').value = dur;
+    onResvDurationChange(mode);
+  }
+  function onResvDurationChange(mode) {
+    const prefix = mode === 'edit' ? 'editResv' : 'newResv';
+    const start = document.getElementById(prefix + 'Time').value;
+    const dur   = +document.getElementById(prefix + 'Duration').value;
+    document.getElementById(prefix + 'EndTime').value = addMinutesToTime(start, dur);
+  }
+  function onResvStartChange(mode) {
+    const prefix = mode === 'edit' ? 'editResv' : 'newResv';
+    const start = document.getElementById(prefix + 'Time').value;
+    const dur   = +document.getElementById(prefix + 'Duration').value;
+    document.getElementById(prefix + 'EndTime').value = addMinutesToTime(start, dur);
+  }
+
+  /* ── 종류별 소요시간 설정 패널 렌더 ── */
+  function renderResvDurationSettings() {
+    const wrap = document.getElementById('resvDurationSettings');
+    if (!wrap) return;
+    const colors = ['#4299E1','#38A169','#E67E22','#9B59B6','#E53E3E','#319795','#D69E2E','#718096'];
+    wrap.innerHTML = Object.keys(RESV_TYPE_DURATIONS).map((type, i) => {
+      const dur = RESV_TYPE_DURATIONS[type];
+      const c = colors[i % colors.length];
+      return `<div style="background:#fff;border:1.5px solid #E2E8F0;border-radius:10px;padding:10px 12px;display:flex;align-items:center;gap:8px;border-left:4px solid ${c}">
+        <div style="flex:1;min-width:0">
+          <div style="font-size:13px;font-weight:800;color:#1A202C;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escapeHtml(type)}</div>
+        </div>
+        <select onchange="updateResvDuration('${escapeHtml(type).replace(/'/g,'')}', this.value)" style="padding:4px 8px;border:1.5px solid #E2E8F0;border-radius:6px;font-size:12px;font-family:'Noto Sans KR',sans-serif;font-weight:700">
+          <option value="15" ${dur==15?'selected':''}>15분</option>
+          <option value="30" ${dur==30?'selected':''}>30분</option>
+          <option value="45" ${dur==45?'selected':''}>45분</option>
+          <option value="60" ${dur==60?'selected':''}>60분</option>
+          <option value="75" ${dur==75?'selected':''}>75분</option>
+          <option value="90" ${dur==90?'selected':''}>90분</option>
+          <option value="120" ${dur==120?'selected':''}>120분</option>
+        </select>
+        <button onclick="removeResvType('${escapeHtml(type).replace(/'/g,'')}')" style="border:none;background:transparent;color:#A0AEC0;cursor:pointer;font-size:14px;padding:2px 6px">×</button>
+      </div>`;
+    }).join('');
+  }
+  function updateResvDuration(type, minutes) {
+    RESV_TYPE_DURATIONS[type] = +minutes;
+    saveResvDurations();
+    showToast(`✓ ${type} → ${minutes}분`);
+  }
+  function addResvType() {
+    const name = (document.getElementById('newResvTypeName').value || '').trim();
+    const dur  = +document.getElementById('newResvTypeDuration').value;
+    if (!name) { showToast('종류 이름을 입력하세요'); return; }
+    if (RESV_TYPE_DURATIONS[name] !== undefined) { showToast('이미 존재하는 종류입니다'); return; }
+    RESV_TYPE_DURATIONS[name] = dur;
+    saveResvDurations();
+    document.getElementById('newResvTypeName').value = '';
+    renderResvDurationSettings();
+    // 예약 등록/수정 select에도 추가
+    ['newResvType','editResvType'].forEach(id => {
+      const sel = document.getElementById(id);
+      if (sel) {
+        const opt = document.createElement('option');
+        opt.value = name; opt.textContent = name;
+        sel.appendChild(opt);
+      }
+    });
+    showToast(`✓ "${name}" (${dur}분) 종류 추가됨`);
+  }
+  function removeResvType(type) {
+    if (!confirm(`"${type}" 종류를 삭제하시겠습니까?`)) return;
+    delete RESV_TYPE_DURATIONS[type];
+    saveResvDurations();
+    renderResvDurationSettings();
+    showToast(`🗑 "${type}" 종류 삭제됨`);
+  }
+
   /* ── 캘린더 빈 셀 → 예약 등록 ── */
   function openQuickReserve(date, time) {
     openModal('m-add-reserve');
@@ -7551,14 +7703,16 @@ VIP 회원 전용 특별 혜택을 안내드립니다.
   }
 
   function saveNewReservation() {
-    const member = document.getElementById('newResvMember').value;
-    const type   = document.getElementById('newResvType').value;
-    const staff  = document.getElementById('newResvStaff').value;
-    const date   = document.getElementById('newResvDate').value;
-    const time   = document.getElementById('newResvTime').value;
+    const member  = document.getElementById('newResvMember').value;
+    const type    = document.getElementById('newResvType').value;
+    const staff   = document.getElementById('newResvStaff').value;
+    const date    = document.getElementById('newResvDate').value;
+    const time    = document.getElementById('newResvTime').value;
+    const endTime = document.getElementById('newResvEndTime').value;
+    const duration = +document.getElementById('newResvDuration').value;
     if (!member || !date || !time) { showToast('회원/날짜/시간을 모두 입력하세요'); return; }
     const id = 'r' + Date.now();
-    RESERVATIONS.push({ id, date, time, member, type, staff, status:'확정', reminder:'미발송' });
+    RESERVATIONS.push({ id, date, time, endTime, duration, member, type, staff, status:'확정', reminder:'미발송' });
     persistAll();
     closeModal('m-add-reserve');
     renderReservations();
@@ -7566,7 +7720,7 @@ VIP 회원 전용 특별 혜택을 안내드립니다.
     if (typeof renderFullCalendar === 'function') renderFullCalendar();
     if (typeof renderHomeStatRow === 'function') renderHomeStatRow();
     if (typeof refreshTodayLists === 'function') refreshTodayLists();
-    showToast(`✅ ${member} ${date} ${time} 예약 등록 완료`);
+    showToast(`✅ ${member} ${date} ${time}~${endTime||''} (${duration}분) 예약 등록 완료`);
   }
 
   function saveNewExam() {
@@ -7599,7 +7753,8 @@ VIP 회원 전용 특별 혜택을 안내드립니다.
       if (hidden)  hidden.value = '';
       if (pass)    pass.innerHTML = '';
       if (results) results.style.display = 'none';
-      setTimeout(() => search?.focus(), 100);
+      // 종류별 기본 소요시간 자동 적용
+      setTimeout(() => { onResvTypeChange('new'); search?.focus(); }, 100);
     }
     if (id === 'm-add-exam')    fillMemberSelect('newExamMember', false);
     if (id === 'm-add-member')  refreshNewCategoryTags();
@@ -8699,6 +8854,7 @@ VIP 회원 전용 특별 혜택을 안내드립니다.
     renderConsultList();
     renderConsultDetail();
     renderConsultChannelSettings();
+    if (typeof renderResvDurationSettings === 'function') renderResvDurationSettings();
   });
 
   /* ═══════════════════════════════════════════════
