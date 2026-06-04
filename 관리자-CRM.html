@@ -5987,14 +5987,16 @@ VIP 회원 전용 특별 혜택을 안내드립니다.
       const s = start.toISOString().slice(0,10), e = end.toISOString().slice(0,10);
       return RESERVATIONS.filter(r => r.date >= s && r.date <= e);
     })();
-    const noshow = RESERVATIONS.filter(r => r.status === '노쇼' && r.date.startsWith(TODAY_DATE.slice(0,7))).length;
-    const cancelRate = RESERVATIONS.length ? Math.round(noshow * 100 / RESERVATIONS.length * 10) / 10 : 0;
+    // 전체 노쇼 + 이번달 노쇼 둘 다 표시
+    const noshowAll   = RESERVATIONS.filter(r => r.status === '노쇼').length;
+    const noshowMonth = RESERVATIONS.filter(r => r.status === '노쇼' && r.date.startsWith(TODAY_DATE.slice(0,7))).length;
+    const cancelRate  = RESERVATIONS.length ? Math.round(noshowAll * 100 / RESERVATIONS.length * 10) / 10 : 0;
     const confirmCnt = today.filter(r => r.status === '확정').length;
     const pendingCnt = today.filter(r => r.status === '대기').length;
     document.getElementById('reserveStatRow').innerHTML = `
       <div class="stat-card" style="--c:#4299E1;cursor:pointer" onclick="reserveQuickFilter('today')"><div class="sc-top"><span class="sc-label">오늘 예약</span><span class="sc-icon">📋</span></div><div class="sc-val">${today.length}</div><div class="sc-change gray">확정 ${confirmCnt} / 대기 ${pendingCnt}</div></div>
       <div class="stat-card" style="--c:#38A169;cursor:pointer" onclick="reserveQuickFilter('week')"><div class="sc-top"><span class="sc-label">이번주 예약</span><span class="sc-icon">📅</span></div><div class="sc-val">${wk.length}</div><div class="sc-change up">전체 ${RESERVATIONS.length}건</div></div>
-      <div class="stat-card" style="--c:#E53E3E;cursor:pointer" onclick="reserveQuickFilter('noshow')"><div class="sc-top"><span class="sc-label">이번달 노쇼</span><span class="sc-icon">❌</span></div><div class="sc-val">${noshow}</div><div class="sc-change dn">관리 필요</div></div>
+      <div class="stat-card" style="--c:#E53E3E;cursor:pointer" onclick="reserveQuickFilter('noshow')"><div class="sc-top"><span class="sc-label">전체 노쇼</span><span class="sc-icon">❌</span></div><div class="sc-val">${noshowAll}</div><div class="sc-change dn">이번달 ${noshowMonth}건</div></div>
       <div class="stat-card" style="--c:#E67E22;cursor:pointer" onclick="reserveQuickFilter('all')"><div class="sc-top"><span class="sc-label">노쇼율</span><span class="sc-icon">🔄</span></div><div class="sc-val">${cancelRate}%</div><div class="sc-change gray">전체 보기</div></div>
     `;
   }
