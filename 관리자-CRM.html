@@ -548,6 +548,7 @@
 <div id="s-consult" class="screen">
   <div class="topbar">
     <div style="flex:1"><div class="topbar-title">💬 상담 이력</div><div class="topbar-sub" id="consultCountSub">—</div></div>
+    <button class="topbar-btn" style="background:#9B59B6;color:#fff;margin-right:6px" onclick="openCallSimulator()" title="전화 수신 시뮬레이션 — 회원 선택 → 통화 → 자동 STT 텍스트화 + AI 요약">🎙 통화 시작 + AI 요약</button>
     <button class="topbar-btn btn-primary" onclick="openModal('m-add-consult')">+ 상담 등록</button>
   </div>
   <div class="content">
@@ -7430,9 +7431,21 @@ VIP 회원 전용 특별 혜택을 안내드립니다.
     if (!panel) return;
     const c = CONSULTS.find(x => x.id === _consultSelectedId);
     if (!c) {
-      panel.innerHTML = `<div style="display:flex;align-items:center;justify-content:center;min-height:520px;color:#A0AEC0;text-align:center;font-size:13px;flex-direction:column;gap:8px">
+      panel.innerHTML = `<div style="display:flex;align-items:center;justify-content:center;min-height:520px;color:#A0AEC0;text-align:center;font-size:13px;flex-direction:column;gap:12px;padding:24px">
         <div style="font-size:40px">💬</div>
         <div>좌측에서 상담을 선택하면<br>상세 내용이 여기에 표시됩니다.</div>
+        <div style="background:#FAF5FF;border:1.5px solid #D6BCFA;border-radius:12px;padding:16px;margin-top:18px;max-width:380px;text-align:left">
+          <div style="font-size:13px;font-weight:900;color:#553C9A;margin-bottom:8px">🤖 AI 자동 요약 기능 안내</div>
+          <div style="font-size:11.5px;color:#4A5568;line-height:1.7">
+            ① 상단 <strong style="color:#553C9A">🎙 통화 시작 + AI 요약</strong> 버튼 클릭<br>
+            ② 회원 선택 후 <strong>📞 통화 받기</strong><br>
+            ③ 통화 (마이크 허용 시 실시간 STT 자동 텍스트화)<br>
+            ④ <strong>통화 종료 + 저장</strong> 클릭<br>
+            ⑤ 상담 이력에 자동 저장 + 🤖 AI 요약 자동 생성<br>
+            <br>
+            <span style="color:#A0AEC0">기존 샘플:</span> 김지훈(4/16) · 이수진(4/15) · 최민준(4/14) — 클릭하면 AI 요약 보임
+          </div>
+        </div>
       </div>`;
       return;
     }
