@@ -2682,7 +2682,7 @@ VIP 회원 전용 특별 혜택을 안내드립니다.
 </div>
 
 <!-- ═══════════════ 수업 완료 + 회원 서명 (최상위 z-index) ═══════════════ -->
-<div class="modal-back" id="m-resv-signature" style="z-index:9999" onclick="closeModalByBack(event,'m-resv-signature')">
+<div class="modal-back" id="m-resv-signature" style="z-index:9999" onclick="closeModalByBack(event,'m-resv-signature');restoreEditResvVisibility()">
   <div class="modal" style="width:520px;max-height:92vh;display:flex;flex-direction:column">
     <div class="modal-title">✍️ 수업 완료 확인 — 회원 서명</div>
     <div id="signResvInfo" style="background:#F0F7FF;border:1.5px solid #BEE3F8;border-radius:10px;padding:11px 14px;margin-bottom:14px"></div>
@@ -2700,7 +2700,7 @@ VIP 회원 전용 특별 혜택을 안내드립니다.
     </div>
 
     <div class="modal-btns">
-      <button style="background:#EDF2F7;color:#4A5568" onclick="closeModal('m-resv-signature')">취소</button>
+      <button style="background:#EDF2F7;color:#4A5568" onclick="closeModal('m-resv-signature');restoreEditResvVisibility()">취소</button>
       <button id="signConfirmBtn" style="background:#38A169;color:#fff" onclick="confirmCompleteWithSignature()">✓ 수업 완료 + 횟수 차감</button>
     </div>
   </div>
@@ -5037,6 +5037,9 @@ VIP 회원 전용 특별 혜택을 안내드립니다.
     const r = (RESERVATIONS||[]).find(x => x.id === _editResvId);
     if (!r) { showToast('예약 정보 없음'); return; }
     if (r.status === '완료') { if (!confirm('이미 완료된 예약입니다. 다시 서명하시겠습니까?')) return; }
+    // 뒤의 예약 수정 모달 임시 숨김 (서명 후 복귀하지 않고 자동으로 닫힘)
+    const edit = document.getElementById('m-edit-reserve');
+    if (edit) edit.style.visibility = 'hidden';
     const m = MEMBERS.find(mm => mm.name === r.member);
     const passProgress = m ? getPassProgress(m) : null;
     // 회원 정보 카드
@@ -5093,6 +5096,11 @@ VIP 회원 전용 특별 혜택을 안내드립니다.
       document.getElementById('signDateTime').textContent = new Date(TODAY_DATE).toLocaleDateString('ko-KR') + ' ' + r.time;
     }, 100);
     openModal('m-resv-signature');
+  }
+
+  function restoreEditResvVisibility() {
+    const edit = document.getElementById('m-edit-reserve');
+    if (edit) edit.style.visibility = '';
   }
 
   function clearSignature() {
