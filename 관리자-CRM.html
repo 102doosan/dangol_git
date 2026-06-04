@@ -3745,6 +3745,118 @@ VIP 회원 전용 특별 혜택을 안내드립니다.
       <div class="modal-btns">${footerBtns}</div>`;
   }
 
+  /* ── 자동 발송 템플릿 (자동 발송 설정과 동일 구조) ── */
+  const AUTO_MSG_TEMPLATES = {
+    'task-churn':
+`안녕하세요 {이름}님 😊
+
+오랜만에 안부 인사드립니다.
+{마지막방문} 이후 못 뵙고 있어서 안부 차 연락드렸어요.
+
+다시 방문해 주시면 정말 반갑겠습니다!
+📞 예약/문의: 02-1234-5678
+- ○○ 센터 드림`,
+    'task-remind-default':
+`[예약 알림]
+{이름} 회원님, {예약일시} {예약종류} 예약이 있습니다.
+담당: {담당자}
+📍 센터 1층
+문의: 02-1234-5678`,
+    'task-inquiry':
+`안녕하세요 {이름}님,
+
+문의 주신 내용 확인했습니다.
+
+(여기에 답변 내용을 입력해 주세요)
+
+추가 문의는 언제든 연락 주세요.
+📞 02-1234-5678`,
+    'task-birthday-vip':
+`🎂 생일 축하드립니다!
+{이름} 회원님, 오늘 생일을 진심으로 축하드립니다 🎉
+
+감사한 마음을 담아 VIP 특별 {쿠폰}을 드립니다.
+쿠폰 유효기간: 04/16 ~ 05/16
+
+항상 건강하게 함께해요 💙
+- ○○ 센터 드림`,
+    'task-birthday-normal':
+`🎂 생일 축하드립니다!
+{이름} 회원님, 오늘 생일을 축하드립니다 🎉
+
+앞으로도 건강한 몸과 마음을 위해 함께해요!
+- ○○ 센터 드림`,
+    'task-expire':
+`[이용권 만료 안내]
+{이름} 회원님, {이용권}이 {디데이}({만료일}) 만료됩니다.
+
+재등록 시 {할인혜택}을 드립니다!
+📞 예약: 02-1234-5678`,
+    'task-consult':
+`안녕하세요 {이름}님,
+
+지난번 {상담주제} 관련 후속 안내드립니다.
+
+(여기에 후속 안내 내용을 입력해 주세요)
+
+추가 문의는 언제든 연락 주세요.
+📞 02-1234-5678`,
+  };
+  function applyAutoMsgTemplate(item, taskKey) {
+    // 항목에 이미 msgPreview가 있으면 그것을 사용 (이미 변수 치환 완료)
+    if (item.msgPreview) return item.msgPreview;
+    let tpl = '';
+    if (taskKey === 'task-birthday') {
+      tpl = item.grade === 'VIP' ? AUTO_MSG_TEMPLATES['task-birthday-vip'] : AUTO_MSG_TEMPLATES['task-birthday-normal'];
+    } else if (taskKey === 'task-consult') {
+      tpl = AUTO_MSG_TEMPLATES['task-consult'];
+    } else {
+      tpl = AUTO_MSG_TEMPLATES[taskKey] || '';
+    }
+    const c = item.consultRef || {};
+    return tpl
+      .replace(/{이름}/g, item.name || '')
+      .replace(/{마지막방문}/g, item.lastVisit || '최근')
+      .replace(/{예약일시}/g, item.apptTime || '')
+      .replace(/{예약종류}/g, item.apptType || '')
+      .replace(/{담당자}/g, item.staff || c.staff || '')
+      .replace(/{쿠폰}/g, item.coupon || '할인 쿠폰')
+      .replace(/{이용권}/g, item.passType || '이용권')
+      .replace(/{디데이}/g, item.dday || '')
+      .replace(/{만료일}/g, item.expDate || '')
+      .replace(/{할인혜택}/g, item.discount || '재등록 혜택')
+      .replace(/{상담주제}/g, c.subject || '상담');
+  }
+  function getMsgEditorHTML(item, taskKey, label) {
+    const initial = applyAutoMsgTemplate(item, taskKey);
+    return `<div class="modal-field" style="margin-bottom:12px">
+      <div class="modal-label" style="display:flex;justify-content:space-between;align-items:center">
+        <span>✏️ ${label} <span style="font-size:11px;color:#A0AEC0;font-weight:400">— 자동 발송 설정 템플릿 자동 적용 · 수정 가능</span></span>
+        <button class="topbar-btn btn-ghost" style="font-size:10px;padding:3px 8px" onclick="resetTaskMsg('${item.id}','${taskKey}')">↩ 초기화</button>
+      </div>
+      <textarea class="modal-input" id="td-msg-content" style="min-height:130px;resize:vertical;line-height:1.7;font-size:12.5px;background:#FFFBEB;border-color:#F6E05E">${escapeHtml(initial)}</textarea>
+      <div style="font-size:10px;color:#A0AEC0;margin-top:3px"><span id="td-msg-char">0</span>자 · 변수: {이름} {마지막방문} {예약일시} {예약종류} {담당자} {쿠폰} {이용권} {디데이} {만료일} {할인혜택} {상담주제}</div>
+    </div>`;
+  }
+  function resetTaskMsg(itemId, taskKey) {
+    const d    = TODAY_DATA[taskKey];
+    const item = d.items.find(i => i.id === itemId);
+    if (!item) return;
+    delete item.msgPreview;
+    const newTpl = applyAutoMsgTemplate(item, taskKey);
+    const ta = document.getElementById('td-msg-content');
+    if (ta) ta.value = newTpl;
+    showToast('↩ 자동 발송 템플릿으로 초기화');
+  }
+  // 액션 버튼이 실제로 textarea 값을 읽도록
+  function sendTaskMsg(channel, name) {
+    const ta = document.getElementById('td-msg-content');
+    const txt = ta ? (ta.value || '').trim() : '';
+    if (!txt) { showToast('메시지 내용을 입력하세요'); return; }
+    const label = channel === 'sms' ? '문자 (SMS)' : channel === 'lms' ? 'LMS' : channel === 'kakao' ? '카카오 알림톡' : channel === 'push' ? '앱 푸시' : '메시지';
+    showToast(`✅ ${name} 님께 ${label} 발송 완료 (${txt.length}자)`);
+  }
+
   function getTaskActionBody(item, taskKey) {
     if (taskKey === 'task-churn') {
       const reasonTags = (item.churnReasons || []).map(r =>
@@ -3762,10 +3874,11 @@ VIP 회원 전용 특별 혜택을 안내드립니다.
           <div style="line-height:1.4">${reasonTags}</div>
         </div>` : ''}
         ${item.memo ? `<div class="td-inquiry-box" style="border-left-color:#E53E3E;margin-bottom:14px">📋 이전 상담 메모: ${item.memo}</div>` : ''}
+        ${getMsgEditorHTML(item, taskKey, '발송 메시지')}
         <div class="td-action-row">
           <button class="td-action-btn" onclick="showToast('📞 ${item.name} (${item.phone}) 전화 발신')">📞 전화 발신<div style="font-size:10px;color:#A0AEC0;margin-top:2px">${item.phone}</div></button>
-          <button class="td-action-btn" onclick="showToast('💬 ${item.name} 문자 발송')">💬 문자 발송</button>
-          <button class="td-action-btn" onclick="showToast('💛 ${item.name} 카카오 발송')">💛 카카오</button>
+          <button class="td-action-btn" onclick="sendTaskMsg('sms','${item.name}')">💬 문자 발송</button>
+          <button class="td-action-btn" onclick="sendTaskMsg('kakao','${item.name}')">💛 카카오</button>
         </div>
         <div class="modal-field" style="margin-bottom:14px">
           <div class="modal-label">연락 결과</div>
@@ -3786,12 +3899,11 @@ VIP 회원 전용 특별 혜택을 안내드립니다.
           <div class="td-info-cell"><div class="td-ic-label">예약 종류</div><div class="td-ic-val">${item.apptType}</div></div>
           <div class="td-info-cell"><div class="td-ic-label">담당자</div><div class="td-ic-val">${item.staff}</div></div>
         </div>
-        <div class="modal-label" style="margin-bottom:6px">발송 메시지 미리보기</div>
-        <div class="td-msg-preview" style="white-space:pre-line">${item.msgPreview}</div>
+        ${getMsgEditorHTML(item, taskKey, '리마인더 메시지')}
         <div class="td-action-row">
-          <button class="td-action-btn" onclick="showToast('💬 ${item.name} 리마인더 문자 발송 완료!')">💬 문자 발송</button>
-          <button class="td-action-btn" onclick="showToast('💛 ${item.name} 카카오 알림톡 발송 완료!')">💛 카카오 알림톡</button>
-          <button class="td-action-btn" onclick="showToast('🔔 ${item.name} 앱 푸시 발송 완료!')">🔔 앱 푸시</button>
+          <button class="td-action-btn" onclick="sendTaskMsg('sms','${item.name}')">💬 문자 발송</button>
+          <button class="td-action-btn" onclick="sendTaskMsg('kakao','${item.name}')">💛 카카오 알림톡</button>
+          <button class="td-action-btn" onclick="sendTaskMsg('push','${item.name}')">🔔 앱 푸시</button>
         </div>`;
     }
     if (taskKey === 'task-inquiry') {
@@ -3803,12 +3915,9 @@ VIP 회원 전용 특별 혜택을 안내드립니다.
         <div class="modal-label" style="margin-bottom:6px">문의 내용</div>
         <div class="td-inquiry-box">${item.content}</div>
         <div class="modal-label" style="margin-bottom:6px">연락처: <strong>${item.contact}</strong></div>
-        <div class="modal-field" style="margin-bottom:14px">
-          <div class="modal-label">답변 내용</div>
-          <textarea class="modal-input" id="td-inquiry-reply" style="min-height:80px;resize:vertical" placeholder="답변을 입력하세요..."></textarea>
-        </div>
+        ${getMsgEditorHTML(item, taskKey, '답변 메시지')}
         <div class="td-action-row">
-          <button class="td-action-btn" onclick="showToast('📧 답변 발송 완료!')">📧 이메일/문자 발송</button>
+          <button class="td-action-btn" onclick="sendTaskMsg('sms','${item.name}')">📧 답변 발송</button>
           <button class="td-action-btn" onclick="showToast('📞 ${item.contact} 전화 발신')">📞 전화 발신</button>
         </div>`;
     }
@@ -3818,12 +3927,11 @@ VIP 회원 전용 특별 혜택을 안내드립니다.
           <div class="td-info-cell"><div class="td-ic-label">등급</div><div class="td-ic-val">${item.grade}</div></div>
           <div class="td-info-cell"><div class="td-ic-label">발송 쿠폰</div><div class="td-ic-val" style="color:#276749">${item.coupon}</div></div>
         </div>
-        <div class="modal-label" style="margin-bottom:6px">생일 축하 메시지 미리보기</div>
-        <div class="td-msg-preview" style="white-space:pre-line">${item.msgPreview}</div>
+        ${getMsgEditorHTML(item, taskKey, '생일 축하 메시지')}
         <div class="td-action-row">
-          <button class="td-action-btn" onclick="showToast('🎂 ${item.name} 생일 문자 발송 완료!')">💬 문자 발송</button>
-          <button class="td-action-btn" onclick="showToast('💛 ${item.name} 카카오 생일 메시지 발송!')">💛 카카오</button>
-          <button class="td-action-btn" onclick="showToast('🔔 ${item.name} 앱 푸시 발송!')">🔔 앱 푸시</button>
+          <button class="td-action-btn" onclick="sendTaskMsg('sms','${item.name}')">💬 문자 발송</button>
+          <button class="td-action-btn" onclick="sendTaskMsg('kakao','${item.name}')">💛 카카오</button>
+          <button class="td-action-btn" onclick="sendTaskMsg('push','${item.name}')">🔔 앱 푸시</button>
         </div>`;
     }
     if (taskKey === 'task-consult') {
@@ -3850,10 +3958,11 @@ VIP 회원 전용 특별 혜택을 안내드립니다.
         <div class="td-inquiry-box" style="border-left-color:#A0AEC0;margin-bottom:10px;white-space:pre-wrap">${escapeHtml(c.memo||'')}</div>
         <div class="modal-label" style="margin-bottom:6px">🔁 후속 조치</div>
         <div class="td-inquiry-box" style="border-left-color:#38A169;background:#F0FFF4;margin-bottom:14px">${escapeHtml(c.followup||'')}</div>
+        ${getMsgEditorHTML(item, taskKey, '후속 안내 메시지')}
         <div class="td-action-row">
           <button class="td-action-btn" onclick="showToast('📞 ${c.member} (${c.phone||''}) 전화 발신')">📞 전화 발신</button>
-          <button class="td-action-btn" onclick="showToast('💬 ${c.member} 문자 발송')">💬 문자 발송</button>
-          <button class="td-action-btn" onclick="showToast('💛 ${c.member} 카카오 발송')">💛 카카오</button>
+          <button class="td-action-btn" onclick="sendTaskMsg('sms','${c.member}')">💬 문자 발송</button>
+          <button class="td-action-btn" onclick="sendTaskMsg('kakao','${c.member}')">💛 카카오</button>
         </div>
         <div class="modal-field" style="margin-bottom:14px">
           <div class="modal-label">처리 결과</div>
@@ -3874,12 +3983,11 @@ VIP 회원 전용 특별 혜택을 안내드립니다.
           <div class="td-info-cell"><div class="td-ic-label">만료일</div><div class="td-ic-val">${item.expDate}</div></div>
         </div>
         <div class="td-inquiry-box" style="border-left-color:#553C9A;margin-bottom:14px">🎁 재등록 혜택: ${item.discount}</div>
-        <div class="modal-label" style="margin-bottom:6px">발송 메시지 미리보기</div>
-        <div class="td-msg-preview" style="white-space:pre-line">${item.msgPreview}</div>
+        ${getMsgEditorHTML(item, taskKey, '만료 안내 메시지')}
         <div class="td-action-row">
-          <button class="td-action-btn" onclick="showToast('💬 ${item.name} 만료 안내 문자 발송 완료!')">💬 문자 발송</button>
+          <button class="td-action-btn" onclick="sendTaskMsg('sms','${item.name}')">💬 문자 발송</button>
           <button class="td-action-btn" onclick="showToast('📞 ${item.phone} 전화 발신')">📞 전화 발신<div style="font-size:10px;color:#A0AEC0;margin-top:2px">${item.phone}</div></button>
-          <button class="td-action-btn" onclick="showToast('💛 ${item.name} 카카오 발송!')">💛 카카오</button>
+          <button class="td-action-btn" onclick="sendTaskMsg('kakao','${item.name}')">💛 카카오</button>
         </div>`;
     }
     return '';
