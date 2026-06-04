@@ -3420,6 +3420,58 @@ VIP 회원 전용 특별 혜택을 안내드립니다.
     if (TODAY_DATA['task-consult']) TODAY_DATA['task-consult'].items = items;
   }
 
+  /* ── 오늘 처리할 일 — 항목 1차 분류 (그룹핑 기준) ── */
+  function getPrimaryCategory(item, taskKey) {
+    if (taskKey === 'task-remind' && item.apptType) {
+      const t = item.apptType;
+      const color = t.includes('TPI') ? 'teal' : t.includes('SFMA') ? 'blue' : t.includes('CSMI') ? 'purple'
+                  : t.includes('골프') ? 'orange' : t.includes('레슨') ? 'pink' : t.includes('재활') ? 'red' : 'gray';
+      return { label:t, color };
+    }
+    if (taskKey === 'task-inquiry' && item.channel) {
+      return { label:item.channel, color: item.channel === '전화' ? 'green' : item.channel === '이메일' ? 'blue' : 'gray' };
+    }
+    if (taskKey === 'task-expire') {
+      const pt = item.passType || '';
+      const key = pt.includes('헬스') ? '헬스 이용권' : pt.includes('골프') ? '골프 이용권'
+                : pt.includes('PT') ? 'PT 이용권' : pt.includes('필라') ? '필라테스 이용권'
+                : pt.includes('재활') ? '재활 이용권' : pt.includes('TPI') ? 'TPI 패키지' : '기타 이용권';
+      const color = key.includes('골프') ? 'orange' : key.includes('PT') ? 'pink' : key.includes('필라') ? 'purple'
+                  : key.includes('재활') ? 'red' : key.includes('TPI') ? 'teal' : 'blue';
+      return { label:key, color };
+    }
+    if (taskKey === 'task-consult' && item.consultRef && item.consultRef.result) {
+      return { label:item.consultRef.result, color: item.consultRef.result === '재연락' ? 'blue' : 'orange' };
+    }
+    if (taskKey === 'task-birthday') {
+      return item.grade === 'VIP' ? { label:'VIP 회원', color:'purple' } : { label:'일반 회원', color:'gray' };
+    }
+    // task-churn: 회원 태그 우선순위
+    const m = (typeof MEMBERS !== 'undefined') ? MEMBERS.find(x => x.name === item.name) : null;
+    if (m && m.tags) {
+      const priority = ['TPI수검','SFMA수검','골프회원','재활','수술후','만성통증','통증완화','PT','필라테스','헬스','체형교정','산전산후'];
+      const labelMap = { 'TPI수검':'TPI 수검자','SFMA수검':'SFMA 수검자','골프회원':'골프','재활':'재활','수술후':'수술후 케어','만성통증':'통증 관리','통증완화':'통증 관리','PT':'PT','필라테스':'필라테스','헬스':'헬스','체형교정':'체형 교정','산전산후':'산전산후 케어' };
+      const colorMap = { 'TPI 수검자':'teal','SFMA 수검자':'blue','골프':'orange','재활':'red','수술후 케어':'red','통증 관리':'red','PT':'pink','필라테스':'purple','헬스':'blue','체형 교정':'teal','산전산후 케어':'pink' };
+      for (const t of priority) {
+        if (m.tags.includes(t)) {
+          const label = labelMap[t];
+          return { label, color: colorMap[label] || 'gray' };
+        }
+      }
+    }
+    return { label:'기타', color:'gray' };
+  }
+  function groupItemsByCategory(items, taskKey) {
+    const groups = {};
+    items.forEach(item => {
+      const cat = getPrimaryCategory(item, taskKey);
+      if (!groups[cat.label]) groups[cat.label] = { meta:cat, items:[] };
+      groups[cat.label].items.push(item);
+    });
+    // 정렬: 항목 많은 그룹 먼저
+    return Object.values(groups).sort((a,b) => b.items.length - a.items.length);
+  }
+
   /* ── 오늘 처리할 일 — 항목 분류 배지 ── */
   function getItemBadges(item, taskKey) {
     const badges = [];
@@ -3520,31 +3572,40 @@ VIP 회원 전용 특별 혜택을 안내드립니다.
         </div>`;
       }
 
+      // 그룹 헤더 렌더 헬퍼
+      function groupHeader(meta, count) {
+        return `<div style="display:flex;align-items:center;gap:8px;padding:9px 20px 6px;background:#FAFBFC;border-top:1px solid #F0F4F8;border-bottom:1px solid #F0F4F8;margin-top:2px">
+          <span class="bdg bdg-${meta.color}" style="font-size:11px;padding:2px 9px">${escapeHtml(meta.label)}</span>
+          <span style="font-size:11px;color:#718096;font-weight:700">${count}명</span>
+        </div>`;
+      }
+      function renderGrouped(items, itemHTML) {
+        if (!items.length) return '';
+        const groups = groupItemsByCategory(items, key);
+        return groups.map(g => groupHeader(g.meta, g.items.length) + g.items.map(itemHTML).join('')).join('');
+      }
+
       // 전체 탭
       const aEl = document.getElementById('all-' + key);
       if (aEl) {
-        const allHtml = [
-          ...pending.map(pendingHTML),
-          ...(done.length ? [`<div style="height:1px;background:#E2E8F0;margin:4px 20px"></div>`] : []),
-          ...done.map(doneHTML)
-        ].join('');
+        const allHtml = renderGrouped(pending, pendingHTML)
+                      + (done.length ? `<div style="height:1px;background:#E2E8F0;margin:6px 0"></div>` : '')
+                      + renderGrouped(done, doneHTML);
         aEl.innerHTML = allHtml || '<div class="tti-empty">항목이 없습니다.</div>';
       }
 
       // 미처리 탭
       const pEl = document.getElementById('pending-' + key);
       if (pEl) {
-        pEl.innerHTML = pending.length
-          ? pending.map(pendingHTML).join('')
-          : '<div class="tti-empty">🎉 모든 항목 처리 완료!</div>';
+        pEl.innerHTML = pending.length ? renderGrouped(pending, pendingHTML)
+                                       : '<div class="tti-empty">🎉 모든 항목 처리 완료!</div>';
       }
 
       // 처리완료 탭
       const dEl = document.getElementById('done-' + key);
       if (dEl) {
-        dEl.innerHTML = done.length
-          ? done.map(doneHTML).join('')
-          : '<div class="tti-empty" style="color:#A0AEC0">처리완료된 항목이 없습니다.</div>';
+        dEl.innerHTML = done.length ? renderGrouped(done, doneHTML)
+                                    : '<div class="tti-empty" style="color:#A0AEC0">처리완료된 항목이 없습니다.</div>';
       }
 
       // 탭 카운트 배지 업데이트
