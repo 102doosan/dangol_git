@@ -340,12 +340,7 @@
     <button class="topbar-btn btn-primary" onclick="goScreen('s-msg',document.querySelector('.sb-item:nth-child(17)'))">+ 메시지 발송</button>
   </div>
   <div class="content">
-    <div class="stat-row col4">
-      <div class="stat-card" style="--c:#4299E1"><div class="sc-top"><span class="sc-label">전체 회원</span><span class="sc-icon">👥</span></div><div class="sc-val">1,284</div><div class="sc-change up">▲ 23 이번달 신규</div></div>
-      <div class="stat-card" style="--c:#38A169"><div class="sc-top"><span class="sc-label">활성 회원</span><span class="sc-icon">✅</span></div><div class="sc-val">847</div><div class="sc-change gray">전체의 66%</div></div>
-      <div class="stat-card" style="--c:#E53E3E"><div class="sc-top"><span class="sc-label">이탈 위험</span><span class="sc-icon">⚠️</span></div><div class="sc-val">38</div><div class="sc-change dn">▲ 5 지난주 대비</div></div>
-      <div class="stat-card" style="--c:#E67E22"><div class="sc-top"><span class="sc-label">오늘 예약</span><span class="sc-icon">📅</span></div><div class="sc-val">21</div><div class="sc-change gray">4건 미확인</div></div>
-    </div>
+    <div class="stat-row col4" id="homeStatRow"></div>
 
     <div style="display:grid;grid-template-columns:1fr 340px;gap:16px">
       <!-- 오늘 할 일 -->
@@ -4384,11 +4379,42 @@ VIP 회원 전용 특별 혜택을 안내드립니다.
     const todayResv = (RESERVATIONS||[]).filter(r => r.date === TODAY_DATE).length;
     const pendingResv = (RESERVATIONS||[]).filter(r => r.date === TODAY_DATE && r.status === '대기').length;
     document.getElementById('homeStatRow').innerHTML = `
-      <div class="stat-card" style="--c:#4299E1"><div class="sc-top"><span class="sc-label">전체 회원</span><span class="sc-icon">👥</span></div><div class="sc-val">${total}</div><div class="sc-change up">▲ ${newCnt} 이번달 신규</div></div>
-      <div class="stat-card" style="--c:#38A169"><div class="sc-top"><span class="sc-label">활성 회원</span><span class="sc-icon">✅</span></div><div class="sc-val">${active}</div><div class="sc-change gray">${total?Math.round(active*100/total):0}% 활성</div></div>
-      <div class="stat-card" style="--c:#E53E3E"><div class="sc-top"><span class="sc-label">이탈 위험</span><span class="sc-icon">⚠️</span></div><div class="sc-val">${risk}</div><div class="sc-change dn">60일+ 미방문</div></div>
-      <div class="stat-card" style="--c:#E67E22"><div class="sc-top"><span class="sc-label">오늘 예약</span><span class="sc-icon">📅</span></div><div class="sc-val">${todayResv}</div><div class="sc-change gray">대기 ${pendingResv}건</div></div>
+      <div class="stat-card" style="--c:#4299E1;cursor:pointer" onclick="homeStatGo('member-all')"><div class="sc-top"><span class="sc-label">전체 회원</span><span class="sc-icon">👥</span></div><div class="sc-val">${total}</div><div class="sc-change up">▲ ${newCnt} 이번달 신규</div></div>
+      <div class="stat-card" style="--c:#38A169;cursor:pointer" onclick="homeStatGo('member-active')"><div class="sc-top"><span class="sc-label">활성 회원</span><span class="sc-icon">✅</span></div><div class="sc-val">${active}</div><div class="sc-change gray">${total?Math.round(active*100/total):0}% 활성</div></div>
+      <div class="stat-card" style="--c:#E53E3E;cursor:pointer" onclick="homeStatGo('churn')"><div class="sc-top"><span class="sc-label">이탈 위험</span><span class="sc-icon">⚠️</span></div><div class="sc-val">${risk}</div><div class="sc-change dn">60일+ 미방문</div></div>
+      <div class="stat-card" style="--c:#E67E22;cursor:pointer" onclick="homeStatGo('reserve-today')"><div class="sc-top"><span class="sc-label">오늘 예약</span><span class="sc-icon">📅</span></div><div class="sc-val">${todayResv}</div><div class="sc-change gray">대기 ${pendingResv}건</div></div>
     `;
+  }
+  function homeStatGo(kind) {
+    const sb = (id) => document.querySelector(`.sb-item[onclick*="${id}"]`);
+    if (kind === 'member-all' || kind === 'member-active') {
+      goScreen('s-member', sb('s-member'));
+      setTimeout(() => {
+        // 회원 관리 목록 탭으로 이동
+        if (typeof switchMemberSubTab === 'function') try { switchMemberSubTab('list'); } catch(_){}
+        // 활성 회원: 분류 없이 정렬을 최근 방문순으로
+        if (typeof selectCategory === 'function') try { selectCategory('all'); } catch(_){}
+        if (kind === 'member-active') {
+          const sortSel = document.getElementById('memberSortSelect');
+          if (sortSel) { sortSel.value = 'visit-recent'; if (typeof renderMemberTable === 'function') renderMemberTable(); }
+          showToast('🟢 활성 회원 — 최근 방문순');
+        } else {
+          showToast('👥 전체 회원 목록');
+        }
+      }, 120);
+    } else if (kind === 'churn') {
+      goScreen('s-churn', sb('s-churn'));
+      setTimeout(() => {
+        if (typeof setChurnFilter === 'function') try { setChurnFilter('60'); } catch(_){}
+      }, 120);
+    } else if (kind === 'reserve-today') {
+      goScreen('s-reserve', sb('s-reserve'));
+      setTimeout(() => {
+        const dateSel = document.getElementById('reserveDateFilter');
+        if (dateSel) { dateSel.value = 'today'; if (typeof renderReservations === 'function') renderReservations(); }
+        showToast('📅 오늘 예약 목록');
+      }, 120);
+    }
   }
 
   function renderFullCalendar() {
