@@ -6042,9 +6042,14 @@ VIP 회원 전용 특별 혜택을 안내드립니다.
     if (q) list = list.filter(r => r.member.toLowerCase().includes(q));
     list.sort((a,b) => (a.date+a.time).localeCompare(b.date+b.time));
 
-    document.getElementById('reserveSub').textContent = `${df === 'today' ? '오늘' : df === 'week' ? '이번주' : df === 'upcoming' ? '다가올' : '전체'} 예약 ${list.length}건`;
+    // 상태 필터가 있으면 타이틀에 반영 (예: 노쇼 예약 / 대기 예약)
+    const dfLabel = df === 'today' ? '오늘' : df === 'week' ? '이번주' : df === 'upcoming' ? '다가올' : '전체';
+    const statusLabel = (_resvStatusFilter && _resvStatusFilter !== 'all') ? _resvStatusFilter : '';
+    const titlePrefix = statusLabel ? `${statusLabel}` : dfLabel;
+    const titleEmoji = statusLabel === '노쇼' ? '❌ ' : statusLabel === '대기' ? '⏳ ' : statusLabel === '확정' ? '✅ ' : '';
+    document.getElementById('reserveSub').textContent = `${titlePrefix} 예약 ${list.length}건${statusLabel && dfLabel !== '전체' ? ` (${dfLabel})` : ''}`;
     document.getElementById('reserveListCount').textContent = list.length + '건';
-    document.getElementById('reserveListTitle').textContent = (df === 'today' ? '오늘' : df === 'week' ? '이번주' : df === 'upcoming' ? '다가올' : '전체') + ' 예약';
+    document.getElementById('reserveListTitle').innerHTML = titleEmoji + titlePrefix + ' 예약' + (statusLabel && dfLabel !== '전체' ? ` <span style="font-size:11px;color:#A0AEC0;font-weight:600;margin-left:6px">(${dfLabel})</span>` : '');
 
     const typeColor = { 'TPI 검진':'teal','SFMA':'teal','CSMI':'purple','골프검진':'orange','재활치료':'blue','개인레슨':'purple','그룹운동':'green','외래진료':'gray' };
     const statusColor = { '확정':'green','대기':'orange','노쇼':'red','취소':'gray','완료':'gray' };
