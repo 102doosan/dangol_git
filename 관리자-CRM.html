@@ -3864,6 +3864,62 @@ VIP 회원 전용 특별 혜택을 안내드립니다.
   }
   // 액션 버튼은 확인 모달을 거쳐 발송
   let _pendingSend = null;
+
+  // 미등록 발신자를 정식 회원으로 등록 (발송 확인 모달에서 호출)
+  function registerUnknownMember() {
+    const newName  = (document.getElementById('regUnregName')?.value || '').trim();
+    const newPhone = (document.getElementById('regUnregPhone')?.value || '').trim();
+    if (!newName)  { showToast('이름을 입력하세요'); document.getElementById('regUnregName')?.focus(); return; }
+    if (!newPhone) { showToast('전화번호를 입력하세요'); document.getElementById('regUnregPhone')?.focus(); return; }
+    if (!/^010[-]?\d{3,4}[-]?\d{4}$/.test(newPhone.replace(/\s/g,''))) {
+      if (!confirm('전화번호 형식이 010-XXXX-XXXX가 아닙니다. 그대로 등록할까요?')) return;
+    }
+    // 이미 존재하는 이름이면 번호만 갱신
+    const existing = MEMBERS.find(m => m.name === newName);
+    if (existing) {
+      existing.phone = newPhone;
+      ensureConsentDetail(existing);
+      showToast(`✅ ${newName} 회원 번호 갱신 — ${newPhone}`);
+    } else {
+      // 신규 회원으로 추가
+      const m = {
+        name:newName, age:0, gender:'-', phone:newPhone,
+        categories:['new'], tags:[],
+        registeredAt:TODAY_DATE, amount:0, lastVisit:'오늘', lastVisitDays:0,
+        manager:'미배정', consent:'동의', importantMemo:'',
+        birthday:'', passExpDate:'', passType:'',
+        consentDetail:{ sms:'동의', kakao:'동의', push:'동의', privacy:'동의' }
+      };
+      MEMBERS.push(m);
+      showToast(`✅ ${newName} 신규 회원으로 등록되었습니다 (${newPhone})`);
+    }
+    persistAll();
+    // 관련 CONSULTS에 새 이름/번호 반영 (원래 미등록이었던 항목)
+    const origName = _pendingSend ? _pendingSend.name : null;
+    if (origName && origName !== newName) {
+      CONSULTS.forEach(c => { if (c.member === origName) { c.member = newName; c.phone = newPhone; } });
+    } else {
+      CONSULTS.forEach(c => { if (c.member === newName && (!c.phone || c.phone === '-')) c.phone = newPhone; });
+    }
+    // 화면 즉시 갱신
+    if (typeof renderMemberTable === 'function') try { renderMemberTable(); } catch(_){}
+    if (typeof renderCategoryPills === 'function') try { renderCategoryPills(); } catch(_){}
+    if (typeof renderConsents === 'function') try { renderConsents(); } catch(_){}
+    if (typeof renderConsultList === 'function') try { renderConsultList(); } catch(_){}
+    if (typeof renderConsultDetail === 'function') try { renderConsultDetail(); } catch(_){}
+    // 발송 확인 모달도 새 회원 정보로 다시 그리기
+    if (_pendingSend) {
+      const ch = _pendingSend.channel;
+      const txt = (document.getElementById('confirmMsgContent')?.value || _pendingSend.text || '').trim();
+      // 텍스트도 새 이름으로 치환
+      const updatedTxt = txt.replace(new RegExp(origName, 'g'), newName);
+      // 다시 sendTaskMsg 호출 → 모달 재렌더
+      const origTa = document.getElementById('td-msg-content');
+      if (origTa) origTa.value = updatedTxt;
+      sendTaskMsg(ch, newName);
+    }
+  }
+
   function sendTaskMsg(channel, name) {
     const ta = document.getElementById('td-msg-content');
     const txt = ta ? (ta.value || '').trim() : '';
@@ -3896,11 +3952,27 @@ VIP 회원 전용 특별 혜택을 안내드립니다.
       <div style="background:${black?'#FFF5F5':'#F7FAFC'};border:1.5px solid ${black?'#FC8181':'#E2E8F0'};border-radius:10px;padding:12px 14px;margin-bottom:12px">
         <div style="font-size:11px;color:#718096;font-weight:700;margin-bottom:4px">${black?'🚫 블랙리스트 회원':'받는 사람'}</div>
         <div style="font-size:16px;font-weight:900;color:#1A202C">${escapeHtml(name)}${member?` <span style="font-size:11px;color:#A0AEC0;font-weight:600">${member.age}·${member.gender}</span>`:''}</div>
-        <div style="display:flex;align-items:center;gap:6px;margin-top:6px">
-          <span style="font-size:16px">📱</span>
-          <strong style="font-size:14px;font-weight:800;color:#2C5282;font-variant-numeric:tabular-nums">${escapeHtml(phone)}</strong>
-          ${member?'<span style="font-size:10px;color:#A0AEC0;margin-left:4px">— 등록된 회원 번호</span>':'<span style="font-size:10px;color:#C05621;margin-left:4px">⚠️ 미등록</span>'}
-        </div>
+        ${member ? `
+          <div style="display:flex;align-items:center;gap:6px;margin-top:6px">
+            <span style="font-size:16px">📱</span>
+            <strong style="font-size:14px;font-weight:800;color:#2C5282;font-variant-numeric:tabular-nums">${escapeHtml(phone)}</strong>
+            <span style="font-size:10px;color:#A0AEC0;margin-left:4px">— 등록된 회원 번호</span>
+          </div>
+        ` : `
+          <!-- 미등록 회원 — 번호 등록 폼 -->
+          <div style="background:#FFFAF0;border:1.5px dashed #F6AD55;border-radius:8px;padding:10px 12px;margin-top:8px">
+            <div style="display:flex;align-items:center;gap:6px;margin-bottom:8px">
+              <span style="font-size:14px">⚠️</span>
+              <span style="font-size:12px;font-weight:800;color:#7B341E">등록된 번호가 없습니다 — 회원 정보에 등록 후 발송하세요</span>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:8px">
+              <input id="regUnregName" placeholder="회원 이름" value="${escapeHtml(name === '미등록' || name === '미등록 발신자' ? '' : name)}" style="padding:7px 10px;border:1.5px solid #E2E8F0;border-radius:7px;font-size:12px;font-family:'Noto Sans KR',sans-serif;outline:none">
+              <input id="regUnregPhone" placeholder="010-0000-0000" style="padding:7px 10px;border:1.5px solid #E2E8F0;border-radius:7px;font-size:12px;font-family:'Noto Sans KR',sans-serif;outline:none;font-variant-numeric:tabular-nums">
+            </div>
+            <button onclick="registerUnknownMember()" style="width:100%;padding:7px;background:#38A169;color:#fff;border:none;border-radius:7px;font-size:12px;font-weight:800;cursor:pointer;font-family:'Noto Sans KR',sans-serif">✓ 회원으로 등록하고 번호 저장</button>
+            <div style="font-size:10px;color:#975A16;margin-top:5px">등록하면 회원 관리에 자동 추가되고 모든 발송에 활용됩니다.</div>
+          </div>
+        `}
         ${member && member.importantMemo ? `<div style="background:#FFFBEB;border-left:3px solid #ECC94B;border-radius:6px;padding:6px 10px;margin-top:8px;font-size:11px;color:#1A202C">📌 ${escapeHtml(member.importantMemo)}</div>` : ''}
       </div>
 
@@ -3935,6 +4007,15 @@ VIP 회원 전용 특별 혜택을 안내드립니다.
   function confirmSendMsg() {
     if (!_pendingSend) { closeModal('m-send-confirm'); return; }
     const { channel, name, phone, chMeta } = _pendingSend;
+
+    // 미등록 회원 차단
+    const member = MEMBERS.find(m => m.name === name);
+    if (!member || !phone || phone === '미등록 번호' || phone === '미등록') {
+      showToast('⚠️ 먼저 회원 번호를 등록해 주세요');
+      document.getElementById('regUnregPhone')?.focus();
+      return;
+    }
+
     // 확인 모달 내 textarea에서 최종 내용 읽기 (수정 반영)
     const finalText = (document.getElementById('confirmMsgContent')?.value || _pendingSend.text || '').trim();
     if (!finalText) { showToast('메시지 내용이 비어있습니다'); return; }
