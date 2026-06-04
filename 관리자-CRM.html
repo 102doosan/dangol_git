@@ -4882,8 +4882,13 @@ VIP 회원 전용 특별 혜택을 안내드립니다.
           const member = MEMBERS.find(m => m.name === r.member);
           const black = member ? isBlacklistedMember(member.name) : false;
           const noShowDecor = r.status === '노쇼' ? 'text-decoration:line-through;opacity:0.7' : '';
-          cell += `<div onclick="event.stopPropagation();showReservationDetail('${r.id}')" title="${escapeHtml(r.member)} · ${escapeHtml(r.type)} · ${r.status}" style="cursor:pointer;background:${color};color:#fff;border-radius:6px;padding:4px 6px;font-size:10.5px;font-weight:700;line-height:1.4;margin-bottom:2px;${noShowDecor}">
-            ${black?'🚫 ':''}${r.time} ${escapeHtml(r.member)}<br><span style="font-size:9.5px;opacity:.85">${escapeHtml(r.type)} · ${escapeHtml(r.staff)}</span>
+          const signed = !!r.signature;
+          const signedBorder = signed ? 'border:2.5px solid #38A169;box-shadow:inset 0 0 0 1px #fff;' : '';
+          const signedBadge = signed ? `<span style="position:absolute;top:-6px;right:-6px;background:#38A169;color:#fff;border-radius:99px;width:18px;height:18px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:900;border:1.5px solid #fff;box-shadow:0 1px 3px rgba(0,0,0,0.2)" title="회원 서명 완료">✓</span>` : '';
+          const doneTitle = signed ? ' · ✍️ 서명완료' : '';
+          cell += `<div onclick="event.stopPropagation();showReservationDetail('${r.id}')" title="${escapeHtml(r.member)} · ${escapeHtml(r.type)} · ${r.status}${doneTitle}" style="position:relative;cursor:pointer;background:${color};color:#fff;border-radius:6px;padding:4px 6px;font-size:10.5px;font-weight:700;line-height:1.4;margin-bottom:2px;${noShowDecor};${signedBorder}">
+            ${black?'🚫 ':''}${r.time} ${escapeHtml(r.member)}${signed?' <span style="font-size:9px;background:rgba(255,255,255,0.3);padding:0 4px;border-radius:99px;margin-left:2px">✍️</span>':''}<br><span style="font-size:9.5px;opacity:.85">${escapeHtml(r.type)} · ${escapeHtml(r.staff)}</span>
+            ${signedBadge}
           </div>`;
         });
         cell += emptyHint;
@@ -5021,6 +5026,17 @@ VIP 회원 전용 특별 혜택을 안내드립니다.
     const dur = r.duration || RESV_TYPE_DURATIONS[r.type] || 60;
     document.getElementById('editResvDuration').value = dur;
     document.getElementById('editResvEndTime').value  = r.endTime || addMinutesToTime(r.time, dur);
+    // 수업 완료 + 서명 버튼 — 이미 서명된 경우 상태 표시
+    const completeBtn = document.getElementById('editResvCompleteBtn');
+    if (completeBtn) {
+      if (r.signature) {
+        completeBtn.innerHTML = `<div style="display:flex;align-items:center;justify-content:center;gap:8px;width:100%"><span style="background:rgba(255,255,255,0.25);padding:3px 9px;border-radius:99px;font-size:11px">✍️ 서명 완료</span><span>👁 서명 보기 / 재서명</span><span style="font-size:10px;opacity:0.85">(${r.signedAt||r.date})</span></div>`;
+        completeBtn.style.background = 'linear-gradient(135deg,#9B59B6,#553C9A)';
+      } else {
+        completeBtn.innerHTML = '✅ 수업 완료 (회원 서명 + 횟수 차감)';
+        completeBtn.style.background = 'linear-gradient(135deg,#38A169,#276749)';
+      }
+    }
     openModal('m-edit-reserve');
   }
   function editResvShiftDate(days) {
@@ -6249,8 +6265,9 @@ VIP 회원 전용 특별 혜택을 안내드립니다.
       const black = m ? isBlacklistedMember(m.name) : false;
       const fromConsult = r.consultId ? `<span style="font-size:10px;color:#9B59B6;background:#FAF5FF;border-radius:4px;padding:1px 5px;margin-left:4px;font-weight:700">💬 상담연계</span>` : '';
       const timeRange = r.endTime ? `${r.time}~${r.endTime}` : r.time;
-      return `<tr class="clickable" onclick="openResvEdit('${r.id}')" style="${black?'background:#FFF5F5':''}">
-        <td>${r.date.slice(5)} ${timeRange}${r.duration?` <span style="font-size:10px;color:#A0AEC0">${r.duration}분</span>`:''}</td>
+      const signedBadge = r.signature ? `<span title="회원 서명 완료" style="display:inline-block;margin-left:4px;background:#38A169;color:#fff;font-size:9px;font-weight:900;padding:1px 6px;border-radius:99px">✍️ 서명</span>` : '';
+      return `<tr class="clickable" onclick="openResvEdit('${r.id}')" style="${black?'background:#FFF5F5':r.signature?'background:#F0FFF4':''}">
+        <td>${r.date.slice(5)} ${timeRange}${r.duration?` <span style="font-size:10px;color:#A0AEC0">${r.duration}분</span>`:''}${signedBadge}</td>
         <td>${black?'<span style="color:#E53E3E;margin-right:3px">🚫</span>':''}<strong>${escapeHtml(r.member)}</strong>${m?` <span style="font-size:10px;color:#A0AEC0">${m.phone}</span>`:''}${fromConsult}</td>
         <td><span class="bdg bdg-${typeColor[r.type]||'blue'}">${escapeHtml(r.type)}</span></td>
         <td>${escapeHtml(r.staff)}</td>
