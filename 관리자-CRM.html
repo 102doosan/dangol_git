@@ -337,10 +337,15 @@
       <div class="topbar-title">📊 CRM 홈</div>
       <div class="topbar-sub">2026년 4월 16일 기준</div>
     </div>
-    <button class="topbar-btn btn-primary" onclick="goScreen('s-msg',document.querySelector('.sb-item:nth-child(17)'))">+ 메시지 발송</button>
+    <button class="topbar-btn btn-primary" onclick="goScreen('s-msg', document.querySelector('.sb-item[onclick*=\'s-msg\']'))">+ 메시지 발송</button>
   </div>
   <div class="content">
-    <div class="stat-row col4" id="homeStatRow"></div>
+    <div class="stat-row col4" id="homeStatRow">
+      <div class="stat-card" style="--c:#4299E1;cursor:pointer" onclick="homeStatGo('member-all')"><div class="sc-top"><span class="sc-label">전체 회원</span><span class="sc-icon">👥</span></div><div class="sc-val">1,284</div><div class="sc-change up">▲ 23 이번달 신규</div></div>
+      <div class="stat-card" style="--c:#38A169;cursor:pointer" onclick="homeStatGo('member-active')"><div class="sc-top"><span class="sc-label">활성 회원</span><span class="sc-icon">✅</span></div><div class="sc-val">847</div><div class="sc-change gray">전체의 66%</div></div>
+      <div class="stat-card" style="--c:#E53E3E;cursor:pointer" onclick="homeStatGo('churn')"><div class="sc-top"><span class="sc-label">이탈 위험</span><span class="sc-icon">⚠️</span></div><div class="sc-val">38</div><div class="sc-change dn">▲ 5 지난주 대비</div></div>
+      <div class="stat-card" style="--c:#E67E22;cursor:pointer" onclick="homeStatGo('reserve-today')"><div class="sc-top"><span class="sc-label">오늘 예약</span><span class="sc-icon">📅</span></div><div class="sc-val">21</div><div class="sc-change gray">4건 미확인</div></div>
+    </div>
 
     <div style="display:grid;grid-template-columns:1fr 340px;gap:16px">
       <!-- 오늘 할 일 -->
