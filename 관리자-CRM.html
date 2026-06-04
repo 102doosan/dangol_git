@@ -3420,6 +3420,67 @@ VIP 회원 전용 특별 혜택을 안내드립니다.
     if (TODAY_DATA['task-consult']) TODAY_DATA['task-consult'].items = items;
   }
 
+  /* ── 오늘 처리할 일 — 항목 분류 배지 ── */
+  function getItemBadges(item, taskKey) {
+    const badges = [];
+    const push = (label, color) => { if (label) badges.push({ label, color }); };
+
+    // 1. task 종류별 우선 배지
+    if (taskKey === 'task-remind' && item.apptType) {
+      const t = item.apptType;
+      const color = t.includes('TPI') ? 'teal' : t.includes('SFMA') ? 'blue' : t.includes('CSMI') ? 'purple'
+                  : t.includes('골프') ? 'orange' : t.includes('레슨') ? 'pink' : t.includes('재활') ? 'red' : 'gray';
+      push(t, color);
+    }
+    if (taskKey === 'task-inquiry' && item.channel) {
+      push(item.channel, item.channel === '전화' ? 'green' : item.channel === '이메일' ? 'blue' : 'gray');
+    }
+    if (taskKey === 'task-expire') {
+      if (item.dday) push(item.dday, 'red');
+      if (item.passType) {
+        const key = item.passType.includes('헬스') ? '헬스' : item.passType.includes('골프') ? '골프'
+                  : item.passType.includes('PT') ? 'PT' : item.passType.includes('필라') ? '필라테스'
+                  : item.passType.includes('재활') ? '재활' : item.passType.includes('TPI') ? 'TPI' : '이용권';
+        push(key, key === '골프' ? 'orange' : key === 'PT' ? 'pink' : key === '필라테스' ? 'purple' : key === '재활' ? 'red' : key === 'TPI' ? 'teal' : 'blue');
+      }
+    }
+    if (taskKey === 'task-consult' && item.consultRef && item.consultRef.result) {
+      push(item.consultRef.result, item.consultRef.result === '재연락' ? 'blue' : 'orange');
+    }
+    if (taskKey === 'task-birthday') {
+      if (item.grade === 'VIP') push('VIP', 'purple');
+      if (item.coupon && item.coupon !== '없음') push('쿠폰', 'green');
+    }
+
+    // 2. 회원 태그 기반 배지 (이탈위험 등)
+    const m = (typeof MEMBERS !== 'undefined') ? MEMBERS.find(x => x.name === item.name) : null;
+    if (m && m.tags) {
+      const tagMap = {
+        'TPI수검':  { label:'TPI',     color:'teal'   },
+        'SFMA수검': { label:'SFMA',    color:'blue'   },
+        '골프회원': { label:'골프',    color:'orange' },
+        '헬스':     { label:'헬스',    color:'blue'   },
+        'PT':       { label:'PT',      color:'pink'   },
+        '필라테스': { label:'필라테스',color:'purple' },
+        '재활':     { label:'재활',    color:'red'    },
+        '수술후':   { label:'수술후',  color:'red'    },
+        '만성통증': { label:'통증',    color:'red'    },
+        '통증완화': { label:'통증',    color:'red'    },
+        '체형교정': { label:'체형',    color:'teal'   },
+        '산전산후': { label:'산전산후',color:'pink'   },
+      };
+      m.tags.forEach(t => { const mm = tagMap[t]; if (mm) push(mm.label, mm.color); });
+      if (m.categories && m.categories.includes('vip') && !badges.some(b => b.label === 'VIP')) push('VIP', 'purple');
+      if (m.categories && m.categories.includes('blacklist')) push('블랙', 'gray');
+    }
+
+    // 중복 제거 + 최대 4개
+    const seen = new Set();
+    const dedup = [];
+    badges.forEach(b => { if (!seen.has(b.label)) { seen.add(b.label); dedup.push(b); } });
+    return dedup.slice(0, 4);
+  }
+
   function refreshTodayLists() {
     try { regenerateMemberLinkedTasks(); } catch(_) {}
     try { regenerateConsultTasks(); } catch(_) {}
@@ -3431,10 +3492,20 @@ VIP 회원 전용 특별 혜택을 안내드립니다.
       totalPending += pending.length;
 
       // 항목 HTML 생성 헬퍼
+      function badgesHTML(item) {
+        const bs = getItemBadges(item, key);
+        if (!bs.length) return '';
+        return `<div style="display:inline-flex;gap:4px;flex-wrap:wrap;margin-left:8px;vertical-align:middle">${
+          bs.map(b => `<span class="bdg bdg-${b.color}" style="font-size:10px;padding:1px 7px">${escapeHtml(b.label)}</span>`).join('')
+        }</div>`;
+      }
       function pendingHTML(item) {
         return `<div class="tti clickable" onclick="openTaskDetail('${item.id}','${key}')">
           <div class="tti-av" style="background:${d.bg}">${d.icon}</div>
-          <div class="tti-info"><div class="tti-name">${item.name}</div><div class="tti-sub">${item.info}</div></div>
+          <div class="tti-info">
+            <div class="tti-name" style="display:flex;align-items:center;flex-wrap:wrap;gap:4px">${item.name}${badgesHTML(item)}</div>
+            <div class="tti-sub">${item.info}</div>
+          </div>
           <span style="font-size:11px;color:#A0AEC0;margin-right:4px">처리하기 ›</span>
         </div>`;
       }
@@ -3442,7 +3513,7 @@ VIP 회원 전용 특별 혜택을 안내드립니다.
         return `<div class="tti done clickable" onclick="openTaskDetail('${item.id}','${key}')">
           <div class="tti-av" style="background:#F0FFF4">✅</div>
           <div class="tti-info">
-            <div class="tti-name" style="text-decoration:line-through;color:#A0AEC0">${item.name}</div>
+            <div class="tti-name" style="text-decoration:line-through;color:#A0AEC0;display:flex;align-items:center;flex-wrap:wrap;gap:4px">${item.name}${badgesHTML(item)}</div>
             <div class="tti-sub">${item.info}</div>
           </div>
           <button class="tti-undo-btn" onclick="event.stopPropagation();undoTask('${item.id}','${key}')">↩ 미처리로</button>
