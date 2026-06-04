@@ -4829,6 +4829,92 @@ VIP 회원 전용 특별 혜택을 안내드립니다.
 
   /* ── 예약 수정 모달 ── */
   let _editResvId = null;
+  /* ── 회원 이용권 진행 정보 계산 ── */
+  function getPassProgress(m) {
+    if (!m || !m.passType) return null;
+    const pt = m.passType;
+    // 회차 기반 (PT 12회권, 필라테스 30회권 등)
+    const sessionMatch = pt.match(/(\d+)\s*회/);
+    if (sessionMatch) {
+      const total = parseInt(sessionMatch[1]);
+      // 어떤 예약 종류가 이 패스에 해당되는지 매핑
+      const matchTypes =
+        pt.includes('PT') || pt.includes('레슨') ? ['개인레슨','PT'] :
+        pt.includes('필라') ? ['필라테스','그룹운동'] :
+        pt.includes('재활') ? ['재활치료'] :
+        pt.includes('TPI') ? ['TPI 검진'] :
+        pt.includes('골프검진') ? ['골프검진'] :
+        pt.includes('SFMA') ? ['SFMA'] :
+        pt.includes('CSMI') ? ['CSMI'] : [];
+      // 회원의 해당 예약 중 완료/노쇼만 사용 횟수로 카운트
+      let used = (RESERVATIONS||[]).filter(r => r.member === m.name && (matchTypes.length === 0 || matchTypes.some(t => r.type === t || r.type.includes(t))) && (r.status === '완료' || r.status === '노쇼')).length;
+      // 시연용 — 기본 사용 횟수 시뮬레이션 (이름 해시 기반 결정적)
+      if (used === 0) {
+        const seed = Array.from(m.name).reduce((a,c) => a + c.charCodeAt(0), 0);
+        used = Math.min(total - 1, Math.floor(seed % total));
+      }
+      return { kind:'session', total, used, remaining: Math.max(0, total - used), label: pt };
+    }
+    // 월 기반 (헬스 12개월권, 골프 시즌권 등)
+    const monthMatch = pt.match(/(\d+)\s*개월/);
+    if (monthMatch && m.passExpDate) {
+      const totalMonths = parseInt(monthMatch[1]);
+      const days = Math.round((new Date(m.passExpDate) - new Date(TODAY_DATE)) / 86400000);
+      const totalDays = totalMonths * 30;
+      const usedDays = Math.max(0, totalDays - days);
+      return { kind:'monthly', total: totalMonths, totalDays, usedDays, remainingDays: days, label: pt, expDate: m.passExpDate };
+    }
+    // 기간 기반 (시즌권 등)
+    if (m.passExpDate) {
+      const days = Math.round((new Date(m.passExpDate) - new Date(TODAY_DATE)) / 86400000);
+      return { kind:'flat', label: pt, expDate: m.passExpDate, remainingDays: days };
+    }
+    return { kind:'flat', label: pt };
+  }
+  function renderPassProgressCard(m) {
+    const p = getPassProgress(m);
+    if (!p) {
+      return `<div style="background:#FAFBFC;border:1px dashed #CBD5E0;border-radius:8px;padding:10px 12px;margin-top:8px;font-size:11px;color:#A0AEC0;text-align:center">📋 등록된 이용권 정보 없음</div>`;
+    }
+    if (p.kind === 'session') {
+      const pct = Math.round(p.used * 100 / p.total);
+      const color = pct >= 80 ? '#E53E3E' : pct >= 50 ? '#E67E22' : '#38A169';
+      return `<div style="background:#F0F7FF;border:1px solid #BEE3F8;border-radius:8px;padding:10px 12px;margin-top:8px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+          <div style="font-size:12px;font-weight:800;color:#2C5282">🎫 ${escapeHtml(p.label)}</div>
+          <div style="font-size:14px;font-weight:900;color:${color}">${p.used} <span style="font-size:11px;color:#A0AEC0;font-weight:600">/ ${p.total}회</span></div>
+        </div>
+        <div style="background:#E2E8F0;border-radius:99px;height:8px;overflow:hidden">
+          <div style="width:${pct}%;height:100%;background:linear-gradient(90deg,${color},${color}DD);border-radius:99px;transition:width 0.3s"></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;margin-top:5px;font-size:10.5px;color:#718096">
+          <span>사용 ${pct}%</span>
+          <span>잔여 <strong style="color:${color}">${p.remaining}회</strong></span>
+        </div>
+      </div>`;
+    }
+    if (p.kind === 'monthly') {
+      const totalDays = p.totalDays;
+      const used = p.usedDays;
+      const pct = Math.round(used * 100 / totalDays);
+      const color = p.remainingDays <= 7 ? '#E53E3E' : p.remainingDays <= 30 ? '#E67E22' : '#38A169';
+      return `<div style="background:#F0F7FF;border:1px solid #BEE3F8;border-radius:8px;padding:10px 12px;margin-top:8px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+          <div style="font-size:12px;font-weight:800;color:#2C5282">🎫 ${escapeHtml(p.label)}</div>
+          <div style="font-size:13px;font-weight:900;color:${color}">D-${p.remainingDays} <span style="font-size:11px;color:#A0AEC0;font-weight:600">(~${p.expDate})</span></div>
+        </div>
+        <div style="background:#E2E8F0;border-radius:99px;height:8px;overflow:hidden">
+          <div style="width:${pct}%;height:100%;background:linear-gradient(90deg,${color},${color}DD);border-radius:99px;transition:width 0.3s"></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;margin-top:5px;font-size:10.5px;color:#718096">
+          <span>경과 ${used}일 / ${totalDays}일</span>
+          <span>잔여 <strong style="color:${color}">${p.remainingDays}일</strong></span>
+        </div>
+      </div>`;
+    }
+    return `<div style="background:#F0F7FF;border:1px solid #BEE3F8;border-radius:8px;padding:10px 12px;margin-top:8px;font-size:12px;font-weight:800;color:#2C5282">🎫 ${escapeHtml(p.label)}${p.expDate?` <span style="font-size:11px;color:#A0AEC0;font-weight:600">— 만료 ${p.expDate}</span>`:''}</div>`;
+  }
+
   function openResvEdit(rid) {
     const r = (RESERVATIONS||[]).find(x => x.id === rid);
     if (!r) return;
@@ -4844,6 +4930,7 @@ VIP 회원 전용 특별 혜택을 안내드립니다.
           <div style="display:flex;flex-wrap:wrap;gap:3px;margin-top:4px">${
             m.categories.map(cid => { const c = getCategory(cid); return c ? `<span class="bdg bdg-${c.color}" style="font-size:10px;padding:1px 7px">${c.label}</span>` : ''; }).join('')
           }</div>
+          ${renderPassProgressCard(m)}
           ${m.importantMemo ? `<div style="font-size:11px;color:#744210;background:#FFFBEB;border-left:3px solid #ECC94B;padding:5px 8px;border-radius:4px;margin-top:6px">📌 ${escapeHtml(m.importantMemo)}</div>` : ''}
         </div>
       </div>` : `<div style="font-size:13px;color:#975A16">⚠️ 미등록 회원 — ${escapeHtml(r.member)}</div>`;
