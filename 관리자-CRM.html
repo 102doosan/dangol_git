@@ -3938,6 +3938,11 @@ VIP 회원 전용 특별 혜택을 안내드립니다.
     // 확인 모달 내 textarea에서 최종 내용 읽기 (수정 반영)
     const finalText = (document.getElementById('confirmMsgContent')?.value || _pendingSend.text || '').trim();
     if (!finalText) { showToast('메시지 내용이 비어있습니다'); return; }
+
+    // 최종 발송 한 번 더 확인
+    const okMsg = `${chMeta.label}을(를) 발송하시겠습니까?\n\n받는 사람: ${name} (${phone})\n글자수: ${finalText.length}자`;
+    if (!confirm(okMsg)) return;
+
     // task-detail 모달의 원본 textarea에도 변경 사항 반영
     const origTa = document.getElementById('td-msg-content');
     if (origTa) origTa.value = finalText;
