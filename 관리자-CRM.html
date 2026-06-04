@@ -2323,9 +2323,14 @@ VIP 회원 전용 특별 혜택을 안내드립니다.
 
 <!-- 예약 등록 -->
 <div class="modal-back" id="m-add-reserve" onclick="closeModalByBack(event,'m-add-reserve')">
-  <div class="modal">
+  <div class="modal" style="width:520px">
     <div class="modal-title">📅 예약 등록</div>
-    <div class="modal-field"><div class="modal-label">회원 선택</div><select class="modal-input" id="newResvMember"></select></div>
+    <div class="modal-field">
+      <div class="modal-label">회원 검색 / 선택</div>
+      <input class="modal-input" id="newResvMemberSearch" placeholder="🔍 이름/전화번호 검색" oninput="filterNewResvMember()" style="margin-bottom:6px">
+      <select class="modal-input" id="newResvMember" onchange="onNewResvMemberChange()"></select>
+      <div id="newResvPassInfo" style="margin-top:6px"></div>
+    </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
       <div class="modal-field"><div class="modal-label">예약 종류</div><select class="modal-input" id="newResvType"><option>TPI 검진</option><option>SFMA</option><option>CSMI</option><option>골프검진</option><option>재활치료</option><option>개인레슨</option><option>그룹운동</option><option>외래진료</option></select></div>
       <div class="modal-field"><div class="modal-label">담당자</div><select class="modal-input" id="newResvStaff"><option>이트레이너</option><option>최물리</option><option>김상담</option></select></div>
@@ -4800,7 +4805,11 @@ VIP 회원 전용 특별 혜택을 안내드립니다.
         <div style="padding:6px;font-size:11px;color:#A0AEC0;font-weight:700;text-align:right">${h}:00</div>`;
       week.forEach(date => {
         const todays = filtered.filter(r => r.date === date && parseInt(r.time.slice(0,2)) === h);
-        let cell = `<div style="padding:3px;border-left:1px solid #F7FAFC;${date===todayYMD?'background:#FFF8F8':''}">`;
+        const timeStr = String(h).padStart(2,'0') + ':00';
+        const hasEvents = todays.length > 0;
+        const cellClickHandler = hasEvents ? '' : `onclick="openQuickReserve('${date}','${timeStr}')"`;
+        const emptyHint = hasEvents ? '' : `<div class="cal-empty-hint" style="opacity:0;transition:opacity 0.15s;font-size:10px;color:#A0AEC0;font-weight:700;text-align:center;padding:6px 0;cursor:pointer">+ 예약</div>`;
+        let cell = `<div ${cellClickHandler} style="padding:3px;border-left:1px solid #F7FAFC;${date===todayYMD?'background:#FFF8F8':''};${hasEvents?'':'cursor:pointer'}" onmouseover="this.querySelector('.cal-empty-hint')&&(this.querySelector('.cal-empty-hint').style.opacity='1');this.style.background='${date===todayYMD?'#FFF0F0':'#EBF8FF'}'" onmouseout="this.querySelector('.cal-empty-hint')&&(this.querySelector('.cal-empty-hint').style.opacity='0');this.style.background='${date===todayYMD?'#FFF8F8':'transparent'}'">`;
         todays.sort((a,b)=>a.time.localeCompare(b.time)).forEach(r => {
           const color = r.status === '노쇼' || r.status === '대기' ? '#E53E3E' : colorOfType(r.type);
           const member = MEMBERS.find(m => m.name === r.member);
@@ -4810,6 +4819,7 @@ VIP 회원 전용 특별 혜택을 안내드립니다.
             ${black?'🚫 ':''}${r.time} ${escapeHtml(r.member)}<br><span style="font-size:9.5px;opacity:.85">${escapeHtml(r.type)} · ${escapeHtml(r.staff)}</span>
           </div>`;
         });
+        cell += emptyHint;
         cell += '</div>';
         row += cell;
       });
@@ -7421,6 +7431,52 @@ VIP 회원 전용 특별 혜택을 안내드립니다.
     showToast(`✅ ${name} 회원이 등록되었습니다`);
   }
 
+  /* ── 캘린더 빈 셀 → 예약 등록 ── */
+  function openQuickReserve(date, time) {
+    openModal('m-add-reserve');
+    setTimeout(() => {
+      const d = document.getElementById('newResvDate');
+      const t = document.getElementById('newResvTime');
+      if (d) d.value = date;
+      if (t) t.value = time;
+      const search = document.getElementById('newResvMemberSearch');
+      if (search) { search.value = ''; search.focus(); }
+      document.getElementById('newResvPassInfo').innerHTML = '';
+    }, 80);
+  }
+
+  /* ── 회원 검색 (예약 등록 모달) ── */
+  function filterNewResvMember() {
+    const q = (document.getElementById('newResvMemberSearch')?.value || '').trim().toLowerCase();
+    const sel = document.getElementById('newResvMember');
+    if (!sel) return;
+    const matches = MEMBERS.filter(m => !q || m.name.toLowerCase().includes(q) || m.phone.includes(q));
+    sel.innerHTML = matches.length
+      ? matches.map(m => `<option value="${escapeHtml(m.name)}">${escapeHtml(m.name)} (${m.phone})</option>`).join('')
+      : '<option value="">— 일치하는 회원 없음 —</option>';
+    onNewResvMemberChange();
+  }
+  function onNewResvMemberChange() {
+    const name = document.getElementById('newResvMember')?.value;
+    const wrap = document.getElementById('newResvPassInfo');
+    if (!wrap) return;
+    const m = MEMBERS.find(x => x.name === name);
+    if (!m) { wrap.innerHTML = ''; return; }
+    const black = isBlacklistedMember(m.name);
+    const cats = m.categories.map(cid => { const c = getCategory(cid); return c ? `<span class="bdg bdg-${c.color}" style="font-size:10px;padding:1px 7px">${c.label}</span>` : ''; }).join(' ');
+    wrap.innerHTML = `
+      <div style="background:${black?'#FFF5F5':'#F7FAFC'};border:1px solid ${black?'#FC8181':'#E2E8F0'};border-radius:8px;padding:8px 10px">
+        <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:4px">
+          ${black ? '<span style="color:#E53E3E">🚫</span>' : ''}
+          <strong style="font-size:13px;color:#1A202C">${escapeHtml(m.name)}</strong>
+          <span style="font-size:10px;color:#A0AEC0">${m.age}·${m.gender} · ${escapeHtml(m.phone)}</span>
+          ${cats}
+        </div>
+        ${m.importantMemo ? `<div style="font-size:11px;color:#744210;background:#FFFBEB;border-left:3px solid #ECC94B;padding:5px 8px;border-radius:4px;margin-top:4px">📌 ${escapeHtml(m.importantMemo)}</div>` : ''}
+        ${typeof renderPassProgressCard === 'function' ? renderPassProgressCard(m) : ''}
+      </div>`;
+  }
+
   function fillMemberSelect(selectId, includeUnregistered) {
     const sel = document.getElementById(selectId);
     if (!sel) return;
@@ -7474,7 +7530,10 @@ VIP 회원 전용 특별 혜택을 안내드립니다.
   // 등록 모달 열릴 때 회원 select 채우기 + 분류 태그 채우기
   const _origOpenModal = openModal;
   openModal = function(id) {
-    if (id === 'm-add-reserve') fillMemberSelect('newResvMember', false);
+    if (id === 'm-add-reserve') {
+      fillMemberSelect('newResvMember', false);
+      setTimeout(() => { if (typeof onNewResvMemberChange === 'function') onNewResvMemberChange(); }, 50);
+    }
     if (id === 'm-add-exam')    fillMemberSelect('newExamMember', false);
     if (id === 'm-add-member')  refreshNewCategoryTags();
     if (id === 'm-add-consult') prefillNewConsult();
