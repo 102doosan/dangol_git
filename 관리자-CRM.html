@@ -2327,9 +2327,12 @@ VIP 회원 전용 특별 혜택을 안내드립니다.
     <div class="modal-title">📅 예약 등록</div>
     <div class="modal-field">
       <div class="modal-label">회원 검색 / 선택</div>
-      <input class="modal-input" id="newResvMemberSearch" placeholder="🔍 이름/전화번호 검색" oninput="filterNewResvMember()" style="margin-bottom:6px">
-      <select class="modal-input" id="newResvMember" onchange="onNewResvMemberChange()"></select>
-      <div id="newResvPassInfo" style="margin-top:6px"></div>
+      <div style="position:relative">
+        <input class="modal-input" id="newResvMemberSearch" placeholder="🔍 이름 또는 전화번호를 입력하세요" oninput="filterNewResvMember()" onfocus="filterNewResvMember()" autocomplete="off">
+        <div id="newResvMemberResults" style="display:none;position:absolute;left:0;right:0;top:100%;background:#fff;border:1.5px solid #4299E1;border-top:none;border-radius:0 0 10px 10px;max-height:220px;overflow-y:auto;z-index:10;box-shadow:0 6px 18px rgba(0,0,0,0.08)"></div>
+      </div>
+      <select id="newResvMember" style="display:none"></select>
+      <div id="newResvPassInfo" style="margin-top:8px"></div>
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
       <div class="modal-field"><div class="modal-label">예약 종류</div><select class="modal-input" id="newResvType"><option>TPI 검진</option><option>SFMA</option><option>CSMI</option><option>골프검진</option><option>재활치료</option><option>개인레슨</option><option>그룹운동</option><option>외래진료</option></select></div>
@@ -7441,21 +7444,74 @@ VIP 회원 전용 특별 혜택을 안내드립니다.
       if (t) t.value = time;
       const search = document.getElementById('newResvMemberSearch');
       if (search) { search.value = ''; search.focus(); }
+      const sel = document.getElementById('newResvMember');
+      if (sel) sel.innerHTML = '';
       document.getElementById('newResvPassInfo').innerHTML = '';
+      document.getElementById('newResvMemberResults').style.display = 'none';
     }, 80);
   }
 
-  /* ── 회원 검색 (예약 등록 모달) ── */
+  /* ── 회원 검색 자동완성 (예약 등록 모달) ── */
   function filterNewResvMember() {
     const q = (document.getElementById('newResvMemberSearch')?.value || '').trim().toLowerCase();
+    const listEl = document.getElementById('newResvMemberResults');
+    if (!listEl) return;
+    const matches = MEMBERS.filter(m => !q || m.name.toLowerCase().includes(q) || m.phone.includes(q)).slice(0, 30);
+    if (!matches.length) {
+      listEl.innerHTML = `<div style="padding:14px;text-align:center;color:#A0AEC0;font-size:12px">"${escapeHtml(q)}" 와 일치하는 회원이 없습니다</div>`;
+      listEl.style.display = 'block';
+      return;
+    }
+    const highlight = (s) => {
+      if (!q) return escapeHtml(s);
+      const idx = s.toLowerCase().indexOf(q);
+      if (idx < 0) return escapeHtml(s);
+      return escapeHtml(s.slice(0,idx)) + '<mark style="background:#FEF3C7;padding:0 1px;border-radius:2px">' + escapeHtml(s.slice(idx, idx+q.length)) + '</mark>' + escapeHtml(s.slice(idx+q.length));
+    };
+    listEl.innerHTML = matches.map(m => {
+      const black = isBlacklistedMember(m.name);
+      const passInfo = getPassProgress(m);
+      let passLabel = '';
+      if (passInfo) {
+        if (passInfo.kind === 'session')  passLabel = `<span style="font-size:10px;color:#2C5282;background:#EBF8FF;padding:2px 7px;border-radius:99px;font-weight:800;margin-left:auto">${escapeHtml(passInfo.label)} · ${passInfo.used}/${passInfo.total}회</span>`;
+        else if (passInfo.kind === 'monthly') passLabel = `<span style="font-size:10px;color:#7B341E;background:#FFFAF0;padding:2px 7px;border-radius:99px;font-weight:800;margin-left:auto">${escapeHtml(passInfo.label)} · D-${passInfo.remainingDays}</span>`;
+        else if (passInfo.label) passLabel = `<span style="font-size:10px;color:#4A5568;background:#EDF2F7;padding:2px 7px;border-radius:99px;font-weight:700;margin-left:auto">${escapeHtml(passInfo.label)}</span>`;
+      }
+      return `<div onclick="selectNewResvMember('${escapeHtml(m.name).replace(/'/g,'')}')"
+        style="display:flex;align-items:center;gap:8px;padding:9px 12px;cursor:pointer;border-bottom:1px solid #F0F4F8;${black?'background:#FFF5F5':''}"
+        onmouseover="this.style.background='${black?'#FED7D7':'#EBF8FF'}'" onmouseout="this.style.background='${black?'#FFF5F5':'#fff'}'">
+        <span style="font-size:14px;width:22px;text-align:center">${black?'🚫':'👤'}</span>
+        <div style="flex:1;min-width:0">
+          <div style="display:flex;align-items:center;gap:5px">
+            <strong style="font-size:13px;color:#1A202C">${highlight(m.name)}</strong>
+            <span style="font-size:10px;color:#A0AEC0">${m.age}·${m.gender}</span>
+            ${passLabel}
+          </div>
+          <div style="font-size:11px;color:#718096;font-variant-numeric:tabular-nums">${highlight(m.phone)}</div>
+        </div>
+      </div>`;
+    }).join('') + (matches.length === 30 ? '<div style="padding:6px;text-align:center;font-size:10px;color:#A0AEC0">상위 30명까지 표시 — 더 정확하게 검색하세요</div>' : '');
+    listEl.style.display = 'block';
+  }
+  function selectNewResvMember(name) {
+    // 숨겨진 select 갱신
     const sel = document.getElementById('newResvMember');
-    if (!sel) return;
-    const matches = MEMBERS.filter(m => !q || m.name.toLowerCase().includes(q) || m.phone.includes(q));
-    sel.innerHTML = matches.length
-      ? matches.map(m => `<option value="${escapeHtml(m.name)}">${escapeHtml(m.name)} (${m.phone})</option>`).join('')
-      : '<option value="">— 일치하는 회원 없음 —</option>';
+    if (sel) {
+      sel.innerHTML = `<option value="${escapeHtml(name)}" selected>${escapeHtml(name)}</option>`;
+    }
+    const m = MEMBERS.find(x => x.name === name);
+    const search = document.getElementById('newResvMemberSearch');
+    if (search && m) search.value = `${m.name} (${m.phone})`;
+    document.getElementById('newResvMemberResults').style.display = 'none';
     onNewResvMemberChange();
   }
+  // 입력창 밖 클릭 시 결과 닫기
+  document.addEventListener('click', (e) => {
+    const wrap = document.getElementById('newResvMemberResults');
+    const inp  = document.getElementById('newResvMemberSearch');
+    if (!wrap || !inp) return;
+    if (e.target !== inp && !wrap.contains(e.target)) wrap.style.display = 'none';
+  });
   function onNewResvMemberChange() {
     const name = document.getElementById('newResvMember')?.value;
     const wrap = document.getElementById('newResvPassInfo');
@@ -7531,8 +7587,16 @@ VIP 회원 전용 특별 혜택을 안내드립니다.
   const _origOpenModal = openModal;
   openModal = function(id) {
     if (id === 'm-add-reserve') {
-      fillMemberSelect('newResvMember', false);
-      setTimeout(() => { if (typeof onNewResvMemberChange === 'function') onNewResvMemberChange(); }, 50);
+      // 검색 자동완성 방식 — 초기 빈 상태로 시작
+      const search = document.getElementById('newResvMemberSearch');
+      const sel    = document.getElementById('newResvMember');
+      const pass   = document.getElementById('newResvPassInfo');
+      const results= document.getElementById('newResvMemberResults');
+      if (search)  search.value = '';
+      if (sel)     sel.innerHTML = '';
+      if (pass)    pass.innerHTML = '';
+      if (results) results.style.display = 'none';
+      setTimeout(() => search?.focus(), 100);
     }
     if (id === 'm-add-exam')    fillMemberSelect('newExamMember', false);
     if (id === 'm-add-member')  refreshNewCategoryTags();
