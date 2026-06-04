@@ -2450,6 +2450,50 @@ VIP 회원 전용 특별 혜택을 안내드립니다.
   </div>
 </div>
 
+<!-- ═══════════════ 후속 조치 → 할일 등록 ═══════════════ -->
+<div class="modal-back" id="m-followup-task" onclick="closeModalByBack(event,'m-followup-task')">
+  <div class="modal" style="width:500px">
+    <div class="modal-title">📌 후속 조치 → 할 일 등록</div>
+    <div id="followupTaskInfo" style="background:#FFFBEB;border-left:4px solid #ECC94B;border-radius:8px;padding:11px 14px;margin-bottom:14px;font-size:12px;line-height:1.6;color:#2D3748"></div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div class="modal-field">
+        <div class="modal-label">📅 처리 날짜</div>
+        <input class="modal-input" id="ftTaskDate" type="date">
+        <div style="font-size:10px;color:#A0AEC0;margin-top:3px">해당 날짜의 "오늘 처리할 일"에 표시됩니다</div>
+      </div>
+      <div class="modal-field">
+        <div class="modal-label">🎯 우선순위</div>
+        <select class="modal-input" id="ftTaskPriority">
+          <option value="high">🔴 높음 (긴급)</option>
+          <option value="medium" selected>🟠 중간</option>
+          <option value="low">🟢 낮음</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="modal-field">
+      <div class="modal-label">📝 업무 제목</div>
+      <input class="modal-input" id="ftTaskTitle" placeholder="예: 박서연 오전 슬롯 재연락">
+    </div>
+
+    <div class="modal-field">
+      <div class="modal-label">🗒️ 상세 내용</div>
+      <textarea class="modal-input" id="ftTaskContent" style="min-height:90px;resize:vertical;line-height:1.7"></textarea>
+    </div>
+
+    <div class="modal-field">
+      <div class="modal-label">👤 담당자</div>
+      <select class="modal-input" id="ftTaskAssignee"><option>이트레이너</option><option>최물리</option><option>김상담</option><option>박재활</option><option>본인</option></select>
+    </div>
+
+    <div class="modal-btns">
+      <button style="background:#EDF2F7;color:#4A5568" onclick="closeModal('m-followup-task')">취소</button>
+      <button style="background:#E67E22;color:#fff" onclick="saveFollowupTask()">📌 할 일에 등록</button>
+    </div>
+  </div>
+</div>
+
 <!-- ═══════════════ 메시지 발송 확인 (최상위 z-index) ═══════════════ -->
 <div class="modal-back" id="m-send-confirm" style="z-index:9999" onclick="closeModalByBack(event,'m-send-confirm')">
   <div class="modal" style="width:540px;max-height:92vh;display:flex;flex-direction:column">
@@ -3222,6 +3266,11 @@ VIP 회원 전용 특별 혜택을 안내드립니다.
       title:'상담 후속 처리', sub:'재연락 · 검토중 상담 — 다음 약속/회신 필요', urgency:'',
       items:[]   // ← regenerateConsultTasks()에서 동적 생성
     },
+    'task-followup': {
+      icon:'📌', bg:'#FFFAF0', color:'#7B341E', badgeCls:'bdg-orange',
+      title:'수동 등록 후속 업무', sub:'후속 조치를 직접 할 일로 등록한 항목', urgency:'',
+      items:[]   // ← regenerateFollowupTasks()에서 동적 생성
+    },
     'task-expire': {
       icon:'💳', bg:'#E9D8FD', color:'#553C9A', badgeCls:'bdg-purple',
       title:'이용권 만료 임박 안내', sub:'7일 이내 만료 · 재구매 유도 문자 미발송', urgency:'11명',
@@ -3412,6 +3461,76 @@ VIP 회원 전용 특별 혜택을 안내드립니다.
     }
   }
 
+  /* ── 사용자 등록 후속 업무 (날짜별) ── */
+  let CUSTOM_FOLLOWUPS = [];
+  function loadCustomFollowups() {
+    try { CUSTOM_FOLLOWUPS = JSON.parse(localStorage.getItem('crm_custom_followups') || '[]'); } catch(_) { CUSTOM_FOLLOWUPS = []; }
+  }
+  function saveCustomFollowups() {
+    try { localStorage.setItem('crm_custom_followups', JSON.stringify(CUSTOM_FOLLOWUPS)); } catch(_){}
+  }
+  let _followupConsultId = null;
+  function openFollowupTaskModal(consultId) {
+    const c = CONSULTS.find(x => x.id === consultId);
+    if (!c) return;
+    _followupConsultId = consultId;
+    const member = MEMBERS.find(m => m.name === c.member);
+    document.getElementById('followupTaskInfo').innerHTML = `
+      <div style="font-size:11px;color:#744210;font-weight:900;margin-bottom:3px">📞 ${escapeHtml(c.subject || '상담')}</div>
+      <div style="font-size:13px;font-weight:800;color:#1A202C">${escapeHtml(c.member)} <span style="font-size:11px;color:#A0AEC0;font-weight:600">${member?member.phone:c.phone||''}</span></div>
+      <div style="font-size:11px;color:#718096;margin-top:2px">${c.date} ${c.time} · ${escapeHtml(c.staff||'-')} · 결과 ${escapeHtml(c.result||'-')}</div>
+    `;
+    document.getElementById('ftTaskDate').value     = c.nextDate || TODAY_DATE;
+    document.getElementById('ftTaskTitle').value    = `${c.member} ${c.subject || '후속 조치'}`;
+    document.getElementById('ftTaskContent').value  = c.followup || '';
+    document.getElementById('ftTaskAssignee').value = c.staff || '본인';
+    document.getElementById('ftTaskPriority').value = (c.result === '재연락' || c.result === '검토중') ? 'high' : 'medium';
+    openModal('m-followup-task');
+  }
+  function saveFollowupTask() {
+    const date     = document.getElementById('ftTaskDate').value;
+    const title    = document.getElementById('ftTaskTitle').value.trim();
+    const content  = document.getElementById('ftTaskContent').value.trim();
+    const assignee = document.getElementById('ftTaskAssignee').value;
+    const priority = document.getElementById('ftTaskPriority').value;
+    if (!date)  { showToast('처리 날짜를 입력하세요'); return; }
+    if (!title) { showToast('업무 제목을 입력하세요'); return; }
+    const c = CONSULTS.find(x => x.id === _followupConsultId);
+    const item = {
+      id: 'ft-' + Date.now(),
+      consultId: _followupConsultId,
+      date, title, content, assignee, priority,
+      member: c ? c.member : '',
+      phone: c ? c.phone : '',
+      createdAt: TODAY_DATE,
+      status: 'pending'
+    };
+    CUSTOM_FOLLOWUPS.push(item);
+    saveCustomFollowups();
+    closeModal('m-followup-task');
+    if (typeof refreshTodayLists === 'function') refreshTodayLists();
+    const dLabel = date === TODAY_DATE ? '오늘'
+                  : date === new Date(new Date(TODAY_DATE).getTime() + 86400000).toISOString().slice(0,10) ? '내일'
+                  : date;
+    showToast(`📌 ${dLabel}의 "오늘 처리할 일"에 등록되었습니다`);
+  }
+  function regenerateFollowupTasks() {
+    if (!TODAY_DATA['task-followup']) return;
+    // 오늘 날짜까지의 항목만 표시 (미래 항목은 그날 되어야 노출)
+    const visible = CUSTOM_FOLLOWUPS.filter(f => f.date <= TODAY_DATE);
+    TODAY_DATA['task-followup'].items = visible.map(f => {
+      const overdue = f.date < TODAY_DATE;
+      const prioIcon = f.priority === 'high' ? '🔴' : f.priority === 'low' ? '🟢' : '🟠';
+      return {
+        id: f.id,
+        name: f.member || f.title,
+        info: `${overdue?'⚠ 기한 경과 ('+f.date+') · ':''}${prioIcon} ${f.title}${f.content?' — '+f.content.slice(0,40)+(f.content.length>40?'…':''):''}`,
+        phone: f.phone,
+        followupRef: f
+      };
+    });
+  }
+
   // 상담 이력 → 후속 처리 task 자동 생성
   // 결과가 followup이거나, 다음약속/후속조치가 입력된 상담은 모두 task로 등록
   function regenerateConsultTasks() {
@@ -3551,6 +3670,7 @@ VIP 회원 전용 특별 혜택을 안내드립니다.
   function refreshTodayLists() {
     try { regenerateMemberLinkedTasks(); } catch(_) {}
     try { regenerateConsultTasks(); } catch(_) {}
+    try { regenerateFollowupTasks(); } catch(_) {}
     let totalPending = 0;
     Object.keys(TODAY_DATA).forEach(key => {
       const d = TODAY_DATA[key];
@@ -4166,7 +4286,47 @@ VIP 회원 전용 특별 혜택을 안내드립니다.
           <button class="td-action-btn" onclick="sendTaskMsg('kakao','${item.name}')">💛 카카오</button>
         </div>`;
     }
+    if (taskKey === 'task-followup') {
+      const f = item.followupRef || {};
+      const consult = f.consultId ? CONSULTS.find(c => c.id === f.consultId) : null;
+      const overdue = f.date && f.date < TODAY_DATE;
+      const prioColor = f.priority === 'high' ? '#E53E3E' : f.priority === 'low' ? '#38A169' : '#E67E22';
+      const prioLabel = f.priority === 'high' ? '🔴 높음 (긴급)' : f.priority === 'low' ? '🟢 낮음' : '🟠 중간';
+      return `
+        ${overdue ? `<div class="td-inquiry-box" style="border-left-color:#E53E3E;background:#FFF5F5;color:#742A2A;margin-bottom:14px;font-weight:800">⚠ 기한 경과 — 예정 처리일: ${f.date}</div>` : ''}
+        <div class="td-info-grid">
+          <div class="td-info-cell"><div class="td-ic-label">처리 날짜</div><div class="td-ic-val">${f.date||'-'}</div></div>
+          <div class="td-info-cell"><div class="td-ic-label">우선순위</div><div class="td-ic-val" style="color:${prioColor}">${prioLabel}</div></div>
+          <div class="td-info-cell"><div class="td-ic-label">담당자</div><div class="td-ic-val">${escapeHtml(f.assignee||'-')}</div></div>
+        </div>
+        <div class="modal-label" style="margin-bottom:6px">📝 업무 제목</div>
+        <div class="td-inquiry-box" style="border-left-color:#E67E22;margin-bottom:10px">${escapeHtml(f.title||'')}</div>
+        <div class="modal-label" style="margin-bottom:6px">🗒️ 상세 내용</div>
+        <div class="td-inquiry-box" style="border-left-color:#A0AEC0;margin-bottom:14px;white-space:pre-wrap">${escapeHtml(f.content||'(상세 내용 없음)')}</div>
+        ${consult ? `<div class="td-inquiry-box" style="border-left-color:#9B59B6;background:#FAF5FF;margin-bottom:14px;font-size:11px">📞 원본 상담: <strong>${escapeHtml(consult.subject||'')}</strong> · ${consult.date} ${consult.time} · ${escapeHtml(consult.staff||'')}</div>` : ''}
+        <div class="td-action-row">
+          <button class="td-action-btn" onclick="showToast('📞 ${item.phone} 전화 발신')">📞 전화 발신</button>
+          ${item.phone ? `<button class="td-action-btn" onclick="sendTaskMsg('sms','${item.name}')">💬 문자 발송</button>
+          <button class="td-action-btn" onclick="sendTaskMsg('kakao','${item.name}')">💛 카카오</button>` : ''}
+        </div>
+        <div class="modal-field" style="margin-bottom:14px">
+          <div class="modal-label" style="display:flex;justify-content:space-between;align-items:center">
+            <span>📌 후속 업무 관리</span>
+            <button class="topbar-btn btn-ghost" style="font-size:11px;padding:4px 10px;color:#C53030" onclick="deleteFollowupTask('${f.id}')">🗑 삭제</button>
+          </div>
+        </div>`;
+    }
     return '';
+  }
+  function deleteFollowupTask(id) {
+    if (!confirm('이 후속 업무를 삭제하시겠습니까?')) return;
+    const i = CUSTOM_FOLLOWUPS.findIndex(f => f.id === id);
+    if (i < 0) return;
+    CUSTOM_FOLLOWUPS.splice(i, 1);
+    saveCustomFollowups();
+    closeModal('m-task-detail');
+    refreshTodayLists();
+    showToast('🗑 후속 업무가 삭제되었습니다');
   }
 
   function completeTaskFromDetail() {
@@ -4216,6 +4376,7 @@ VIP 회원 전용 특별 혜택을 안내드립니다.
       try { buildAutoLinkedData(); } catch(_) {}
     }
     loadTodayState();
+    try { loadCustomFollowups(); } catch(_) {}
     renderTodayAll();
   });
 
@@ -7546,7 +7707,10 @@ VIP 회원 전용 특별 혜택을 안내드립니다.
         </div>
 
         <div class="modal-field">
-          <div class="modal-label">🔁 후속 조치</div>
+          <div class="modal-label" style="display:flex;justify-content:space-between;align-items:center">
+            <span>🔁 후속 조치</span>
+            <button class="topbar-btn" style="font-size:11px;padding:5px 12px;background:#E67E22;color:#fff" onclick="openFollowupTaskModal('${c.id}')">📌 할 일에 추가</button>
+          </div>
           <div style="background:#F0FFF4;border-radius:8px;padding:12px 14px;font-size:13px;line-height:1.7;color:#2D3748">${escapeHtml(c.followup)}</div>
         </div>
 
