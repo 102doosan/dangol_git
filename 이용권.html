@@ -746,21 +746,43 @@
 
           <!-- 이용 기간 안내 -->
           <div class="ticket-info">
-            🏋️ 헬스 3개월 정기권<br>
+            🏋️ 헬스 3개월 정기권 + PT 24회권<br>
             📅 2026.03.20 ~ 2026.06.19 (91일 남음)
           </div>
 
-          <!-- 이용 진행률 -->
+          <!-- PT 회차 사용 현황 (강조) -->
+          <div class="info-card" style="background:linear-gradient(135deg,#F0F7FF,#fff);border:1.5px solid #BEE3F8">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+              <div style="font-size:14px;font-weight:900;color:#2C5282">🎫 PT 24회권 — 회차 사용 현황</div>
+              <div style="font-size:11px;font-weight:700;color:#A0AEC0">유효 ~2026.06.19</div>
+            </div>
+            <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:8px">
+              <div>
+                <span style="font-size:34px;font-weight:900;color:#2B6CB0;letter-spacing:-1px">4</span>
+                <span style="font-size:18px;color:#A0AEC0;font-weight:700">/ 24회</span>
+              </div>
+              <div style="text-align:right">
+                <div style="font-size:11px;color:#718096">잔여</div>
+                <div style="font-size:18px;font-weight:900;color:#38A169">20회</div>
+              </div>
+            </div>
+            <div class="usage-bar-bg"><div class="usage-bar-fill" style="width:16.7%;background:linear-gradient(90deg,#4299E1,#2B6CB0)"></div></div>
+            <div class="usage-bar-label">사용 16.7% · 예상 소진 시기 <strong style="color:#2C5282">2026.05.20</strong></div>
+          </div>
+
+          <!-- 일수 진행률 -->
           <div class="info-card">
-            <div style="font-size:13px;font-weight:800;color:#4A5568;margin-bottom:10px;">📈 이용 현황</div>
-            <div style="font-size:13px;color:#718096;margin-bottom:4px;">출석 횟수</div>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+              <div style="font-size:13px;font-weight:800;color:#4A5568">📅 헬스 정기권 일수</div>
+              <div style="font-size:11px;font-weight:700;color:#38A169">D-91</div>
+            </div>
             <div class="usage-bar-wrap">
               <div style="display:flex;justify-content:space-between;margin-bottom:4px;">
-                <span style="font-size:14px;font-weight:900;color:#2B6CB0;">12회 출석</span>
-                <span style="font-size:12px;color:#A0AEC0;">전체 기간 중</span>
+                <span style="font-size:14px;font-weight:900;color:#2B6CB0;">12회 방문</span>
+                <span style="font-size:12px;color:#A0AEC0;">91일 중 36일 경과</span>
               </div>
               <div class="usage-bar-bg"><div class="usage-bar-fill" style="width:40%;"></div></div>
-              <div class="usage-bar-label">91일 중 36일 이용 (40%)</div>
+              <div class="usage-bar-label">전체 기간의 40% 경과 · 잔여 55일</div>
             </div>
           </div>
 
