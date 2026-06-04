@@ -2681,6 +2681,31 @@ VIP 회원 전용 특별 혜택을 안내드립니다.
   </div>
 </div>
 
+<!-- ═══════════════ 수업 완료 + 회원 서명 ═══════════════ -->
+<div class="modal-back" id="m-resv-signature" onclick="closeModalByBack(event,'m-resv-signature')">
+  <div class="modal" style="width:520px">
+    <div class="modal-title">✍️ 수업 완료 확인 — 회원 서명</div>
+    <div id="signResvInfo" style="background:#F0F7FF;border:1.5px solid #BEE3F8;border-radius:10px;padding:11px 14px;margin-bottom:14px"></div>
+
+    <div class="modal-field">
+      <div class="modal-label" style="display:flex;justify-content:space-between;align-items:center">
+        <span>회원 서명 <span style="font-size:11px;color:#A0AEC0;font-weight:400">— 손가락 또는 마우스로 서명해 주세요</span></span>
+        <button onclick="clearSignature()" style="border:none;background:#EDF2F7;color:#4A5568;padding:4px 10px;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;font-family:'Noto Sans KR',sans-serif">↩ 지우기</button>
+      </div>
+      <div style="position:relative;background:#fff;border:2px dashed #CBD5E0;border-radius:10px;overflow:hidden">
+        <canvas id="signCanvas" width="480" height="200" style="display:block;width:100%;height:200px;cursor:crosshair;touch-action:none;background:#fff"></canvas>
+        <div id="signPlaceholder" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#CBD5E0;font-size:13px;pointer-events:none">✍️ 여기에 서명</div>
+      </div>
+      <div style="font-size:10px;color:#A0AEC0;margin-top:4px;text-align:right">서명 일시: <span id="signDateTime">—</span></div>
+    </div>
+
+    <div class="modal-btns">
+      <button style="background:#EDF2F7;color:#4A5568" onclick="closeModal('m-resv-signature')">취소</button>
+      <button id="signConfirmBtn" style="background:#38A169;color:#fff" onclick="confirmCompleteWithSignature()">✓ 수업 완료 + 횟수 차감</button>
+    </div>
+  </div>
+</div>
+
 <!-- ═══════════════ 예약 수정 ═══════════════ -->
 <div class="modal-back" id="m-edit-reserve" onclick="closeModalByBack(event,'m-edit-reserve')">
   <div class="modal" style="width:520px">
@@ -2719,6 +2744,12 @@ VIP 회원 전용 특별 혜택을 안내드립니다.
       <button class="topbar-btn btn-ghost" style="font-size:11px;padding:5px 10px" onclick="editResvShiftDate(7)">+1주</button>
       <button class="topbar-btn btn-ghost" style="font-size:11px;padding:5px 10px" onclick="editResvShiftDate(-7)">-1주</button>
       <button class="topbar-btn btn-ghost" style="font-size:11px;padding:5px 10px;margin-left:auto" onclick="closeModal('m-edit-reserve');openDrawer('d-member')">👤 회원 상세 →</button>
+    </div>
+
+    <div style="margin-bottom:10px">
+      <button id="editResvCompleteBtn" style="width:100%;padding:12px;background:linear-gradient(135deg,#38A169,#276749);color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:900;cursor:pointer;font-family:'Noto Sans KR',sans-serif;display:flex;align-items:center;justify-content:center;gap:8px" onclick="openSignatureForCompletion()">
+        ✅ 수업 완료 (회원 서명 + 횟수 차감)
+      </button>
     </div>
 
     <div class="modal-btns">
@@ -4999,6 +5030,112 @@ VIP 회원 전용 특별 혜택을 안내드립니다.
     d.setDate(d.getDate() + days);
     el.value = d.toISOString().slice(0,10);
   }
+  /* ── 수업 완료 + 회원 서명 ── */
+  let _signCtx = null;
+  let _signHasDrawing = false;
+  function openSignatureForCompletion() {
+    const r = (RESERVATIONS||[]).find(x => x.id === _editResvId);
+    if (!r) { showToast('예약 정보 없음'); return; }
+    if (r.status === '완료') { if (!confirm('이미 완료된 예약입니다. 다시 서명하시겠습니까?')) return; }
+    const m = MEMBERS.find(mm => mm.name === r.member);
+    const passProgress = m ? getPassProgress(m) : null;
+    // 회원 정보 카드
+    let passLine = '';
+    if (passProgress && passProgress.kind === 'session') {
+      const nextUsed = passProgress.used + 1;
+      passLine = `<div style="background:#fff;border:1.5px solid #BEE3F8;border-radius:8px;padding:8px 11px;margin-top:8px">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <span style="font-size:11px;color:#2C5282;font-weight:700">🎫 ${escapeHtml(passProgress.label)}</span>
+          <span style="font-size:14px;font-weight:900;color:#2B6CB0">${passProgress.used} → <span style="color:#38A169">${nextUsed}</span> / ${passProgress.total}회</span>
+        </div>
+        <div style="font-size:10px;color:#A0AEC0;margin-top:2px;text-align:right">완료 시 1회 차감 (잔여 ${Math.max(0, passProgress.total - nextUsed)}회)</div>
+      </div>`;
+    } else if (passProgress && passProgress.kind === 'monthly') {
+      passLine = `<div style="background:#fff;border:1.5px solid #BEE3F8;border-radius:8px;padding:8px 11px;margin-top:8px;font-size:11px;color:#2C5282;font-weight:700">🎫 ${escapeHtml(passProgress.label)} · 출석 1회 추가</div>`;
+    }
+    document.getElementById('signResvInfo').innerHTML = `
+      <div style="font-size:11px;color:#2C5282;font-weight:900;margin-bottom:3px">📅 ${r.date} ${r.time}${r.endTime?'~'+r.endTime:''}</div>
+      <div style="font-size:14px;font-weight:900;color:#1A202C">${escapeHtml(r.member)} <span style="font-size:11px;color:#A0AEC0;font-weight:600">${m?m.age+'·'+m.gender:''}</span></div>
+      <div style="font-size:11px;color:#4A5568;margin-top:2px">${escapeHtml(r.type)} · ${escapeHtml(r.staff)} · ${r.duration||60}분</div>
+      ${passLine}
+    `;
+    // 캔버스 초기화
+    setTimeout(() => {
+      const canvas = document.getElementById('signCanvas');
+      if (!canvas) return;
+      // 해상도 보정
+      const dpr = window.devicePixelRatio || 1;
+      const rect = canvas.getBoundingClientRect();
+      canvas.width = rect.width * dpr;
+      canvas.height = rect.height * dpr;
+      _signCtx = canvas.getContext('2d');
+      _signCtx.scale(dpr, dpr);
+      _signCtx.lineWidth = 2.5;
+      _signCtx.strokeStyle = '#1A202C';
+      _signCtx.lineCap = 'round';
+      _signCtx.lineJoin = 'round';
+      _signCtx.fillStyle = '#fff';
+      _signCtx.fillRect(0, 0, rect.width, rect.height);
+      _signHasDrawing = false;
+      document.getElementById('signPlaceholder').style.display = '';
+      // 입력 이벤트 등록
+      let drawing = false;
+      const getPos = (e) => {
+        const t = e.touches ? e.touches[0] : e;
+        const r2 = canvas.getBoundingClientRect();
+        return { x: t.clientX - r2.left, y: t.clientY - r2.top };
+      };
+      const start = (e) => { drawing = true; const p = getPos(e); _signCtx.beginPath(); _signCtx.moveTo(p.x, p.y); _signHasDrawing = true; document.getElementById('signPlaceholder').style.display = 'none'; e.preventDefault(); };
+      const move  = (e) => { if (!drawing) return; const p = getPos(e); _signCtx.lineTo(p.x, p.y); _signCtx.stroke(); e.preventDefault(); };
+      const end   = () => { drawing = false; };
+      canvas.onmousedown = start; canvas.onmousemove = move; canvas.onmouseup = end; canvas.onmouseleave = end;
+      canvas.ontouchstart = start; canvas.ontouchmove = move; canvas.ontouchend = end;
+      document.getElementById('signDateTime').textContent = new Date(TODAY_DATE).toLocaleDateString('ko-KR') + ' ' + r.time;
+    }, 100);
+    openModal('m-resv-signature');
+  }
+
+  function clearSignature() {
+    if (!_signCtx) return;
+    const canvas = document.getElementById('signCanvas');
+    const rect = canvas.getBoundingClientRect();
+    _signCtx.clearRect(0, 0, canvas.width, canvas.height);
+    _signCtx.fillStyle = '#fff';
+    _signCtx.fillRect(0, 0, canvas.width, canvas.height);
+    _signHasDrawing = false;
+    document.getElementById('signPlaceholder').style.display = '';
+  }
+
+  function confirmCompleteWithSignature() {
+    if (!_signHasDrawing) { showToast('회원 서명을 받아주세요'); return; }
+    const r = (RESERVATIONS||[]).find(x => x.id === _editResvId);
+    if (!r) { closeModal('m-resv-signature'); return; }
+    // 서명을 base64로 저장
+    try {
+      const canvas = document.getElementById('signCanvas');
+      r.signature = canvas.toDataURL('image/png');
+      r.signedAt = new Date(TODAY_DATE).toISOString().slice(0,10) + ' ' + r.time;
+    } catch(_){}
+    // 상태 → 완료 (자동으로 패스 횟수 차감되는 효과)
+    r.status   = '완료';
+    r.reminder = '완료';
+    persistAll();
+    closeModal('m-resv-signature');
+    closeModal('m-edit-reserve');
+    renderReservations();
+    if (typeof renderHomeCalendar === 'function') renderHomeCalendar();
+    if (typeof renderFullCalendar === 'function') renderFullCalendar();
+    if (typeof renderHomeStatRow === 'function') renderHomeStatRow();
+    // 진행 상태 토스트
+    const m = MEMBERS.find(mm => mm.name === r.member);
+    const p = m ? getPassProgress(m) : null;
+    if (p && p.kind === 'session') {
+      showToast(`✅ ${r.member} 수업 완료 — ${p.label} ${p.used}/${p.total}회 (잔여 ${p.remaining}회)`);
+    } else {
+      showToast(`✅ ${r.member} 수업 완료 처리됨`);
+    }
+  }
+
   function saveResvEdit() {
     const r = (RESERVATIONS||[]).find(x => x.id === _editResvId);
     if (!r) { closeModal('m-edit-reserve'); return; }
