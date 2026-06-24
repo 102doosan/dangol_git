@@ -664,13 +664,8 @@ function render() {
     return true;
   });
 
-  // 정렬: 미완료 위, 그 안에서는 최신순
-  filtered.sort((a, b) => {
-    const aDone = a.status === 'done' ? 1 : 0;
-    const bDone = b.status === 'done' ? 1 : 0;
-    if (aDone !== bDone) return aDone - bDone;
-    return (b.createdAt || '').localeCompare(a.createdAt || '');
-  });
+  // 정렬: 등록 시간 최신순 (완료 여부 무시)
+  filtered.sort((a, b) => (b.createdAt || '').localeCompare(a.createdAt || ''));
 
   // 포커스/커서 보존
   const active = document.activeElement;
