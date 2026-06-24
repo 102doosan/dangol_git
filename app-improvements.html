@@ -143,6 +143,8 @@
     .item-tab-badge { padding: 3px 8px; border-radius: 99px; font-size: 11px; font-weight: 700; background: #EDF2F7; color: #4A5568; }
     .item-cat-badge { padding: 3px 8px; border-radius: 99px; font-size: 11px; font-weight: 700; }
     .item-date { margin-left: auto; font-size: 11px; color: #A0AEC0; font-weight: 600; }
+    .item-edit-btn { background: none; border: none; color: #A0AEC0; cursor: pointer; font-size: 13px; padding: 2px 6px; font-family: inherit; transition: opacity 0.15s; opacity: 0.6; }
+    .item-edit-btn:hover { opacity: 1; }
     .item-delete-btn { background: none; border: none; color: #CBD5E0; cursor: pointer; font-size: 16px; padding: 2px 6px; font-family: inherit; transition: color 0.15s; }
     .item-delete-btn:hover { color: #E53E3E; }
 
@@ -342,27 +344,43 @@ const targetOptions = [
   { id: 'admin',   label: '관리자',     icon: '🖥️', color: '#48BB78' },
 ];
 
-// ── 새 항목 모달 ──
+// ── 새 항목 / 수정 모달 ──
 let modalCategories = []; // 선택된 카테고리 id 배열
 let modalTargets = [];    // 선택된 대상 id 배열
+let editingItemId = null; // 수정 모드인 경우 항목 id
 
-function openAddModal() {
-  newType = 'add';
-  modalCategories = [];
-  modalTargets = [];
+function openAddModal(editId) {
+  editingItemId = editId || null;
+  let editing = null;
+  if (editingItemId) {
+    editing = items.find(it => it.id === editingItemId);
+    if (!editing) { editingItemId = null; }
+  }
+
+  if (editing) {
+    newType = editing.type || 'add';
+    modalCategories = Array.isArray(editing.categories) ? [...editing.categories] : (editing.category ? [editing.category] : []);
+    modalTargets = Array.isArray(editing.targets) ? [...editing.targets] : [];
+  } else {
+    newType = 'add';
+    modalCategories = [];
+    modalTargets = [];
+  }
+  const tabInit = editing ? (editing.tab || 'user') : 'user';
+
   const modal = document.getElementById('add-modal');
   modal.innerHTML = `
     <div class="modal-overlay" id="add-modal-bg" onclick="closeAddModal()">
       <div class="modal-card" onclick="event.stopPropagation()">
         <div class="modal-header">
-          <span class="modal-title">➕ 새 작업 추가</span>
+          <span class="modal-title">${editing ? '✏️ 작업 수정' : '➕ 새 작업 추가'}</span>
           <button type="button" class="modal-close" onclick="closeAddModal()">✕</button>
         </div>
 
         <div class="modal-section">
           <span class="modal-section-label">구분</span>
           <div class="form-row form-btns">
-            <button type="button" class="type-btn active add" id="tab-user" data-tab="user" onclick="setModalTab('user')" style="background:#EBF8FF;color:#2B6CB0;border-color:#4299E1;">🙍 사용자 앱</button>
+            <button type="button" class="type-btn" id="tab-user" data-tab="user" onclick="setModalTab('user')">🙍 사용자 앱</button>
             <button type="button" class="type-btn" id="tab-admin" data-tab="admin" onclick="setModalTab('admin')">🖥️ 관리자</button>
           </div>
         </div>
@@ -370,7 +388,7 @@ function openAddModal() {
         <div class="modal-section">
           <span class="modal-section-label">종류</span>
           <div class="form-row form-btns">
-            <button type="button" class="type-btn active add" id="type-add" onclick="setNewType('add')">➕ 추가</button>
+            <button type="button" class="type-btn" id="type-add" onclick="setNewType('add')">➕ 추가</button>
             <button type="button" class="type-btn" id="type-edit" onclick="setNewType('edit')">🔧 수정</button>
             <button type="button" class="type-btn" id="type-delete" onclick="setNewType('delete')">🗑 삭제</button>
           </div>
@@ -388,31 +406,39 @@ function openAddModal() {
 
         <div class="modal-section">
           <span class="modal-section-label">작업 내용</span>
-          <textarea class="form-textarea" id="new-content" placeholder="작업 내용을 입력하세요 (예: 로그인 화면 카카오 버튼 색상 변경)"></textarea>
+          <textarea class="form-textarea" id="new-content" placeholder="작업 내용을 입력하세요 (예: 로그인 화면 카카오 버튼 색상 변경)">${escapeHtml(editing ? editing.content : '')}</textarea>
         </div>
 
         <div class="form-row" style="justify-content:flex-end;gap:8px;">
           <button type="button" class="header-btn" onclick="closeAddModal()">취소</button>
-          <button type="button" class="submit-btn" id="submit-btn" onclick="addItem()">등록</button>
+          <button type="button" class="submit-btn" id="submit-btn" onclick="addItem()">${editing ? '저장' : '등록'}</button>
         </div>
       </div>
     </div>
   `;
   modal.style.display = 'block';
-  setModalTab('user');
+  setModalTab(tabInit);
+  setNewType(newType);
   renderTargetGrid();
   const ta = document.getElementById('new-content');
   ta.focus();
+  if (editing) {
+    ta.setSelectionRange(ta.value.length, ta.value.length);
+  }
   ta.addEventListener('keydown', e => {
     if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) { e.preventDefault(); addItem(); }
     if (e.key === 'Escape') closeAddModal();
   });
 }
 
+function openEditModal(id) { openAddModal(id); }
+
 function closeAddModal() {
   const modal = document.getElementById('add-modal');
   modal.style.display = 'none';
   modal.innerHTML = '';
+  editingItemId = null;
+  window.__tabInitDone = false;
 }
 
 function setModalTab(tab) {
@@ -420,10 +446,11 @@ function setModalTab(tab) {
     const isActive = b.dataset.tab === tab;
     b.classList.toggle('active', isActive);
     b.classList.toggle('add', isActive);
-    if (!isActive) b.removeAttribute('style');
-    else b.setAttribute('style', 'background:#EBF8FF;color:#2B6CB0;border-color:#4299E1;');
   });
-  modalCategories = [];
+  // 수정 모드에서 첫 setModalTab 호출 시엔 선택된 카테고리 유지, 사용자가 탭 변경 시 초기화
+  if (!editingItemId || (window.__tabInitDone && window.__lastTab !== tab)) modalCategories = [];
+  window.__tabInitDone = true;
+  window.__lastTab = tab;
   renderCategoryGrid(tab);
 }
 
@@ -480,13 +507,26 @@ function addItem() {
   if (!content) { alert('작업 내용을 입력해주세요.'); contentEl.focus(); return; }
   if (modalCategories.length === 0) { alert('카테고리를 1개 이상 선택해주세요.'); return; }
   const now = new Date().toISOString();
-  const item = {
-    id: 'i_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
-    tab, categories: [...modalCategories], targets: [...modalTargets],
-    type: newType, content, status: 'pending', memo: '',
-    createdAt: now, updatedAt: now
-  };
-  items.unshift(item);
+  if (editingItemId) {
+    const it = items.find(x => x.id === editingItemId);
+    if (it) {
+      it.tab = tab;
+      it.categories = [...modalCategories];
+      it.targets = [...modalTargets];
+      it.type = newType;
+      it.content = content;
+      it.updatedAt = now;
+      delete it.category; // 단일 필드 제거(다중으로 통일)
+    }
+  } else {
+    const item = {
+      id: 'i_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+      tab, categories: [...modalCategories], targets: [...modalTargets],
+      type: newType, content, status: 'pending', memo: '',
+      createdAt: now, updatedAt: now
+    };
+    items.unshift(item);
+  }
   saveItems();
   closeAddModal();
 }
@@ -663,6 +703,7 @@ function render() {
           ${targetBadges}
           ${cats.map(c => `<span class="item-cat-badge" style="background:${c.color}1A;color:${c.color}">${c.icon} ${c.title}</span>`).join('')}
           <span class="item-date">${dateStr}</span>
+          <button type="button" class="item-edit-btn" onclick="openEditModal('${it.id}')" title="수정">✏️</button>
           <button type="button" class="item-delete-btn" onclick="deleteItem('${it.id}')" title="삭제">✕</button>
         </div>
         <div class="item-content">${escapeHtml(it.content)}</div>
