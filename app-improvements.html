@@ -36,10 +36,32 @@
     .progress-bar { background: #EDF2F7; border-radius: 99px; height: 7px; overflow: hidden; }
     .progress-fill { height: 100%; max-width: 100%; background: linear-gradient(90deg, #48BB78, #68D391); border-radius: 99px; transition: width 0.4s ease; }
 
-    .add-form {
-      background: #fff; border-radius: 14px; padding: 16px 20px;
-      box-shadow: 0 1px 6px rgba(0,0,0,0.07); margin-bottom: 16px;
+    .open-modal-btn {
+      width: 100%; padding: 14px; background: linear-gradient(135deg, #4F9CF9, #48BB78);
+      color: #fff; border: none; border-radius: 14px; font-size: 15px; font-weight: 800;
+      cursor: pointer; font-family: inherit; margin-bottom: 16px;
+      box-shadow: 0 2px 12px rgba(79,156,249,0.3); transition: all 0.15s;
     }
+    .open-modal-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 16px rgba(79,156,249,0.4); }
+
+    .modal-overlay {
+      position: fixed; inset: 0; background: rgba(26,32,44,0.55);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 1000; padding: 16px; backdrop-filter: blur(2px);
+      animation: fadeIn 0.15s ease-out;
+    }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    .modal-card {
+      background: #fff; border-radius: 16px; padding: 22px 24px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.25); width: 100%; max-width: 480px;
+      max-height: 90vh; overflow-y: auto;
+      animation: slideUp 0.2s ease-out;
+    }
+    @keyframes slideUp { from { transform: translateY(10px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+    .modal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+    .modal-title { font-size: 17px; font-weight: 900; color: #1A202C; }
+    .modal-close { background: none; border: none; font-size: 22px; cursor: pointer; color: #A0AEC0; padding: 0; line-height: 1; font-family: inherit; }
+    .modal-close:hover { color: #1A202C; }
     .add-form-title { font-size: 13px; font-weight: 800; color: #4A5568; margin-bottom: 12px; display: flex; align-items: center; gap: 6px; }
     .form-row { display: flex; gap: 8px; margin-bottom: 8px; flex-wrap: wrap; }
     .form-select, .form-input, .form-textarea {
@@ -67,10 +89,11 @@
     .submit-btn:disabled { background: #CBD5E0; cursor: not-allowed; box-shadow: none; }
 
     .filter-bar {
-      display: flex; gap: 8px; margin-bottom: 14px; flex-wrap: wrap; align-items: center;
+      display: flex; gap: 10px; margin-bottom: 8px; flex-wrap: nowrap; align-items: flex-start;
       padding: 10px 14px; background: #fff; border-radius: 12px; box-shadow: 0 1px 4px rgba(0,0,0,0.05);
     }
-    .filter-label { font-size: 11px; font-weight: 800; color: #A0AEC0; margin-right: 4px; }
+    .filter-label { font-size: 11px; font-weight: 800; color: #A0AEC0; padding-top: 6px; flex: 0 0 auto; min-width: 50px; }
+    .filter-group { display: flex; gap: 6px; flex-wrap: wrap; flex: 1; }
     .filter-chip {
       padding: 4px 11px; border-radius: 99px; border: 1.5px solid #E2E8F0; background: #fff;
       color: #718096; font-size: 12px; font-weight: 700; cursor: pointer; font-family: inherit;
@@ -154,54 +177,44 @@
 
   <div class="progress-wrap" id="progress-wrap"></div>
 
-  <div class="add-form">
-    <div class="add-form-title">➕ 새 작업 추가</div>
-    <div class="form-row">
-      <select class="form-select" id="new-tab" onchange="updateCategoryOptions()">
-        <option value="user">🙍 사용자 앱</option>
-        <option value="admin">🖥️ 관리자</option>
-      </select>
-      <select class="form-select" id="new-category"></select>
-    </div>
-    <div class="form-row form-btns">
-      <button type="button" class="type-btn active add" id="type-add" onclick="setNewType('add')">➕ 추가</button>
-      <button type="button" class="type-btn" id="type-edit" onclick="setNewType('edit')">🔧 수정</button>
-      <button type="button" class="type-btn" id="type-delete" onclick="setNewType('delete')">🗑 삭제</button>
-    </div>
-    <div class="form-row">
-      <textarea class="form-textarea" id="new-content" placeholder="작업 내용을 입력하세요 (예: 로그인 화면 카카오 버튼 색상 변경)"></textarea>
-    </div>
-    <div class="form-row" style="justify-content:flex-end">
-      <button type="button" class="submit-btn" id="submit-btn" onclick="addItem()">등록</button>
-    </div>
-  </div>
+  <button type="button" class="open-modal-btn" onclick="openAddModal()">➕ 새 작업 추가</button>
 
   <div class="filter-bar">
     <span class="filter-label">구분</span>
-    <button type="button" class="filter-chip active" data-key="tab" data-val="all" onclick="setFilter('tab','all')">전체</button>
-    <button type="button" class="filter-chip" data-key="tab" data-val="user" onclick="setFilter('tab','user')">🙍 사용자</button>
-    <button type="button" class="filter-chip" data-key="tab" data-val="admin" onclick="setFilter('tab','admin')">🖥️ 관리자</button>
-    <span class="filter-divider"></span>
+    <div class="filter-group">
+      <button type="button" class="filter-chip active" data-key="tab" data-val="all" onclick="setFilter('tab','all')">전체</button>
+      <button type="button" class="filter-chip" data-key="tab" data-val="user" onclick="setFilter('tab','user')">🙍 사용자</button>
+      <button type="button" class="filter-chip" data-key="tab" data-val="admin" onclick="setFilter('tab','admin')">🖥️ 관리자</button>
+    </div>
+  </div>
+  <div class="filter-bar">
     <span class="filter-label">종류</span>
-    <button type="button" class="filter-chip active" data-key="type" data-val="all" onclick="setFilter('type','all')">전체</button>
-    <button type="button" class="filter-chip" data-key="type" data-val="add" onclick="setFilter('type','add')">➕ 추가</button>
-    <button type="button" class="filter-chip" data-key="type" data-val="edit" onclick="setFilter('type','edit')">🔧 수정</button>
-    <button type="button" class="filter-chip" data-key="type" data-val="delete" onclick="setFilter('type','delete')">🗑 삭제</button>
-    <span class="filter-divider"></span>
+    <div class="filter-group">
+      <button type="button" class="filter-chip active" data-key="type" data-val="all" onclick="setFilter('type','all')">전체</button>
+      <button type="button" class="filter-chip" data-key="type" data-val="add" onclick="setFilter('type','add')">➕ 추가</button>
+      <button type="button" class="filter-chip" data-key="type" data-val="edit" onclick="setFilter('type','edit')">🔧 수정</button>
+      <button type="button" class="filter-chip" data-key="type" data-val="delete" onclick="setFilter('type','delete')">🗑 삭제</button>
+    </div>
+  </div>
+  <div class="filter-bar">
     <span class="filter-label">상태</span>
-    <button type="button" class="filter-chip active" data-key="status" data-val="all" onclick="setFilter('status','all')">전체</button>
-    <button type="button" class="filter-chip" data-key="status" data-val="pending" onclick="setFilter('status','pending')">⏳ 대기</button>
-    <button type="button" class="filter-chip" data-key="status" data-val="progress" onclick="setFilter('status','progress')">🚧 진행중</button>
-    <button type="button" class="filter-chip" data-key="status" data-val="done" onclick="setFilter('status','done')">✅ 완료</button>
+    <div class="filter-group">
+      <button type="button" class="filter-chip active" data-key="status" data-val="all" onclick="setFilter('status','all')">전체</button>
+      <button type="button" class="filter-chip" data-key="status" data-val="pending" onclick="setFilter('status','pending')">⏳ 대기</button>
+      <button type="button" class="filter-chip" data-key="status" data-val="progress" onclick="setFilter('status','progress')">🚧 진행중</button>
+      <button type="button" class="filter-chip" data-key="status" data-val="done" onclick="setFilter('status','done')">✅ 완료</button>
+    </div>
   </div>
 
   <div class="filter-bar" id="category-filter-bar">
     <span class="filter-label">카테고리</span>
-    <div id="category-filter-chips" style="display:flex;gap:6px;flex-wrap:wrap;flex:1;"></div>
+    <div class="filter-group" id="category-filter-chips"></div>
   </div>
 
   <div id="items-list"></div>
 </div>
+
+<div id="add-modal" style="display:none"></div>
 
 <script>
 // ── 카테고리 (전체앱-list.html과 동일) ──
@@ -301,35 +314,86 @@ function saveItems() {
   if (firebaseReady && dataRef) dataRef.set({ items });
 }
 
-// ── 새 항목 등록 ──
+// ── 새 항목 모달 ──
+function openAddModal() {
+  newType = 'add';
+  const modal = document.getElementById('add-modal');
+  modal.innerHTML = `
+    <div class="modal-overlay" id="add-modal-bg" onclick="closeAddModal()">
+      <div class="modal-card" onclick="event.stopPropagation()">
+        <div class="modal-header">
+          <span class="modal-title">➕ 새 작업 추가</span>
+          <button type="button" class="modal-close" onclick="closeAddModal()">✕</button>
+        </div>
+        <div class="form-row">
+          <select class="form-select" id="new-tab" onchange="updateCategoryOptions()">
+            <option value="user">🙍 사용자 앱</option>
+            <option value="admin">🖥️ 관리자</option>
+          </select>
+          <select class="form-select" id="new-category"></select>
+        </div>
+        <div class="form-row form-btns">
+          <button type="button" class="type-btn active add" id="type-add" onclick="setNewType('add')">➕ 추가</button>
+          <button type="button" class="type-btn" id="type-edit" onclick="setNewType('edit')">🔧 수정</button>
+          <button type="button" class="type-btn" id="type-delete" onclick="setNewType('delete')">🗑 삭제</button>
+        </div>
+        <div class="form-row">
+          <textarea class="form-textarea" id="new-content" placeholder="작업 내용을 입력하세요 (예: 로그인 화면 카카오 버튼 색상 변경)"></textarea>
+        </div>
+        <div class="form-row" style="justify-content:flex-end;gap:8px;">
+          <button type="button" class="header-btn" onclick="closeAddModal()">취소</button>
+          <button type="button" class="submit-btn" id="submit-btn" onclick="addItem()">등록</button>
+        </div>
+      </div>
+    </div>
+  `;
+  modal.style.display = 'block';
+  updateCategoryOptions();
+  const ta = document.getElementById('new-content');
+  ta.focus();
+  ta.addEventListener('keydown', e => {
+    if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) { e.preventDefault(); addItem(); }
+    if (e.key === 'Escape') closeAddModal();
+  });
+}
+
+function closeAddModal() {
+  const modal = document.getElementById('add-modal');
+  modal.style.display = 'none';
+  modal.innerHTML = '';
+}
+
 function updateCategoryOptions() {
-  const tab = document.getElementById('new-tab').value;
+  const tabEl = document.getElementById('new-tab');
   const sel = document.getElementById('new-category');
+  if (!tabEl || !sel) return;
+  const tab = tabEl.value;
   sel.innerHTML = getCategories(tab).map(c => `<option value="${c.id}">${c.icon} ${c.title}</option>`).join('');
 }
 
 function setNewType(t) {
   newType = t;
-  document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('active', 'add', 'edit', 'delete'));
   const btn = document.getElementById('type-' + t);
-  btn.classList.add('active', t);
+  if (btn) btn.classList.add('active', t);
 }
 
 function addItem() {
-  const tab = document.getElementById('new-tab').value;
-  const category = document.getElementById('new-category').value;
+  const tabEl = document.getElementById('new-tab');
+  const catEl = document.getElementById('new-category');
   const contentEl = document.getElementById('new-content');
+  if (!tabEl || !catEl || !contentEl) return;
   const content = contentEl.value.trim();
   if (!content) { alert('작업 내용을 입력해주세요.'); contentEl.focus(); return; }
   const now = new Date().toISOString();
   const item = {
     id: 'i_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
-    tab, category, type: newType, content, status: 'pending', memo: '',
-    createdAt: now, updatedAt: now
+    tab: tabEl.value, category: catEl.value, type: newType, content,
+    status: 'pending', memo: '', createdAt: now, updatedAt: now
   };
   items.unshift(item);
-  contentEl.value = '';
   saveItems();
+  closeAddModal();
 }
 
 function deleteItem(id) {
@@ -402,9 +466,6 @@ async function restoreData(file) {
 // ── 렌더링 ──
 function render() {
   window.__rendered = true;
-
-  // 카테고리 셀렉트 초기화 (한 번만)
-  if (!document.getElementById('new-category').options.length) updateCategoryOptions();
 
   // 통계
   const total = items.length;
@@ -527,8 +588,6 @@ function escapeHtml(str) {
   return (str || '').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
 }
 
-// 초기화
-updateCategoryOptions();
 </script>
 </body>
 </html>
