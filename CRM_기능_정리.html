@@ -279,6 +279,14 @@
   .done-badge { background: var(--ok); }
   .saas-badge { background: var(--info); }
   .sub-badge  { background: var(--warn); color: #78350F; }
+  .blocked-badge, .warn-badge {
+    display: inline-flex; align-items: center; gap: 4px;
+    color: #fff; font-size: 10px; font-weight: 800;
+    padding: 3px 8px; border-radius: 999px;
+    margin-left: auto; flex-shrink: 0; white-space: nowrap;
+  }
+  .blocked-badge { background: var(--danger); }
+  .warn-badge { background: var(--warn); color: #78350F; }
   .target-block .simple-item .txt {
     flex: 1;
     display: flex;
@@ -1492,37 +1500,37 @@
           <span class="target-title">🤖 AI 자동 요약 카드 — 통화 상세 표시</span>
         </div>
         <div class="simple-list">
-          <div class="simple-item">
+          <div class="simple-item done">
             <span class="icon">😊</span>
-            <span class="txt"><b>감정 분석</b> (긍정 / 중립 / 부정 + %)</span>
+            <span class="txt"><b>감정 분석</b> (긍정 / 중립 / 부정 + %)<span class="done-badge">✓ 지금 됨</span></span>
           </div>
-          <div class="simple-item">
+          <div class="simple-item done">
             <span class="icon">🏷️</span>
-            <span class="txt"><b>주제 태그</b> (예약 · 검진 · 문의 등 자동 분류)</span>
+            <span class="txt"><b>주제 태그</b> (예약 · 검진 · 문의 등 자동 분류)<span class="done-badge">✓ 지금 됨</span></span>
           </div>
-          <div class="simple-item">
+          <div class="simple-item done">
             <span class="icon">📌</span>
-            <span class="txt"><b>핵심 내용</b> (통화의 요점 3-5줄)</span>
+            <span class="txt"><b>핵심 내용</b> (통화의 요점 3-5줄)<span class="done-badge">✓ 지금 됨</span></span>
           </div>
-          <div class="simple-item">
+          <div class="simple-item done">
             <span class="icon">📝</span>
-            <span class="txt"><b>요청 사항</b> (회원이 요청한 것 자동 추출)</span>
+            <span class="txt"><b>요청 사항</b> (회원이 요청한 것 자동 추출)<span class="done-badge">✓ 지금 됨</span></span>
           </div>
-          <div class="simple-item">
+          <div class="simple-item done">
             <span class="icon">✅</span>
-            <span class="txt"><b>결정 / 합의</b> (통화 중 정한 것)</span>
+            <span class="txt"><b>결정 / 합의</b> (통화 중 정한 것)<span class="done-badge">✓ 지금 됨</span></span>
           </div>
-          <div class="simple-item">
+          <div class="simple-item warn">
             <span class="icon">⚙️</span>
-            <span class="txt"><b>자동 후속 액션 항목</b> (예: 문자 발송, 재연락 등)</span>
+            <span class="txt"><b>자동 후속 액션 항목</b> (예: 문자 발송, 재연락 등)<span class="warn-badge">⚠ 표시만 (자동 발송 X · 안전 설계)</span></span>
           </div>
-          <div class="simple-item">
+          <div class="simple-item done">
             <span class="icon">⚠️</span>
-            <span class="txt"><b>리스크 / 주의 사항</b> (컴플레인 등 자동 감지)</span>
+            <span class="txt"><b>리스크 / 주의 사항</b> (컴플레인 등 자동 감지)<span class="done-badge">✓ 지금 됨</span></span>
           </div>
-          <div class="simple-item">
+          <div class="simple-item done">
             <span class="icon">📊</span>
-            <span class="txt"><b>신뢰도 표시</b> (%) · 모델 · 분석 소요 시간</span>
+            <span class="txt"><b>신뢰도 표시</b> (%) · 모델 · 분석 소요 시간<span class="done-badge">✓ 지금 됨</span></span>
           </div>
         </div>
       </div>
@@ -1534,13 +1542,13 @@
           <span class="target-title">🎧 녹취 재생 + AI 재분석</span>
         </div>
         <div class="simple-list">
-          <div class="simple-item">
+          <div class="simple-item danger">
             <span class="icon">▶️</span>
-            <span class="txt">저장된 통화 <b>녹취 파일 재생</b></span>
+            <span class="txt">저장된 통화 <b>녹취 파일 재생</b><span class="blocked-badge">✗ LGU+ 제약 (재생 불가)</span></span>
           </div>
-          <div class="simple-item">
+          <div class="simple-item done">
             <span class="icon">🤖</span>
-            <span class="txt"><b>AI 재분석 버튼</b> (요약 다시 생성)</span>
+            <span class="txt"><b>AI 재분석 버튼</b> (요약 다시 생성)<span class="done-badge">✓ 지금 됨</span></span>
           </div>
         </div>
       </div>
