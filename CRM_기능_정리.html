@@ -1,0 +1,2186 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>단골 CRM 통화 기능 정리</title>
+<link rel="preconnect" href="https://cdn.jsdelivr.net">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css">
+<style>
+  :root {
+    --bg: #F7FAFC;
+    --card: #FFFFFF;
+    --text: #1A202C;
+    --sub: #4A5568;
+    --muted: #718096;
+    --border: #E2E8F0;
+    --ok: #22C55E;
+    --ok-bg: #F0FDF4;
+    --warn: #F59E0B;
+    --warn-bg: #FFFBEB;
+    --info: #3182CE;
+    --info-bg: #EBF8FF;
+    --danger: #D9534F;
+    --danger-bg: #FEE2E2;
+    --purple: #7C3AED;
+    --purple-bg: #F3E8FF;
+    --shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+    --shadow-hover: 0 4px 12px rgba(0,0,0,0.08), 0 2px 4px rgba(0,0,0,0.04);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    font-size: 15px;
+    -webkit-font-smoothing: antialiased;
+  }
+  .container {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 20px 16px 60px;
+  }
+
+  /* ─────────── 공통 HEADER ─────────── */
+  header {
+    background: linear-gradient(135deg, #2D3748 0%, #1A202C 100%);
+    color: #fff;
+    padding: 28px 24px;
+    border-radius: 16px;
+    margin-bottom: 24px;
+    box-shadow: var(--shadow);
+  }
+  header h1 {
+    font-size: 26px;
+    font-weight: 900;
+    letter-spacing: -0.5px;
+    margin-bottom: 6px;
+  }
+  header p {
+    font-size: 14px;
+    color: #A0AEC0;
+  }
+
+  /* ─────────── TOGGLE 버튼 ─────────── */
+  .view-toggle {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 24px;
+    background: var(--card);
+    border-radius: 999px;
+    padding: 5px;
+    box-shadow: var(--shadow);
+    max-width: 520px;
+    margin-left: auto;
+    margin-right: auto;
+    gap: 4px;
+  }
+  .view-toggle button {
+    flex: 1;
+    padding: 10px 14px;
+    border: none;
+    background: transparent;
+    color: var(--sub);
+    font-size: 13px;
+    font-weight: 700;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: inherit;
+    white-space: nowrap;
+  }
+  .view-toggle button.active {
+    background: linear-gradient(135deg, #3182CE, #2C5282);
+    color: #fff;
+    box-shadow: 0 2px 8px rgba(49,130,206,0.3);
+  }
+  .view-toggle button:not(.active):hover {
+    background: #F1F5F9;
+  }
+
+  /* ─────────── 뷰 전환 ─────────── */
+  .view { display: none; }
+  .view.active { display: block; animation: fadeIn 0.3s; }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ─────────── 간략 뷰 (SIMPLE) ─────────── */
+  .hero-stats {
+    display: grid;
+    gap: 14px;
+    grid-template-columns: 1fr;
+    margin-bottom: 28px;
+  }
+  @media (min-width: 640px) {
+    .hero-stats { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (min-width: 900px) {
+    .hero-stats { grid-template-columns: repeat(4, 1fr); }
+  }
+  .stat-card {
+    background: var(--card);
+    border-radius: 14px;
+    padding: 22px;
+    box-shadow: var(--shadow);
+    border-top: 4px solid var(--info);
+    text-align: center;
+    transition: transform 0.2s;
+  }
+  .stat-card:hover { transform: translateY(-2px); }
+  .stat-card .emoji { font-size: 36px; margin-bottom: 8px; }
+  .stat-card .number {
+    font-size: 32px;
+    font-weight: 900;
+    color: var(--text);
+    line-height: 1;
+    margin-bottom: 4px;
+    letter-spacing: -1px;
+  }
+  .stat-card .label {
+    font-size: 13px;
+    color: var(--muted);
+    font-weight: 600;
+  }
+  .stat-ok { border-top-color: var(--ok); }
+  .stat-warn { border-top-color: var(--warn); }
+  .stat-info { border-top-color: var(--info); }
+  .stat-purple { border-top-color: var(--purple); }
+
+  /* Simple 큰 카드 */
+  .big-card {
+    background: var(--card);
+    border-radius: 16px;
+    padding: 26px;
+    box-shadow: var(--shadow);
+    margin-bottom: 20px;
+  }
+  .big-card h2 {
+    font-size: 20px;
+    font-weight: 900;
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .big-card .sub {
+    font-size: 13px;
+    color: var(--muted);
+    margin-bottom: 18px;
+  }
+
+  /* Simple 리스트 (한 줄 요약) */
+  .simple-list {
+    display: grid;
+    gap: 10px;
+    grid-template-columns: 1fr;
+  }
+  @media (min-width: 700px) {
+    .simple-list { grid-template-columns: repeat(2, 1fr); }
+  }
+  .simple-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 16px;
+    background: #F8FAFC;
+    border-radius: 10px;
+    border-left: 3px solid var(--ok);
+  }
+  .simple-item.warn { border-left-color: var(--warn); }
+  .simple-item.danger { border-left-color: var(--danger); }
+  .simple-item .icon {
+    font-size: 22px;
+    flex-shrink: 0;
+  }
+  .simple-item .txt {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text);
+    line-height: 1.4;
+  }
+
+  /* Simple - Target block */
+  .target-block {
+    background: linear-gradient(135deg, #F3E8FF 0%, #EDE9FE 100%);
+    border-left: 4px solid var(--purple);
+    border-radius: 12px;
+    padding: 18px;
+    margin-bottom: 16px;
+  }
+  .target-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 14px;
+    padding-bottom: 10px;
+    border-bottom: 1px dashed #C4B5FD;
+  }
+  .target-num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    background: var(--purple);
+    color: #fff;
+    font-weight: 900;
+    font-size: 14px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .target-title {
+    font-size: 15px;
+    font-weight: 800;
+    color: #4C1D95;
+  }
+  .sub-note {
+    font-size: 12px;
+    color: #4C1D95;
+    background: #fff;
+    padding: 10px 12px;
+    border-radius: 8px;
+    margin-bottom: 12px;
+    line-height: 1.6;
+    border-left: 3px solid var(--purple);
+  }
+  .target-block .simple-item {
+    background: #fff;
+    border-left-color: var(--purple);
+    position: relative;
+  }
+  .target-block .simple-item.done {
+    border-left-color: var(--ok);
+    background: #F0FDF4;
+  }
+  .target-block .simple-item.saas {
+    border-left-color: var(--info);
+    background: #EBF8FF;
+  }
+  .target-block .simple-item.subscription {
+    border-left-color: var(--warn);
+    background: var(--warn-bg);
+  }
+  .done-badge, .saas-badge, .sub-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    color: #fff;
+    font-size: 10px;
+    font-weight: 800;
+    padding: 3px 8px;
+    border-radius: 999px;
+    margin-left: auto;
+    flex-shrink: 0;
+    white-space: nowrap;
+  }
+  .done-badge { background: var(--ok); }
+  .saas-badge { background: var(--info); }
+  .sub-badge  { background: var(--warn); color: #78350F; }
+  .target-block .simple-item .txt {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+    margin-bottom: 20px;
+    padding: 12px;
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: var(--shadow);
+  }
+  .legend-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: var(--sub);
+    font-weight: 600;
+  }
+  .legend-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 3px;
+  }
+  .legend-dot.ok        { background: #22C55E; }
+  .legend-dot.sub       { background: #F59E0B; }
+  .legend-dot.saas      { background: #3182CE; }
+  .legend-dot.pending   { background: #7C3AED; }
+
+  /* ───── 결론 (2옵션) ───── */
+  .verdict-wrap {
+    margin: 28px 0 20px;
+  }
+  .verdict-title {
+    font-size: 20px;
+    font-weight: 900;
+    color: var(--text);
+    text-align: center;
+    margin-bottom: 16px;
+  }
+  .verdict-grid {
+    display: grid;
+    gap: 16px;
+    grid-template-columns: 1fr;
+    margin-bottom: 16px;
+  }
+  @media (min-width: 900px) {
+    .verdict-grid { grid-template-columns: 1fr 1fr; }
+  }
+  .verdict-card {
+    background: linear-gradient(135deg, #EBF8FF 0%, #ffffff 60%);
+    border: 2px solid var(--info);
+    border-radius: 14px;
+    padding: 22px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    box-shadow: var(--shadow);
+  }
+  .verdict-card.verdict-alt {
+    background: linear-gradient(135deg, #F0FDF4 0%, #ffffff 60%);
+    border-color: var(--ok);
+  }
+  .verdict-badge {
+    display: inline-block;
+    background: var(--info);
+    color: #fff;
+    font-size: 12px;
+    font-weight: 800;
+    padding: 4px 12px;
+    border-radius: 999px;
+    align-self: flex-start;
+  }
+  .verdict-alt .verdict-badge { background: var(--ok); }
+  .verdict-name {
+    font-size: 20px;
+    font-weight: 900;
+    color: var(--text);
+  }
+  .verdict-price {
+    font-size: 14px;
+    color: var(--sub);
+  }
+  .verdict-price b {
+    font-size: 22px;
+    color: var(--text);
+    letter-spacing: -0.5px;
+  }
+  .verdict-desc {
+    font-size: 12.5px;
+    color: var(--sub);
+    line-height: 1.7;
+    background: #fff;
+    border-radius: 8px;
+    padding: 10px 12px;
+  }
+  .verdict-pros b, .verdict-cons b {
+    display: block;
+    margin-bottom: 4px;
+    font-size: 12px;
+  }
+  .verdict-pros b { color: #065F46; }
+  .verdict-cons b { color: #9A3412; }
+  .verdict-pros ul, .verdict-cons ul {
+    list-style: none;
+    padding-left: 0;
+    font-size: 12.5px;
+    color: var(--sub);
+    line-height: 1.6;
+  }
+  .verdict-pros li, .verdict-cons li {
+    padding: 2px 0;
+    padding-left: 16px;
+    position: relative;
+  }
+  .verdict-pros li::before { content: '✓'; position: absolute; left: 0; color: var(--ok); font-weight: 900; }
+  .verdict-cons li::before { content: '✗'; position: absolute; left: 0; color: var(--danger); font-weight: 900; }
+  .verdict-when {
+    background: #FEF3C7;
+    color: #78350F;
+    padding: 10px 12px;
+    border-radius: 8px;
+    font-size: 12px;
+    line-height: 1.6;
+    margin-top: auto;
+  }
+  .verdict-order {
+    background: linear-gradient(135deg, #FFF7ED 0%, #FEF3C7 100%);
+    border-radius: 12px;
+    padding: 16px 20px;
+    font-size: 13px;
+    color: #78350F;
+    line-height: 1.9;
+  }
+  .price-note {
+    display: block;
+    font-size: 11px;
+    color: var(--muted);
+    font-weight: 500;
+    margin-top: 2px;
+  }
+  .fee-table {
+    width: 100%;
+    background: #fff;
+    border-radius: 8px;
+    border-collapse: collapse;
+    overflow: hidden;
+    font-size: 12.5px;
+  }
+  .fee-table td {
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--border);
+    color: var(--sub);
+  }
+  .fee-table td:last-child {
+    text-align: right;
+    font-weight: 800;
+    color: var(--text);
+    white-space: nowrap;
+  }
+  .fee-table tr:last-child td { border-bottom: none; }
+  .fee-note {
+    display: inline-block;
+    font-size: 10.5px;
+    color: var(--muted);
+    font-weight: 500;
+    margin-left: 4px;
+  }
+  .fee-total td {
+    background: #F1F5F9;
+    color: var(--text);
+    font-weight: 900;
+    font-size: 13px;
+  }
+  .verdict-alt .fee-total td { background: #DCFCE7; color: #14532D; }
+  .verdict-card:not(.verdict-alt) .fee-total td { background: #DBEAFE; color: #1E3A8A; }
+
+  /* ───── 조사 결론 박스 ───── */
+  .conclusion-box {
+    background: linear-gradient(135deg, #FEF2F2 0%, #FEE2E2 100%);
+    border-left: 5px solid var(--danger);
+    border-radius: 12px;
+    padding: 20px 24px;
+    margin-bottom: 20px;
+    box-shadow: var(--shadow);
+  }
+  .conclusion-title {
+    font-size: 18px;
+    font-weight: 900;
+    color: #991B1B;
+    margin-bottom: 12px;
+  }
+  .conclusion-body {
+    font-size: 13.5px;
+    color: #7F1D1D;
+    line-height: 1.8;
+  }
+  .conclusion-body b { color: #7F1D1D; }
+
+  /* ───── 업체 비교 뷰 ───── */
+  .vendor-note {
+    background: #FFFBEB;
+    border-left: 4px solid var(--warn);
+    border-radius: 10px;
+    padding: 12px 16px;
+    font-size: 12.5px;
+    color: #78350F;
+    line-height: 1.6;
+    margin-bottom: 20px;
+  }
+  .vendor-table-wrap {
+    background: var(--card);
+    border-radius: 14px;
+    box-shadow: var(--shadow);
+    overflow-x: auto;
+    margin-bottom: 24px;
+    border: 1.5px solid var(--border);
+  }
+  table.vendor-table {
+    min-width: 900px;
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+  .vendor-table thead th {
+    background: #F8FAFC;
+    padding: 12px 10px;
+    text-align: center;
+    font-weight: 800;
+    font-size: 12px;
+    color: var(--sub);
+    border-bottom: 2px solid #CBD5E0;
+    border-right: 1px solid #CBD5E0;
+    white-space: nowrap;
+    position: sticky;
+    top: 0;
+    z-index: 2;
+  }
+  .vendor-table thead th:last-child { border-right: none; }
+  .vendor-table thead th.feat {
+    text-align: left;
+    background: #F1F5F9;
+    color: var(--text);
+    position: sticky;
+    left: 0;
+    z-index: 3;
+    min-width: 220px;
+  }
+  .vendor-table thead th.pick {
+    background: linear-gradient(180deg, #D1FAE5, #F8FAFC);
+    color: #065F46;
+  }
+  .vendor-table tbody td {
+    padding: 10px 8px;
+    text-align: center;
+    border-bottom: 1px solid #CBD5E0;
+    border-right: 1px solid #CBD5E0;
+    color: var(--sub);
+  }
+  .vendor-table tbody td:last-child { border-right: none; }
+  .vendor-table tbody tr:last-child td { border-bottom: none; }
+  .vendor-table tbody td.feat {
+    text-align: left;
+    background: #F8FAFC;
+    font-weight: 700;
+    color: var(--text);
+    position: sticky;
+    left: 0;
+    z-index: 1;
+    border-right: 2px solid var(--border);
+  }
+  .vendor-table tbody tr:hover td { background: #FAFAFA; }
+  .vendor-table tbody tr:hover td.feat { background: #EFF6FF; }
+  .cell-ok { color: #14532D; font-size: 15px; font-weight: 900; background: #BBF7D0; }
+  .cell-no { color: #7C2D12; font-size: 15px; font-weight: 900; background: #FED7AA; }
+  .cell-partial { color: #713F12; font-size: 15px; font-weight: 900; background: #FEF08A; }
+  .cell-unknown { color: var(--muted); font-size: 14px; }
+  .vendor-table tbody tr:hover td.cell-ok      { background: #86EFAC; }
+  .vendor-table tbody tr:hover td.cell-no      { background: #FDBA74; }
+  .vendor-table tbody tr:hover td.cell-partial { background: #FDE047; }
+  .cell-note { font-size: 10.5px; color: var(--muted); margin-top: 2px; display: block; line-height: 1.3; }
+  .vendor-table tbody tr.footer-row td {
+    background: #F1F5F9;
+    font-weight: 900;
+    font-size: 12.5px;
+    color: var(--text);
+    padding: 12px 8px;
+  }
+  .vendor-table tbody tr.footer-row td.feat { background: #E2E8F0; }
+
+  /* 요약 카드 3열 */
+  .vendor-cards {
+    display: grid;
+    gap: 14px;
+    grid-template-columns: 1fr;
+    margin-bottom: 20px;
+  }
+  @media (min-width: 700px)  { .vendor-cards { grid-template-columns: repeat(2, 1fr); } }
+  @media (min-width: 1024px) { .vendor-cards { grid-template-columns: repeat(3, 1fr); } }
+  .vendor-card {
+    background: var(--card);
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+    box-shadow: var(--shadow);
+    transition: all 0.2s;
+  }
+  .vendor-card:hover { box-shadow: var(--shadow-hover); transform: translateY(-2px); }
+  .vendor-card.rec {
+    border-color: var(--ok);
+    background: linear-gradient(135deg, #F0FDF4 0%, #ffffff 60%);
+    position: relative;
+  }
+  .vendor-card.rec::before {
+    content: '⭐ 검토 대상';
+    position: absolute;
+    top: -10px;
+    right: 12px;
+    background: var(--ok);
+    color: #fff;
+    font-size: 10px;
+    font-weight: 800;
+    padding: 3px 9px;
+    border-radius: 999px;
+  }
+  .vendor-card h4 {
+    font-size: 15px;
+    font-weight: 900;
+    margin-bottom: 4px;
+  }
+  .vendor-card .biz {
+    font-size: 11px;
+    color: var(--muted);
+    margin-bottom: 10px;
+  }
+  .vendor-card .price {
+    font-size: 22px;
+    font-weight: 900;
+    color: var(--text);
+    margin-bottom: 8px;
+    letter-spacing: -0.5px;
+  }
+  .vendor-card .price small {
+    font-size: 12px;
+    color: var(--muted);
+    font-weight: 500;
+  }
+  .vendor-card ul {
+    list-style: none;
+    font-size: 12px;
+    color: var(--sub);
+    margin-top: 6px;
+  }
+  .vendor-card ul li {
+    padding: 3px 0;
+    display: flex;
+    align-items: flex-start;
+    gap: 6px;
+  }
+  .vendor-card ul li.pos::before { content: '✓'; color: var(--ok); font-weight: 900; }
+  .vendor-card ul li.neg::before { content: '✗'; color: var(--danger); font-weight: 900; }
+  .vendor-card ul li.mid::before { content: '△'; color: var(--warn); font-weight: 900; }
+
+  /* 상세 토글 */
+  .detail-toggle-wrap {
+    text-align: center;
+    margin: 20px 0;
+  }
+  .detail-toggle-btn {
+    background: var(--card);
+    border: 2px solid var(--info);
+    color: var(--info);
+    font-size: 14px;
+    font-weight: 800;
+    padding: 12px 28px;
+    border-radius: 999px;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.2s;
+  }
+  .detail-toggle-btn:hover {
+    background: var(--info-bg);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(49,130,206,0.2);
+  }
+  .detail-toggle-btn.open {
+    background: var(--info);
+    color: #fff;
+  }
+  .vendor-detail-hidden { display: none; }
+  .vendor-detail-shown  { display: block; animation: fadeIn 0.3s; }
+
+  /* ───── 시나리오 카드 (비전문가용) ───── */
+  .scenario-intro {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  .scenario-intro h3 {
+    font-size: 22px;
+    font-weight: 900;
+    color: var(--text);
+    margin-bottom: 6px;
+  }
+  .scenario-intro p {
+    font-size: 13px;
+    color: var(--muted);
+  }
+  .scenario-grid {
+    display: grid;
+    gap: 18px;
+    grid-template-columns: 1fr;
+    margin-bottom: 24px;
+  }
+  @media (min-width: 1024px) {
+    .scenario-grid { grid-template-columns: repeat(3, 1fr); }
+  }
+  .scenario-card {
+    background: var(--card);
+    border: 2px solid var(--border);
+    border-radius: 16px;
+    padding: 22px;
+    box-shadow: var(--shadow);
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .scenario-card.recommended {
+    border-color: var(--ok);
+    background: linear-gradient(135deg, #F0FDF4 0%, #ffffff 40%);
+    position: relative;
+  }
+  .scenario-card.recommended::after {
+    content: '⭐ 추천';
+    position: absolute;
+    top: -12px;
+    right: 16px;
+    background: var(--ok);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 800;
+    padding: 4px 10px;
+    border-radius: 999px;
+  }
+  .scenario-badge {
+    display: inline-block;
+    background: #EDF2F7;
+    color: var(--sub);
+    font-size: 11px;
+    font-weight: 800;
+    padding: 4px 10px;
+    border-radius: 999px;
+    align-self: flex-start;
+  }
+  .scenario-card.recommended .scenario-badge {
+    background: var(--ok);
+    color: #fff;
+  }
+  .scenario-title {
+    font-size: 20px;
+    font-weight: 900;
+    color: var(--text);
+    margin-top: -8px;
+  }
+  .scenario-price {
+    font-size: 15px;
+    color: var(--muted);
+    font-weight: 700;
+  }
+  .scenario-price b {
+    font-size: 22px;
+    color: var(--text);
+    letter-spacing: -0.5px;
+  }
+  .scenario-price small {
+    font-size: 11px;
+    color: var(--muted);
+    font-weight: 500;
+  }
+  .scenario-story {
+    background: #F8FAFC;
+    border-radius: 10px;
+    padding: 12px 14px;
+  }
+  .scenario-story .story-title {
+    font-size: 12px;
+    font-weight: 900;
+    color: var(--info);
+    margin-bottom: 6px;
+  }
+  .scenario-story ol {
+    padding-left: 20px;
+    font-size: 12.5px;
+    color: var(--sub);
+    line-height: 1.7;
+  }
+  .scenario-pros, .scenario-cons {
+    font-size: 12px;
+    line-height: 1.5;
+  }
+  .scenario-pros b { color: #065F46; display: block; margin-bottom: 4px; font-size: 12px; }
+  .scenario-cons b { color: #9A3412; display: block; margin-bottom: 4px; font-size: 12px; }
+  .scenario-pros ul, .scenario-cons ul {
+    list-style: none;
+    padding-left: 0;
+  }
+  .scenario-pros li, .scenario-cons li {
+    padding: 2px 0;
+    padding-left: 16px;
+    position: relative;
+    color: var(--sub);
+  }
+  .scenario-pros li::before { content: '✓'; position: absolute; left: 0; color: var(--ok); font-weight: 900; }
+  .scenario-cons li::before { content: '✗'; position: absolute; left: 0; color: var(--danger); font-weight: 900; }
+  .scenario-verdict {
+    background: #FEF3C7;
+    color: #78350F;
+    padding: 10px 14px;
+    border-radius: 8px;
+    font-size: 12.5px;
+    text-align: center;
+    margin-top: auto;
+  }
+  .scenario-summary {
+    background: linear-gradient(135deg, #EBF8FF 0%, #E6FFFA 100%);
+    border-radius: 14px;
+    padding: 20px 24px;
+    margin-bottom: 24px;
+  }
+  .scenario-summary-title {
+    font-size: 16px;
+    font-weight: 900;
+    color: #1E40AF;
+    margin-bottom: 10px;
+  }
+  .scenario-summary-body {
+    font-size: 13px;
+    color: #075985;
+    line-height: 1.8;
+  }
+  .scenario-divider {
+    border: none;
+    border-top: 1px dashed var(--border);
+    margin: 32px 0 24px;
+  }
+
+  .target-summary {
+    background: linear-gradient(135deg, #FFF7ED 0%, #FEF3C7 100%);
+    border-radius: 12px;
+    padding: 18px;
+    margin-top: 20px;
+  }
+  .ts-title {
+    font-size: 14px;
+    font-weight: 900;
+    margin-bottom: 12px;
+    color: #92400E;
+  }
+  .ts-grid {
+    display: grid;
+    gap: 14px;
+    grid-template-columns: 1fr;
+  }
+  @media (min-width: 640px) {
+    .ts-grid { grid-template-columns: 1fr 1fr; }
+  }
+  .ts-col {
+    background: #fff;
+    border-radius: 10px;
+    padding: 14px 16px;
+  }
+  .ts-label {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 800;
+    padding: 3px 10px;
+    border-radius: 999px;
+    margin-bottom: 10px;
+  }
+  .ts-now { background: #E0E7FF; color: #3730A3; }
+  .ts-goal { background: #D1FAE5; color: #065F46; }
+  .ts-list {
+    list-style: none;
+    font-size: 13px;
+    color: var(--sub);
+  }
+  .ts-list li {
+    padding: 4px 0;
+    padding-left: 16px;
+    position: relative;
+  }
+  .ts-list li::before {
+    content: '•';
+    position: absolute;
+    left: 4px;
+    color: var(--purple);
+    font-weight: 900;
+  }
+
+  /* Simple 옵션 3장 */
+  .options-3 {
+    display: grid;
+    gap: 14px;
+    grid-template-columns: 1fr;
+    margin-top: 14px;
+  }
+  @media (min-width: 768px) {
+    .options-3 { grid-template-columns: repeat(3, 1fr); }
+  }
+  .opt {
+    background: #fff;
+    border: 2px solid var(--border);
+    border-radius: 14px;
+    padding: 20px;
+    text-align: center;
+    position: relative;
+    transition: all 0.2s;
+  }
+  .opt:hover { transform: translateY(-3px); box-shadow: var(--shadow-hover); }
+  .opt.pick {
+    border-color: var(--ok);
+    background: linear-gradient(135deg, #F0FDF4 0%, #ffffff 75%);
+  }
+  .opt.pick::before {
+    content: '⭐ 추천';
+    position: absolute;
+    top: -12px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--ok);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 800;
+    padding: 4px 12px;
+    border-radius: 999px;
+    white-space: nowrap;
+  }
+  .opt .title {
+    font-size: 15px;
+    font-weight: 800;
+    margin-bottom: 8px;
+    color: var(--text);
+  }
+  .opt .cost {
+    font-size: 26px;
+    font-weight: 900;
+    color: var(--text);
+    margin: 6px 0;
+    letter-spacing: -0.5px;
+  }
+  .opt .cost small {
+    font-size: 13px;
+    color: var(--muted);
+    font-weight: 500;
+  }
+  .opt .why {
+    font-size: 12px;
+    color: var(--sub);
+    line-height: 1.5;
+    margin-top: 10px;
+  }
+
+  /* Simple - 결론 박스 */
+  .conclusion {
+    background: linear-gradient(135deg, #EBF8FF 0%, #E6FFFA 100%);
+    border-radius: 16px;
+    padding: 26px;
+    text-align: center;
+    margin-top: 24px;
+  }
+  .conclusion .icon {
+    font-size: 42px;
+    margin-bottom: 10px;
+  }
+  .conclusion h3 {
+    font-size: 20px;
+    font-weight: 900;
+    margin-bottom: 8px;
+    color: #1E40AF;
+  }
+  .conclusion p {
+    font-size: 14px;
+    color: #075985;
+    line-height: 1.6;
+    max-width: 640px;
+    margin: 0 auto;
+  }
+  .conclusion .cta {
+    display: inline-block;
+    margin-top: 16px;
+    padding: 12px 28px;
+    background: var(--info);
+    color: #fff;
+    border-radius: 999px;
+    font-size: 14px;
+    font-weight: 800;
+    cursor: pointer;
+    border: none;
+    font-family: inherit;
+    transition: all 0.2s;
+  }
+  .conclusion .cta:hover {
+    background: #2C5282;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(49,130,206,0.4);
+  }
+  .cta-row {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: 16px;
+  }
+  .cta.cta-ghost {
+    background: #fff;
+    color: var(--info);
+    border: 2px solid var(--info);
+  }
+  .cta.cta-ghost:hover {
+    background: var(--info-bg);
+    color: var(--info);
+  }
+
+  /* ─────────── 상세 뷰 (DETAIL) ─────────── */
+  .progress-wrap {
+    background: rgba(255,255,255,0.1);
+    border-radius: 999px;
+    height: 14px;
+    overflow: hidden;
+    margin-top: 12px;
+  }
+  .progress-bar {
+    background: linear-gradient(90deg, #22C55E, #10B981);
+    height: 100%;
+    width: 75%;
+    border-radius: 999px;
+  }
+  .progress-label {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 12px;
+    color: #CBD5E0;
+    margin-top: 20px;
+    margin-bottom: 6px;
+  }
+  .progress-label b { color: #fff; font-size: 14px; }
+
+  section { margin-bottom: 32px; }
+  .section-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 19px;
+    font-weight: 800;
+    margin-bottom: 14px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid var(--border);
+  }
+  .section-title .badge {
+    font-size: 11px;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 999px;
+    margin-left: 4px;
+  }
+  .badge-ok { background: var(--ok-bg); color: #15803D; }
+  .badge-warn { background: var(--warn-bg); color: #92400E; }
+  .badge-info { background: var(--info-bg); color: #1E40AF; }
+
+  .grid {
+    display: grid;
+    gap: 14px;
+    grid-template-columns: 1fr;
+  }
+  @media (min-width: 640px) { .grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (min-width: 1024px) { .grid { grid-template-columns: repeat(3, 1fr); } }
+
+  .card {
+    background: var(--card);
+    border-radius: 12px;
+    padding: 18px;
+    border: 1.5px solid var(--border);
+    box-shadow: var(--shadow);
+    transition: all 0.2s;
+  }
+  .card:hover { box-shadow: var(--shadow-hover); transform: translateY(-2px); }
+  .card-ok { border-left: 4px solid var(--ok); }
+  .card-warn { border-left: 4px solid var(--warn); }
+  .card-info { border-left: 4px solid var(--info); }
+
+  .card-title {
+    font-size: 15px;
+    font-weight: 800;
+    margin-bottom: 10px;
+  }
+  .card ul {
+    list-style: none;
+    font-size: 13px;
+    color: var(--sub);
+  }
+  .card li {
+    padding: 4px 0;
+    display: flex;
+    align-items: flex-start;
+    gap: 6px;
+    line-height: 1.5;
+  }
+  .card-ok li::before { content: '✓'; color: var(--ok); font-weight: 900; }
+  .card-warn li::before { content: '⚠'; color: var(--warn); }
+  .card-info li::before { content: '▸'; color: var(--info); font-weight: 900; }
+
+  .flow {
+    background: #F1F5F9;
+    border-radius: 8px;
+    padding: 12px 14px;
+    font-family: 'JetBrains Mono', ui-monospace, Menlo, Consolas, monospace;
+    font-size: 12px;
+    color: #334155;
+    white-space: pre-wrap;
+    line-height: 1.7;
+    margin-top: 10px;
+    overflow-x: auto;
+  }
+
+  .table-wrap {
+    background: var(--card);
+    border-radius: 12px;
+    padding: 4px;
+    border: 1.5px solid var(--border);
+    box-shadow: var(--shadow);
+    overflow-x: auto;
+  }
+  .progress-wrap.mb-lg { margin-bottom: 28px; }
+  .col-40 { width: 40%; }
+  .col-30 { width: 30%; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th, td { padding: 12px 14px; text-align: left; border-bottom: 1px solid var(--border); }
+  th { background: #F8FAFC; font-weight: 800; color: var(--sub); font-size: 12px; text-transform: uppercase; letter-spacing: 0.3px; }
+  tr:last-child td { border-bottom: none; }
+  .pill { display: inline-block; font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 6px; }
+  .pill-ok { background: var(--ok-bg); color: #15803D; }
+  .pill-warn { background: var(--warn-bg); color: #92400E; }
+  .pill-danger { background: var(--danger-bg); color: #991B1B; }
+
+  .compare-grid {
+    display: grid;
+    gap: 16px;
+    grid-template-columns: 1fr;
+  }
+  @media (min-width: 768px) { .compare-grid { grid-template-columns: repeat(3, 1fr); } }
+  .compare-card {
+    background: var(--card);
+    border-radius: 14px;
+    padding: 22px;
+    border: 2px solid var(--border);
+    box-shadow: var(--shadow);
+  }
+  .compare-card.recommended {
+    border-color: var(--ok);
+    background: linear-gradient(135deg, #F0FDF4 0%, #FFFFFF 75%);
+    position: relative;
+  }
+  .compare-card.recommended::before {
+    content: '⭐ 추천';
+    position: absolute;
+    top: -10px;
+    right: 16px;
+    background: var(--ok);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 800;
+    padding: 4px 10px;
+    border-radius: 999px;
+  }
+  .compare-card h3 { font-size: 17px; font-weight: 900; margin-bottom: 6px; }
+  .compare-card .price { font-size: 26px; font-weight: 900; margin: 8px 0; }
+  .compare-card .price small { font-size: 13px; color: var(--muted); font-weight: 500; }
+  .compare-card .completion { font-size: 13px; color: var(--sub); margin-bottom: 12px; }
+  .compare-card .completion b { color: var(--ok); }
+  .compare-card ul { list-style: none; font-size: 13px; color: var(--sub); }
+  .compare-card ul li { padding: 3px 0; display: flex; align-items: flex-start; gap: 6px; }
+
+  .cost-highlight {
+    background: linear-gradient(135deg, #FEF3C7 0%, #FDE68A 100%);
+    border-radius: 12px;
+    padding: 20px;
+    text-align: center;
+    margin-top: 20px;
+  }
+  .cost-highlight .amount {
+    font-size: 30px;
+    font-weight: 900;
+    color: #92400E;
+    letter-spacing: -0.5px;
+  }
+  .cost-highlight .label { font-size: 12px; color: #78350F; margin-top: 4px; }
+
+  footer {
+    text-align: center;
+    color: var(--muted);
+    font-size: 12px;
+    margin-top: 40px;
+    padding: 20px;
+    border-top: 1px solid var(--border);
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- ═══════════ 공통 헤더 ═══════════ -->
+  <header>
+    <h1>📞 단골 CRM 통화 기능</h1>
+    <p>재활 헬스장 CRM · 지금 어디까지 됐고 앞으로 뭐 할 수 있나</p>
+  </header>
+
+  <!-- ═══════════ 뷰 전환 버튼 ═══════════ -->
+  <div class="view-toggle">
+    <button type="button" class="active" onclick="switchView('goal', this)">🎯 최종 목표</button>
+    <button type="button" onclick="switchView('vendor', this)">🏢 업체 비교</button>
+    <button type="button" hidden onclick="switchView('simple', this)">🌱 간략히</button>
+    <button type="button" onclick="switchView('detail', this)">🔬 상세 기술 정보</button>
+  </div>
+
+  <!-- ═══════════════════════════════════ -->
+  <!-- ═══════════ 간략 뷰 ═══════════════ -->
+  <!-- ═══════════════════════════════════ -->
+  <div id="view-simple" class="view">
+
+    <!-- 핵심 숫자 4개 -->
+    <div class="hero-stats">
+      <div class="stat-card stat-ok">
+        <div class="emoji">🎯</div>
+        <div class="number">75%</div>
+        <div class="label">전체 완성도</div>
+      </div>
+      <div class="stat-card stat-info">
+        <div class="emoji">📞</div>
+        <div class="number">전화</div>
+        <div class="label">받고 걸기 자동</div>
+      </div>
+      <div class="stat-card stat-purple">
+        <div class="emoji">🤖</div>
+        <div class="number">AI</div>
+        <div class="label">메모 → 자동 요약</div>
+      </div>
+      <div class="stat-card stat-warn">
+        <div class="emoji">⏳</div>
+        <div class="number">4가지</div>
+        <div class="label">아직 안 되는 기능</div>
+      </div>
+    </div>
+
+    <!-- 지금 되는 것 -->
+    <div class="big-card">
+      <h2>✅ 지금 되는 것</h2>
+      <p class="sub">어드민 페이지에서 바로 쓸 수 있어요</p>
+      <div class="simple-list">
+        <div class="simple-item">
+          <span class="icon">📞</span>
+          <span class="txt">전화 오면 어드민 화면에 회원 정보가 자동으로 떠요</span>
+        </div>
+        <div class="simple-item">
+          <span class="icon">👤</span>
+          <span class="txt">누가 전화했는지 (이름·지점·메모) 한눈에 보여요</span>
+        </div>
+        <div class="simple-item">
+          <span class="icon">✏️</span>
+          <span class="txt">통화하면서 메모·후속조치를 바로 입력해요</span>
+        </div>
+        <div class="simple-item">
+          <span class="icon">🤖</span>
+          <span class="txt">상담사가 <b>메모를 입력하면</b> AI 가 그 내용을 자동 요약해줘요</span>
+        </div>
+        <div class="simple-item">
+          <span class="icon">📱</span>
+          <span class="txt">어드민에서 회원 찾아서 바로 전화 걸 수 있어요</span>
+        </div>
+        <div class="simple-item">
+          <span class="icon">📋</span>
+          <span class="txt">모든 상담이력이 회원별로 쌓여요</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 아쉬운 것 -->
+    <div class="big-card">
+      <h2>⚠️ 아직 안 되는 것</h2>
+      <p class="sub">지금 쓰는 LGU+ 070 전화기의 한계 때문이에요</p>
+      <div class="simple-list">
+        <div class="simple-item warn">
+          <span class="icon">🎧</span>
+          <span class="txt">아직은 <b>진짜 전화기</b>로 받아야 해요 (PC 헤드셋 X)</span>
+        </div>
+        <div class="simple-item warn">
+          <span class="icon">🎙️</span>
+          <span class="txt">통화 <b>음성 → 자동 텍스트 변환은 안 돼요</b> (녹음 다운로드 청약 필요)</span>
+        </div>
+        <div class="simple-item warn">
+          <span class="icon">🧠</span>
+          <span class="txt">그래서 AI 요약도 <b>상담사가 메모 입력해야만</b> 가능해요</span>
+        </div>
+        <div class="simple-item warn">
+          <span class="icon">📞</span>
+          <span class="txt">전화 받았는지 / 끊었는지 <b>자동 감지 못 해요</b> (수동 버튼 필요)</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 다음 옵션 -->
+    <div class="big-card">
+      <h2>🚀 다음에 뭐 할 수 있어요?</h2>
+      <p class="sub">지금 이대로 써도 되고, 더 자동화하고 싶으면 옵션이 있어요</p>
+
+      <div class="options-3">
+
+        <div class="opt">
+          <div class="title">🅐 지금 그대로</div>
+          <div class="cost">현재 요금<br><small>추가 없음</small></div>
+          <div class="why">
+            일단 그대로 쓰기.<br>
+            수동 메모로 충분하면<br>
+            지금이 가장 편해요.
+          </div>
+        </div>
+
+        <div class="opt">
+          <div class="title">🅑 조금만 개선</div>
+          <div class="cost">월 약 1.4만원<br><small>LGU+ + AI 변환</small></div>
+          <div class="why">
+            녹음 파일 → AI 가 <br>
+            글로 자동 변환.<br>
+            전화기는 그대로.
+          </div>
+        </div>
+
+        <div class="opt pick">
+          <div class="title">🅒 완전 자동화</div>
+          <div class="cost">월 약 2.4만원<br><small>ClawOps 도입</small></div>
+          <div class="why">
+            <b>PC 헤드셋으로 통화</b>.<br>
+            녹음·요약 100% 자동.<br>
+            전화기 없어도 됨.
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- 결론 -->
+    <div class="conclusion">
+      <div class="icon">💡</div>
+      <h3>기본은 되지만 아직 반쪽자리에요</h3>
+      <p>
+        <b>전화 받고 / 회원 정보 보고 / 손으로 메모 남기고 / 그 메모를 AI 로 요약</b>까지는 됩니다.<br>
+        다만 <b>통화 음성 자동 텍스트 변환</b> · <b>PC 헤드셋 통화</b> · <b>자동 응답 감지</b> 같은<br>
+        진짜 자동화는 지금 LGU+ 로는 불가능해요.<br>
+        월 1만원 정도만 더 쓰면 <b>모두 자동화</b> 가능한 옵션이 있습니다.
+      </p>
+      <div class="cta-row">
+        <button type="button" class="cta" onclick="switchView('goal', document.querySelectorAll('.view-toggle button')[0])">
+          🎯 최종 목표 보기 →
+        </button>
+        <button type="button" class="cta cta-ghost" onclick="switchView('detail', document.querySelectorAll('.view-toggle button')[2])">
+          🔬 상세 기술 정보 →
+        </button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ═══════════════════════════════════ -->
+  <!-- ═══════════ 최종 목표 뷰 ═══════════ -->
+  <!-- ═══════════════════════════════════ -->
+  <div id="view-goal" class="view active">
+
+    <div class="big-card">
+      <h2>🎯 최종 목표 (mock-up 기준)</h2>
+      <p class="sub">참고 화면 (관리자-CRM.html) 에 있는 상담이력 메뉴 전체 기능</p>
+
+      <!-- 발신 시작 화면 (전화 걸 때) -->
+      <div class="target-block">
+        <div class="target-header">
+          <span class="target-num">1</span>
+          <span class="target-title">📱 전화 걸 때 화면 — 회원 검색 + 발신</span>
+        </div>
+        <div class="simple-list">
+          <div class="simple-item done">
+            <span class="icon">🔍</span>
+            <span class="txt">회원 검색 (이름·번호) + 최근 통화 회원 탭<span class="done-badge">✓ 지금 됨</span></span>
+          </div>
+          <div class="simple-item done">
+            <span class="icon">👤</span>
+            <span class="txt">회원 프로필 사진 + 지점 표시<span class="done-badge">✓ 지금 됨</span></span>
+          </div>
+          <div class="simple-item done">
+            <span class="icon">📞</span>
+            <span class="txt">미등록 번호도 직접 입력해서 발신 가능<span class="done-badge">✓ 지금 됨</span></span>
+          </div>
+          <div class="simple-item done">
+            <span class="icon">🚀</span>
+            <span class="txt">[통화 시작] → 단말기로 자동 발신 신호<span class="done-badge">✓ 지금 됨</span></span>
+          </div>
+          <div class="simple-item">
+            <span class="icon">🎧</span>
+            <span class="txt"><b>PC 헤드셋으로 직접 통화</b> (단말기 없이)</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 수신 화면 (전화 왔을 때) -->
+      <div class="target-block">
+        <div class="target-header">
+          <span class="target-num">2</span>
+          <span class="target-title">📞 전화 왔을 때 화면 — 발신자 자동 인식</span>
+        </div>
+        <div class="simple-list">
+          <div class="simple-item done">
+            <span class="icon">🔔</span>
+            <span class="txt">전화 오면 어드민에 자동 팝업 (벨 울림 표시)<span class="done-badge">✓ 지금 됨</span></span>
+          </div>
+          <div class="simple-item done">
+            <span class="icon">✅</span>
+            <span class="txt"><b>회원 자동 인식</b> — 이름·나이·성별·지점 표시<span class="done-badge">✓ 지금 됨</span></span>
+          </div>
+          <div class="simple-item done">
+            <span class="icon">🏷️</span>
+            <span class="txt">회원권 태그 (휴면 · 골프 등) · 마지막 방문일<span class="done-badge">✓ 지금 됨</span></span>
+          </div>
+          <div class="simple-item done">
+            <span class="icon">📌</span>
+            <span class="txt">CRM 메모 + 트레이너 메모 표시<span class="done-badge">✓ 지금 됨</span></span>
+          </div>
+          <div class="simple-item done">
+            <span class="icon">⚠️</span>
+            <span class="txt">미등록 번호는 노란 경고 배너<span class="done-badge">✓ 지금 됨</span></span>
+          </div>
+          <div class="simple-item done">
+            <span class="icon">🎯</span>
+            <span class="txt">[📞 상담 시작] / [닫기] 버튼<span class="done-badge">✓ 지금 됨</span></span>
+          </div>
+          <div class="simple-item">
+            <span class="icon">🎧</span>
+            <span class="txt"><b>[수락] 즉시 PC 헤드셋으로 통화 시작</b> (단말기 없이)</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 통화중 화면 목표 -->
+      <div class="target-block">
+        <div class="target-header">
+          <span class="target-num">3</span>
+          <span class="target-title">🎙 통화중 화면 — 자동화 완성</span>
+        </div>
+        <div class="simple-list">
+          <div class="simple-item">
+            <span class="icon">📝</span>
+            <span class="txt"><b>실시간 통화 내용 자동 텍스트화</b> (음성 → 글자)</span>
+          </div>
+          <div class="simple-item done">
+            <span class="icon">💬</span>
+            <span class="txt">메모/특이사항 수동 입력<span class="done-badge">✓ 지금 됨</span></span>
+          </div>
+          <div class="simple-item done">
+            <span class="icon">🔁</span>
+            <span class="txt">후속 조치 → "오늘 처리할 일" 자동 등록<span class="done-badge">✓ 지금 됨</span></span>
+          </div>
+          <div class="simple-item done">
+            <span class="icon">📌</span>
+            <span class="txt">다음 약속 날짜·시간 + 상담 결과 저장<span class="done-badge">✓ 지금 됨</span></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- AI 자동 요약 카드 -->
+      <div class="target-block">
+        <div class="target-header">
+          <span class="target-num">4</span>
+          <span class="target-title">🤖 AI 자동 요약 카드 — 통화 상세 표시</span>
+        </div>
+        <div class="simple-list">
+          <div class="simple-item">
+            <span class="icon">😊</span>
+            <span class="txt"><b>감정 분석</b> (긍정 / 중립 / 부정 + %)</span>
+          </div>
+          <div class="simple-item">
+            <span class="icon">🏷️</span>
+            <span class="txt"><b>주제 태그</b> (예약 · 검진 · 문의 등 자동 분류)</span>
+          </div>
+          <div class="simple-item">
+            <span class="icon">📌</span>
+            <span class="txt"><b>핵심 내용</b> (통화의 요점 3-5줄)</span>
+          </div>
+          <div class="simple-item">
+            <span class="icon">📝</span>
+            <span class="txt"><b>요청 사항</b> (회원이 요청한 것 자동 추출)</span>
+          </div>
+          <div class="simple-item">
+            <span class="icon">✅</span>
+            <span class="txt"><b>결정 / 합의</b> (통화 중 정한 것)</span>
+          </div>
+          <div class="simple-item">
+            <span class="icon">⚙️</span>
+            <span class="txt"><b>자동 후속 액션 항목</b> (예: 문자 발송, 재연락 등)</span>
+          </div>
+          <div class="simple-item">
+            <span class="icon">⚠️</span>
+            <span class="txt"><b>리스크 / 주의 사항</b> (컴플레인 등 자동 감지)</span>
+          </div>
+          <div class="simple-item">
+            <span class="icon">📊</span>
+            <span class="txt"><b>신뢰도 표시</b> (%) · 모델 · 분석 소요 시간</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 녹취 재생 + AI 재분석 -->
+      <div class="target-block">
+        <div class="target-header">
+          <span class="target-num">5</span>
+          <span class="target-title">🎧 녹취 재생 + AI 재분석</span>
+        </div>
+        <div class="simple-list">
+          <div class="simple-item">
+            <span class="icon">▶️</span>
+            <span class="txt">저장된 통화 <b>녹취 파일 재생</b></span>
+          </div>
+          <div class="simple-item">
+            <span class="icon">🤖</span>
+            <span class="txt"><b>AI 재분석 버튼</b> (요약 다시 생성)</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- ═══════════════════════════════════ -->
+  <!-- ═══════════ 업체 비교 뷰 ═══════════ -->
+  <!-- ═══════════════════════════════════ -->
+  <div id="view-vendor" class="view">
+
+    <div class="vendor-note">
+      💡 <b>가격은 공식 홈페이지 명시 최저가</b> (2026-07). 실제 도입 시 견적·통화량·계약에 따라 달라짐. 홈페이지 미공개는 "견적/문의".<br>
+      ⚠️ <b>자체 완결형 SaaS</b> (CLEX·아톡비즈·KT통화매니저·채널톡 등): 기능은 다 있어도 <b>제공 업체의 UI/앱을 그대로 써야 함</b>. 우리 단골 어드민과 별도 운영.<br>
+      🔍 <b>도입 전 문의 필수</b>: 채널톡 STT/AI 요약 얼리 스테이지 포함 여부 · A'Cen Cloud API 스펙 · KT 통화매니저 통화료 · 각 업체 최소 도입 규모.
+    </div>
+
+    <!-- 업체 비교 표 -->
+    <div class="vendor-table-wrap">
+      <table class="vendor-table">
+        <thead>
+          <tr>
+            <th class="feat">업체</th>
+            <th>관리자 페이지<br>연동</th>
+            <th>PC 헤드셋<br>통화</th>
+            <th>자동 녹음</th>
+            <th>실시간 통화<br>텍스트 (STT)</th>
+            <th>AI 분석<br>요약</th>
+            <th>REST API<br>+ Webhook</th>
+            <th>월 비용<br>(500분 기준)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="feat">LGU+ Centrex<span class="cell-note">현재 사용 중</span></td>
+            <td class="cell-no">✗ 지원 안 함</td>
+            <td class="cell-no">✗ 지원 안 함<span class="cell-note">단말기 필수</span></td>
+            <td class="cell-partial">△ 부분 지원<span class="cell-note">옵션 켜기 필요</span></td>
+            <td class="cell-no">✗ 지원 안 함</td>
+            <td class="cell-partial">△ 부분 지원<span class="cell-note">메모 기반만</span></td>
+            <td class="cell-ok">✓ 지원<span class="cell-note">벨울림만</span></td>
+            <td>~₩14,000</td>
+          </tr>
+          <tr>
+            <td class="feat">채널톡 얼리 스테이지<span class="cell-note">국내 대표 SaaS · 다채널</span></td>
+            <td class="cell-no">✗ 지원 안 함<span class="cell-note">앱 병용 필요</span></td>
+            <td class="cell-ok">✓ 지원<span class="cell-note">PC/모바일 앱</span></td>
+            <td class="cell-ok">✓ 지원</td>
+            <td class="cell-partial">△ 견적/문의<span class="cell-note">플랜 포함 여부 확인</span></td>
+            <td class="cell-partial">△ 견적/문의</td>
+            <td class="cell-ok">✓ 지원<span class="cell-note">Open API</span></td>
+            <td>~₩36,000+<span class="cell-note">+ 통화료 실비</span></td>
+          </tr>
+          <tr>
+            <td class="feat">A'Cen Cloud (KT)<span class="cell-note">구독형 SaaS · 상담 애플리케이션</span></td>
+            <td class="cell-no">✗ 지원 안 함<span class="cell-note">KT 자체 앱 필수</span></td>
+            <td class="cell-partial">△ 유료 옵션<span class="cell-note">KT 소프트폰</span></td>
+            <td class="cell-ok">✓ 지원</td>
+            <td class="cell-ok">✓ 지원</td>
+            <td class="cell-ok">✓ 지원</td>
+            <td class="cell-no">✗ 스펙 미공개<span class="cell-note">자체 앱 내부만</span></td>
+            <td>~₩50,000+<span class="cell-note">/ 좌석·월</span></td>
+          </tr>
+          <tr>
+            <td class="feat">KT 통화매니저<span class="cell-note">저렴한 KT 서비스</span></td>
+            <td class="cell-no">✗ 지원 안 함<span class="cell-note">KT 자체 앱</span></td>
+            <td class="cell-ok">✓ 지원<span class="cell-note">PC 클라이언트 + APP</span></td>
+            <td class="cell-ok">✓ 지원<span class="cell-note">AI 통화레코딩</span></td>
+            <td class="cell-ok">✓ 지원</td>
+            <td class="cell-ok">✓ 지원</td>
+            <td class="cell-partial">△ 견적/문의</td>
+            <td>~₩22,000+<span class="cell-note">회선 4,400 + AI 17,600</span></td>
+          </tr>
+          <tr>
+            <td class="feat">ClawOps<span class="cell-note">AI 에이전트 전용 · 사람 상담 X</span></td>
+            <td class="cell-no">✗ 지원 안 함<span class="cell-note">AI 자동 응답</span></td>
+            <td class="cell-no">✗ 지원 안 함<span class="cell-note">AI 자동 응답</span></td>
+            <td class="cell-ok">✓ 지원</td>
+            <td class="cell-ok">✓ 지원</td>
+            <td class="cell-ok">✓ 지원</td>
+            <td class="cell-ok">✓ 지원<span class="cell-note">API 풍부</span></td>
+            <td>~₩24,000</td>
+          </tr>
+          <tr>
+            <td class="feat">CLEX<span class="cell-note">Furence · 자체 완결형 SaaS</span></td>
+            <td class="cell-no">✗ 지원 안 함<span class="cell-note">자체 UI 사용</span></td>
+            <td class="cell-partial">△ 부분 지원<span class="cell-note">CLEX UI 안에서만</span></td>
+            <td class="cell-partial">△ 부분 지원<span class="cell-note">CLEX 내부 저장</span></td>
+            <td class="cell-ok">✓ 지원<span class="cell-note">CLEX 내부</span></td>
+            <td class="cell-ok">✓ 지원<span class="cell-note">CLEX 내부</span></td>
+            <td class="cell-no">✗ 스펙 미공개</td>
+            <td>~₩50,000+</td>
+          </tr>
+          <tr>
+            <td class="feat">아톡비즈<span class="cell-note">저렴한 070 회선</span></td>
+            <td class="cell-no">✗ 지원 안 함</td>
+            <td class="cell-ok">✓ 지원<span class="cell-note">모바일/PC 앱</span></td>
+            <td class="cell-partial">△ 유료 옵션<span class="cell-note">가격 미공개</span></td>
+            <td class="cell-no">✗ 지원 안 함</td>
+            <td class="cell-no">✗ 지원 안 함</td>
+            <td class="cell-partial">△ 견적/문의</td>
+            <td>~₩7,700+<span class="cell-note">기본 + 번호료</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 결론 : 2개 옵션 (간결) -->
+    <div class="verdict-wrap">
+      <div class="verdict-title">📌 결론 — 현실적으로 2가지 옵션</div>
+      <div class="verdict-grid">
+        <div class="verdict-card">
+          <div class="verdict-badge">🅐 현상태 유지</div>
+          <div class="verdict-name">LGU+ + 녹음 자동화</div>
+          <div class="verdict-price">월 <b>₩8,800</b><span class="price-note">기본료 (STT·통화료 별도)</span></div>
+
+          <table class="fee-table">
+            <tbody>
+              <tr><td>LGU+ 070 회선료</td><td>₩5,500<span class="fee-note">/ 월 (기본)</span></td></tr>
+              <tr><td>녹취 부가서비스 (B타입)</td><td>₩3,300<span class="fee-note">/ 월 (100건 + 자동녹취 · VAT 포함)</span></td></tr>
+              <tr><td>Whisper STT</td><td>약 8원<span class="fee-note">/ 분 (사용량 별도 · $0.006/분)</span></td></tr>
+              <tr><td>Gemini AI 요약</td><td>₩0<span class="fee-note">Flash 무료 티어 (1,500회/일 · 우리 규모 커버)</span></td></tr>
+              <tr class="fee-total"><td>월 기본료</td><td>₩8,800 + 사용량 별도</td></tr>
+            </tbody>
+          </table>
+
+          <div class="verdict-desc">
+            지금 시스템 그대로 + LGU+ 자동녹취 옵션 켜기 + 녹취 부가서비스 청약 + Whisper STT + Gemini 요약 파이프라인 구축 (약 4시간 개발). 상담사는 단말기 통화 유지.
+          </div>
+        </div>
+        <div class="verdict-card verdict-alt">
+          <div class="verdict-badge">🅑 채널톡 도입</div>
+          <div class="verdict-name">채널톡 얼리 스테이지</div>
+          <div class="verdict-price">월 <b>₩36,000</b><span class="price-note">기본료 (통화료 별도)</span></div>
+
+          <table class="fee-table">
+            <tbody>
+              <tr><td>얼리 스테이지 플랜</td><td>₩27,000<span class="fee-note">/ 월 (25% 할인가)</span></td></tr>
+              <tr><td>070 전화번호 1개</td><td>₩9,000<span class="fee-note">/ 월</span></td></tr>
+              <tr><td>유선 통화료</td><td>15원<span class="fee-note">/ 분 (사용량 별도)</span></td></tr>
+              <tr><td>무선 통화료</td><td>72원<span class="fee-note">/ 분 (사용량 별도)</span></td></tr>
+              <tr class="fee-total"><td>월 기본료</td><td>₩36,000 + 통화료 별도</td></tr>
+            </tbody>
+          </table>
+
+          <div class="verdict-desc">
+            채널톡 앱으로 PC 헤드셋 통화 + 자동 녹음·STT·AI 요약. Open API 로 단골 어드민 연동. 앱 병용 감수.<br>
+            얼리 자격·STT/AI 얼리 포함 여부는 도입 전 문의 필수.
+          </div>
+        </div>
+      </div>
+      <div class="verdict-order">
+        <b>🚀 순서</b> — ① 자동녹취 옵션 켜고 테스트 → ② LGU+ B타입 견적 문의 → ③ 옵션 A 구현 → ④ 부족하면 옵션 B 검토
+      </div>
+    </div>
+
+    <!-- 상세보기 토글 (14 기능 × 8업체) -->
+    <div class="detail-toggle-wrap">
+      <button type="button" class="detail-toggle-btn" onclick="toggleDetailTable(this)">
+        🔽 전체 기능 상세 비교 (14 기능 × 8업체)
+      </button>
+    </div>
+
+    <div id="vendor-detail-table" class="vendor-detail-hidden">
+      <div class="vendor-table-wrap">
+        <table class="vendor-table">
+          <thead>
+            <tr>
+              <th class="feat">기능</th>
+              <th>LGU+ Centrex</th>
+              <th class="pick">채널톡</th>
+              <th class="pick">A'Cen Cloud</th>
+              <th>KT 통화매니저</th>
+              <th>ClawOps</th>
+              <th>CLEX</th>
+              <th>아톡비즈</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="feat">상담사 통화 도구</td>
+              <td class="cell-no">IP폰/휴대폰<span class="cell-note">단말기</span></td>
+              <td class="cell-no">채널톡 앱<span class="cell-note">PC/모바일</span></td>
+              <td class="cell-no">KT 소프트폰<span class="cell-note">부가 서비스</span></td>
+              <td class="cell-no">KT 통화매니저 앱<span class="cell-note">PC/모바일</span></td>
+              <td class="cell-partial">AI 자동 응답<span class="cell-note">사람 상담사 X</span></td>
+              <td class="cell-no">CLEX 상담원 화면<span class="cell-note">웹 브라우저</span></td>
+              <td class="cell-no">아톡 오피스 앱<span class="cell-note">PC/모바일</span></td>
+            </tr>
+            <tr>
+              <td class="feat">070 번호 발급</td>
+              <td class="cell-ok">✓ 지원</td>
+              <td class="cell-ok">✓ 지원</td>
+              <td class="cell-partial">△ 부분 지원<span class="cell-note">기존 회선</span></td>
+              <td class="cell-ok">✓ 지원</td>
+              <td class="cell-ok">✓ 지원</td>
+              <td class="cell-ok">✓ 지원</td>
+              <td class="cell-ok">✓ 지원</td>
+            </tr>
+            <tr>
+              <td class="feat">PC 헤드셋 통화</td>
+              <td class="cell-no">✗ 지원 안 함<span class="cell-note">단말기 필수</span></td>
+              <td class="cell-ok">✓ 지원<span class="cell-note">PC/모바일 앱</span></td>
+              <td class="cell-partial">△ 유료 옵션</td>
+              <td class="cell-ok">✓ 지원<span class="cell-note">PC/모바일 앱</span></td>
+              <td class="cell-no">✗ 지원 안 함<span class="cell-note">AI 자동 응답</span></td>
+              <td class="cell-partial">△ 부분 지원<span class="cell-note">CLEX UI 안에서만</span></td>
+              <td class="cell-ok">✓ 지원<span class="cell-note">모바일 앱</span></td>
+            </tr>
+            <tr>
+              <td class="feat">자동 통화 녹음</td>
+              <td class="cell-partial">△ 부분 지원<span class="cell-note">옵션 켜기</span></td>
+              <td class="cell-ok">✓ 지원</td>
+              <td class="cell-ok">✓ 지원</td>
+              <td class="cell-ok">✓ 지원</td>
+              <td class="cell-ok">✓ 지원</td>
+              <td class="cell-partial">△ 부분 지원<span class="cell-note">CLEX 내부 저장</span></td>
+              <td class="cell-partial">△ 유료 옵션</td>
+            </tr>
+            <tr>
+              <td class="feat">녹음 다운로드 API</td>
+              <td class="cell-no">✗ 지원 안 함<span class="cell-note">B타입 청약 필요</span></td>
+              <td class="cell-partial">△ 견적/문의</td>
+              <td class="cell-partial">△ 견적/문의</td>
+              <td class="cell-partial">△ 견적/문의</td>
+              <td class="cell-ok">✓ 지원</td>
+              <td class="cell-partial">△ 견적/문의</td>
+              <td class="cell-no">✗ 지원 안 함</td>
+            </tr>
+            <tr>
+              <td class="feat">한국어 STT</td>
+              <td class="cell-no">✗ 지원 안 함</td>
+              <td class="cell-ok">✓ 지원</td>
+              <td class="cell-ok">✓ 지원</td>
+              <td class="cell-ok">✓ 지원</td>
+              <td class="cell-ok">✓ 지원</td>
+              <td class="cell-ok">✓ 지원</td>
+              <td class="cell-no">✗ 지원 안 함</td>
+            </tr>
+            <tr>
+              <td class="feat">AI 자동 요약</td>
+              <td class="cell-no">✗ 지원 안 함</td>
+              <td class="cell-ok">✓ 지원</td>
+              <td class="cell-ok">✓ 지원</td>
+              <td class="cell-ok">✓ 지원</td>
+              <td class="cell-ok">✓ 지원</td>
+              <td class="cell-ok">✓ 지원</td>
+              <td class="cell-no">✗ 지원 안 함</td>
+            </tr>
+            <tr>
+              <td class="feat">통화 이벤트 Webhook</td>
+              <td class="cell-no">✗ 지원 안 함<span class="cell-note">벨울림만</span></td>
+              <td class="cell-ok">✓ 지원</td>
+              <td class="cell-partial">△ 견적/문의</td>
+              <td class="cell-partial">△ 견적/문의</td>
+              <td class="cell-ok">✓ 지원<span class="cell-note">전 이벤트</span></td>
+              <td class="cell-partial">△ 견적/문의</td>
+              <td class="cell-partial">△ 견적/문의</td>
+            </tr>
+            <tr>
+              <td class="feat">REST API + Webhook</td>
+              <td class="cell-ok">✓ 지원</td>
+              <td class="cell-ok">✓ 지원<span class="cell-note">Open API</span></td>
+              <td class="cell-partial">△ 견적/문의</td>
+              <td class="cell-partial">△ 견적/문의</td>
+              <td class="cell-ok">✓ 지원<span class="cell-note">API 풍부</span></td>
+              <td class="cell-no">✗ 스펙 미공개</td>
+              <td class="cell-partial">△ 견적/문의</td>
+            </tr>
+            <tr>
+              <td class="feat">관리자 페이지 연동</td>
+              <td class="cell-no">✗ 지원 안 함</td>
+              <td class="cell-no">✗ 지원 안 함<span class="cell-note">앱 병용 필요</span></td>
+              <td class="cell-no">✗ 지원 안 함<span class="cell-note">전용 앱 사용</span></td>
+              <td class="cell-no">✗ 지원 안 함</td>
+              <td class="cell-no">✗ 지원 안 함<span class="cell-note">AI 자동 응답</span></td>
+              <td class="cell-no">✗ 지원 안 함<span class="cell-note">자체 UI 사용</span></td>
+              <td class="cell-no">✗ 지원 안 함</td>
+            </tr>
+            <tr>
+              <td class="feat">SMS 발송</td>
+              <td class="cell-ok">✓ 지원</td>
+              <td class="cell-ok">✓ 지원</td>
+              <td class="cell-partial">△ 부분 지원</td>
+              <td class="cell-ok">✓ 지원</td>
+              <td class="cell-ok">✓ 지원</td>
+              <td class="cell-partial">△ 부분 지원</td>
+              <td class="cell-ok">✓ 지원</td>
+            </tr>
+            <tr>
+              <td class="feat">다채널 (카톡·인스타 등)</td>
+              <td class="cell-no">✗ 지원 안 함</td>
+              <td class="cell-ok">✓ 지원<span class="cell-note">강점</span></td>
+              <td class="cell-no">✗ 지원 안 함</td>
+              <td class="cell-no">✗ 지원 안 함</td>
+              <td class="cell-no">✗ 지원 안 함</td>
+              <td class="cell-ok">✓ 지원</td>
+              <td class="cell-no">✗ 지원 안 함</td>
+            </tr>
+            <tr>
+              <td class="feat">통화 전달 (Transfer)</td>
+              <td class="cell-no">✗ 지원 안 함</td>
+              <td class="cell-partial">△ 부분 지원</td>
+              <td class="cell-ok">✓ 지원</td>
+              <td class="cell-partial">△ 부분 지원</td>
+              <td class="cell-ok">✓ 지원</td>
+              <td class="cell-ok">✓ 지원</td>
+              <td class="cell-partial">△ 부분 지원</td>
+            </tr>
+            <tr>
+              <td class="feat">국내 안정성</td>
+              <td class="cell-ok">✓ 대기업<span class="cell-note">LGU+</span></td>
+              <td class="cell-ok">✓ 대표 SaaS</td>
+              <td class="cell-ok">✓ 대기업<span class="cell-note">KT</span></td>
+              <td class="cell-ok">✓ 대기업<span class="cell-note">KT</span></td>
+              <td class="cell-partial">△ 신생 스타트업</td>
+              <td class="cell-partial">△ 중견</td>
+              <td class="cell-partial">△ 중견</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="vendor-note">
+      💬 <b>문의 연락처</b>: LGU+ 1544-0001 · 채널톡 support@channel.io · KT 1522-0123 · CLEX 02-6443-5600 · 아톡비즈 1877-8280
+    </div>
+
+  </div>
+
+  <!-- ═══════════════════════════════════ -->
+  <!-- ═══════════ 상세 뷰 ═══════════════ -->
+  <!-- ═══════════════════════════════════ -->
+  <div id="view-detail" class="view">
+
+    <div class="progress-label">
+      <span>전체 진행률</span>
+      <b>75% 완성</b>
+    </div>
+    <div class="progress-wrap mb-lg">
+      <div class="progress-bar"></div>
+    </div>
+
+    <!-- 1. 구현 완료 -->
+    <section>
+      <h2 class="section-title">
+        <span>✅</span>
+        <span>구현 완료 (당장 동작)</span>
+        <span class="badge badge-ok">8개 카테고리</span>
+      </h2>
+
+      <div class="grid">
+        <div class="card card-ok">
+          <div class="card-title">🎯 수신 전화 라이프사이클</div>
+          <ul>
+            <li>LGU+ webhook 자동 수신</li>
+            <li>WebSocket broadcast (실시간)</li>
+            <li>어드민 수신 모달 자동 노출</li>
+            <li>회원 자동 인식 (번호 매칭)</li>
+            <li>[수락] → 통화중 모달 자동 진입</li>
+          </ul>
+          <div class="flow">070 전화 → Centrex webhook
+  → CrmGateway broadcast
+  → 수신 모달 → [수락]
+  → CallSessionModal (incall)</div>
+        </div>
+
+        <div class="card card-ok">
+          <div class="card-title">🎯 수신 모달 회원 카드</div>
+          <ul>
+            <li>이름 (나이·성별)</li>
+            <li>지점명 표시</li>
+            <li>누적결제 금액</li>
+            <li>회원권 태그 (휴면·골프 등)</li>
+            <li>마지막 방문일 / 등록일</li>
+            <li>📌 CRM 메모 (상담사)</li>
+            <li>📝 트레이너 메모 (앱)</li>
+            <li>전화번호 마스킹 X</li>
+          </ul>
+        </div>
+
+        <div class="card card-ok">
+          <div class="card-title">🎯 통화중 모달 (CallSessionModal)</div>
+          <ul>
+            <li>실시간 타이머 (수신 시각 기준)</li>
+            <li>회원 중요 메모 인라인 편집</li>
+            <li>Web Speech API 자동 STT</li>
+            <li>메모/특이사항 수동 입력</li>
+            <li>후속 조치 → 오늘 처리할 일 자동 등록</li>
+            <li>다음 약속 (날짜/시간/결과)</li>
+            <li>[통화 종료 + 저장] → PATCH (중복 X)</li>
+          </ul>
+        </div>
+
+        <div class="card card-ok">
+          <div class="card-title">🎯 발신 (clickdial)</div>
+          <ul>
+            <li>회원 검색 (전체/최근 통화 탭)</li>
+            <li>회원 선택 파랑 강조</li>
+            <li>번호 직접 입력 (미등록)</li>
+            <li>LGU+ clickdial → 단말기 벨</li>
+            <li>발신 로그 자동 INSERT + PATCH</li>
+          </ul>
+        </div>
+
+        <div class="card card-ok">
+          <div class="card-title">🎯 AI 요약 (Gemini 1.5 Flash)</div>
+          <ul>
+            <li>통화 종료 시 자동 트리거</li>
+            <li>transcript → Gemini 분석</li>
+            <li>ai_summary jsonb 저장</li>
+            <li>감정/토픽/핵심/후속 자동 추출</li>
+            <li>AISummaryCard 표시</li>
+          </ul>
+        </div>
+
+        <div class="card card-ok">
+          <div class="card-title">🎯 상담 이력 관리</div>
+          <ul>
+            <li>2컬럼 (좌 목록 / 우 상세)</li>
+            <li>채널 필터 (전화/방문/온라인)</li>
+            <li>온라인 소스 9개 서브필터</li>
+            <li>날짜별 그룹 + 검색</li>
+            <li>수정 / 삭제 / PDF 출력</li>
+          </ul>
+        </div>
+
+        <div class="card card-ok">
+          <div class="card-title">🎯 LGU+ 콜백 자동화 (인프라)</div>
+          <ul>
+            <li>setringcallback 자동 등록 API</li>
+            <li>IP + HTTP 등록 (HTTPS 회피)</li>
+            <li>nginx proxy_ignore_client_abort</li>
+            <li>fire-and-forget 응답 패턴</li>
+            <li>발신 콜백 중복 dedupe</li>
+          </ul>
+        </div>
+
+        <div class="card card-ok">
+          <div class="card-title">🎯 데이터 모델</div>
+          <ul>
+            <li>users.trainer_note (앱 메모)</li>
+            <li>users.crm_memo (CRM 메모, 분리)</li>
+            <li>consult_logs.kind (call_in/out/visit/online)</li>
+            <li>consult_logs.transcript / ai_summary</li>
+            <li>user.branch 자동 조인</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2. LGU+ 한계 -->
+    <section>
+      <h2 class="section-title">
+        <span>⚠️</span>
+        <span>LGU+ 한계로 못 하는 것</span>
+        <span class="badge badge-warn">현재 상태</span>
+      </h2>
+
+      <div class="grid">
+        <div class="card card-warn">
+          <div class="card-title">실시간 통화 응답 감지</div>
+          <ul>
+            <li>LGU+ 는 벨울림(ring) 콜백만 제공</li>
+            <li>응답/종료 콜백 API 없음</li>
+            <li>setanswer/setend/setconnect 모두 400 검증됨</li>
+          </ul>
+        </div>
+
+        <div class="card card-warn">
+          <div class="card-title">PC 브라우저 직접 통화</div>
+          <ul>
+            <li>LGU+ WebRTC 미지원</li>
+            <li>단말기 (IP폰 / 휴대폰) 필수</li>
+            <li>PC 어드민은 알림 · 이력만 담당</li>
+          </ul>
+        </div>
+
+        <div class="card card-warn">
+          <div class="card-title">실시간 통화 음성 캡쳐</div>
+          <ul>
+            <li>통화 음성이 PC 마이크로 안 옴</li>
+            <li>Web Speech API 는 상담사 목소리만 캡쳐</li>
+            <li>정확한 통화 내용 STT 불가</li>
+          </ul>
+        </div>
+
+        <div class="card card-warn">
+          <div class="card-title">자동 통화 녹음 다운로드</div>
+          <ul>
+            <li>LGU+ B타입 부가서비스 별도 청약 필요</li>
+            <li>~₩5,000/월 추가</li>
+            <li>1544-0001 영업 통해 신청</li>
+          </ul>
+        </div>
+
+        <div class="card card-warn">
+          <div class="card-title">부재중 자동 감지</div>
+          <ul>
+            <li>phonestatus 폴링 필요</li>
+            <li>rate limit 위험 (연달아 호출 금지)</li>
+            <li>정확도 낮음</li>
+          </ul>
+        </div>
+
+        <div class="card card-warn">
+          <div class="card-title">여러 상담사 · IVR</div>
+          <ul>
+            <li>회선당 단말 1개만 등록 가능</li>
+            <li>여러 상담사 라우팅 X</li>
+            <li>IVR 자동응답 API 미제공</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. ClawOps 도입 시 -->
+    <section>
+      <h2 class="section-title">
+        <span>🚀</span>
+        <span>ClawOps 도입 시 완성될 것</span>
+        <span class="badge badge-info">100% 자동화</span>
+      </h2>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th class="col-40">기능</th>
+              <th class="col-30">현재 (LGU+)</th>
+              <th class="col-30">ClawOps 도입 후</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td><b>PC 헤드셋 직접 통화</b></td><td><span class="pill pill-danger">불가</span></td><td><span class="pill pill-ok">WebRTC 지원</span></td></tr>
+            <tr><td><b>실시간 통화 이벤트</b> (벨울림·응답·종료)</td><td><span class="pill pill-danger">벨울림만</span></td><td><span class="pill pill-ok">전 이벤트 Webhook</span></td></tr>
+            <tr><td><b>자동 녹음 + 다운로드 API</b></td><td><span class="pill pill-warn">B타입 별도 청약</span></td><td><span class="pill pill-ok">기본 포함</span></td></tr>
+            <tr><td><b>정확한 STT</b> (통화 후 배치)</td><td><span class="pill pill-warn">Web Speech (부정확)</span></td><td><span class="pill pill-ok">Add-on ₩10/분</span></td></tr>
+            <tr><td><b>통화 전달</b> (transfer)</td><td><span class="pill pill-danger">불가</span></td><td><span class="pill pill-ok">Blind / Warm</span></td></tr>
+            <tr><td><b>여러 상담사 동시 통화</b></td><td><span class="pill pill-danger">1명만</span></td><td><span class="pill pill-ok">Business 10명</span></td></tr>
+            <tr><td><b>SMS 발송</b></td><td><span class="pill pill-warn">별도 구축</span></td><td><span class="pill pill-ok">SMS/LMS/MMS API</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- 4. 옵션 비교 -->
+    <section>
+      <h2 class="section-title">
+        <span>💰</span>
+        <span>옵션 비교 (월 100-500 통화 기준)</span>
+      </h2>
+
+      <div class="compare-grid">
+        <div class="compare-card">
+          <h3>🅐 LGU+ 유지</h3>
+          <div class="price">~₩14,000<small>/월</small></div>
+          <div class="completion">완성도 <b>90%</b></div>
+          <ul>
+            <li>✓ 현재 인프라 그대로</li>
+            <li>✓ Whisper STT 추가 통합 (4시간)</li>
+            <li>✓ LGU+ B타입 청약</li>
+            <li>✗ 실시간 통화 이벤트 없음</li>
+            <li>✗ 단말기 필수 (PC 통화 X)</li>
+          </ul>
+        </div>
+
+        <div class="compare-card recommended">
+          <h3>🅑 ClawOps 도입 (풀스택)</h3>
+          <div class="price">~₩24,000<small>/월</small></div>
+          <div class="completion">완성도 <b>100%</b></div>
+          <ul>
+            <li>✓ 070 번호 즉시 발급</li>
+            <li>✓ WebRTC PC 통화</li>
+            <li>✓ 실시간 통화 이벤트 Webhook</li>
+            <li>✓ 자동 녹음 + STT + AI 요약</li>
+            <li>✓ SMS · 통화 전달 · 다중 상담사</li>
+            <li>△ 신생 스타트업 (안정성 리스크)</li>
+          </ul>
+        </div>
+
+        <div class="compare-card">
+          <h3>🅒 현재 그대로</h3>
+          <div class="price">LGU+ 회선료<small>만</small></div>
+          <div class="completion">완성도 <b>75%</b></div>
+          <ul>
+            <li>✓ 추가 작업 없음</li>
+            <li>✓ 이미 안정 운영</li>
+            <li>✗ 실시간 통화 이벤트 없음</li>
+            <li>✗ STT 정확도 낮음</li>
+            <li>✗ 녹음 다운로드 X</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="cost-highlight">
+        <div class="amount">월 ₩10,000 차이</div>
+        <div class="label">A → B 전환 시 실시간 이벤트 + WebRTC + 통화 전달 + 다중 상담사 획득</div>
+      </div>
+    </section>
+
+    <!-- 5. 진행 상태 -->
+    <section>
+      <h2 class="section-title">
+        <span>📊</span>
+        <span>진행 상태 최종 요약</span>
+      </h2>
+      <div class="card card-info">
+        <div class="card-title">CRM 통화 통합 완성도</div>
+        <div class="flow">CRM 통화 통합 100% 목표
+  ├─ 어드민 UI                       ✅ 100%
+  ├─ 백엔드 API                       ✅ 100%
+  ├─ 데이터 모델                       ✅ 100%
+  ├─ 회원 매칭 로직                    ✅ 100%
+  ├─ AI 요약 (Gemini)                ✅ 100%
+  ├─ 통화 라이프사이클 관리             ✅  90%   (수동 [수락] 필요)
+  ├─ 자동 STT                        △  30%   (Web Speech, 부정확)
+  ├─ 자동 녹음                        ❌   0%   (LGU+ 청약 or ClawOps)
+  └─ WebRTC PC 통화                  ❌   0%   (ClawOps 도입 필요)
+
+전체 완성도: 약 75%</div>
+      </div>
+    </section>
+
+  </div>
+
+  <footer>
+    작성: Claude Code · 2026-06-30<br>
+    단골 (Dangol) — 재활 운동처방 헬스케어 CRM
+  </footer>
+
+</div>
+
+<script>
+  function switchView(name, btn) {
+    // 뷰 전환
+    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+    document.getElementById('view-' + name).classList.add('active');
+    // 버튼 활성 상태
+    document.querySelectorAll('.view-toggle button').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    // 스크롤 top
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+  function toggleDetailTable(btn) {
+    const el = document.getElementById('vendor-detail-table');
+    const isOpen = el.classList.toggle('vendor-detail-shown');
+    el.classList.toggle('vendor-detail-hidden', !isOpen);
+    btn.classList.toggle('open', isOpen);
+    btn.innerHTML = isOpen
+      ? '🔼 상세 접기'
+      : '🔽 전체 기능 상세 비교 (14 기능 × 8업체)';
+  }
+  function toggleSummaryTable(btn) {
+    const el = document.getElementById('vendor-summary-wrap');
+    const isOpen = el.classList.toggle('vendor-detail-shown');
+    el.classList.toggle('vendor-detail-hidden', !isOpen);
+    btn.classList.toggle('open', isOpen);
+    btn.innerHTML = isOpen
+      ? '🔼 요약 표 접기'
+      : '📊 8개 업체 전체 요약 표 보기 (기술 정보)';
+  }
+</script>
+
+</body>
+</html>
