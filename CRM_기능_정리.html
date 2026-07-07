@@ -453,6 +453,124 @@
     color: #78350F;
     line-height: 1.9;
   }
+
+  /* 3사 완전 재조사 최종표 */
+  .final-review-section {
+    margin: 32px 0 24px;
+    background: #fff;
+    border: 2px solid #FCA5A5;
+    border-radius: 16px;
+    padding: 20px 24px;
+    box-shadow: 0 4px 16px rgba(239, 68, 68, 0.08);
+  }
+  .final-review-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 14px;
+    flex-wrap: wrap;
+  }
+  .final-review-badge {
+    background: #DC2626;
+    color: #fff;
+    font-size: 11px;
+    font-weight: 800;
+    padding: 5px 12px;
+    border-radius: 999px;
+    white-space: nowrap;
+  }
+  .final-review-title {
+    font-size: 15px;
+    font-weight: 800;
+    color: #1F2937;
+  }
+  .final-review-desc {
+    font-size: 12.5px;
+    color: var(--muted);
+    margin-bottom: 12px;
+    line-height: 1.6;
+  }
+  .final-review-table-wrap {
+    overflow-x: auto;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+  }
+  table.final-review-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12.5px;
+    min-width: 620px;
+  }
+  .final-review-table thead th {
+    background: #F9FAFB;
+    color: #374151;
+    font-weight: 800;
+    padding: 10px 12px;
+    text-align: left;
+    border-bottom: 2px solid var(--border);
+    font-size: 11.5px;
+    white-space: nowrap;
+  }
+  .final-review-table tbody td {
+    padding: 9px 12px;
+    border-bottom: 1px solid #F3F4F6;
+    vertical-align: middle;
+  }
+  .final-review-table tbody tr:last-child td { border-bottom: none; }
+  .final-review-table .telco-cell {
+    font-weight: 800;
+    color: #1F2937;
+    background: #F9FAFB;
+    white-space: nowrap;
+  }
+  .final-review-table .telco-lgu { color: #E11D48; }
+  .final-review-table .telco-kt  { color: #DC2626; }
+  .final-review-table .telco-sk  { color: #EA580C; }
+  .final-review-table .prod-name {
+    font-weight: 700;
+    color: #1F2937;
+  }
+  .final-review-table .prod-type {
+    color: var(--muted);
+    font-size: 11.5px;
+    white-space: nowrap;
+  }
+  .final-review-table .api-cell {
+    text-align: center;
+    font-weight: 800;
+    white-space: nowrap;
+  }
+  .api-full { color: #16A34A; }
+  .api-partial { color: #D97706; }
+  .api-none { color: #DC2626; }
+  .final-review-table .cond-cell {
+    font-size: 12px;
+    color: #374151;
+  }
+  .final-review-table tr.killed td {
+    background: #FEF2F2;
+    color: #991B1B;
+  }
+  .final-review-table tr.killed .prod-name {
+    color: #991B1B;
+    text-decoration: line-through;
+    text-decoration-color: rgba(153, 27, 27, 0.4);
+  }
+  .final-review-table tr.killed .cond-cell {
+    color: #991B1B;
+    font-weight: 700;
+  }
+  .final-review-summary {
+    margin-top: 14px;
+    padding: 12px 16px;
+    background: #FEF3C7;
+    border-left: 4px solid #F59E0B;
+    border-radius: 8px;
+    font-size: 12.5px;
+    color: #78350F;
+    line-height: 1.7;
+  }
+  .final-review-summary b { color: #92400E; }
   .price-note {
     display: block;
     font-size: 11px;
@@ -1708,6 +1826,135 @@
       </div>
       <div class="verdict-order">
         <b>🚀 순서</b> — ① 자동녹취 옵션 켜고 테스트 → ② LGU+ B타입 견적 문의 → ③ 옵션 A 구현 → ④ 부족하면 옵션 B 검토
+      </div>
+
+      <!-- 3사 완전 재조사 최종표 -->
+      <div class="final-review-section">
+        <div class="final-review-header">
+          <span class="final-review-badge">🔎 3사 완전 재조사</span>
+          <span class="final-review-title">SK · KT · LGU+ 15개 상품 최종 검증 — 우리 조건 매칭</span>
+        </div>
+        <div class="final-review-desc">
+          웹 발신·수신·자동녹취·REST API·웹훅 기준으로 3사 전체 상품을 재조사. ⚰️ = 우리 조건 미달로 사실상 배제.
+        </div>
+        <div class="final-review-table-wrap">
+          <table class="final-review-table">
+            <thead>
+              <tr>
+                <th>통신사</th>
+                <th>상품</th>
+                <th>유형</th>
+                <th style="text-align:center;">REST API</th>
+                <th>우리 조건</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- LGU+ -->
+              <tr class="killed">
+                <td class="telco-cell telco-lgu" rowspan="5">LGU+</td>
+                <td class="prod-name">LGU+ 센트릭스 <span style="font-size:11px;color:#6B7280;font-weight:600;">(지금 사용)</span></td>
+                <td class="prod-type">REST</td>
+                <td class="api-cell api-full">✅</td>
+                <td class="cond-cell">B타입 판매 종료 ⚰️</td>
+              </tr>
+              <tr>
+                <td class="prod-name">LGU+ 익시오</td>
+                <td class="prod-type">개인 앱</td>
+                <td class="api-cell api-none">❌</td>
+                <td class="cond-cell">오버스펙</td>
+              </tr>
+              <tr class="killed">
+                <td class="prod-name">LGU+ CloudContact Lite</td>
+                <td class="prod-type">개발자 규격서</td>
+                <td class="api-cell api-partial">🟡</td>
+                <td class="cond-cell">2회선 필수 ⚰️</td>
+              </tr>
+              <tr>
+                <td class="prod-name">LGU+ AICC</td>
+                <td class="prod-type">콜센터 SaaS</td>
+                <td class="api-cell api-partial">🟡</td>
+                <td class="cond-cell">대기업급 오버스펙</td>
+              </tr>
+              <tr>
+                <td class="prod-name">LGU+ 소호 녹취</td>
+                <td class="prod-type">홈피 관리형</td>
+                <td class="api-cell api-none">❌</td>
+                <td class="cond-cell">자동화 X</td>
+              </tr>
+
+              <!-- KT -->
+              <tr class="killed">
+                <td class="telco-cell telco-kt" rowspan="6">KT</td>
+                <td class="prod-name">KT 통화매니저</td>
+                <td class="prod-type">COM ActiveX</td>
+                <td class="api-cell api-none">❌</td>
+                <td class="cond-cell">Linux X ⚰️</td>
+              </tr>
+              <tr>
+                <td class="prod-name">KT AI 전화 <span style="font-size:10px;background:#DC2626;color:#fff;padding:1px 5px;border-radius:4px;">NEW</span></td>
+                <td class="prod-type">자체 앱</td>
+                <td class="api-cell api-none">❌</td>
+                <td class="cond-cell">어드민 통합 X</td>
+              </tr>
+              <tr>
+                <td class="prod-name">KT A'Cen Cloud</td>
+                <td class="prod-type">자체 앱</td>
+                <td class="api-cell api-none">❌</td>
+                <td class="cond-cell">자체 앱 필수</td>
+              </tr>
+              <tr>
+                <td class="prod-name">KT 콜센터 클라우드 비즈</td>
+                <td class="prod-type">콜센터 SaaS</td>
+                <td class="api-cell api-partial">🟡</td>
+                <td class="cond-cell">월 ₩56,000 (비쌈)</td>
+              </tr>
+              <tr>
+                <td class="prod-name">KT 지니 Dictation</td>
+                <td class="prod-type">STT 전용</td>
+                <td class="api-cell api-full">✅</td>
+                <td class="cond-cell">통화 X (STT 만)</td>
+              </tr>
+              <tr>
+                <td class="prod-name">KT SIP Trunk</td>
+                <td class="prod-type">엔터프라이즈</td>
+                <td class="api-cell api-partial">🟡</td>
+                <td class="cond-cell">자체 PBX 필수</td>
+              </tr>
+
+              <!-- SK -->
+              <tr class="killed">
+                <td class="telco-cell telco-sk" rowspan="4">SK</td>
+                <td class="prod-name">SK IMS API (Java SDK)</td>
+                <td class="prod-type">개발자 SDK</td>
+                <td class="api-cell api-partial">🟡</td>
+                <td class="cond-cell">유지보수 X · 리스크 큼 ⚰️</td>
+              </tr>
+              <tr>
+                <td class="prod-name">SK Simple Recording</td>
+                <td class="prod-type">부가서비스</td>
+                <td class="api-cell api-none">❌</td>
+                <td class="cond-cell">홈피 관리형</td>
+              </tr>
+              <tr>
+                <td class="prod-name">SK Simple CRM <span style="font-size:10px;background:#DC2626;color:#fff;padding:1px 5px;border-radius:4px;">NEW</span></td>
+                <td class="prod-type">자체 프로그램</td>
+                <td class="api-cell api-none">❌</td>
+                <td class="cond-cell">어드민 통합 X</td>
+              </tr>
+              <tr>
+                <td class="prod-name">SK CloudX SIP</td>
+                <td class="prod-type">엔터프라이즈</td>
+                <td class="api-cell api-partial">🟡</td>
+                <td class="cond-cell">자체 PBX 필수</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="final-review-summary">
+          <b>💡 결론</b> — 15개 상품 중 <b>4개는 ⚰️ 즉시 배제</b> (판매 종료·회선 조건·플랫폼 제약·유지보수 리스크).
+          나머지 11개도 <b>대기업 오버스펙</b>이거나 <b>자체 앱 필수</b>라 우리 어드민 통합에 부적합.
+          <br>→ 결국 <b>LGU+ 자동녹취 + 자체 STT + LLM 파이프라인(옵션 A)</b> 또는 <b>채널톡 SaaS(옵션 B)</b>가 현실적 선택지.
+        </div>
       </div>
     </div>
 
