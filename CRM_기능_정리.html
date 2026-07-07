@@ -1358,7 +1358,7 @@
     <button type="button" class="active" onclick="switchView('goal', this)">🎯 최종 목표</button>
     <button type="button" onclick="switchView('vendor', this)">🏢 업체 비교</button>
     <button type="button" hidden onclick="switchView('simple', this)">🌱 간략히</button>
-    <button type="button" onclick="switchView('detail', this)">🔬 상세 기술 정보</button>
+    <button type="button" onclick="switchView('detail', this)">🏛 통신3사 상품비교</button>
   </div>
 
   <!-- ═══════════════════════════════════ -->
@@ -1501,7 +1501,7 @@
           🎯 최종 목표 보기 →
         </button>
         <button type="button" class="cta cta-ghost" onclick="switchView('detail', document.querySelectorAll('.view-toggle button')[2])">
-          🔬 상세 기술 정보 →
+          🏛 통신3사 상품비교 →
         </button>
       </div>
     </div>
@@ -1827,135 +1827,6 @@
       <div class="verdict-order">
         <b>🚀 순서</b> — ① 자동녹취 옵션 켜고 테스트 → ② LGU+ B타입 견적 문의 → ③ 옵션 A 구현 → ④ 부족하면 옵션 B 검토
       </div>
-
-      <!-- 3사 완전 재조사 최종표 -->
-      <div class="final-review-section">
-        <div class="final-review-header">
-          <span class="final-review-badge">🔎 3사 완전 재조사</span>
-          <span class="final-review-title">SK · KT · LGU+ 15개 상품 최종 검증 — 우리 조건 매칭</span>
-        </div>
-        <div class="final-review-desc">
-          웹 발신·수신·자동녹취·REST API·웹훅 기준으로 3사 전체 상품을 재조사. ⚰️ = 우리 조건 미달로 사실상 배제.
-        </div>
-        <div class="final-review-table-wrap">
-          <table class="final-review-table">
-            <thead>
-              <tr>
-                <th>통신사</th>
-                <th>상품</th>
-                <th>유형</th>
-                <th style="text-align:center;">REST API</th>
-                <th>우리 조건</th>
-              </tr>
-            </thead>
-            <tbody>
-              <!-- LGU+ -->
-              <tr class="killed">
-                <td class="telco-cell telco-lgu" rowspan="5">LGU+</td>
-                <td class="prod-name">LGU+ 센트릭스 <span style="font-size:11px;color:#6B7280;font-weight:600;">(지금 사용)</span></td>
-                <td class="prod-type">REST</td>
-                <td class="api-cell api-full">✅</td>
-                <td class="cond-cell">B타입 판매 종료 ⚰️</td>
-              </tr>
-              <tr>
-                <td class="prod-name">LGU+ 익시오</td>
-                <td class="prod-type">개인 앱</td>
-                <td class="api-cell api-none">❌</td>
-                <td class="cond-cell">오버스펙</td>
-              </tr>
-              <tr class="killed">
-                <td class="prod-name">LGU+ CloudContact Lite</td>
-                <td class="prod-type">개발자 규격서</td>
-                <td class="api-cell api-partial">🟡</td>
-                <td class="cond-cell">2회선 필수 ⚰️</td>
-              </tr>
-              <tr>
-                <td class="prod-name">LGU+ AICC</td>
-                <td class="prod-type">콜센터 SaaS</td>
-                <td class="api-cell api-partial">🟡</td>
-                <td class="cond-cell">대기업급 오버스펙</td>
-              </tr>
-              <tr>
-                <td class="prod-name">LGU+ 소호 녹취</td>
-                <td class="prod-type">홈피 관리형</td>
-                <td class="api-cell api-none">❌</td>
-                <td class="cond-cell">자동화 X</td>
-              </tr>
-
-              <!-- KT -->
-              <tr class="killed">
-                <td class="telco-cell telco-kt" rowspan="6">KT</td>
-                <td class="prod-name">KT 통화매니저</td>
-                <td class="prod-type">COM ActiveX</td>
-                <td class="api-cell api-none">❌</td>
-                <td class="cond-cell">Linux X ⚰️</td>
-              </tr>
-              <tr>
-                <td class="prod-name">KT AI 전화 <span style="font-size:10px;background:#DC2626;color:#fff;padding:1px 5px;border-radius:4px;">NEW</span></td>
-                <td class="prod-type">자체 앱</td>
-                <td class="api-cell api-none">❌</td>
-                <td class="cond-cell">어드민 통합 X</td>
-              </tr>
-              <tr>
-                <td class="prod-name">KT A'Cen Cloud</td>
-                <td class="prod-type">자체 앱</td>
-                <td class="api-cell api-none">❌</td>
-                <td class="cond-cell">자체 앱 필수</td>
-              </tr>
-              <tr>
-                <td class="prod-name">KT 콜센터 클라우드 비즈</td>
-                <td class="prod-type">콜센터 SaaS</td>
-                <td class="api-cell api-partial">🟡</td>
-                <td class="cond-cell">월 ₩56,000 (비쌈)</td>
-              </tr>
-              <tr>
-                <td class="prod-name">KT 지니 Dictation</td>
-                <td class="prod-type">STT 전용</td>
-                <td class="api-cell api-full">✅</td>
-                <td class="cond-cell">통화 X (STT 만)</td>
-              </tr>
-              <tr>
-                <td class="prod-name">KT SIP Trunk</td>
-                <td class="prod-type">엔터프라이즈</td>
-                <td class="api-cell api-partial">🟡</td>
-                <td class="cond-cell">자체 PBX 필수</td>
-              </tr>
-
-              <!-- SK -->
-              <tr class="killed">
-                <td class="telco-cell telco-sk" rowspan="4">SK</td>
-                <td class="prod-name">SK IMS API (Java SDK)</td>
-                <td class="prod-type">개발자 SDK</td>
-                <td class="api-cell api-partial">🟡</td>
-                <td class="cond-cell">유지보수 X · 리스크 큼 ⚰️</td>
-              </tr>
-              <tr>
-                <td class="prod-name">SK Simple Recording</td>
-                <td class="prod-type">부가서비스</td>
-                <td class="api-cell api-none">❌</td>
-                <td class="cond-cell">홈피 관리형</td>
-              </tr>
-              <tr>
-                <td class="prod-name">SK Simple CRM <span style="font-size:10px;background:#DC2626;color:#fff;padding:1px 5px;border-radius:4px;">NEW</span></td>
-                <td class="prod-type">자체 프로그램</td>
-                <td class="api-cell api-none">❌</td>
-                <td class="cond-cell">어드민 통합 X</td>
-              </tr>
-              <tr>
-                <td class="prod-name">SK CloudX SIP</td>
-                <td class="prod-type">엔터프라이즈</td>
-                <td class="api-cell api-partial">🟡</td>
-                <td class="cond-cell">자체 PBX 필수</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-        <div class="final-review-summary">
-          <b>💡 결론</b> — 15개 상품 중 <b>4개는 ⚰️ 즉시 배제</b> (판매 종료·회선 조건·플랫폼 제약·유지보수 리스크).
-          나머지 11개도 <b>대기업 오버스펙</b>이거나 <b>자체 앱 필수</b>라 우리 어드민 통합에 부적합.
-          <br>→ 결국 <b>LGU+ 자동녹취 + 자체 STT + LLM 파이프라인(옵션 A)</b> 또는 <b>채널톡 SaaS(옵션 B)</b>가 현실적 선택지.
-        </div>
-      </div>
     </div>
 
     <!-- 상세보기 토글 (14 기능 × 8업체) -->
@@ -2137,294 +2008,133 @@
   <!-- ═══════════════════════════════════ -->
   <div id="view-detail" class="view">
 
-    <div class="progress-label">
-      <span>전체 진행률</span>
-      <b>75% 완성</b>
-    </div>
-    <div class="progress-wrap mb-lg">
-      <div class="progress-bar"></div>
-    </div>
-
-    <!-- 1. 구현 완료 -->
-    <section>
-      <h2 class="section-title">
-        <span>✅</span>
-        <span>구현 완료 (당장 동작)</span>
-        <span class="badge badge-ok">8개 카테고리</span>
-      </h2>
-
-      <div class="grid">
-        <div class="card card-ok">
-          <div class="card-title">🎯 수신 전화 라이프사이클</div>
-          <ul>
-            <li>LGU+ webhook 자동 수신</li>
-            <li>WebSocket broadcast (실시간)</li>
-            <li>어드민 수신 모달 자동 노출</li>
-            <li>회원 자동 인식 (번호 매칭)</li>
-            <li>[수락] → 통화중 모달 자동 진입</li>
-          </ul>
-          <div class="flow">070 전화 → Centrex webhook
-  → CrmGateway broadcast
-  → 수신 모달 → [수락]
-  → CallSessionModal (incall)</div>
-        </div>
-
-        <div class="card card-ok">
-          <div class="card-title">🎯 수신 모달 회원 카드</div>
-          <ul>
-            <li>이름 (나이·성별)</li>
-            <li>지점명 표시</li>
-            <li>누적결제 금액</li>
-            <li>회원권 태그 (휴면·골프 등)</li>
-            <li>마지막 방문일 / 등록일</li>
-            <li>📌 CRM 메모 (상담사)</li>
-            <li>📝 트레이너 메모 (앱)</li>
-            <li>전화번호 마스킹 X</li>
-          </ul>
-        </div>
-
-        <div class="card card-ok">
-          <div class="card-title">🎯 통화중 모달 (CallSessionModal)</div>
-          <ul>
-            <li>실시간 타이머 (수신 시각 기준)</li>
-            <li>회원 중요 메모 인라인 편집</li>
-            <li>Web Speech API 자동 STT</li>
-            <li>메모/특이사항 수동 입력</li>
-            <li>후속 조치 → 오늘 처리할 일 자동 등록</li>
-            <li>다음 약속 (날짜/시간/결과)</li>
-            <li>[통화 종료 + 저장] → PATCH (중복 X)</li>
-          </ul>
-        </div>
-
-        <div class="card card-ok">
-          <div class="card-title">🎯 발신 (clickdial)</div>
-          <ul>
-            <li>회원 검색 (전체/최근 통화 탭)</li>
-            <li>회원 선택 파랑 강조</li>
-            <li>번호 직접 입력 (미등록)</li>
-            <li>LGU+ clickdial → 단말기 벨</li>
-            <li>발신 로그 자동 INSERT + PATCH</li>
-          </ul>
-        </div>
-
-        <div class="card card-ok">
-          <div class="card-title">🎯 AI 요약 (Gemini 1.5 Flash)</div>
-          <ul>
-            <li>통화 종료 시 자동 트리거</li>
-            <li>transcript → Gemini 분석</li>
-            <li>ai_summary jsonb 저장</li>
-            <li>감정/토픽/핵심/후속 자동 추출</li>
-            <li>AISummaryCard 표시</li>
-          </ul>
-        </div>
-
-        <div class="card card-ok">
-          <div class="card-title">🎯 상담 이력 관리</div>
-          <ul>
-            <li>2컬럼 (좌 목록 / 우 상세)</li>
-            <li>채널 필터 (전화/방문/온라인)</li>
-            <li>온라인 소스 9개 서브필터</li>
-            <li>날짜별 그룹 + 검색</li>
-            <li>수정 / 삭제 / PDF 출력</li>
-          </ul>
-        </div>
-
-        <div class="card card-ok">
-          <div class="card-title">🎯 LGU+ 콜백 자동화 (인프라)</div>
-          <ul>
-            <li>setringcallback 자동 등록 API</li>
-            <li>IP + HTTP 등록 (HTTPS 회피)</li>
-            <li>nginx proxy_ignore_client_abort</li>
-            <li>fire-and-forget 응답 패턴</li>
-            <li>발신 콜백 중복 dedupe</li>
-          </ul>
-        </div>
-
-        <div class="card card-ok">
-          <div class="card-title">🎯 데이터 모델</div>
-          <ul>
-            <li>users.trainer_note (앱 메모)</li>
-            <li>users.crm_memo (CRM 메모, 분리)</li>
-            <li>consult_logs.kind (call_in/out/visit/online)</li>
-            <li>consult_logs.transcript / ai_summary</li>
-            <li>user.branch 자동 조인</li>
-          </ul>
-        </div>
+    <div class="final-review-section">
+      <div class="final-review-header">
+        <span class="final-review-badge">🔎 통신3사 상품비교</span>
+        <span class="final-review-title">SK · KT · LGU+ 15개 상품 최종 검증 — 우리 조건 매칭</span>
       </div>
-    </section>
-
-    <!-- 2. LGU+ 한계 -->
-    <section>
-      <h2 class="section-title">
-        <span>⚠️</span>
-        <span>LGU+ 한계로 못 하는 것</span>
-        <span class="badge badge-warn">현재 상태</span>
-      </h2>
-
-      <div class="grid">
-        <div class="card card-warn">
-          <div class="card-title">실시간 통화 응답 감지</div>
-          <ul>
-            <li>LGU+ 는 벨울림(ring) 콜백만 제공</li>
-            <li>응답/종료 콜백 API 없음</li>
-            <li>setanswer/setend/setconnect 모두 400 검증됨</li>
-          </ul>
-        </div>
-
-        <div class="card card-warn">
-          <div class="card-title">PC 브라우저 직접 통화</div>
-          <ul>
-            <li>LGU+ WebRTC 미지원</li>
-            <li>단말기 (IP폰 / 휴대폰) 필수</li>
-            <li>PC 어드민은 알림 · 이력만 담당</li>
-          </ul>
-        </div>
-
-        <div class="card card-warn">
-          <div class="card-title">실시간 통화 음성 캡쳐</div>
-          <ul>
-            <li>통화 음성이 PC 마이크로 안 옴</li>
-            <li>Web Speech API 는 상담사 목소리만 캡쳐</li>
-            <li>정확한 통화 내용 STT 불가</li>
-          </ul>
-        </div>
-
-        <div class="card card-warn">
-          <div class="card-title">자동 통화 녹음 다운로드</div>
-          <ul>
-            <li>LGU+ B타입 부가서비스 별도 청약 필요</li>
-            <li>~₩5,000/월 추가</li>
-            <li>1544-0001 영업 통해 신청</li>
-          </ul>
-        </div>
-
-        <div class="card card-warn">
-          <div class="card-title">부재중 자동 감지</div>
-          <ul>
-            <li>phonestatus 폴링 필요</li>
-            <li>rate limit 위험 (연달아 호출 금지)</li>
-            <li>정확도 낮음</li>
-          </ul>
-        </div>
-
-        <div class="card card-warn">
-          <div class="card-title">여러 상담사 · IVR</div>
-          <ul>
-            <li>회선당 단말 1개만 등록 가능</li>
-            <li>여러 상담사 라우팅 X</li>
-            <li>IVR 자동응답 API 미제공</li>
-          </ul>
-        </div>
+      <div class="final-review-desc">
+        웹 발신·수신·자동녹취·REST API·웹훅 기준으로 3사 전체 상품을 재조사. ⚰️ = 우리 조건 미달로 사실상 배제.
       </div>
-    </section>
-
-    <!-- 3. ClawOps 도입 시 -->
-    <section>
-      <h2 class="section-title">
-        <span>🚀</span>
-        <span>ClawOps 도입 시 완성될 것</span>
-        <span class="badge badge-info">100% 자동화</span>
-      </h2>
-
-      <div class="table-wrap">
-        <table>
+      <div class="final-review-table-wrap">
+        <table class="final-review-table">
           <thead>
             <tr>
-              <th class="col-40">기능</th>
-              <th class="col-30">현재 (LGU+)</th>
-              <th class="col-30">ClawOps 도입 후</th>
+              <th>통신사</th>
+              <th>상품</th>
+              <th>유형</th>
+              <th style="text-align:center;">REST API</th>
+              <th>우리 조건</th>
             </tr>
           </thead>
           <tbody>
-            <tr><td><b>PC 헤드셋 직접 통화</b></td><td><span class="pill pill-danger">불가</span></td><td><span class="pill pill-ok">WebRTC 지원</span></td></tr>
-            <tr><td><b>실시간 통화 이벤트</b> (벨울림·응답·종료)</td><td><span class="pill pill-danger">벨울림만</span></td><td><span class="pill pill-ok">전 이벤트 Webhook</span></td></tr>
-            <tr><td><b>자동 녹음 + 다운로드 API</b></td><td><span class="pill pill-warn">B타입 별도 청약</span></td><td><span class="pill pill-ok">기본 포함</span></td></tr>
-            <tr><td><b>정확한 STT</b> (통화 후 배치)</td><td><span class="pill pill-warn">Web Speech (부정확)</span></td><td><span class="pill pill-ok">Add-on ₩10/분</span></td></tr>
-            <tr><td><b>통화 전달</b> (transfer)</td><td><span class="pill pill-danger">불가</span></td><td><span class="pill pill-ok">Blind / Warm</span></td></tr>
-            <tr><td><b>여러 상담사 동시 통화</b></td><td><span class="pill pill-danger">1명만</span></td><td><span class="pill pill-ok">Business 10명</span></td></tr>
-            <tr><td><b>SMS 발송</b></td><td><span class="pill pill-warn">별도 구축</span></td><td><span class="pill pill-ok">SMS/LMS/MMS API</span></td></tr>
+            <!-- LGU+ -->
+            <tr class="killed">
+              <td class="telco-cell telco-lgu" rowspan="5">LGU+</td>
+              <td class="prod-name">LGU+ 센트릭스 <span style="font-size:11px;color:#6B7280;font-weight:600;">(지금 사용)</span></td>
+              <td class="prod-type">REST</td>
+              <td class="api-cell api-full">✅</td>
+              <td class="cond-cell">B타입 판매 종료 ⚰️</td>
+            </tr>
+            <tr>
+              <td class="prod-name">LGU+ 익시오</td>
+              <td class="prod-type">개인 앱</td>
+              <td class="api-cell api-none">❌</td>
+              <td class="cond-cell">오버스펙</td>
+            </tr>
+            <tr class="killed">
+              <td class="prod-name">LGU+ CloudContact Lite</td>
+              <td class="prod-type">개발자 규격서</td>
+              <td class="api-cell api-partial">🟡</td>
+              <td class="cond-cell">2회선 필수 ⚰️</td>
+            </tr>
+            <tr>
+              <td class="prod-name">LGU+ AICC</td>
+              <td class="prod-type">콜센터 SaaS</td>
+              <td class="api-cell api-partial">🟡</td>
+              <td class="cond-cell">대기업급 오버스펙</td>
+            </tr>
+            <tr>
+              <td class="prod-name">LGU+ 소호 녹취</td>
+              <td class="prod-type">홈피 관리형</td>
+              <td class="api-cell api-none">❌</td>
+              <td class="cond-cell">자동화 X</td>
+            </tr>
+
+            <!-- KT -->
+            <tr class="killed">
+              <td class="telco-cell telco-kt" rowspan="6">KT</td>
+              <td class="prod-name">KT 통화매니저</td>
+              <td class="prod-type">COM ActiveX</td>
+              <td class="api-cell api-none">❌</td>
+              <td class="cond-cell">Linux X ⚰️</td>
+            </tr>
+            <tr>
+              <td class="prod-name">KT AI 전화 <span style="font-size:10px;background:#DC2626;color:#fff;padding:1px 5px;border-radius:4px;">NEW</span></td>
+              <td class="prod-type">자체 앱</td>
+              <td class="api-cell api-none">❌</td>
+              <td class="cond-cell">어드민 통합 X</td>
+            </tr>
+            <tr>
+              <td class="prod-name">KT A'Cen Cloud</td>
+              <td class="prod-type">자체 앱</td>
+              <td class="api-cell api-none">❌</td>
+              <td class="cond-cell">자체 앱 필수</td>
+            </tr>
+            <tr>
+              <td class="prod-name">KT 콜센터 클라우드 비즈</td>
+              <td class="prod-type">콜센터 SaaS</td>
+              <td class="api-cell api-partial">🟡</td>
+              <td class="cond-cell">월 ₩56,000 (비쌈)</td>
+            </tr>
+            <tr>
+              <td class="prod-name">KT 지니 Dictation</td>
+              <td class="prod-type">STT 전용</td>
+              <td class="api-cell api-full">✅</td>
+              <td class="cond-cell">통화 X (STT 만)</td>
+            </tr>
+            <tr>
+              <td class="prod-name">KT SIP Trunk</td>
+              <td class="prod-type">엔터프라이즈</td>
+              <td class="api-cell api-partial">🟡</td>
+              <td class="cond-cell">자체 PBX 필수</td>
+            </tr>
+
+            <!-- SK -->
+            <tr class="killed">
+              <td class="telco-cell telco-sk" rowspan="4">SK</td>
+              <td class="prod-name">SK IMS API (Java SDK)</td>
+              <td class="prod-type">개발자 SDK</td>
+              <td class="api-cell api-partial">🟡</td>
+              <td class="cond-cell">유지보수 X · 리스크 큼 ⚰️</td>
+            </tr>
+            <tr>
+              <td class="prod-name">SK Simple Recording</td>
+              <td class="prod-type">부가서비스</td>
+              <td class="api-cell api-none">❌</td>
+              <td class="cond-cell">홈피 관리형</td>
+            </tr>
+            <tr>
+              <td class="prod-name">SK Simple CRM <span style="font-size:10px;background:#DC2626;color:#fff;padding:1px 5px;border-radius:4px;">NEW</span></td>
+              <td class="prod-type">자체 프로그램</td>
+              <td class="api-cell api-none">❌</td>
+              <td class="cond-cell">어드민 통합 X</td>
+            </tr>
+            <tr>
+              <td class="prod-name">SK CloudX SIP</td>
+              <td class="prod-type">엔터프라이즈</td>
+              <td class="api-cell api-partial">🟡</td>
+              <td class="cond-cell">자체 PBX 필수</td>
+            </tr>
           </tbody>
         </table>
       </div>
-    </section>
-
-    <!-- 4. 옵션 비교 -->
-    <section>
-      <h2 class="section-title">
-        <span>💰</span>
-        <span>옵션 비교 (월 100-500 통화 기준)</span>
-      </h2>
-
-      <div class="compare-grid">
-        <div class="compare-card">
-          <h3>🅐 LGU+ 유지</h3>
-          <div class="price">~₩14,000<small>/월</small></div>
-          <div class="completion">완성도 <b>90%</b></div>
-          <ul>
-            <li>✓ 현재 인프라 그대로</li>
-            <li>✓ Whisper STT 추가 통합 (4시간)</li>
-            <li>✓ LGU+ B타입 청약</li>
-            <li>✗ 실시간 통화 이벤트 없음</li>
-            <li>✗ 단말기 필수 (PC 통화 X)</li>
-          </ul>
-        </div>
-
-        <div class="compare-card recommended">
-          <h3>🅑 ClawOps 도입 (풀스택)</h3>
-          <div class="price">~₩24,000<small>/월</small></div>
-          <div class="completion">완성도 <b>100%</b></div>
-          <ul>
-            <li>✓ 070 번호 즉시 발급</li>
-            <li>✓ WebRTC PC 통화</li>
-            <li>✓ 실시간 통화 이벤트 Webhook</li>
-            <li>✓ 자동 녹음 + STT + AI 요약</li>
-            <li>✓ SMS · 통화 전달 · 다중 상담사</li>
-            <li>△ 신생 스타트업 (안정성 리스크)</li>
-          </ul>
-        </div>
-
-        <div class="compare-card">
-          <h3>🅒 현재 그대로</h3>
-          <div class="price">LGU+ 회선료<small>만</small></div>
-          <div class="completion">완성도 <b>75%</b></div>
-          <ul>
-            <li>✓ 추가 작업 없음</li>
-            <li>✓ 이미 안정 운영</li>
-            <li>✗ 실시간 통화 이벤트 없음</li>
-            <li>✗ STT 정확도 낮음</li>
-            <li>✗ 녹음 다운로드 X</li>
-          </ul>
-        </div>
+      <div class="final-review-summary">
+        <b>💡 결론</b> — 15개 상품 중 <b>4개는 ⚰️ 즉시 배제</b> (판매 종료·회선 조건·플랫폼 제약·유지보수 리스크).
+        나머지 11개도 <b>대기업 오버스펙</b>이거나 <b>자체 앱 필수</b>라 우리 어드민 통합에 부적합.
+        <br>→ 결국 <b>LGU+ 자동녹취 + 자체 STT + LLM 파이프라인(옵션 A)</b> 또는 <b>채널톡 SaaS(옵션 B)</b>가 현실적 선택지.
       </div>
-
-      <div class="cost-highlight">
-        <div class="amount">월 ₩10,000 차이</div>
-        <div class="label">A → B 전환 시 실시간 이벤트 + WebRTC + 통화 전달 + 다중 상담사 획득</div>
-      </div>
-    </section>
-
-    <!-- 5. 진행 상태 -->
-    <section>
-      <h2 class="section-title">
-        <span>📊</span>
-        <span>진행 상태 최종 요약</span>
-      </h2>
-      <div class="card card-info">
-        <div class="card-title">CRM 통화 통합 완성도</div>
-        <div class="flow">CRM 통화 통합 100% 목표
-  ├─ 어드민 UI                       ✅ 100%
-  ├─ 백엔드 API                       ✅ 100%
-  ├─ 데이터 모델                       ✅ 100%
-  ├─ 회원 매칭 로직                    ✅ 100%
-  ├─ AI 요약 (Gemini)                ✅ 100%
-  ├─ 통화 라이프사이클 관리             ✅  90%   (수동 [수락] 필요)
-  ├─ 자동 STT                        △  30%   (Web Speech, 부정확)
-  ├─ 자동 녹음                        ❌   0%   (LGU+ 청약 or ClawOps)
-  └─ WebRTC PC 통화                  ❌   0%   (ClawOps 도입 필요)
-
-전체 완성도: 약 75%</div>
-      </div>
-    </section>
+    </div>
 
   </div>
 
