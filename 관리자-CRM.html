@@ -554,13 +554,21 @@
   <div class="content">
     <div class="tabs" id="consultTabs"></div>
     <div class="search-bar" id="onlineSourceFilter" style="margin-bottom:14px;display:none"></div>
-    <div style="display:grid;grid-template-columns:380px 1fr;gap:14px;align-items:start">
-      <!-- 좌측: 날짜별 요약 리스트 -->
+    <div style="display:grid;grid-template-columns:230px 340px 1fr;gap:12px;align-items:start">
+      <!-- 좌측: 미니 캘린더 -->
       <div class="panel" style="max-height:calc(100vh - 220px);overflow-y:auto">
         <div class="panel-head" style="position:sticky;top:0;background:#fff;z-index:2">
-          <span class="panel-title">📅 날짜별 상담 요약</span>
+          <span class="panel-title" style="font-size:12.5px">📅 캘린더</span>
+          <button class="topbar-btn btn-ghost" style="padding:3px 8px;font-size:10.5px" id="consultCalTodayBtn" onclick="consultCalGoToday()">오늘</button>
+        </div>
+        <div id="consultMiniCal" style="padding:8px 6px"></div>
+      </div>
+      <!-- 중앙: 날짜별 요약 리스트 -->
+      <div class="panel" style="max-height:calc(100vh - 220px);overflow-y:auto">
+        <div class="panel-head" style="position:sticky;top:0;background:#fff;z-index:2">
+          <span class="panel-title" id="consultListPanelTitle">📋 전체 상담</span>
           <input id="consultSearchInput" placeholder="🔍 검색" oninput="renderConsultList()"
-            style="padding:6px 10px;border:1.5px solid #E2E8F0;border-radius:8px;font-size:12px;width:140px;font-family:'Noto Sans KR',sans-serif;outline:none">
+            style="padding:6px 10px;border:1.5px solid #E2E8F0;border-radius:8px;font-size:12px;width:120px;font-family:'Noto Sans KR',sans-serif;outline:none">
         </div>
         <div id="consultListBody" style="padding:6px"></div>
       </div>
@@ -8330,16 +8338,128 @@ VIP 회원 전용 특별 혜택을 안내드립니다.
     renderConsultDetail();
   }
 
+  // 미니 캘린더 상태
+  let _consultCalMonth = (() => {
+    const d = new Date(TODAY_DATE);
+    return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+  })();
+  let _consultDateFilter = null;  // 'YYYY-MM-DD' 또는 null (전체)
+
+  function consultCalGoToday() {
+    const d = new Date(TODAY_DATE);
+    _consultCalMonth = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+    _consultDateFilter = TODAY_DATE;
+    renderConsultMiniCal();
+    renderConsultList();
+  }
+  function consultCalPrevMonth() {
+    const [y, m] = _consultCalMonth.split('-').map(n => parseInt(n,10));
+    const d = new Date(y, m-2, 1);
+    _consultCalMonth = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+    renderConsultMiniCal();
+  }
+  function consultCalNextMonth() {
+    const [y, m] = _consultCalMonth.split('-').map(n => parseInt(n,10));
+    const d = new Date(y, m, 1);
+    _consultCalMonth = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+    renderConsultMiniCal();
+  }
+  function consultCalPickDate(dateStr) {
+    _consultDateFilter = (_consultDateFilter === dateStr) ? null : dateStr;
+    renderConsultMiniCal();
+    renderConsultList();
+  }
+  function consultCalClearFilter() {
+    _consultDateFilter = null;
+    renderConsultMiniCal();
+    renderConsultList();
+  }
+
+  function renderConsultMiniCal() {
+    const wrap = document.getElementById('consultMiniCal');
+    if (!wrap) return;
+    const [y, m] = _consultCalMonth.split('-').map(n => parseInt(n,10));
+    const firstDay = new Date(y, m-1, 1);
+    const daysInMonth = new Date(y, m, 0).getDate();
+    const startDow = firstDay.getDay();  // 0=일
+
+    // 해당 채널의 상담 날짜별 카운트
+    const dateCounts = {};
+    CONSULTS.filter(c => c.channel === _consultChannel).forEach(c => {
+      dateCounts[c.date] = (dateCounts[c.date] || 0) + 1;
+    });
+
+    const dowLabels = ['일','월','화','수','목','금','토'];
+    let html = `<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+      <button class="topbar-btn btn-ghost" style="padding:4px 8px;font-size:12px" onclick="consultCalPrevMonth()">◀</button>
+      <span style="font-size:12.5px;font-weight:800;color:#1A202C">${y}년 ${m}월</span>
+      <button class="topbar-btn btn-ghost" style="padding:4px 8px;font-size:12px" onclick="consultCalNextMonth()">▶</button>
+    </div>`;
+
+    html += `<div style="display:grid;grid-template-columns:repeat(7,1fr);gap:1px;font-size:10px;text-align:center;color:#A0AEC0;font-weight:800;margin-bottom:2px">`;
+    dowLabels.forEach((d, i) => {
+      const color = i===0 ? '#E53E3E' : i===6 ? '#4299E1' : '#A0AEC0';
+      html += `<div style="padding:3px 0;color:${color}">${d}</div>`;
+    });
+    html += `</div>`;
+
+    html += `<div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px">`;
+    // 앞 빈 칸
+    for (let i = 0; i < startDow; i++) html += `<div></div>`;
+    for (let day = 1; day <= daysInMonth; day++) {
+      const ymd = `${y}-${String(m).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+      const cnt = dateCounts[ymd] || 0;
+      const isToday = ymd === TODAY_DATE;
+      const isSel = ymd === _consultDateFilter;
+      const dow = (startDow + day - 1) % 7;
+      const dayColor = dow===0 ? '#E53E3E' : dow===6 ? '#4299E1' : '#2D3748';
+      let bg = 'transparent', border = '1px solid transparent', color = dayColor;
+      if (isSel) { bg = '#4299E1'; color = '#fff'; border = '1px solid #4299E1'; }
+      else if (isToday) { bg = '#FFF5F5'; border = '1px solid #FEB2B2'; }
+      else if (cnt > 0) { bg = '#F0FFF4'; border = '1px solid #C6F6D5'; }
+      const dot = cnt > 0 && !isSel
+        ? `<div style="width:4px;height:4px;border-radius:50%;background:#38A169;margin:2px auto 0"></div>`
+        : (cnt > 0 && isSel ? `<div style="width:4px;height:4px;border-radius:50%;background:#fff;margin:2px auto 0"></div>` : '');
+      const cursor = cnt > 0 ? 'pointer' : 'default';
+      const clickHandler = cnt > 0 ? `onclick="consultCalPickDate('${ymd}')"` : '';
+      const cntBadge = cnt > 0 ? `<div style="font-size:8.5px;font-weight:800;opacity:.85">${cnt}</div>` : '<div style="height:10px"></div>';
+      html += `<div ${clickHandler} title="${cnt>0?cnt+'건 상담':''}" style="cursor:${cursor};padding:3px 0;background:${bg};border:${border};border-radius:5px;text-align:center;transition:all 0.15s">
+        <div style="font-size:11px;font-weight:700;color:${color};line-height:1.2">${day}</div>
+        ${cntBadge}
+        ${dot}
+      </div>`;
+    }
+    html += `</div>`;
+
+    // 필터 활성 시 해제 버튼
+    if (_consultDateFilter) {
+      html += `<div style="margin-top:10px;padding:8px;background:#EBF8FF;border-radius:6px;text-align:center">
+        <div style="font-size:11px;color:#2B6CB0;font-weight:700;margin-bottom:5px">📌 ${_consultDateFilter} 만 표시 중</div>
+        <button class="topbar-btn btn-ghost" style="padding:3px 10px;font-size:10.5px;color:#C53030" onclick="consultCalClearFilter()">✕ 전체 보기</button>
+      </div>`;
+    }
+
+    // 통계
+    const monthCount = Object.keys(dateCounts).filter(d => d.startsWith(_consultCalMonth)).reduce((s,d)=>s+dateCounts[d],0);
+    html += `<div style="margin-top:10px;padding-top:10px;border-top:1px solid #EDF2F7;font-size:10.5px;color:#718096;text-align:center">
+      이번 달 총 <strong style="color:#38A169">${monthCount}건</strong>
+    </div>`;
+
+    wrap.innerHTML = html;
+  }
+
   function renderConsultList() {
     const body = document.getElementById('consultListBody');
     const sub  = document.getElementById('consultCountSub');
     if (!body) return;
     renderOnlineSourceFilter();
+    renderConsultMiniCal();
     const q = (document.getElementById('consultSearchInput')?.value || '').trim().toLowerCase();
     let list = CONSULTS.filter(c => c.channel === _consultChannel);
     if (_consultChannel === 'online' && _onlineSourceFilter !== 'all') {
       list = list.filter(c => c.source === _onlineSourceFilter);
     }
+    if (_consultDateFilter) list = list.filter(c => c.date === _consultDateFilter);
     if (q) list = list.filter(c =>
       c.member.toLowerCase().includes(q) ||
       c.subject.toLowerCase().includes(q) ||
@@ -8354,8 +8474,16 @@ VIP 회원 전용 특별 혜택을 안내드립니다.
       const s = getOnlineSource(_onlineSourceFilter);
       if (s) subText = `${channelLabel} · ${s.icon} ${s.label} · ${list.length}건`;
     }
+    if (_consultDateFilter) subText += ` · 📅 ${_consultDateFilter}`;
     if (q) subText += ` · "${q}" 검색결과`;
     if (sub) sub.textContent = subText;
+
+    const listTitleEl = document.getElementById('consultListPanelTitle');
+    if (listTitleEl) {
+      listTitleEl.textContent = _consultDateFilter
+        ? `📅 ${_consultDateFilter} 상담`
+        : '📋 전체 상담';
+    }
 
     if (!list.length) {
       body.innerHTML = `<div style="text-align:center;padding:40px 20px;color:#A0AEC0;font-size:13px">상담 기록이 없습니다.</div>`;
