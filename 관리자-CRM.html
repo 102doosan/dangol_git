@@ -756,8 +756,17 @@
         <span class="panel-title" id="churnListTitle">이탈 위험 회원 목록</span>
         <span style="font-size:11px;color:#A0AEC0;font-weight:600" id="churnListCount">0명</span>
       </div>
+      <!-- 발송 상태 탭 -->
+      <div style="display:flex;gap:0;border-bottom:2px solid #EDF2F7;padding:0 6px" id="churnViewTabs">
+        <button id="churnTabPending" class="churn-view-tab" onclick="setChurnView('pending')" style="padding:10px 18px;border:none;background:transparent;font-size:13px;font-weight:800;color:#4299E1;border-bottom:3px solid #4299E1;cursor:pointer;margin-bottom:-2px">
+          📋 미발송 <span id="churnPendingCnt" style="font-size:11px;color:#A0AEC0;font-weight:700;margin-left:2px">0</span>
+        </button>
+        <button id="churnTabSent" class="churn-view-tab" onclick="setChurnView('sent')" style="padding:10px 18px;border:none;background:transparent;font-size:13px;font-weight:800;color:#A0AEC0;border-bottom:3px solid transparent;cursor:pointer;margin-bottom:-2px">
+          ✅ 발송완료 <span id="churnSentCnt" style="font-size:11px;color:#A0AEC0;font-weight:700;margin-left:2px">0</span>
+        </button>
+      </div>
       <table class="tbl">
-        <thead><tr><th><input type="checkbox" id="churnSelectAll" onchange="toggleChurnSelectAll(this)"></th><th>회원명</th><th>마지막 방문</th><th>위험 점수</th><th>위험도</th><th>주요 서비스</th><th>이용권</th><th>액션</th></tr></thead>
+        <thead id="churnTableHead"><tr><th><input type="checkbox" id="churnSelectAll" onchange="toggleChurnSelectAll(this)"></th><th>회원명</th><th>마지막 방문</th><th>위험 점수</th><th>위험도</th><th>주요 서비스</th><th>이용권</th><th>액션</th></tr></thead>
         <tbody id="churnTableBody"></tbody>
       </table>
     </div>
@@ -5895,6 +5904,7 @@ VIP 회원 전용 특별 혜택을 안내드립니다.
     if (typeof renderExams         === 'function') renderExams();
     if (typeof renderBodyTable     === 'function') renderBodyTable();
     if (typeof renderConsents      === 'function') renderConsents();
+    if (typeof loadChurnSent       === 'function') loadChurnSent();
     if (typeof renderChurn         === 'function') renderChurn();
     if (typeof renderMsgRecipients === 'function') renderMsgRecipients();
   });
@@ -6406,6 +6416,52 @@ VIP 회원 전용 특별 혜택을 안내드립니다.
     return { label:'유효', color:'green' };
   }
 
+  // ── 발송 상태 (미발송/발송완료) 관리 ──
+  const CHURN_SENT_KEY = 'crm_churn_sent_v1';
+  let _churnSent = {};   // { memberName: { ts, channel, textPreview, count } }
+  let _churnView = 'pending';  // 'pending' | 'sent'
+
+  function loadChurnSent() {
+    try { const raw = localStorage.getItem(CHURN_SENT_KEY); _churnSent = raw ? JSON.parse(raw) : {}; }
+    catch(e) { _churnSent = {}; }
+  }
+  function saveChurnSentLS() {
+    try { localStorage.setItem(CHURN_SENT_KEY, JSON.stringify(_churnSent)); } catch(e){}
+  }
+  function markChurnSent(name, channel, textPreview) {
+    const prev = _churnSent[name] || { count: 0 };
+    _churnSent[name] = {
+      ts: Date.now(),
+      channel,
+      textPreview: (textPreview || '').slice(0, 60),
+      count: (prev.count || 0) + 1
+    };
+    saveChurnSentLS();
+  }
+
+  function setChurnView(v) {
+    _churnView = v;
+    _churnSelected.clear();
+    // 탭 스타일 갱신
+    const p = document.getElementById('churnTabPending');
+    const s = document.getElementById('churnTabSent');
+    if (p && s) {
+      p.style.color = v==='pending' ? '#4299E1' : '#A0AEC0';
+      p.style.borderBottomColor = v==='pending' ? '#4299E1' : 'transparent';
+      s.style.color = v==='sent' ? '#38A169' : '#A0AEC0';
+      s.style.borderBottomColor = v==='sent' ? '#38A169' : 'transparent';
+    }
+    renderChurn();
+  }
+
+  function undoChurnSent(name) {
+    if (!confirm(`"${name}" 발송완료 기록을 취소하고 미발송으로 되돌리시겠습니까?`)) return;
+    delete _churnSent[name];
+    saveChurnSentLS();
+    renderChurn();
+    showToast(`↩ "${name}" 미발송으로 되돌렸습니다`);
+  }
+
   function setChurnFilter(f) {
     _churnFilter = f;
     _churnSelected.clear();
@@ -6434,22 +6490,67 @@ VIP 회원 전용 특별 혜택을 안내드립니다.
       <div class="stat-card" style="--c:#38A169;cursor:pointer;${_churnFilter==='reactivated'?'box-shadow:0 0 0 3px #C6F6D5':''}" onclick="setChurnFilter('reactivated')"><div class="sc-top"><span class="sc-label">재유입 성공</span><span class="sc-icon">✅</span></div><div class="sc-val">${cntReact}</div><div class="sc-change up">최근 7일</div></div>
     `;
 
-    let list;
+    let baseList;
     if (_churnFilter === 'reactivated') {
-      list = all.filter(m => m.lastVisitDays <= 7 && (m.categories.includes('risk') || m.categories.includes('dormant')));
+      baseList = all.filter(m => m.lastVisitDays <= 7 && (m.categories.includes('risk') || m.categories.includes('dormant')));
     } else {
       const min = _churnFilter === '30' ? 30 : _churnFilter === '60' ? 60 : _churnFilter === '90' ? 90 : 30;
       const max = _churnFilter === '30' ? 59 : _churnFilter === '60' ? 89 : _churnFilter === '90' ? 9999 : 9999;
-      list = all.filter(m => m.lastVisitDays >= min && m.lastVisitDays <= max);
+      baseList = all.filter(m => m.lastVisitDays >= min && m.lastVisitDays <= max);
     }
-    list.sort((a,b) => b.lastVisitDays - a.lastVisitDays);
+    baseList.sort((a,b) => b.lastVisitDays - a.lastVisitDays);
+
+    // 미발송 / 발송완료 분리
+    const pendingList = baseList.filter(m => !_churnSent[m.name]);
+    const sentList = baseList.filter(m => !!_churnSent[m.name]);
+    const list = _churnView === 'sent' ? sentList : pendingList;
+
+    // 상단 탭 카운트 갱신
+    if (document.getElementById('churnPendingCnt')) document.getElementById('churnPendingCnt').textContent = pendingList.length;
+    if (document.getElementById('churnSentCnt'))    document.getElementById('churnSentCnt').textContent    = sentList.length;
 
     document.getElementById('churnListCount').textContent = list.length + '명';
     const titleMap = { 'all':'30일 이상 미방문 회원', '30':'30~59일 미방문 회원', '60':'60~89일 미방문 회원', '90':'90일+ 미방문 회원', 'reactivated':'재유입 성공 회원 (7일 내 복귀)' };
-    document.getElementById('churnListTitle').textContent = titleMap[_churnFilter] || '회원 목록';
+    document.getElementById('churnListTitle').textContent = (titleMap[_churnFilter] || '회원 목록') + (_churnView==='sent' ? ' · ✅ 발송완료' : ' · 📋 미발송');
+
+    // 발송완료 뷰는 컬럼이 다름 (일시/채널/재발송)
+    const head = document.getElementById('churnTableHead');
+    if (_churnView === 'sent') {
+      head.innerHTML = `<tr><th>회원명</th><th>마지막 방문</th><th>발송 일시</th><th>채널</th><th>발송 횟수</th><th>메시지 미리보기</th><th>액션</th></tr>`;
+    } else {
+      head.innerHTML = `<tr><th><input type="checkbox" id="churnSelectAll" onchange="toggleChurnSelectAll(this)"></th><th>회원명</th><th>마지막 방문</th><th>위험 점수</th><th>위험도</th><th>주요 서비스</th><th>이용권</th><th>액션</th></tr>`;
+    }
 
     const body = document.getElementById('churnTableBody');
-    if (!list.length) { body.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:30px;color:#A0AEC0;font-size:13px">조건에 맞는 회원이 없습니다.</td></tr>'; return; }
+    if (!list.length) {
+      const emptyMsg = _churnView === 'sent' ? '발송완료된 회원이 없습니다.' : '조건에 맞는 회원이 없습니다.';
+      body.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:30px;color:#A0AEC0;font-size:13px">${emptyMsg}</td></tr>`;
+      return;
+    }
+
+    if (_churnView === 'sent') {
+      body.innerHTML = list.map(m => {
+        const sent = _churnSent[m.name];
+        const black = isBlacklistedMember(m.name);
+        const chLabel = sent.channel === 'sms' ? 'SMS' : sent.channel === 'kakao' ? '💛 카카오' : sent.channel === 'push' ? '🔔 앱푸시' : sent.channel;
+        const chColor = sent.channel === 'kakao' ? 'orange' : sent.channel === 'push' ? 'green' : 'blue';
+        const dt = new Date(sent.ts);
+        const dtStr = `${dt.getMonth()+1}/${dt.getDate()} ${String(dt.getHours()).padStart(2,'0')}:${String(dt.getMinutes()).padStart(2,'0')}`;
+        return `<tr class="clickable" onclick="openDrawer('d-member')" style="${black?'background:#FFF5F5':''}">
+          <td>${black?'<span style="color:#E53E3E;margin-right:3px">🚫</span>':''}<strong>${escapeHtml(m.name)}</strong><div style="font-size:11px;color:#A0AEC0">${m.age}·${m.gender}</div></td>
+          <td>${m.lastVisit}</td>
+          <td style="font-size:12px;color:#276749;font-weight:700">${dtStr}</td>
+          <td><span class="bdg bdg-${chColor}">${chLabel}</span></td>
+          <td><span style="font-size:12px;font-weight:800;color:#4299E1">${sent.count}회</span></td>
+          <td style="font-size:11px;color:#718096;max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${escapeHtml(sent.textPreview)}">${escapeHtml(sent.textPreview)}</td>
+          <td onclick="event.stopPropagation()" style="white-space:nowrap">
+            <button class="topbar-btn btn-primary" style="padding:5px 10px;font-size:11px;margin-right:4px" onclick="openSingleChurnMessage('${escapeHtml(m.name)}')">🔁 재발송</button>
+            <button class="topbar-btn btn-ghost" style="padding:5px 10px;font-size:11px;color:#C53030" onclick="undoChurnSent('${escapeHtml(m.name)}')">↩ 취소</button>
+          </td>
+        </tr>`;
+      }).join('');
+      return;
+    }
 
     body.innerHTML = list.map(m => {
       const score = calcRiskScore(m);
@@ -6628,13 +6729,17 @@ VIP 회원 전용 특별 혜택을 안내드립니다.
       if (!m) return;
       ensureConsentDetail(m);
       const ch = _churnMsgChannel;
-      if (m.consentDetail[ch] !== '동의') excluded++;
+      const consentOk = (m.consentDetail[ch] === '동의');
+      if (!consentOk) { excluded++; return; }
+      // 발송 성공 → 발송완료 기록
+      markChurnSent(t.name, _churnMsgChannel, txt);
     });
     const sent = targets.length - excluded;
     const channelLabel = _churnMsgChannel === 'sms' ? 'SMS' : _churnMsgChannel === 'kakao' ? '카카오 알림톡' : '앱 푸시';
     closeModal('m-churn-message');
     _churnSelected.clear();
-    renderChurn();
+    // 발송이 하나라도 성공했으면 발송완료 탭으로 자동 이동
+    if (sent > 0) setChurnView('sent'); else renderChurn();
     showToast(`📤 ${channelLabel} 발송 완료 — ${sent}명${excluded ? ` (수신거부 ${excluded}명 자동 제외)` : ''}`);
   }
 
